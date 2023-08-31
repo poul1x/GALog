@@ -1,0 +1,4 @@
+PyYAML
+coloredlogs
+pyqt5-tools
+pure-python-adb

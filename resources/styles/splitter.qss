@@ -1,0 +1,14 @@
+
+QSplitter::handle:hover {
+	height: 1px;
+	width: 1px;
+	background: red;
+	color:red;
+}
+
+QSplitter::handle:pressed {
+	height: 1px;
+	width: 1px;
+	background: blue;
+	color: blue;
+}

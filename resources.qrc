@@ -1,0 +1,7 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource>
+    <file alias="search.svg">resources/search.svg</file>
+    <file alias="splitter.qss">resources/styles/splitter.qss</file>
+  </qresource>
+</RCC>

@@ -1,0 +1,49 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test (pytest)
+.pytest_cache/
+
+# Pdoc3 documentation
+docs
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Environments
+.env
+.venv
+venv/
+
+# Logs
+*.log
+
+# Keys
+*.gpg
+*.key
+
+# PyQt5 related
+/sqs_gui/app/resources.py
+/resources_rc.py
+
+# Development files
+/.env*
+/docker-compose.yml
+/elasticmq.conf
+/*.tar.gz
+links.txt
+plan.txt
+loggat.drawio
+
+# Release files
+/release

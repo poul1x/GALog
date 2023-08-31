@@ -1,0 +1,12 @@
+{
+  "python.formatting.provider": "black",
+  "files.exclude": {
+    "venv/": true,
+    "loggat/app/resources.py": true
+  },
+  "python.testing.pytestArgs": [
+    "loggat"
+  ],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
+}
