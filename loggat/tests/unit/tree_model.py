@@ -6,8 +6,8 @@ from PyQt5.QtWidgets import QWidget
 
 # See https://doc.qt.io/qt-5/qtwidgets-itemviews-simpletreemodel-example.html
 
-class TreeItem:
 
+class TreeItem:
     _dataItems: List[str]
     _dataItemsEditable: List[bool]
     _children: List[TreeItem]
@@ -24,14 +24,12 @@ class TreeItem:
         self._children = []
 
     def isEditable(self, column: int):
-
         if column < 0 or column > len(self._dataItemsEditable):
             return False
 
         return self._dataItemsEditable[column]
 
     def setEditable(self, column: int, isEditable: bool):
-
         if column < 0 or column > len(self._dataItemsEditable):
             return False
 
@@ -39,14 +37,12 @@ class TreeItem:
         return True
 
     def data(self, column: int):
-
         if column < 0 or column > len(self._dataItems):
             return None
 
         return self._dataItems[column]
 
     def setData(self, column: int, data: str) -> bool:
-
         if column < 0 or column > len(self._dataItems):
             return False
 
@@ -54,7 +50,6 @@ class TreeItem:
         return True
 
     def child(self, row: int):
-
         if row < 0 or row > len(self._children):
             return None
 
@@ -80,7 +75,6 @@ class TreeItem:
         return self._children.index(item)
 
     def row(self):
-
         if self._parent is None:
             return 0
 
@@ -94,7 +88,6 @@ class TreeItem:
 
 
 class CustomTreeModel(QAbstractItemModel):
-
     _rootItem: TreeItem
     _numColumns: int
 
@@ -108,7 +101,6 @@ class CustomTreeModel(QAbstractItemModel):
         self._numColumns = headers.columnCount()
 
     def setItems(self, treeItems: List[TreeItem]):
-
         self.layoutAboutToBeChanged.emit()
 
         self._rootItem.removeChildren()
@@ -124,14 +116,12 @@ class CustomTreeModel(QAbstractItemModel):
         self.layoutChanged.emit()
 
     def itemFromIndex(self, index: QModelIndex) -> TreeItem:
-
         if not index.isValid():
             return self._rootItem
 
         return index.internalPointer()
 
     def index(self, row: int, column: int, parent: QModelIndex) -> QModelIndex:
-
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
 
@@ -144,7 +134,6 @@ class CustomTreeModel(QAbstractItemModel):
         return self.createIndex(row, column, childItem)
 
     def parent(self, index: QModelIndex) -> QModelIndex:
-
         childItem = self.itemFromIndex(index)
         parentItem = childItem.parentItem()
 
@@ -154,7 +143,6 @@ class CustomTreeModel(QAbstractItemModel):
         return self.createIndex(parentItem.row(), 0, parentItem)
 
     def rowCount(self, parent: QModelIndex) -> int:
-
         if parent.column() > 0:
             return 0
 
@@ -165,7 +153,6 @@ class CustomTreeModel(QAbstractItemModel):
         return self._numColumns
 
     def data(self, index: QModelIndex, role: int) -> Any:
-
         if not index.isValid():
             return None
 
@@ -176,7 +163,6 @@ class CustomTreeModel(QAbstractItemModel):
         return item.data(index.column())
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
-
         if not index.isValid():
             return Qt.NoItemFlags
 
@@ -189,7 +175,6 @@ class CustomTreeModel(QAbstractItemModel):
         return defaultFlags
 
     def setData(self, index: QModelIndex, value: Any, role: int) -> bool:
-
         if not index.isValid():
             return False
 
@@ -203,7 +188,6 @@ class CustomTreeModel(QAbstractItemModel):
         return item.setData(index.column(), value)
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int) -> Any:
-
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return self._rootItem.data(section)
 

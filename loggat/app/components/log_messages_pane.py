@@ -29,7 +29,6 @@ class CustomSortProxyModel(QSortFilterProxyModel):
         super().__init__(parent)
 
     def filterAcceptsRow(self, sourceRow: int, sourceParent: QModelIndex) -> bool:
-
         filterRegExp = self.filterRegExp()
         if filterRegExp.isEmpty():
             return True
@@ -38,8 +37,6 @@ class CustomSortProxyModel(QSortFilterProxyModel):
         indexBody = sourceModel.index(sourceRow, Columns.messageBody, sourceParent)
         return filterRegExp.indexIn(sourceModel.data(indexBody)) != -1
 
-from ppadb.client import Client as AdbClient
-import threading
 
 class LogMessagesPane(QWidget):
 
@@ -49,44 +46,7 @@ class LogMessagesPane(QWidget):
         super().__init__(parent)
         self.initUserInterface()
 
-    def logcat(self):
-
-        def read_lines_from_socket(sock):
-            received_data = b""
-            while True:
-                chunk = sock.recv(1024)  # Receive data in chunks of 1024 bytes
-                if not chunk:
-                    break  # No more data to receive
-                received_data += chunk
-                while b'\n' in received_data:
-                    line, received_data = received_data.split(b'\n', 1)
-                    yield line.decode('utf-8')
-
-        def dump_logcat(connect):
-
-            i = 0
-            for line in read_lines_from_socket(connect.socket):
-
-                if line.index()
-                    continue
-
-                fmt, message = line.split(":", 1)
-                level, tag = fmt.split("/")
-
-                self.appendRow(level.strip(), tag.strip(), message)
-                i+=1
-                if i > 100:
-                    break
-
-        client = AdbClient(host="127.0.0.1", port=5037)
-        device = client.devices()[0]
-
-        threading.Thread(target=lambda:device.shell("logcat -v tag", handler=dump_logcat)).start()
-
-
-
     def initUserInterface(self):
-
         labels = ["Log level", "Tag", "Message"]
         dataModel = QStandardItemModel(0, len(Columns))
         dataModel.setHorizontalHeaderLabels(labels)
@@ -120,13 +80,11 @@ class LogMessagesPane(QWidget):
         self._tableView = tableView
         self._dataModel = dataModel
         self.setLayout(layout)
-        self.logcat()
 
     def clear(self):
         self._dataModel.clear()
 
     def appendRow(self, logLevel, tagName, logMessage):
-
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
 
         itemLogLevel = QStandardItem(logLevel)
