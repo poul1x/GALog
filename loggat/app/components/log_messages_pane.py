@@ -1,3 +1,4 @@
+from traceback import print_tb
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -73,6 +74,18 @@ class LogMessagesPane(QWidget):
         self._dataModel = dataModel
         self.setLayout(layout)
 
+        self._scroll = True
+        self._dataModel.rowsAboutToBeInserted.connect(self.beforeInsert)
+        self._dataModel.rowsInserted.connect(self.afterInsert)
+
+    def beforeInsert(self):
+        vbar = self._tableView.verticalScrollBar()
+        self._scroll = vbar.value() == vbar.maximum()
+
+    def afterInsert(self):
+        if self._scroll:
+            self._tableView.scrollToBottom()
+
     def clear(self):
         self._dataModel.clear()
 
@@ -90,13 +103,9 @@ class LogMessagesPane(QWidget):
 
         row = [itemLogLevel, itemTagName, itemLogMessage]
         self._dataModel.appendRow(row)
-        self._tableView.scrollToBottom()
 
     def navigateToItem(self, row, col):
         self.activateWindow()
         self.raise_()
         if 0 <= row < self._dataModel.rowCount() and 0 <= col < self._dataModel.columnCount():
-            # self._tableView.selectionModel().select(index, QItemSelectionModel.Select)
-            # self._tableView.selectionModel().select(index, QTableView.Rows)
             self._tableView.selectRow(row)
-            # self._tableView.scrollTo(index)

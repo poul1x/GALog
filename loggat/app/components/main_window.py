@@ -70,8 +70,8 @@ class MainWindow(QMainWindow):
 
     def readSomeAndroidLogs(self):
         self.startReadingAndroidLog()
-        sleep(0.5)
-        self.stopReadingAndroidLog()
+        # sleep(0.5)
+        # self.stopReadingAndroidLog()
 
     def startReadingAndroidLog(self):
         self._logReader = AndroidLogReader("127.0.0.1", 5037, "15151JEC210855")
