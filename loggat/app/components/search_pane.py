@@ -1,19 +1,7 @@
-from distutils.log import log
 from .log_messages_pane import LogMessagesPane
-from PyQt5.QtCore import Qt, QSortFilterProxyModel, pyqtSignal, QModelIndex, QDateTime
-from PyQt5.QtGui import QIcon, QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import (
-    QApplication,
-    QAbstractItemView,
-    QHeaderView,
-    QTableView,
-    QPushButton,
-    QVBoxLayout,
-    QListWidget,
-    QLineEdit,
-    QWidget,
-    QScrollBar,
-)
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 
 from dataclasses import dataclass
@@ -82,14 +70,31 @@ class SearchPane(QWidget):
         vHeader = tableView.verticalHeader()
         vHeader.setVisible(True)
 
-        searchField = QLineEdit()
-        searchField.setPlaceholderText("Search log message")
-        searchField.addAction(QIcon(":search.svg"), QLineEdit.LeadingPosition)
-        searchField.textChanged.connect(proxyModel.setFilterFixedString)
+        self._searchLabel = QLabel()
+        self._searchLabel.setText("Enter text to search")
+        self._searchLabel.setAlignment(Qt.AlignCenter)
+
+        self._searchField = QLineEdit()
+        self._searchField.setPlaceholderText("Search log message")
+        self._searchField.addAction(QIcon(":search.svg"), QLineEdit.LeadingPosition)
+        # searchField.textChanged.connect(proxyModel.setFilterFixedString)
+
+        searchButton = QPushButton()
+        searchButton.setText("Search")
+        searchButton.clicked.connect(self.runSearch)
+        # searchButton.setFocus()
+        # searchButton.setAutoDefault(True)
+        self._searchField.returnPressed.connect(self.runSearch)
+
+        searchLayout = QHBoxLayout()
+        searchLayout.addWidget(self._searchField)
+        searchLayout.addWidget(searchButton)
 
         layout = QVBoxLayout()
+        layout.addWidget(self._searchLabel)
         layout.addWidget(tableView)
-        layout.addWidget(searchField)
+        # layout.addWidget(searchField)
+        layout.addLayout(searchLayout)
 
         tableView.doubleClicked.connect(self.onDoubleClicked)
         self.itemDoubleClicked.connect(self._logMessagesPane.navigateToItem)
@@ -98,6 +103,15 @@ class SearchPane(QWidget):
         self._dataModel = self._logMessagesPane._dataModel
         self._proxyModel = proxyModel
         self.setLayout(layout)
+
+    def runSearch(self):
+
+        if self._searchField.text():
+            self._searchLabel.setText("Results for '%s'" % self._searchField.text())
+        else:
+            self._searchLabel.setText("Enter text to search")
+
+        self._proxyModel.setFilterFixedString(self._searchField.text())
 
     def onDoubleClicked(self, proxyIndex: QModelIndex):
         index = self._proxyModel.mapToSource(proxyIndex)
