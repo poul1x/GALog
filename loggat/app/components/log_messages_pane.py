@@ -98,3 +98,12 @@ class LogMessagesPane(QWidget):
 
         row = [itemLogLevel, itemTagName, itemLogMessage]
         self._dataModel.appendRow(row)
+        self._tableView.scrollToBottom()
+
+    def beforeInsert(self):
+        vbar = self._tableView.verticalScrollBar()
+        self._scroll = vbar.value() == vbar.maximum()
+
+    def afterInsert(self):
+        if self._scroll:
+            self._tableView.scrollToBottom()

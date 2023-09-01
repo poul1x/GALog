@@ -1,9 +1,15 @@
+from contextlib import suppress
 from dataclasses import dataclass
 from typing import Callable, List, Optional
 from ppadb.client import Client
 from ppadb.device import Device
 from ppadb.connection import Connection
 from threading import Thread, Event
+from .util.event import Event
+import socket
+
+
+from PyQt5.QtCore import *
 
 
 @dataclass
@@ -13,10 +19,9 @@ class LogcatLine:
     msg: str
 
 
+IDLE_INTERVAL_MS = 100
 RECV_CHUNK_SIZE = 4096
 LOGCAT_CMD = "logcat -v tag"
-IDLE_SECONDS = 0.1
-LogcatLineCallback = Callable[[LogcatLine], None]
 
 
 class LogcatLineReader:
@@ -28,54 +33,52 @@ class LogcatLineReader:
     def addDataChunk(self, chunk: bytes):
         self._buf += chunk
 
+    def _parseLine(self, line: bytes):
+        decodedLine = line.decode("utf-8", errors="replace")
+        fmt, msg = decodedLine.split(":", 1)
+        level, tag = fmt.split("/")
+        return LogcatLine(level, tag, msg)
+
     def readParsedLines(self):
         lines = self._buf.split(b"\n")
         self.buf = lines.pop()
 
         result = []
         for line in lines:
-            decodedLine = line.decode("utf-8", errors="replace")
-            print(decodedLine)
-            fmt, msg = decodedLine.split(":", 1)
-            level, tag = fmt.split("/")
-
-            parsedLine = LogcatLine(level, tag, msg)
-            result.append(parsedLine)
+            try:
+                result.append(self._parseLine(line))
+            except Exception:
+                # print(f"Failed to parse line: {line}")
+                pass
 
         return result
 
 
-class LogcatReaderThread(Thread):
-    _stopEvent: Event
-    _callback: LogcatLineCallback
-    _device: Device
+class LogcatReaderThread(QThread):
+    lineRead = pyqtSignal(LogcatLine)
 
     def __init__(self, device: Device) -> None:
         super().__init__()
         self._device = device
         self._stopEvent = Event()
-        self._callback = LogcatReaderThread.defaultCallback
-
-    def defaultCallback(line: LogcatLine):
-        fmt = "level='%s', tag='%s', msg='%s'"
-        args = line.level, line.tag, line.msg
-        print(fmt % args)
-
-    def setOnLineCallback(self, callback: LogcatLineCallback):
-        self._callback = callback
 
     def run(self):
         reader = LogcatLineReader()
-        conn: Connection = self._device.create_connection(timeout=None)
+        conn: Connection = self._device.create_connection()
         conn.send("shell:{}".format(LOGCAT_CMD))
-        conn.read(30) # skip b'--------- beginning of system\n'
+        conn.socket.setblocking(False)
 
         while True:
-            reader.addDataChunk(conn.read(RECV_CHUNK_SIZE))
-            for line in reader.readParsedLines():
-                self._callback(line)
+            with suppress(BlockingIOError):
+                data = conn.read(RECV_CHUNK_SIZE)
+                if not data:
+                    raise RuntimeError("Connection closed by server")
 
-            self._stopEvent.wait(IDLE_SECONDS)
+                reader.addDataChunk(data)
+                for line in reader.readParsedLines():
+                    self.lineRead.emit(line)
+
+            self._stopEvent.wait(IDLE_INTERVAL_MS)
             if self._stopEvent.isSet():
                 break
 
@@ -83,24 +86,25 @@ class LogcatReaderThread(Thread):
         self._stopEvent.set()
 
 
-_logcatReaderThread: Optional[LogcatReaderThread] = None
+class AndroidLogReader:
+    def __init__(self, host: str, port: str, serial: str):
+        try:
+            device = Client(host, port).device(serial)
+            if device is None:
+                raise Exception("No such device")
+        except Exception:
+            raise
 
+        self._readerThread = LogcatReaderThread(device)
+        self.lineRead = self._readerThread.lineRead
 
-def startLogcatReaderThread(deviceName: str, onLine: LogcatLineCallback):
-    global _logcatReaderThread
-    assert _logcatReaderThread is None
-    client = Client(host="127.0.0.1", port=5037)
-    device: Device = client.device(deviceName)
-    _logcatReaderThread = LogcatReaderThread(device)
-    _logcatReaderThread.setOnLineCallback(onLine)
-    _logcatReaderThread.start()
+    def start(self):
+        self._readerThread.start()
 
+    def stop(self):
+        self._readerThread.stop()
+        self._readerThread.wait()
 
-def stopLogcatReaderThread():
-    global _logcatReaderThread
-    if _logcatReaderThread is None:
-        return
-
-    _logcatReaderThread.stop()
-    _logcatReaderThread.join()
-    _logcatReaderThread = None
+    def __del__(self):
+        if not self._readerThread.isFinished():
+            print("ERROR: thread still runnning")

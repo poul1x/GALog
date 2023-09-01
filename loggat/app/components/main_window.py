@@ -1,11 +1,16 @@
 from datetime import datetime
+from queue import Queue
 from threading import Thread
-from typing import Dict, List
+from time import sleep
+from typing import Dict, List, Optional
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
-from loggat.app.logcat import LogcatLine, startLogcatReaderThread, stopLogcatReaderThread
+from loggat.app.logcat import (
+    AndroidLogReader,
+    LogcatLine,
+)
 
 
 from .log_messages_pane import LogMessagesPane
@@ -32,34 +37,49 @@ class CentralWidget(QWidget):
         self.setLayout(hBoxLayout)
 
 
+queue = Queue()
+
+
 class MainWindow(QMainWindow):
+    _logReader: Optional[AndroidLogReader]
+
     def __init__(self) -> None:
         super().__init__()
         self.initUserInterface()
         self.startReadingAndroidLog()
 
-    def startReadingAndroidLog(self):
-        def onLine(parsedLine: LogcatLine):
-            centralWidget: CentralWidget = self.centralWidget()
-            centralWidget.pane.appendRow(
-                parsedLine.level,
-                parsedLine.tag,
-                parsedLine.msg,
-            )
+    def lineRead(self, parsedLine: LogcatLine):
+        centralWidget: CentralWidget = self.centralWidget()
+        centralWidget.pane.appendRow(
+            parsedLine.level,
+            parsedLine.tag,
+            parsedLine.msg,
+        )
 
-        startLogcatReaderThread("ac41d64c", onLine)
+    def startReadingAndroidLog(self):
+        self._logReader = AndroidLogReader("127.0.0.1", 5037, "15151JEC210855")
+        self._logReader.lineRead.connect(self.lineRead)
+        self._logReader.start()
+
+    def stopReadingAndroidLog(self):
+        self._logReader.stop()
+        self._logReader = None
 
     def quitSafe(self):
-        stopLogcatReaderThread()
+        self.stopReadingAndroidLog()
         qApp.quit()
 
     def closeEvent(self, event):
-
-        reply = QMessageBox.question(self, 'Window Close', 'Are you sure you want to close the window?',
-                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        reply = QMessageBox.question(
+            self,
+            "Window Close",
+            "Are you sure you want to close the window?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
 
         if reply == QMessageBox.Yes:
-            stopLogcatReaderThread()
+            self.stopReadingAndroidLog()
             event.accept()
         else:
             event.ignore()
