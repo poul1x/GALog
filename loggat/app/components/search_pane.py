@@ -32,6 +32,11 @@ class CustomSortProxyModel(QSortFilterProxyModel):
 class SearchPane(QWidget):
 
     itemDoubleClicked = pyqtSignal(int, int)
+    windowClosed = pyqtSignal()
+
+    def closeEvent(self, event: QEvent):
+        self.windowClosed.emit()
+        event.accept()
 
     def __init__(self, logMessagesPane: LogMessagesPane, parent: QWidget):
         super().__init__(parent)
@@ -105,7 +110,6 @@ class SearchPane(QWidget):
         self.setLayout(layout)
 
     def runSearch(self):
-
         if self._searchField.text():
             self._searchLabel.setText("Results for '%s'" % self._searchField.text())
         else:

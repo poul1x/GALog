@@ -15,20 +15,6 @@ class Columns(int, Enum):
     logMessage = 2
 
 
-class CustomSortProxyModel(QSortFilterProxyModel):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-    def filterAcceptsRow(self, sourceRow: int, sourceParent: QModelIndex) -> bool:
-        filterRegExp = self.filterRegExp()
-        if filterRegExp.isEmpty():
-            return True
-
-        sourceModel = self.sourceModel()
-        indexBody = sourceModel.index(sourceRow, Columns.logMessage, sourceParent)
-        return filterRegExp.indexIn(sourceModel.data(indexBody)) != -1
-
-
 class LogMessagesPane(QWidget):
 
     """Displays log messages"""
@@ -43,12 +29,8 @@ class LogMessagesPane(QWidget):
         dataModel = QStandardItemModel(0, len(Columns))
         dataModel.setHorizontalHeaderLabels(labels)
 
-        proxyModel = CustomSortProxyModel()
-        proxyModel.setSourceModel(dataModel)
-        proxyModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
-
         tableView = QTableView(self)
-        tableView.setModel(proxyModel)
+        tableView.setModel(dataModel)
         tableView.setSelectionBehavior(QAbstractItemView.SelectRows)
         tableView.setSelectionMode(QTableView.SingleSelection)
         tableView.setColumnWidth(Columns.logLevel, 20)
@@ -61,14 +43,8 @@ class LogMessagesPane(QWidget):
         vHeader = tableView.verticalHeader()
         vHeader.setVisible(False)
 
-        # searchField = QLineEdit()
-        # searchField.setPlaceholderText("Search in message body")
-        # searchField.addAction(QIcon(":search.svg"), QLineEdit.LeadingPosition)
-        # searchField.textChanged.connect(proxyModel.setFilterFixedString)
-
         layout = QVBoxLayout()
         layout.addWidget(tableView)
-        # layout.addWidget(searchField)
 
         self._tableView = tableView
         self._dataModel = dataModel

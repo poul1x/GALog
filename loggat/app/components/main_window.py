@@ -60,8 +60,12 @@ class MainWindow(QMainWindow):
     def centralWidget(self) -> CentralWidget:
         return super().centralWidget()
 
+    def searchPaneClosed(self):
+        self._searchPane=None
+
     def showSearchPane(self):
         if self._searchPane:
+            self._searchPane.windowClosed.connect(self.searchPaneClosed)
             self._searchPane.activateWindow()
             self._searchPane.raise_()
         else:
@@ -86,7 +90,7 @@ class MainWindow(QMainWindow):
         self.stopReadingAndroidLog()
         qApp.quit()
 
-    def closeEvent(self, event):
+    def closeEvent(self, event: QEvent):
         reply = QMessageBox.question(
             self,
             "Window Close",
