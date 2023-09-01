@@ -30,7 +30,6 @@ class CustomSortProxyModel(QSortFilterProxyModel):
 
 
 class SearchPane(QWidget):
-
     itemDoubleClicked = pyqtSignal(int, int)
     windowClosed = pyqtSignal()
 
@@ -44,7 +43,6 @@ class SearchPane(QWidget):
         self.initUserInterface()
 
     def initUserInterface(self):
-
         # dataModel = QStandardItemModel(0, len(Columns))
         # dataModel.setHorizontalHeaderLabels(["1", "2", "3"])
 
@@ -54,7 +52,6 @@ class SearchPane(QWidget):
         x = (screen.width() - width) // 2
         y = (screen.height() - height) // 2
         self.setGeometry(x, y, width, height)
-
 
         proxyModel = CustomSortProxyModel()
         proxyModel.setSourceModel(self._logMessagesPane._dataModel)
@@ -67,7 +64,6 @@ class SearchPane(QWidget):
         tableView.setColumnWidth(Columns.logLevel, 20)
         tableView.setColumnWidth(Columns.tagName, 200)
 
-
         hHeader = tableView.horizontalHeader()
         hHeader.setSectionResizeMode(Columns.logMessage, QHeaderView.Stretch)
         hHeader.setDefaultAlignment(Qt.AlignLeft)
@@ -79,16 +75,14 @@ class SearchPane(QWidget):
         self._searchLabel.setText("Enter text to search")
         self._searchLabel.setAlignment(Qt.AlignCenter)
 
-        self._searchField = QLineEdit()
+        self._searchField = QLineEdit(self)
         self._searchField.setPlaceholderText("Search log message")
         self._searchField.addAction(QIcon(":search.svg"), QLineEdit.LeadingPosition)
-        # searchField.textChanged.connect(proxyModel.setFilterFixedString)
+        self._searchField.setFocus()
 
         searchButton = QPushButton()
         searchButton.setText("Search")
         searchButton.clicked.connect(self.runSearch)
-        # searchButton.setFocus()
-        # searchButton.setAutoDefault(True)
         self._searchField.returnPressed.connect(self.runSearch)
 
         searchLayout = QHBoxLayout()
@@ -110,12 +104,21 @@ class SearchPane(QWidget):
         self.setLayout(layout)
 
     def runSearch(self):
-        if self._searchField.text():
-            self._searchLabel.setText("Results for '%s'" % self._searchField.text())
-        else:
-            self._searchLabel.setText("Enter text to search")
-
         self._proxyModel.setFilterFixedString(self._searchField.text())
+
+        if not self._searchField.text():
+            self._searchLabel.setText("Results for '%s'" % self._searchField.text())
+            return
+
+        rowCount = self._proxyModel.rowCount()
+        if rowCount > 0:
+            self._searchLabel.setText(
+                "Found %d results for '%s'" % (rowCount, self._searchField.text())
+            )
+        else:
+            self._searchLabel.setText(
+                "Nothing found for '%s'" % self._searchField.text()
+            )
 
     def onDoubleClicked(self, proxyIndex: QModelIndex):
         index = self._proxyModel.mapToSource(proxyIndex)
