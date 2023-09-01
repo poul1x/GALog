@@ -11,7 +11,6 @@ import socket
 
 from PyQt5.QtCore import *
 
-
 @dataclass
 class LogcatLine:
     level: str
@@ -53,8 +52,8 @@ class LogcatLineReader:
 
         return result
 
-
 class LogcatReaderThread(QThread):
+
     lineRead = pyqtSignal(LogcatLine)
 
     def __init__(self, device: Device) -> None:
@@ -82,11 +81,12 @@ class LogcatReaderThread(QThread):
             if self._stopEvent.isSet():
                 break
 
+
     def stop(self):
         self._stopEvent.set()
 
-
 class AndroidLogReader:
+
     def __init__(self, host: str, port: str, serial: str):
         try:
             device = Client(host, port).device(serial)
@@ -104,7 +104,3 @@ class AndroidLogReader:
     def stop(self):
         self._readerThread.stop()
         self._readerThread.wait()
-
-    def __del__(self):
-        if not self._readerThread.isFinished():
-            print("ERROR: thread still runnning")

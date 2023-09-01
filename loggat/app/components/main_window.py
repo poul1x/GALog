@@ -14,6 +14,7 @@ from loggat.app.logcat import (
 
 
 from .log_messages_pane import LogMessagesPane
+from .search_pane import SearchPane
 
 
 class CentralWidget(QWidget):
@@ -37,16 +38,16 @@ class CentralWidget(QWidget):
         self.setLayout(hBoxLayout)
 
 
-queue = Queue()
-
 
 class MainWindow(QMainWindow):
     _logReader: Optional[AndroidLogReader]
+    _searchPane: Optional[SearchPane]
 
     def __init__(self) -> None:
         super().__init__()
         self.initUserInterface()
-        self.startReadingAndroidLog()
+        self.readSomeAndroidLogs()
+        self._searchPane = None
 
     def lineRead(self, parsedLine: LogcatLine):
         centralWidget: CentralWidget = self.centralWidget()
@@ -56,6 +57,22 @@ class MainWindow(QMainWindow):
             parsedLine.msg,
         )
 
+    def centralWidget(self) -> CentralWidget:
+        return super().centralWidget()
+
+    def showSearchPane(self):
+        if self._searchPane:
+            self._searchPane.activateWindow()
+            self._searchPane.raise_()
+        else:
+            self._searchPane = SearchPane(self.centralWidget().pane, None)
+            self._searchPane.show()
+
+    def readSomeAndroidLogs(self):
+        self.startReadingAndroidLog()
+        sleep(0.5)
+        self.stopReadingAndroidLog()
+
     def startReadingAndroidLog(self):
         self._logReader = AndroidLogReader("127.0.0.1", 5037, "15151JEC210855")
         self._logReader.lineRead.connect(self.lineRead)
@@ -63,7 +80,7 @@ class MainWindow(QMainWindow):
 
     def stopReadingAndroidLog(self):
         self._logReader.stop()
-        self._logReader = None
+        # self._logReader = None
 
     def quitSafe(self):
         self.stopReadingAndroidLog()
@@ -94,25 +111,29 @@ class MainWindow(QMainWindow):
         fileMenu = menubar.addMenu("&File")
         fileMenu.addAction(exitAction)
 
-    def setupQueueActions(self):
-        # reloadAction = QAction("&Exit", self)
-        # reloadAction.setShortcut("Ctrl+Q")
-        # reloadAction.setStatusTip("Reload queue")
-        # reloadAction.triggered.connect()
-
-        queuePurgeAction = QAction("&Purge", self)
-        # queuePurgeAction.setShortcut("Ctrl+Q")
-        # queuePurgeAction.setStatusTip("Purge queue")
+    def setupSearchAction(self):
+        action = QAction("&Search", self)
+        action.setShortcut("Ctrl+F")
+        action.setStatusTip("Search")
+        action.triggered.connect(self.showSearchPane)
 
         menubar = self.menuBar()
-        fileMenu = menubar.addMenu("&Queue")
-        fileMenu.addAction(queuePurgeAction)
+        menu = menubar.addMenu("&Messages")
+        menu.addAction(action)
 
     def setupMenuBar(self):
         self.setupExitAction()
+        self.setupSearchAction()
 
     def initUserInterface(self):
-        self.resize(1900, 1200)
+
+        screen = QApplication.desktop().screenGeometry()
+        width = int(screen.width() * 0.8)
+        height = int(screen.height() * 0.8)
+        x = (screen.width() - width) // 2
+        y = (screen.height() - height) // 2
+        self.setGeometry(x, y, width, height)
+
         self.setCentralWidget(CentralWidget())
         # self.statusBar().showMessage('Ready')
         self.setWindowTitle("Loggat")

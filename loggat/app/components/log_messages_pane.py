@@ -1,16 +1,6 @@
-from PyQt5.QtCore import Qt, QSortFilterProxyModel, pyqtSignal, QModelIndex, QDateTime
-from PyQt5.QtGui import QIcon, QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import (
-    QAbstractItemView,
-    QHeaderView,
-    QTableView,
-    QPushButton,
-    QVBoxLayout,
-    QListWidget,
-    QLineEdit,
-    QWidget,
-    QScrollBar,
-)
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 
 from dataclasses import dataclass
@@ -19,9 +9,9 @@ from enum import Enum
 
 
 class Columns(int, Enum):
-    sendTimestamp = 0
-    sendDate = 1
-    messageBody = 2
+    logLevel = 0
+    tagName = 1
+    logMessage = 2
 
 
 class CustomSortProxyModel(QSortFilterProxyModel):
@@ -34,7 +24,7 @@ class CustomSortProxyModel(QSortFilterProxyModel):
             return True
 
         sourceModel = self.sourceModel()
-        indexBody = sourceModel.index(sourceRow, Columns.messageBody, sourceParent)
+        indexBody = sourceModel.index(sourceRow, Columns.logMessage, sourceParent)
         return filterRegExp.indexIn(sourceModel.data(indexBody)) != -1
 
 
@@ -47,6 +37,7 @@ class LogMessagesPane(QWidget):
         self.initUserInterface()
 
     def initUserInterface(self):
+
         labels = ["Log level", "Tag", "Message"]
         dataModel = QStandardItemModel(0, len(Columns))
         dataModel.setHorizontalHeaderLabels(labels)
@@ -55,15 +46,16 @@ class LogMessagesPane(QWidget):
         proxyModel.setSourceModel(dataModel)
         proxyModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
 
-        tableView = QTableView()
+        tableView = QTableView(self)
         tableView.setModel(proxyModel)
         tableView.setSelectionBehavior(QAbstractItemView.SelectRows)
+        tableView.setSelectionMode(QTableView.SingleSelection)
+        tableView.setColumnWidth(Columns.logLevel, 20)
+        tableView.setColumnWidth(Columns.tagName, 200)
 
         hHeader = tableView.horizontalHeader()
-        # hHeader.setSectionResizeMode(QHeaderView.Interactive)
-        hHeader.setSectionResizeMode(Columns.messageBody, QHeaderView.Stretch)
-        hHeader.resizeSections(QHeaderView.ResizeToContents)
-        # hHeader.setDefaultAlignment(Qt.AlignLeft)
+        hHeader.setSectionResizeMode(Columns.logMessage, QHeaderView.Stretch)
+        hHeader.setDefaultAlignment(Qt.AlignLeft)
 
         vHeader = tableView.verticalHeader()
         vHeader.setVisible(False)
@@ -100,10 +92,11 @@ class LogMessagesPane(QWidget):
         self._dataModel.appendRow(row)
         self._tableView.scrollToBottom()
 
-    def beforeInsert(self):
-        vbar = self._tableView.verticalScrollBar()
-        self._scroll = vbar.value() == vbar.maximum()
-
-    def afterInsert(self):
-        if self._scroll:
-            self._tableView.scrollToBottom()
+    def navigateToItem(self, row, col):
+        self.activateWindow()
+        self.raise_()
+        if 0 <= row < self._dataModel.rowCount() and 0 <= col < self._dataModel.columnCount():
+            # self._tableView.selectionModel().select(index, QItemSelectionModel.Select)
+            # self._tableView.selectionModel().select(index, QTableView.Rows)
+            self._tableView.selectRow(row)
+            # self._tableView.scrollTo(index)
