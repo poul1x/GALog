@@ -74,8 +74,8 @@ class MainWindow(QMainWindow):
 
     def readSomeAndroidLogs(self):
         self.startReadingAndroidLog()
-        # sleep(0.5)
-        # self.stopReadingAndroidLog()
+        sleep(0.5)
+        self.stopReadingAndroidLog()
 
     def startReadingAndroidLog(self):
         self._logReader = AndroidLogReader("127.0.0.1", 5037, "15151JEC210855")
@@ -85,10 +85,6 @@ class MainWindow(QMainWindow):
     def stopReadingAndroidLog(self):
         self._logReader.stop()
         # self._logReader = None
-
-    def quitSafe(self):
-        self.stopReadingAndroidLog()
-        qApp.quit()
 
     def closeEvent(self, event: QEvent):
         reply = QMessageBox.question(
@@ -101,6 +97,7 @@ class MainWindow(QMainWindow):
 
         if reply == QMessageBox.Yes:
             self.stopReadingAndroidLog()
+            self._searchPane.close()
             event.accept()
         else:
             event.ignore()
@@ -109,7 +106,7 @@ class MainWindow(QMainWindow):
         exitAction = QAction("&Exit", self)
         exitAction.setShortcut("Ctrl+Q")
         exitAction.setStatusTip("Exit application")
-        exitAction.triggered.connect(self.quitSafe)
+        exitAction.triggered.connect(lambda: self.close())
 
         menubar = self.menuBar()
         fileMenu = menubar.addMenu("&File")
