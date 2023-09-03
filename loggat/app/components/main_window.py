@@ -6,6 +6,7 @@ from typing import Dict, List, Optional
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+from loggat.app.components.message_view_pane import LogMessageViewPane
 
 from loggat.app.logcat import (
     AndroidLogReader,
@@ -42,11 +43,14 @@ class CentralWidget(QWidget):
 class MainWindow(QMainWindow):
     _logReader: Optional[AndroidLogReader]
     _searchPane: Optional[SearchPane]
+    _viewWindows: List[LogMessageViewPane]
 
     def __init__(self) -> None:
         super().__init__()
         self.initUserInterface()
-        self.readSomeAndroidLogs()
+        # self.readSomeAndroidLogs()
+        self.centralWidget().pane.appendRow("E", "TAG", "122345" + " " + "A" * 56 + " " + "12345")
+        self.centralWidget().pane.appendRow("E", "TAG", "122345" + " " + "A" * 256 + " " + "12345")
         self._searchPane = None
 
     def lineRead(self, parsedLine: LogcatLine):
@@ -71,6 +75,13 @@ class MainWindow(QMainWindow):
         else:
             self._searchPane = SearchPane(self.centralWidget().pane, None)
             self._searchPane.show()
+
+    def openLogMessageViewPane(self):
+        window = LogMessageViewPane(self)
+        window.setTag("Portswertive")
+        window.setLogLevel("I")
+        window.setLogMessage("qwerty efdfdfdasasa sasasasa")
+        window.exec_()
 
     def readSomeAndroidLogs(self):
         self.startReadingAndroidLog()
@@ -97,7 +108,8 @@ class MainWindow(QMainWindow):
 
         if reply == QMessageBox.Yes:
             self.stopReadingAndroidLog()
-            self._searchPane.close()
+            if self._searchPane:
+                self._searchPane.close()
             event.accept()
         else:
             event.ignore()
@@ -122,9 +134,20 @@ class MainWindow(QMainWindow):
         menu = menubar.addMenu("&Messages")
         menu.addAction(action)
 
+    def setupViewAction(self):
+        action = QAction("&View", self)
+        action.setShortcut("Ctrl+W")
+        action.setStatusTip("View")
+        action.triggered.connect(self.openLogMessageViewPane)
+
+        menubar = self.menuBar()
+        menu = menubar.addMenu("&Qwerty")
+        menu.addAction(action)
+
     def setupMenuBar(self):
         self.setupExitAction()
         self.setupSearchAction()
+        self.setupViewAction()
 
     def initUserInterface(self):
 
