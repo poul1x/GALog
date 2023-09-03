@@ -84,7 +84,10 @@ class HighlightingDelegate(QStyledItemDelegate):
         if index.column() == Columns.logLevel:
             self.highlightLogLevel(index.data())
         else:
-            pass
+            charFormat = QTextCharFormat()
+            charFormat.setForeground(Qt.red)
+            charFormat.setFontItalic(True)
+            self.highlightKeyword(SearchResult(1, 0, 6), charFormat)
 
     def getStyle(self, viewItem: QStyleOptionViewItem):
         if viewItem.widget:
@@ -128,7 +131,10 @@ class HighlightingDelegate(QStyledItemDelegate):
         self.doc.documentLayout().draw(painter, ctx)
 
     def paint(
-        self, painter: QPainter, viewItem: QStyleOptionViewItem, index: QModelIndex
+        self,
+        painter: QPainter,
+        viewItem: QStyleOptionViewItem,
+        index: QModelIndex,
     ):
         with painterSaveRestore(painter) as p:
             self._paint(p, viewItem, index)
@@ -136,16 +142,14 @@ class HighlightingDelegate(QStyledItemDelegate):
     def highlightLogLevel(self, logLevel: str):
         logLevel = logLevel.upper()
         charFormat = QTextCharFormat()
+        charFormat.setFontWeight(QFont.Bold)
 
         if logLevel == "I":
             charFormat.setForeground(QColor("#DCDCDC"))
-            charFormat.setBackground(QColor("#2E2D2D"))
         elif logLevel == "E":
             charFormat.setForeground(QColor("#FF5454"))
-            charFormat.setBackground(QColor("#EBEBEB"))
         else:
             charFormat.setForeground(QColor("#6352B9"))
-            charFormat.setBackground(QColor("#EBEBEB"))
 
         self.highlightAllText(charFormat)
 
@@ -156,7 +160,7 @@ class HighlightingDelegate(QStyledItemDelegate):
         if tag == "dalvikvm":
             charFormat.setForeground(QColor("#DCDCDC"))
             charFormat.setBackground(QColor("#2E2D2D"))
-        elif tag == "Process":
+        elif tag == "process":
             charFormat.setForeground(QColor("#FF5454"))
             charFormat.setBackground(QColor("#EBEBEB"))
         else:
@@ -164,7 +168,7 @@ class HighlightingDelegate(QStyledItemDelegate):
             charFormat.setBackground(QColor("#EBEBEB"))
 
         # 'Process' 'ActivityManager' 'ActivityThread' 'AndroidRuntime' 'jdwp' 'StrictMode' 'DEBUG'
-        return charFormat
+        self.highlightAllText(charFormat)
 
     def highlightAllText(self, charFormat: QTextCharFormat):
         cursor = QTextCursor(self.doc)
