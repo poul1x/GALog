@@ -11,5 +11,5 @@ class PainterStateContextManager:
     def __exit__(self, *unused):
         self.painter.restore()
 
-def takePainter(painter: QPainter):
+def painterSaveRestore(painter: QPainter):
     return PainterStateContextManager(painter)

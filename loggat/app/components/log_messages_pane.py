@@ -8,7 +8,7 @@ from typing import List
 from enum import Enum
 from loggat.app.syntax_highlight import SearchItemTask, SearchResult
 
-from loggat.app.util.painter import takePainter
+from loggat.app.util.painter import painterSaveRestore
 
 
 class Columns(int, Enum):
@@ -17,85 +17,22 @@ class Columns(int, Enum):
     logMessage = 2
 
 
-class HighlightingDelegate(QStyledItemDelegate):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.doc = QTextDocument(self)
-        # Create a QFont with the desired font size
-        font = QFont()
-        font.setPointSize(10)  # Set the font size to 12 points
-        self.doc.setDefaultFont(font)
+class Highlighter:
+    def __init__(self, index: QModelIndex, doc: QTextDocument) -> None:
+        self.doc = doc
 
+    def highlightColumnText(self, index: QModelIndex):
+        pass
 
-        self._filters = []
+    def highlightLogLevel(self, logLevel: str):
+        self.doc.setPlainText(logLevel)
+        char_format = QTextCharFormat()
+        char_format.setForeground(Qt.red)  # Set the font color to red
+        cursor = QTextCursor(self.doc)
+        cursor.select(QTextCursor.Document)
+        cursor.mergeCharFormat(char_format)
 
-    def paint(self, painter, option, index):
-        painter.save()
-        options = QStyleOptionViewItem(option)
-        self.initStyleOption(options, index)
-
-
-        fm = QFontMetrics(self.doc.defaultFont())
-        elidedText = fm.elidedText(options.text, Qt.ElideRight, option.rect.width())
-        self.doc.setPlainText(elidedText)
-
-        self.default_highlight()
-        self.apply_highlight()
-        options.text = ""
-        # style = QApplication.style() if options.widget is None \
-        #     else options.widget.style()
-
-        style = QApplication.style()
-        # style = options.widget.style()
-        style.drawControl(QStyle.CE_ItemViewItem, options, painter)
-
-        # Create a custom QTextOption
-        text_option = QTextOption()
-        text_option.setAlignment(Qt.AlignCenter)
-
-        # Set text options on the painter
-        # painter.setTextOption(text_option)
-
-        # Customize other rendering properties if needed
-        painter.setPen(Qt.blue)  # Set text color to blue
-        painter.fillRect(option.rect, Qt.yellow)
-
-        ctx = QAbstractTextDocumentLayout.PaintContext()
-
-        # ctx.palette.setColor(QPalette.Text, option.palette.color(
-        #     QPalette.Active, QPalette.HighlightedText))
-
-        # ctx.palette.setColor(QPalette.Text, option.palette.color(
-        #     QPalette.Active, QPalette.Text))
-
-        # if options.state & QStyle.State_Selected:
-        #     ctx.palette.setColor(QPalette.Text, Qt.blue)
-        #     ctx.palette.setColor(QPalette.Highlight, Qt.green) # + background on select
-        #     option.palette.setColor(QPalette.Highlight, Qt.green) # + background on select
-        #     options.palette.setColor(QPalette.Highlight, Qt.magenta) # + background on select
-        #     options.palette.setColor(QPalette.Background, Qt.magenta) # + background on select
-        # else:
-        #     ctx.palette.setColor(QPalette.Text, Qt.red)
-
-        textRect = style.subElementRect(QStyle.SE_ItemViewItemText, options)
-
-        if index.column() != 0:
-            textRect.adjust(4, 0, 0, 4)
-
-        the_constant = 4
-        margin = (option.rect.height() - options.fontMetrics.height()) // 2
-        margin = margin - the_constant
-        textRect.setTop(textRect.top() + margin)
-
-        painter.translate(textRect.topLeft())
-        painter.setClipRect(textRect.translated(-textRect.topLeft()))
-        self.doc.documentLayout().draw(painter, ctx)
-
-        painter.restore()
-
-        # super().paint(painter, option, index)
-
-    def default_highlight(self):
+    def logMessageTextDefaultFormatting(self):
         # Set the color for the entire text
         char_format = QTextCharFormat()
         char_format.setForeground(Qt.red)  # Set the font color to red
@@ -119,6 +56,130 @@ class HighlightingDelegate(QStyledItemDelegate):
                 if not highlightCursor.isNull():
                     highlightCursor.mergeCharFormat(fmt)
         cursor.endEditBlock()
+
+
+class HighlightingDelegate(QStyledItemDelegate):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._initTextDocument()
+        self._items = []
+
+    def setItemsToHighlight(self, items: list):
+        self._items = items
+
+    def _initTextDocument(self):
+        font = QFont()
+        font.setPointSize(10)
+        self.doc = QTextDocument(self)
+        self.doc.setDefaultFont(font)
+
+    def loadTextForHighlighting(self, viewItem: QStyleOptionViewItem):
+        fm = QFontMetrics(self.doc.defaultFont())
+        elidedText = fm.elidedText(viewItem.text, Qt.ElideRight, viewItem.rect.width())
+        self.doc.setPlainText(elidedText)
+
+    def applyHighlighting(self, index: QModelIndex, viewItem: QStyleOptionViewItem):
+        if index.column() == Columns.tagName:
+            self.highlightTag(index.data())
+        if index.column() == Columns.logLevel:
+            self.highlightLogLevel(index.data())
+        else:
+            pass
+
+    def getStyle(self, viewItem: QStyleOptionViewItem):
+        if viewItem.widget:
+            return viewItem.widget.style()
+        else:
+            return QApplication.style()
+
+    def _paint(
+        self,
+        painter: QPainter,
+        viewItem: QStyleOptionViewItem,
+        index: QModelIndex,
+    ):
+        self.initStyleOption(viewItem, index)
+        self.loadTextForHighlighting(viewItem)
+        self.applyHighlighting(index, viewItem)
+        viewItem.text = ""
+
+        style = self.getStyle(viewItem)
+        style.drawControl(QStyle.CE_ItemViewItem, viewItem, painter)
+
+        if index.column() == 1:
+            if viewItem.state & QStyle.State_Selected:
+                painter.fillRect(viewItem.rect, QColor("#DCDBFF"))
+            else:
+                painter.fillRect(viewItem.rect, QColor("#F2F2FF"))
+
+        textRect = style.subElementRect(QStyle.SE_ItemViewItemText, viewItem)
+        if index.column() != 0:
+            textRect.adjust(5, 0, 0, 0)
+
+        the_constant = 4
+        margin = (viewItem.rect.height() - viewItem.fontMetrics.height()) // 2
+        margin = margin - the_constant
+        textRect.setTop(textRect.top() + margin)
+
+        painter.translate(textRect.topLeft())
+        painter.setClipRect(textRect.translated(-textRect.topLeft()))
+
+        ctx = QAbstractTextDocumentLayout.PaintContext()
+        self.doc.documentLayout().draw(painter, ctx)
+
+    def paint(
+        self, painter: QPainter, viewItem: QStyleOptionViewItem, index: QModelIndex
+    ):
+        with painterSaveRestore(painter) as p:
+            self._paint(p, viewItem, index)
+
+    def highlightLogLevel(self, logLevel: str):
+        logLevel = logLevel.upper()
+        charFormat = QTextCharFormat()
+
+        if logLevel == "I":
+            charFormat.setForeground(QColor("#DCDCDC"))
+            charFormat.setBackground(QColor("#2E2D2D"))
+        elif logLevel == "E":
+            charFormat.setForeground(QColor("#FF5454"))
+            charFormat.setBackground(QColor("#EBEBEB"))
+        else:
+            charFormat.setForeground(QColor("#6352B9"))
+            charFormat.setBackground(QColor("#EBEBEB"))
+
+        self.highlightAllText(charFormat)
+
+    def highlightTag(self, tag: str):
+        tag = tag.lower()
+        charFormat = QTextCharFormat()
+
+        if tag == "dalvikvm":
+            charFormat.setForeground(QColor("#DCDCDC"))
+            charFormat.setBackground(QColor("#2E2D2D"))
+        elif tag == "Process":
+            charFormat.setForeground(QColor("#FF5454"))
+            charFormat.setBackground(QColor("#EBEBEB"))
+        else:
+            charFormat.setForeground(QColor("#6352B9"))
+            charFormat.setBackground(QColor("#EBEBEB"))
+
+        # 'Process' 'ActivityManager' 'ActivityThread' 'AndroidRuntime' 'jdwp' 'StrictMode' 'DEBUG'
+        return charFormat
+
+    def highlightAllText(self, charFormat: QTextCharFormat):
+        cursor = QTextCursor(self.doc)
+        cursor.select(QTextCursor.Document)
+        cursor.mergeCharFormat(charFormat)
+
+    def cursorSelect(self, begin: int, end: int):
+        cursor = QTextCursor(self.doc)
+        cursor.setPosition(begin, QTextCursor.MoveAnchor)
+        cursor.setPosition(end, QTextCursor.KeepAnchor)
+        return cursor
+
+    def highlightKeyword(self, keyword: SearchResult, charFormat: QTextCharFormat):
+        cursor = self.cursorSelect(keyword.posBegin, keyword.posEnd)
+        cursor.mergeCharFormat(charFormat)
 
 
 class LogMessagesPane(QWidget):
@@ -167,6 +228,8 @@ class LogMessagesPane(QWidget):
 
         vHeader = tableView.verticalHeader()
         vHeader.setVisible(False)
+        vHeader.setSectionResizeMode(QHeaderView.Fixed)
+        vHeader.setDefaultSectionSize(vHeader.minimumSectionSize())
 
         layout = QVBoxLayout()
         layout.addWidget(tableView)

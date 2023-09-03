@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from enum import IntEnum, auto
 
-from loggat.app.util.painter import takePainter
 
 
 class SearchItemType(IntEnum):
