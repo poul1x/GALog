@@ -6,12 +6,15 @@ from typing import Dict, List, Optional
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+import yaml
+from loggat.app.color_parser import HighlightingRules
 from loggat.app.components.message_view_pane import LogMessageViewPane
 
 from loggat.app.logcat import (
     AndroidLogReader,
     LogcatLine,
 )
+from loggat.app.mtsearch import SearchItem, SearchItemTask, SearchResult
 
 
 from .log_messages_pane import LogMessagesPane
@@ -45,21 +48,54 @@ class MainWindow(QMainWindow):
     _searchPane: Optional[SearchPane]
     _viewWindows: List[LogMessageViewPane]
 
+    lineHighlightingReady = pyqtSignal(int, list)
+
     def __init__(self) -> None:
         super().__init__()
         self.initUserInterface()
-        # self.readSomeAndroidLogs()
-        self.centralWidget().pane.appendRow("E", "TAG", "122345" + " " + "A" * 56 + " " + "12345")
-        self.centralWidget().pane.appendRow("E", "TAG", "122345" + " " + "A" * 256 + " " + "12345")
+        self.initThreadPool()
+        self.initHighlighting()
         self._searchPane = None
 
+        self.readSomeAndroidLogs()
+        # self.lineRead(LogcatLine("E", "TAG", "Visit https://aaa.ru"))
+        # self.lineRead(LogcatLine("E", "TAG", "Buffer overflow 0xffffff"))
+
+
+    def initThreadPool(self):
+        self.threadPool = QThreadPool()
+        self.threadPool.setMaxThreadCount(3)
+
+    def initHighlighting(self):
+        self.highlightingRules = HighlightingRules()
+        with open("highlighting_rules.yaml") as f:
+            rules = yaml.load_all(f, yaml.SafeLoader)
+            self.highlightingRules.load(rules)
+
+        pane = self.centralWidget().pane
+        self.lineHighlightingReady.connect(pane.onLineHighlightingReady)
+        pane.setHighlightingRules(self.highlightingRules)
+
+    def searchDone(self, row: int, results: List[SearchResult]):
+        self.lineHighlightingReady.emit(row, results)
+
     def lineRead(self, parsedLine: LogcatLine):
+
         centralWidget: CentralWidget = self.centralWidget()
         centralWidget.pane.appendRow(
             parsedLine.level,
             parsedLine.tag,
             parsedLine.msg,
         )
+
+        items = []
+        for name, pattern in self.highlightingRules.iter():
+            items.append(SearchItem(name, pattern))
+
+        task = SearchItemTask(parsedLine.msg, items)
+        nextRow = self.centralWidget().pane._dataModel.rowCount() -1
+        task.signals.finished.connect(lambda results: self.searchDone(nextRow, results))
+        self.threadPool.start(task)
 
     def centralWidget(self) -> CentralWidget:
         return super().centralWidget()

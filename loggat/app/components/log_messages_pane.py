@@ -1,3 +1,4 @@
+from copy import copy
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -6,7 +7,8 @@ from PyQt5.QtWidgets import *
 from dataclasses import dataclass
 from typing import List
 from enum import Enum
-from loggat.app.syntax_highlight import SearchItemTask, SearchResult
+from loggat.app.color_parser import HighlightingRules
+from loggat.app.mtsearch import SearchItemTask, SearchResult
 
 from loggat.app.util.painter import painterSaveRestore
 
@@ -59,10 +61,25 @@ class Highlighter:
 
 
 class HighlightingDelegate(QStyledItemDelegate):
+    _items: List[SearchResult]
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self._initTextDocument()
+        self.rules = None
         self._items = []
+
+    def onLineHighlightingReady(self, row: int, items: List[SearchResult]):
+        self._items[row] = items
+
+    def onNewLineAdded(self):
+        self._items.append(list())
+
+    def clearHighlightingData(self):
+        self._items.clear()
+
+    def setHighlightingRules(self, rules: HighlightingRules):
+        self.rules = rules
 
     def setItemsToHighlight(self, items: list):
         self._items = items
@@ -78,16 +95,32 @@ class HighlightingDelegate(QStyledItemDelegate):
         elidedText = fm.elidedText(viewItem.text, Qt.ElideRight, viewItem.rect.width())
         self.doc.setPlainText(elidedText)
 
-    def applyHighlighting(self, index: QModelIndex, viewItem: QStyleOptionViewItem):
+    def applyHighlighting(self, index: QModelIndex):
         if index.column() == Columns.tagName:
             self.highlightTag(index.data())
+            return
         if index.column() == Columns.logLevel:
             self.highlightLogLevel(index.data())
+            return
         else:
-            charFormat = QTextCharFormat()
-            charFormat.setForeground(Qt.red)
-            charFormat.setFontItalic(True)
-            self.highlightKeyword(SearchResult(1, 0, 6), charFormat)
+            plainText = self.doc.toPlainText()
+            n = 2
+            if plainText.endswith("..."):
+                n = 3
+
+            n = self.doc.characterCount() - n
+            row = index.row()
+            items = self._items[row]
+            item: SearchResult
+            for item in items:
+                style = self.rules.getStyle(item.name)
+                itemCopy = copy(item)
+
+                if itemCopy.begin < n:
+                    if itemCopy.end > n:
+                        itemCopy.end = n
+                    self.highlightKeyword(itemCopy, style)
+            return
 
     def getStyle(self, viewItem: QStyleOptionViewItem):
         if viewItem.widget:
@@ -103,17 +136,16 @@ class HighlightingDelegate(QStyledItemDelegate):
     ):
         self.initStyleOption(viewItem, index)
         self.loadTextForHighlighting(viewItem)
-        self.applyHighlighting(index, viewItem)
+        self.applyHighlighting(index)
         viewItem.text = ""
 
         style = self.getStyle(viewItem)
         style.drawControl(QStyle.CE_ItemViewItem, viewItem, painter)
 
-        if index.column() == 1:
-            if viewItem.state & QStyle.State_Selected:
-                painter.fillRect(viewItem.rect, QColor("#DCDBFF"))
-            else:
-                painter.fillRect(viewItem.rect, QColor("#F2F2FF"))
+        if viewItem.state & QStyle.State_Selected:
+            painter.fillRect(viewItem.rect, QColor("#DCDBFF"))
+        else:
+            painter.fillRect(viewItem.rect, QColor("#F2F2FF"))
 
         textRect = style.subElementRect(QStyle.SE_ItemViewItemText, viewItem)
         if index.column() != 0:
@@ -163,9 +195,9 @@ class HighlightingDelegate(QStyledItemDelegate):
         elif tag == "process":
             charFormat.setForeground(QColor("#FF5454"))
             charFormat.setBackground(QColor("#EBEBEB"))
-        else:
-            charFormat.setForeground(QColor("#6352B9"))
-            charFormat.setBackground(QColor("#EBEBEB"))
+        # else:
+        #     charFormat.setForeground(QColor("#6352B9"))
+        #     charFormat.setBackground(QColor("#EBEBEB"))
 
         # 'Process' 'ActivityManager' 'ActivityThread' 'AndroidRuntime' 'jdwp' 'StrictMode' 'DEBUG'
         self.highlightAllText(charFormat)
@@ -182,13 +214,16 @@ class HighlightingDelegate(QStyledItemDelegate):
         return cursor
 
     def highlightKeyword(self, keyword: SearchResult, charFormat: QTextCharFormat):
-        cursor = self.cursorSelect(keyword.posBegin, keyword.posEnd)
+        cursor = self.cursorSelect(keyword.begin, keyword.end)
         cursor.mergeCharFormat(charFormat)
 
 
 class LogMessagesPane(QWidget):
 
     """Displays log messages"""
+
+    lineHighlightingReady = pyqtSignal(int, list)
+    newLineAdded = pyqtSignal()
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)
@@ -197,10 +232,12 @@ class LogMessagesPane(QWidget):
 
     def initHighlightning(self):
         self._delegate = HighlightingDelegate(self)
+        self.lineHighlightingReady.connect(self._delegate.onLineHighlightingReady)
+        self.newLineAdded.connect(self._delegate.onNewLineAdded)
         self._tableView.setItemDelegate(self._delegate)
-        # self._tableView.setItemDelegateForColumn(Columns.logMessage, self._delegate)
-        self._threadPool = QThreadPool()
-        self._threadPool.setMaxThreadCount(3)
+
+    def setHighlightingRules(self, rules: HighlightingRules):
+        self._delegate.setHighlightingRules(rules)
 
     def initUserInterface(self):
         labels = ["Log level", "Tag", "Message"]
@@ -213,18 +250,7 @@ class LogMessagesPane(QWidget):
         tableView.setSelectionMode(QTableView.SingleSelection)
         tableView.setColumnWidth(Columns.logLevel, 20)
         tableView.setColumnWidth(Columns.tagName, 200)
-
-        # Set the selection background color
-        selection_palette = QPalette()
-        # # selection_palette.setColor(QPalette.Text, Qt.yellow) # +
-        # selection_palette.setColor(QPalette.Base, Qt.magenta) # base = background table
-        # selection_palette.setColor(QPalette.HighlightedText, Qt.red) # + foreground on select
-        selection_palette.setColor(
-            QPalette.Highlight, Qt.blue
-        )  # + background on select
-        # selection_palette.setColor(QPalette.HighlightedText, Qt.blue)
-        tableView.setPalette(selection_palette)
-        # tableView.setStyleSheet("QTableView { background-color: green; }")
+        tableView.setShowGrid(False)
 
         hHeader = tableView.horizontalHeader()
         hHeader.setSectionResizeMode(Columns.logMessage, QHeaderView.Stretch)
@@ -269,22 +295,12 @@ class LogMessagesPane(QWidget):
         itemLogMessage = QStandardItem(logMessage)
         itemLogMessage.setFlags(flags)
 
-        document = QTextDocument()
-        itemLogMessage.setData(QVariant(document), Qt.UserRole)
-
-        # task = SearchItemTask(logMessage)
-        # nextRow = self._dataModel.rowCount()
-        # self._threadPool.start(task)
-        # task.signals.finished.connect(lambda results: self.highlightReady(nextRow, results))
-
         row = [itemLogLevel, itemTagName, itemLogMessage]
         self._dataModel.appendRow(row)
+        self.newLineAdded.emit()
 
-    def myslot(self):
-        pass
-
-    def highlightReady(self, row: int, results: List[SearchResult]):
-        self._delegate.updateResults(row, results)
+    def onLineHighlightingReady(self, row: int, items: List[SearchResult]):
+        self.lineHighlightingReady.emit(row, items)
         index = self._dataModel.createIndex(row, Columns.logMessage)
         self._tableView.update(index)
 
