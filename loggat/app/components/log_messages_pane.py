@@ -54,19 +54,13 @@ class HighlightingDelegate(QStyledItemDelegate):
         self.doc.setDefaultFont(font)
 
     def loadTextForHighlighting(self, viewItem: QStyleOptionViewItem):
-        # fm = QFontMetrics(self.doc.defaultFont())
-        # elidedText = fm.elidedText(viewItem.text, Qt.ElideRight, viewItem.rect.width())
-        self.doc.setPlainText(viewItem.text)
+        fm = QFontMetrics(self.doc.defaultFont())
+        elidedText = fm.elidedText(viewItem.text, Qt.ElideRight, viewItem.rect.width())
+        self.doc.setPlainText(elidedText)
         viewItem.text = ""
 
     def applyHighlighting(self, index: QModelIndex):
-        if index.column() == Columns.tagName:
-            # self.highlightTag(index.data())
-            pass
-        elif index.column() == Columns.logLevel:
-            # self.highlightLogLevel(index.data())
-            pass
-        else:
+        if index.column() == Columns.logMessage:
             self.highlightKeywords(index.row())
 
     def getStyle(self, viewItem: QStyleOptionViewItem):
@@ -97,6 +91,11 @@ class HighlightingDelegate(QStyledItemDelegate):
         self.doc.documentLayout().draw(painter, ctx)
 
     def paint(self, p: QPainter, viewItem: QStyleOptionViewItem, index: QModelIndex):
+
+        # model = index.model()
+        # if isinstance(model, QSortFilterProxyModel):
+        #     index = model.mapToSource(index)
+
         with painterSaveRestore(p) as painter:
             self.initStyleOption(viewItem, index)
             self.loadTextForHighlighting(viewItem)

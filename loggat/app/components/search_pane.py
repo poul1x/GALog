@@ -1,3 +1,6 @@
+from PyQt5.QtCore import QModelIndex
+from PyQt5.QtGui import QPainter
+from PyQt5.QtWidgets import QStyleOptionViewItem
 from .log_messages_pane import LogMessagesPane
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -8,10 +11,17 @@ from dataclasses import dataclass
 from typing import List
 from enum import Enum
 
+from .log_messages_pane import HighlightingDelegate
+
+class MyHighlightingDelegate(HighlightingDelegate):
+    def paint(self, p: QPainter, viewItem: QStyleOptionViewItem, index: QModelIndex):
+        realIndex = index.model().mapToSource(index)
+        return super().paint(p, viewItem, realIndex)
+
 
 class Columns(int, Enum):
-    logLevel = 0
-    tagName = 1
+    tagName = 0
+    logLevel = 1
     logMessage = 2
 
 
@@ -41,6 +51,7 @@ class SearchPane(QWidget):
         super().__init__(parent)
         self._logMessagesPane = logMessagesPane
         self.initUserInterface()
+        self._tableView.setItemDelegate(logMessagesPane._delegate)
 
     def initUserInterface(self):
         # dataModel = QStandardItemModel(0, len(Columns))
@@ -63,6 +74,7 @@ class SearchPane(QWidget):
         tableView.setSelectionMode(QTableView.SingleSelection)
         tableView.setColumnWidth(Columns.logLevel, 20)
         tableView.setColumnWidth(Columns.tagName, 200)
+        tableView.setShowGrid(False)
 
         hHeader = tableView.horizontalHeader()
         hHeader.setSectionResizeMode(Columns.logMessage, QHeaderView.Stretch)
@@ -70,6 +82,8 @@ class SearchPane(QWidget):
 
         vHeader = tableView.verticalHeader()
         vHeader.setVisible(True)
+        vHeader.setSectionResizeMode(QHeaderView.Fixed)
+        vHeader.setDefaultSectionSize(vHeader.minimumSectionSize())
 
         self._searchLabel = QLabel()
         self._searchLabel.setText("Enter text to search")
