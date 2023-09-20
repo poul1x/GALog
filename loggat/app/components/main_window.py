@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import yaml
-from loggat.app.color_parser import HighlightingRules
+from loggat.app.highlighting_rules import HighlightingRules
 from loggat.app.components.message_view_pane import LogMessageViewPane
 
 from loggat.app.logcat import (
@@ -68,7 +68,7 @@ class MainWindow(QMainWindow):
 
     def initHighlighting(self):
         self.highlightingRules = HighlightingRules()
-        with open("highlighting_rules.yaml") as f:
+        with open("config/highlighting_rules.yaml") as f:
             rules = yaml.load_all(f, yaml.SafeLoader)
             self.highlightingRules.load(rules)
 
@@ -121,7 +121,7 @@ class MainWindow(QMainWindow):
 
     def readSomeAndroidLogs(self):
         self.startReadingAndroidLog()
-        sleep(0.5)
+        sleep(2.0)
         self.stopReadingAndroidLog()
 
     def startReadingAndroidLog(self):

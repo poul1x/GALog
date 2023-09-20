@@ -97,12 +97,15 @@ class HighlightingRules:
                 raise RuleParseError(msg)
 
         charFormat = QTextCharFormat()
+        mediumbold = formatting.get("mediumbold", False)
         demibold = formatting.get("demibold", False)
         bold = formatting.get("bold", False)
         italic = formatting.get("italic", False)
         underline = formatting.get("underline", False)
         strikeout = formatting.get("strikeout", False)
 
+        if mediumbold:
+            charFormat.setFontWeight(QFont.Medium)
         if demibold:
             charFormat.setFontWeight(QFont.DemiBold)
         elif bold:
@@ -145,7 +148,7 @@ class HighlightingRules:
         style = self._loadStyle(rule)
 
         if name in self._rules:
-            msg = "Rule '{name}' already exists"
+            msg = f"Rule '{name}' already exists"
             raise RuleAlreadyExistsError(msg)
 
         self._rules[name] = HighlightingRule(pattern, style)

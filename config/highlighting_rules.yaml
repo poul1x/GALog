@@ -1,0 +1,141 @@
+# name: exampleName
+# pattern: \w+://\S+
+# style:
+#   color:
+#     foreground: "#FFFFFF"
+#     background: "#000000"
+#   formatting:
+#     demibold: false
+#     bold: false
+#     italic: false
+#     underline: true
+#     strikeout: false
+# ---
+########################################
+# General
+########################################
+name: genericUrl
+pattern: \w+://\S+
+style:
+  formatting:
+    underline: true
+---
+name: decimalNumber
+pattern: '\b-?\d+(?:\.\d+)?\b'
+style:
+  color:
+    background: "#10000000"
+  # formatting:
+  #   underline: true
+---
+name: HashSymbolWithDecimalNumber
+pattern: '#\d+'
+style:
+  color:
+    background: "#10000000"
+  # formatting:
+  #   underline: true
+---
+name: hexadecimalNumber
+pattern: '0x[0-9a-fA-F]+'
+style:
+  color:
+    background: "#10000000"
+---
+name: uppercaseWord
+pattern: '\b[A-Z]+\b'
+style:
+  color:
+    background: "#10000000"
+---
+name: boolean
+pattern: '\bTRUE|True|true|FALSE|False|false\b'
+style:
+  color:
+    background: "#10000000"
+
+########################################
+# AAAA
+########################################
+---
+name: DotSeparatedWords
+pattern: '\w+\.[\w\./]+'
+style:
+  formatting:
+    underline: true
+    mediumbold: true
+---
+name: FilePath
+pattern: '\w+/[^\s]+'
+style:
+  formatting:
+    underline: true
+    mediumbold: true
+####
+---
+name: singleQuotedString
+pattern: "'[^']*'"
+style:
+  color:
+    background: "#10000000"
+# style:
+#   formatting:
+#     demibold: true
+---
+name: doubleQuotedString
+pattern: '"[^"]*"'
+style:
+  color:
+    background: "#10000000"
+# style:
+#   formatting:
+#     demibold: true
+########################################
+# Exception
+########################################
+---
+name: FatalExceptionMain
+pattern: 'FATAL EXCEPTION: main'
+style:
+  color:
+    background: '#10000000'
+  formatting:
+    bold: true
+---
+name: FatalExceptionProcessName
+pattern: 'Process:\s+.+, PID: \d+'
+style:
+  color:
+    background: '#10000000'
+  formatting:
+    bold: true
+---
+name: ExceptionBegin
+pattern: '.*Exception:\s*.+'
+style:
+  color:
+    background: '#10000000'
+  formatting:
+    bold: true
+---
+name: ExceptionCausedBy
+pattern: 'Caused by:\s*.+'
+style:
+  color:
+    background: '#10000000'
+  formatting:
+    bold: true
+---
+name: ExceptionStacktraceLine
+pattern: 'at\s+.+\(.+\)$'
+style:
+  color:
+    background: '#10000000'
+---
+name: ExceptionMoreLines
+pattern: '... \d+ more$'
+style:
+  color:
+    background: '#10000000'
+
+
