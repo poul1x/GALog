@@ -43,7 +43,7 @@ style:
     background: "#10000000"
 ---
 name: uppercaseWord
-pattern: '\b[A-Z]+\b'
+pattern: '\b[A-Z_]+\b'
 style:
   color:
     background: "#10000000"
@@ -55,11 +55,26 @@ style:
     background: "#10000000"
 
 ########################################
-# AAAA
+# Network addresses
 ########################################
 ---
+name: IPv4Address
+pattern: '(?:[0-9]{1,3}\.){3}[0-9]{1,3}'
+style:
+  color:
+    background: "#10000000"
+---
+name: MacAddress
+pattern: '([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})'
+style:
+  color:
+    background: "#10000000"
+---
+########################################
+# Packages & file paths
+########################################
 name: DotSeparatedWords
-pattern: '\w+\.[\w\./]+'
+pattern: '[a-zA-Z_]{1}\w+\.[\w\./]+'
 style:
   formatting:
     underline: true
