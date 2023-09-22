@@ -18,7 +18,6 @@ from loggat.app.mtsearch import SearchItem, SearchItemTask, SearchResult
 
 
 from .log_messages_pane import LogMessagesPane
-from .search_pane import SearchPane
 
 
 class CentralWidget(QWidget):
@@ -45,7 +44,6 @@ class CentralWidget(QWidget):
 
 class MainWindow(QMainWindow):
     _logReader: Optional[AndroidLogReader]
-    _searchPane: Optional[SearchPane]
     _viewWindows: List[LogMessageViewPane]
 
     lineHighlightingReady = pyqtSignal(int, list)
@@ -104,13 +102,7 @@ class MainWindow(QMainWindow):
         self._searchPane=None
 
     def showSearchPane(self):
-        if self._searchPane:
-            self._searchPane.windowClosed.connect(self.searchPaneClosed)
-            self._searchPane.activateWindow()
-            self._searchPane.raise_()
-        else:
-            self._searchPane = SearchPane(self.centralWidget().pane, None)
-            self._searchPane.show()
+        self.centralWidget().pane.enableDisableFilter()
 
     def openLogMessageViewPane(self):
         window = LogMessageViewPane(self)

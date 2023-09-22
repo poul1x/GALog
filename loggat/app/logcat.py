@@ -71,7 +71,9 @@ class LogcatReaderThread(QThread):
             with suppress(BlockingIOError):
                 data = conn.read(RECV_CHUNK_SIZE)
                 if not data:
-                    raise RuntimeError("Connection closed by server")
+                    return
+                    break
+                    # raise RuntimeError("Connection closed by server")
 
                 reader.addDataChunk(data)
                 for line in reader.readParsedLines():
@@ -80,6 +82,7 @@ class LogcatReaderThread(QThread):
             self._stopEvent.wait(IDLE_INTERVAL_MS)
             if self._stopEvent.isSet():
                 break
+
 
 
     def stop(self):

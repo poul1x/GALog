@@ -19,6 +19,12 @@ class Columns(int, Enum):
     logLevel = 1
     logMessage = 2
 
+class CustomStyle(QProxyStyle):
+    def drawPrimitive(self, element, option, painter, widget):
+        if element == QStyle.PE_FrameFocusRect:
+            # Do not draw the focus frame (dots) around selected items
+            return
+        super().drawPrimitive(element, option, painter, widget)
 
 class HighlightingDelegate(QStyledItemDelegate):
     _items: List[List[SearchResult]]
@@ -45,7 +51,6 @@ class HighlightingDelegate(QStyledItemDelegate):
 
     def setItemsToHighlight(self, items: list):
         self._items = items
-
 
     def _initTextDocument(self):
         font = QFont()
@@ -92,9 +97,9 @@ class HighlightingDelegate(QStyledItemDelegate):
 
     def paint(self, p: QPainter, viewItem: QStyleOptionViewItem, index: QModelIndex):
 
-        # model = index.model()
-        # if isinstance(model, QSortFilterProxyModel):
-        #     index = model.mapToSource(index)
+        model = index.model()
+        if isinstance(model, QSortFilterProxyModel):
+            index = model.mapToSource(index)
 
         with painterSaveRestore(p) as painter:
             self.initStyleOption(viewItem, index)
@@ -103,7 +108,9 @@ class HighlightingDelegate(QStyledItemDelegate):
             self.fillCellBackground(painter, viewItem)
 
             model = index.model()
-            newIndex = model.index(index.row(), Columns.logLevel)  # Example: Get data from row 1, column 1
+            newIndex = model.index(
+                index.row(), Columns.logLevel
+            )  # Example: Get data from row 1, column 1
             data = model.data(newIndex, role=Qt.DisplayRole)
 
             if data == "E":
@@ -156,6 +163,28 @@ class HighlightingDelegate(QStyledItemDelegate):
         cursor.setCharFormat(charFormat)
 
 
+class CustomSortProxyModel(QSortFilterProxyModel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.filteringEnabled = False
+
+    def setFilteringEnabled(self, enabled: bool):
+        self.filteringEnabled = enabled
+        self.invalidateFilter()
+
+    def filterAcceptsRow(self, sourceRow: int, sourceParent: QModelIndex) -> bool:
+        if not self.filteringEnabled:
+            return True
+
+        filterRegExp = self.filterRegExp()
+        if filterRegExp.isEmpty():
+            return True
+
+        sourceModel = self.sourceModel()
+        indexBody = sourceModel.index(sourceRow, Columns.logMessage, sourceParent)
+        return filterRegExp.indexIn(sourceModel.data(indexBody)) != -1
+
+
 class LogMessagesPane(QWidget):
 
     """Displays log messages"""
@@ -182,13 +211,20 @@ class LogMessagesPane(QWidget):
         dataModel = QStandardItemModel(0, len(Columns))
         dataModel.setHorizontalHeaderLabels(labels)
 
+        proxyModel = CustomSortProxyModel()
+        proxyModel.setSourceModel(dataModel)
+        proxyModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
+
         tableView = QTableView(self)
-        tableView.setModel(dataModel)
+        tableView.setModel(proxyModel)
+
         tableView.setSelectionBehavior(QAbstractItemView.SelectRows)
         tableView.setSelectionMode(QTableView.SingleSelection)
         tableView.setColumnWidth(Columns.logLevel, 20)
         tableView.setColumnWidth(Columns.tagName, 200)
         tableView.setShowGrid(False)
+        tableView.doubleClicked.connect(self.onDoubleClicked)
+        tableView.setStyle(CustomStyle())
 
         hHeader = tableView.horizontalHeader()
         hHeader.setSectionResizeMode(Columns.logMessage, QHeaderView.Stretch)
@@ -199,16 +235,51 @@ class LogMessagesPane(QWidget):
         vHeader.setSectionResizeMode(QHeaderView.Fixed)
         vHeader.setDefaultSectionSize(vHeader.minimumSectionSize())
 
-        layout = QVBoxLayout()
-        layout.addWidget(tableView)
+        self._searchField = QLineEdit(self)
+        self._searchField.setPlaceholderText("Search log message")
+        self._searchField.addAction(QIcon(":search.svg"), QLineEdit.LeadingPosition)
+
+        self._searchButton = QPushButton()
+        self._searchButton.setText("Search")
+        self._searchButton.clicked.connect(self.applyFilter)
+        self._searchField.returnPressed.connect(self.applyFilter)
+
+        hLayout = QHBoxLayout()
+        hLayout.addWidget(self._searchField)
+        hLayout.addWidget(self._searchButton)
+        self._searchButton.hide()
+        self._searchField.hide()
+
+        vLayout = QVBoxLayout()
+        vLayout.addWidget(tableView)
+        vLayout.addLayout(hLayout)
 
         self._tableView = tableView
         self._dataModel = dataModel
-        self.setLayout(layout)
+        self._proxyModel = proxyModel
+        self.setLayout(vLayout)
 
         self._scroll = True
         self._dataModel.rowsAboutToBeInserted.connect(self.beforeInsert)
         self._dataModel.rowsInserted.connect(self.afterInsert)
+
+
+    def enableDisableFilter(self):
+
+        # self._tableView.scrollTo(index, QTableView.PositionAtCenter)
+
+        if self._proxyModel.filteringEnabled:
+            self._proxyModel.setFilteringEnabled(False)
+            self._searchButton.hide()
+            self._searchField.hide()
+        else:
+            self._proxyModel.setFilteringEnabled(True)
+            self._searchField.setFocus()
+            self._searchButton.show()
+            self._searchField.show()
+
+    def applyFilter(self):
+        self._proxyModel.setFilterFixedString(self._searchField.text())
 
     def beforeInsert(self):
         vbar = self._tableView.verticalScrollBar()
@@ -237,16 +308,17 @@ class LogMessagesPane(QWidget):
         self._dataModel.appendRow(row)
         self.newLineAdded.emit()
 
+
     def onLineHighlightingReady(self, row: int, items: List[SearchResult]):
         self.lineHighlightingReady.emit(row, items)
-        index = self._dataModel.createIndex(row, Columns.logMessage)
+        index = self._dataModel.index(row, Columns.logMessage)
         self._tableView.update(index)
 
-    def navigateToItem(self, row, col):
-        self.activateWindow()
-        self.raise_()
-        if (
-            0 <= row < self._dataModel.rowCount()
-            and 0 <= col < self._dataModel.columnCount()
-        ):
-            self._tableView.selectRow(row)
+    def onDoubleClicked(self, index: QModelIndex):
+        if self._proxyModel.filteringEnabled:
+            index2 = self._proxyModel.mapToSource(index)
+            self.enableDisableFilter()
+
+            self._tableView.scrollToBottom()
+            index = self._proxyModel.index(index2.row(), 0)
+            self._tableView.scrollTo(index, QTableView.PositionAtCenter)
