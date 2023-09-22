@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from typing import List
 from enum import Enum
 from loggat.app.highlighting_rules import HighlightingRules
-from loggat.app.mtsearch import SearchItemTask, SearchResult
+from loggat.app.mtsearch import SearchItem, SearchItemTask, SearchResult
 
 from loggat.app.util.painter import painterSaveRestore
 
@@ -18,6 +18,11 @@ class Columns(int, Enum):
     tagName = 0
     logLevel = 1
     logMessage = 2
+
+class LazyHighlightingState(int, Enum):
+    pending = 0
+    running = 1
+    done = 2
 
 class CustomStyle(QProxyStyle):
     def drawPrimitive(self, element, option, painter, widget):
@@ -28,23 +33,25 @@ class CustomStyle(QProxyStyle):
 
 class HighlightingDelegate(QStyledItemDelegate):
     _items: List[List[SearchResult]]
+    _tasks: List[bool]
+    _ready: bool
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._initTextDocument()
         self.rules = None
         self._items = []
+        self._tasks = []
         self._background_selected = QColor("#DCDBFF")
         self._background_normal = QColor("#F2F2FF")
 
-    def onLineHighlightingReady(self, row: int, items: List[SearchResult]):
-        self._items[row] = items
-
     def onNewLineAdded(self):
         self._items.append(list())
+        self._tasks.append(LazyHighlightingState.pending)
 
     def clearHighlightingData(self):
         self._items.clear()
+        self._tasks.clear()
 
     def setHighlightingRules(self, rules: HighlightingRules):
         self.rules = rules
@@ -64,9 +71,30 @@ class HighlightingDelegate(QStyledItemDelegate):
         self.doc.setPlainText(elidedText)
         viewItem.text = ""
 
+    def searchDone(self, index: QModelIndex, results: List[SearchResult]):
+        self._items[index.row()] = results
+        self._tasks[index.row()] = LazyHighlightingState.done
+        model = index.model()
+        model.dataChanged.emit(index, index)
+
+
     def applyHighlighting(self, index: QModelIndex):
+
         if index.column() == Columns.logMessage:
-            self.highlightKeywords(index.row())
+            if self._tasks[index.row()] == LazyHighlightingState.running:
+                return
+
+            if self._tasks[index.row()] == LazyHighlightingState.done:
+                self.highlightKeywords(index.row())
+            else: # self._tasks[index.row()] == LazyHighlightingState.pending:
+                items = []
+                for name, pattern in self.rules.iter():
+                    items.append(SearchItem(name, pattern))
+
+                task = SearchItemTask(index.data(), items)
+                task.signals.finished.connect(lambda results: self.searchDone(index, results))
+                self._tasks[index.row()] = LazyHighlightingState.running
+                QThreadPool.globalInstance().start(task)
 
     def getStyle(self, viewItem: QStyleOptionViewItem):
         if viewItem.widget:
@@ -189,7 +217,6 @@ class LogMessagesPane(QWidget):
 
     """Displays log messages"""
 
-    lineHighlightingReady = pyqtSignal(int, list)
     newLineAdded = pyqtSignal()
 
     def __init__(self, parent: QWidget):
@@ -198,8 +225,7 @@ class LogMessagesPane(QWidget):
         self.initHighlightning()
 
     def initHighlightning(self):
-        self._delegate = HighlightingDelegate(self)
-        self.lineHighlightingReady.connect(self._delegate.onLineHighlightingReady)
+        self._delegate = HighlightingDelegate(self._tableView)
         self.newLineAdded.connect(self._delegate.onNewLineAdded)
         self._tableView.setItemDelegate(self._delegate)
 
@@ -259,9 +285,17 @@ class LogMessagesPane(QWidget):
         self._proxyModel = proxyModel
         self.setLayout(vLayout)
 
-        self._scroll = True
+        self.scrolling = True
         self._dataModel.rowsAboutToBeInserted.connect(self.beforeInsert)
         self._dataModel.rowsInserted.connect(self.afterInsert)
+
+    def beforeInsert(self):
+        vbar = self._tableView.verticalScrollBar()
+        self._scrolling = vbar.value() == vbar.maximum()
+
+    def afterInsert(self):
+        if self._scrolling:
+            self._tableView.scrollToBottom()
 
 
     def enableDisableFilter(self):
@@ -270,24 +304,18 @@ class LogMessagesPane(QWidget):
 
         if self._proxyModel.filteringEnabled:
             self._proxyModel.setFilteringEnabled(False)
+            self._tableView.verticalHeader().setVisible(False)
             self._searchButton.hide()
             self._searchField.hide()
         else:
             self._proxyModel.setFilteringEnabled(True)
+            self._tableView.verticalHeader().setVisible(True)
             self._searchField.setFocus()
             self._searchButton.show()
             self._searchField.show()
 
     def applyFilter(self):
         self._proxyModel.setFilterFixedString(self._searchField.text())
-
-    def beforeInsert(self):
-        vbar = self._tableView.verticalScrollBar()
-        self._scroll = vbar.value() == vbar.maximum()
-
-    def afterInsert(self):
-        if self._scroll:
-            self._tableView.scrollToBottom()
 
     def clear(self):
         self._dataModel.clear()
@@ -308,11 +336,6 @@ class LogMessagesPane(QWidget):
         self._dataModel.appendRow(row)
         self.newLineAdded.emit()
 
-
-    def onLineHighlightingReady(self, row: int, items: List[SearchResult]):
-        self.lineHighlightingReady.emit(row, items)
-        index = self._dataModel.index(row, Columns.logMessage)
-        self._tableView.update(index)
 
     def onDoubleClicked(self, index: QModelIndex):
         if self._proxyModel.filteringEnabled:

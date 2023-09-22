@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from time import sleep
 from typing import List
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *

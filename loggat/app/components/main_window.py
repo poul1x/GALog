@@ -46,23 +46,17 @@ class MainWindow(QMainWindow):
     _logReader: Optional[AndroidLogReader]
     _viewWindows: List[LogMessageViewPane]
 
-    lineHighlightingReady = pyqtSignal(int, list)
-
     def __init__(self) -> None:
         super().__init__()
         self.initUserInterface()
-        self.initThreadPool()
         self.initHighlighting()
         self._searchPane = None
 
         self.readSomeAndroidLogs()
         # self.lineRead(LogcatLine("E", "TAG", "Visit https://aaa.ru"))
         # self.lineRead(LogcatLine("E", "TAG", "Buffer overflow 0xffffff"))
+        self.n = 0
 
-
-    def initThreadPool(self):
-        self.threadPool = QThreadPool()
-        self.threadPool.setMaxThreadCount(3)
 
     def initHighlighting(self):
         self.highlightingRules = HighlightingRules()
@@ -71,13 +65,14 @@ class MainWindow(QMainWindow):
             self.highlightingRules.load(rules)
 
         pane = self.centralWidget().pane
-        self.lineHighlightingReady.connect(pane.onLineHighlightingReady)
         pane.setHighlightingRules(self.highlightingRules)
 
-    def searchDone(self, row: int, results: List[SearchResult]):
-        self.lineHighlightingReady.emit(row, results)
-
     def lineRead(self, parsedLine: LogcatLine):
+
+        if self.n > 100000:
+            return
+
+        self.n += 1
 
         centralWidget: CentralWidget = self.centralWidget()
         centralWidget.pane.appendRow(
@@ -85,15 +80,6 @@ class MainWindow(QMainWindow):
             parsedLine.tag,
             parsedLine.msg,
         )
-
-        items = []
-        for name, pattern in self.highlightingRules.iter():
-            items.append(SearchItem(name, pattern))
-
-        task = SearchItemTask(parsedLine.msg, items)
-        nextRow = self.centralWidget().pane._dataModel.rowCount() -1
-        task.signals.finished.connect(lambda results: self.searchDone(nextRow, results))
-        self.threadPool.start(task)
 
     def centralWidget(self) -> CentralWidget:
         return super().centralWidget()
@@ -113,8 +99,8 @@ class MainWindow(QMainWindow):
 
     def readSomeAndroidLogs(self):
         self.startReadingAndroidLog()
-        sleep(0.5)
-        self.stopReadingAndroidLog()
+        # sleep(0.5)
+        # self.stopReadingAndroidLog()
 
     def startReadingAndroidLog(self):
         self._logReader = AndroidLogReader("127.0.0.1", 5037, "15151JEC210855")

@@ -1,5 +1,6 @@
 from contextlib import suppress
 from dataclasses import dataclass
+from time import sleep
 from typing import Callable, List, Optional
 from ppadb.client import Client
 from ppadb.device import Device
@@ -71,13 +72,12 @@ class LogcatReaderThread(QThread):
             with suppress(BlockingIOError):
                 data = conn.read(RECV_CHUNK_SIZE)
                 if not data:
-                    return
                     break
-                    # raise RuntimeError("Connection closed by server")
 
                 reader.addDataChunk(data)
                 for line in reader.readParsedLines():
                     self.lineRead.emit(line)
+                    sleep(0.0005) # Use delay to avoid UI freezing
 
             self._stopEvent.wait(IDLE_INTERVAL_MS)
             if self._stopEvent.isSet():
