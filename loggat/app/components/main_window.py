@@ -11,6 +11,7 @@ from loggat.app.highlighting_rules import HighlightingRules
 from loggat.app.components.message_view_pane import LogMessageViewPane
 
 from loggat.app.logcat import (
+    AndroidAppLogReader,
     AndroidLogReader,
     LogcatLine,
 )
@@ -68,12 +69,6 @@ class MainWindow(QMainWindow):
         pane.setHighlightingRules(self.highlightingRules)
 
     def lineRead(self, parsedLine: LogcatLine):
-
-        if self.n > 100000:
-            return
-
-        self.n += 1
-
         centralWidget: CentralWidget = self.centralWidget()
         centralWidget.pane.appendRow(
             parsedLine.level,
@@ -103,8 +98,8 @@ class MainWindow(QMainWindow):
         # self.stopReadingAndroidLog()
 
     def startReadingAndroidLog(self):
-        self._logReader = AndroidLogReader("127.0.0.1", 5037, "15151JEC210855")
-        self._logReader.lineRead.connect(self.lineRead)
+        self._logReader = AndroidAppLogReader("127.0.0.1", 5037, "15151JEC210855", "org.telegram.messenger")
+        self._logReader.signals.lineRead.connect(self.lineRead)
         self._logReader.start()
 
     def stopReadingAndroidLog(self):

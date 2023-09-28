@@ -337,6 +337,8 @@ class LogMessagesPane(QWidget):
         self.newLineAdded.emit()
 
 
+
+
     def onDoubleClicked(self, index: QModelIndex):
         if self._proxyModel.filteringEnabled:
             index2 = self._proxyModel.mapToSource(index)
