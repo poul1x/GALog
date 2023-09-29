@@ -315,7 +315,8 @@ class LogMessagesPane(QWidget):
         self._proxyModel.setFilterFixedString(self._searchField.text())
 
     def clear(self):
-        self._dataModel.clear()
+        cnt = self._dataModel.rowCount()
+        self._dataModel.removeRows(0, cnt)
 
     def appendRow(self, logLevel, tagName, logMessage):
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled

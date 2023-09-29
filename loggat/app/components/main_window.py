@@ -47,12 +47,14 @@ class CentralWidget(QWidget):
 class MainWindow(QMainWindow):
     _logReader: Optional[AndroidLogReader]
     _viewWindows: List[LogMessageViewPane]
+    _liveReload: bool
 
     def __init__(self) -> None:
         super().__init__()
         self.initUserInterface()
         self.initHighlighting()
         self._searchPane = None
+        self._liveReload = True
 
         self.readSomeAndroidLogs()
         # self.lineRead(LogcatLine("E", "TAG", "Visit https://aaa.ru"))
@@ -76,21 +78,25 @@ class MainWindow(QMainWindow):
         )
 
     def appStarted(self, packageName: str):
+
         centralWidget: CentralWidget = self.centralWidget()
+
+        if self._liveReload:
+            centralWidget.pane.clear()
+        # TODO: disable filter
+
         msg = f"App '{packageName}' started"
         centralWidget.pane.appendRow("S", "loggat", msg)
 
     def processStarted(self, event: ProcessStartedEvent):
         centralWidget: CentralWidget = self.centralWidget()
-        msg = "New process <PID=%s, APP='%s'> started for %s"
-        args = event.processId, event.packageName, event.target
-        centralWidget.pane.appendRow("S", "loggat", msg % args)
+        msg = f"Process <PID={event.processId}> started for {event.target}"
+        centralWidget.pane.appendRow("S", "loggat", msg)
 
     def processEnded(self, event: ProcessEndedEvent):
         centralWidget: CentralWidget = self.centralWidget()
-        msg = "Process <PID=%s, APP='%s'> ended"
-        args = event.processId, event.packageName
-        centralWidget.pane.appendRow("S", "loggat", msg % args)
+        msg = f"Process <PID={event.processId}> ended"
+        centralWidget.pane.appendRow("S", "loggat", msg)
 
     def appEnded(self, packageName: str):
         centralWidget: CentralWidget = self.centralWidget()
