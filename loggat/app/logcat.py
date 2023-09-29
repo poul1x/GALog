@@ -220,7 +220,6 @@ class AndroidAppLogReader:
         if event.packageName == self.packageName:
             if not self._pids:
                 self.signals.appStarted.emit(event.packageName)
-                print("App started")
             self._pids.add(event.processId)
             self.signals.processStarted.emit(event)
 
@@ -230,7 +229,6 @@ class AndroidAppLogReader:
             self.signals.processEnded.emit(event)
             if not self._pids:
                 self.signals.appEnded.emit(event.packageName)
-                print("App finished")
 
     def start(self):
         self._readerThread.start()

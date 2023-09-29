@@ -57,7 +57,6 @@ class MainWindow(QMainWindow):
         self.readSomeAndroidLogs()
         # self.lineRead(LogcatLine("E", "TAG", "Visit https://aaa.ru"))
         # self.lineRead(LogcatLine("E", "TAG", "Buffer overflow 0xffffff"))
-        self.n = 0
 
     def initHighlighting(self):
         self.highlightingRules = HighlightingRules()

@@ -9,12 +9,6 @@ from typing import List
 from enum import Enum
 
 
-class Columns(int, Enum):
-    logLevel = 0
-    tagName = 1
-    logMessage = 2
-
-
 class LogMessageViewPane(QDialog):
     def __init__(self, parent: QWidget):
         super().__init__(parent)

@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import *
 
 from dataclasses import dataclass
 from typing import List
-from enum import Enum
+from enum import Enum, auto
 from loggat.app.highlighting_rules import HighlightingRules
 from loggat.app.mtsearch import SearchItem, SearchItemTask, SearchResult
 
@@ -16,13 +16,20 @@ from loggat.app.util.painter import painterSaveRestore
 
 class Columns(int, Enum):
     tagName = 0
-    logLevel = 1
-    logMessage = 2
+    logLevel = auto()
+    logMessage = auto()
 
 class LazyHighlightingState(int, Enum):
-    pending = 0
-    running = 1
-    done = 2
+    pending = auto()
+    running = auto()
+    done = auto()
+
+
+@dataclass
+class HighlightingData:
+    state: LazyHighlightingState
+    items: List[SearchResult]
+
 
 class CustomStyle(QProxyStyle):
     def drawPrimitive(self, element, option, painter, widget):
@@ -31,33 +38,17 @@ class CustomStyle(QProxyStyle):
             return
         super().drawPrimitive(element, option, painter, widget)
 
-class HighlightingDelegate(QStyledItemDelegate):
-    _items: List[List[SearchResult]]
-    _tasks: List[bool]
-    _ready: bool
 
+class HighlightingDelegate(QStyledItemDelegate):
     def __init__(self, parent=None):
         super().__init__(parent)
         self._initTextDocument()
         self.rules = None
-        self._items = []
-        self._tasks = []
         self._background_selected = QColor("#DCDBFF")
         self._background_normal = QColor("#F2F2FF")
 
-    def onNewLineAdded(self):
-        self._items.append(list())
-        self._tasks.append(LazyHighlightingState.pending)
-
-    def clearHighlightingData(self):
-        self._items.clear()
-        self._tasks.clear()
-
     def setHighlightingRules(self, rules: HighlightingRules):
         self.rules = rules
-
-    def setItemsToHighlight(self, items: list):
-        self._items = items
 
     def _initTextDocument(self):
         font = QFont()
@@ -72,29 +63,35 @@ class HighlightingDelegate(QStyledItemDelegate):
         viewItem.text = ""
 
     def searchDone(self, index: QModelIndex, results: List[SearchResult]):
-        self._items[index.row()] = results
-        self._tasks[index.row()] = LazyHighlightingState.done
+        data = HighlightingData(
+            state=LazyHighlightingState.done,
+            items=results,
+        )
+
         model = index.model()
+        model.setData(index, data, Qt.UserRole)
         model.dataChanged.emit(index, index)
 
-
     def applyHighlighting(self, index: QModelIndex):
+        if index.column() != Columns.logMessage:
+            return
 
-        if index.column() == Columns.logMessage:
-            if self._tasks[index.row()] == LazyHighlightingState.running:
-                return
+        data: HighlightingData = index.data(Qt.UserRole)
+        if data.state == LazyHighlightingState.running:
+            return
 
-            if self._tasks[index.row()] == LazyHighlightingState.done:
-                self.highlightKeywords(index.row())
-            else: # self._tasks[index.row()] == LazyHighlightingState.pending:
-                items = []
-                for name, pattern in self.rules.iter():
-                    items.append(SearchItem(name, pattern))
+        if data.state == LazyHighlightingState.done:
+            self.highlightKeywords(data.items)
+            return
 
-                task = SearchItemTask(index.data(), items)
-                task.signals.finished.connect(lambda results: self.searchDone(index, results))
-                self._tasks[index.row()] = LazyHighlightingState.running
-                QThreadPool.globalInstance().start(task)
+        items = []
+        for name, pattern in self.rules.iter():
+            items.append(SearchItem(name, pattern))
+
+        data.state = LazyHighlightingState.running
+        task = SearchItemTask(index.data(), items)
+        task.signals.finished.connect(lambda results: self.searchDone(index, results))
+        QThreadPool.globalInstance().start(task)
 
     def getStyle(self, viewItem: QStyleOptionViewItem):
         if viewItem.widget:
@@ -124,7 +121,6 @@ class HighlightingDelegate(QStyledItemDelegate):
         self.doc.documentLayout().draw(painter, ctx)
 
     def paint(self, p: QPainter, viewItem: QStyleOptionViewItem, index: QModelIndex):
-
         model = index.model()
         if isinstance(model, QSortFilterProxyModel):
             index = model.mapToSource(index)
@@ -158,7 +154,7 @@ class HighlightingDelegate(QStyledItemDelegate):
             elif data == "D":
                 color = QColor("green")
                 color.setAlphaF(0.4)
-            else: # V
+            else:  # V
                 color = QColor("orange")
                 color.setAlphaF(0.4)
 
@@ -167,9 +163,9 @@ class HighlightingDelegate(QStyledItemDelegate):
             self.adjustCellText(painter, viewItem)
             self.drawCell(painter)
 
-    def highlightKeywords(self, row: int):
+    def highlightKeywords(self, items: List[SearchResult]):
         n = self.doc.characterCount() - 2
-        for item in self._items[row]:
+        for item in items:
             style = self.rules.getStyle(item.name)
 
             itemCopy = copy(item)
@@ -223,8 +219,6 @@ class LogMessagesPane(QWidget):
 
     """Displays log messages"""
 
-    newLineAdded = pyqtSignal()
-
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.initUserInterface()
@@ -232,7 +226,6 @@ class LogMessagesPane(QWidget):
 
     def initHighlightning(self):
         self._delegate = HighlightingDelegate(self._tableView)
-        self.newLineAdded.connect(self._delegate.onNewLineAdded)
         self._tableView.setItemDelegate(self._delegate)
 
     def setHighlightingRules(self, rules: HighlightingRules):
@@ -303,9 +296,7 @@ class LogMessagesPane(QWidget):
         if self._scrolling:
             self._tableView.scrollToBottom()
 
-
     def enableDisableFilter(self):
-
         # self._tableView.scrollTo(index, QTableView.PositionAtCenter)
 
         if self._proxyModel.filteringEnabled:
@@ -335,15 +326,17 @@ class LogMessagesPane(QWidget):
         itemTagName = QStandardItem(tagName)
         itemTagName.setFlags(flags)
 
+        data = HighlightingData(
+            state=LazyHighlightingState.pending,
+            items=[],
+        )
+
         itemLogMessage = QStandardItem(logMessage)
+        itemLogMessage.setData(data, Qt.UserRole)
         itemLogMessage.setFlags(flags)
 
         row = [itemTagName, itemLogLevel, itemLogMessage]
         self._dataModel.appendRow(row)
-        self.newLineAdded.emit()
-
-
-
 
     def onDoubleClicked(self, index: QModelIndex):
         if self._proxyModel.filteringEnabled:
