@@ -141,7 +141,13 @@ class HighlightingDelegate(QStyledItemDelegate):
             )  # Example: Get data from row 1, column 1
             data = model.data(newIndex, role=Qt.DisplayRole)
 
-            if data == "E":
+            if data == "S":
+                color = QColor("#CECECE")
+                color.setAlphaF(0.4)
+            elif data == "F":
+                color = QColor("#FF2635")
+                color.setAlphaF(0.4)
+            elif data == "E":
                 color = QColor("#FF2635")
                 color.setAlphaF(0.4)
             elif data == "I":
@@ -152,7 +158,7 @@ class HighlightingDelegate(QStyledItemDelegate):
             elif data == "D":
                 color = QColor("green")
                 color.setAlphaF(0.4)
-            else:
+            else: # V
                 color = QColor("orange")
                 color.setAlphaF(0.4)
 
