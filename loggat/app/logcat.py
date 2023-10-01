@@ -158,6 +158,7 @@ class LogcatReaderThread(QThread):
             return
 
         self.lineRead.emit(line)
+        QThread.msleep(10)
 
     def run(self):
         reader = LogcatLineReader()

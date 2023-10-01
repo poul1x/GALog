@@ -3,5 +3,5 @@
 from .app import resources
 
 # Explicitly import some dependencies
-# to make them imported by pyinstaller
+# to make them fetched by pyinstaller
 import coloredlogs

@@ -14,12 +14,6 @@
 ########################################
 # General
 ########################################
-name: genericUrl
-pattern: \w+://\S+
-style:
-  formatting:
-    underline: true
----
 name: decimalNumber
 pattern: '\b-?\d+(?:\.\d+)?\b'
 style:
@@ -69,10 +63,10 @@ pattern: '([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})'
 style:
   color:
     background: "#10000000"
----
 ########################################
 # Packages & file paths
 ########################################
+---
 name: DotSeparatedWords
 pattern: '[a-zA-Z_]{1}\w+\.[\w\./]+'
 style:
@@ -82,6 +76,13 @@ style:
 ---
 name: FilePath
 pattern: '\w+/[^\s]+'
+style:
+  formatting:
+    underline: true
+    mediumbold: true
+---
+name: genericUrl
+pattern: \w+://\S+
 style:
   formatting:
     underline: true

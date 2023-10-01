@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 from queue import Queue
 from threading import Thread
 from time import sleep
@@ -18,6 +19,7 @@ from loggat.app.logcat import (
     ProcessStartedEvent,
 )
 from loggat.app.mtsearch import SearchItem, SearchItemTask, SearchResult
+from loggat.app.util.paths import stylesPath
 
 
 from .log_messages_pane import LogMessagesPane
@@ -51,14 +53,36 @@ class MainWindow(QMainWindow):
 
     def __init__(self) -> None:
         super().__init__()
+        self.loadStyleSheet()
         self.initUserInterface()
         self.initHighlighting()
         self._searchPane = None
         self._liveReload = True
 
         self.readSomeAndroidLogs()
-        # self.lineRead(LogcatLine("E", "TAG", "Visit https://aaa.ru"))
+        # self.lineRead(LogcatLine("W", "TAG", 12, "Visit https://aaa.ru"))
         # self.lineRead(LogcatLine("E", "TAG", "Buffer overflow 0xffffff"))
+
+    def styleSheetFiles(self, path: str = stylesPath()):
+
+        result = []
+        for entry in os.scandir(path):
+            if entry.is_file() and entry.path.endswith(".qss"):
+                result.append(entry.path)
+            elif entry.is_dir():
+                result.extend(self.styleSheetFiles(entry.path))
+
+        return result
+
+    def loadStyleSheet(self):
+
+        style = ""
+        for filepath in self.styleSheetFiles():
+            with open(filepath, "r", encoding="utf-8") as f:
+                style += f.read() + "\n"
+
+        self.setStyleSheet(style)
+
 
     def initHighlighting(self):
         self.highlightingRules = HighlightingRules()
@@ -113,7 +137,7 @@ class MainWindow(QMainWindow):
         window = LogMessageViewPane(self)
         window.setTag("Portswertive")
         window.setLogLevel("I")
-        window.setLogMessage("qwerty efdfdfdasasa sasasasa")
+        window.setLogMessage("qwerty efdfdfdasasa sasasasa https://google.com")
         window.exec_()
 
     def readSomeAndroidLogs(self):

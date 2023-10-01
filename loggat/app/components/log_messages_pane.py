@@ -8,10 +8,14 @@ from PyQt5.QtWidgets import *
 from dataclasses import dataclass
 from typing import List
 from enum import Enum, auto
+
+from PyQt5.QtWidgets import QWidget
+from loggat.app.components.message_view_pane import LogMessageViewPane
 from loggat.app.highlighting_rules import HighlightingRules
 from loggat.app.mtsearch import SearchItem, SearchItemTask, SearchResult
 
 from loggat.app.util.painter import painterSaveRestore
+from loggat.app.util.paths import iconPath
 
 
 class Columns(int, Enum):
@@ -131,6 +135,12 @@ class HighlightingDelegate(QStyledItemDelegate):
             self.applyHighlighting(index)
             self.fillCellBackground(painter, viewItem)
 
+            if viewItem.state & QStyle.State_Selected:
+                if index.column() in [Columns.logLevel, Columns.tagName]:
+                    fmt = QTextCharFormat()
+                    fmt.setFontWeight(QFont.DemiBold)
+                    self.highlightAllText(fmt)
+
             model = index.model()
             newIndex = model.index(
                 index.row(), Columns.logLevel
@@ -214,6 +224,75 @@ class CustomSortProxyModel(QSortFilterProxyModel):
         indexBody = sourceModel.index(sourceRow, Columns.logMessage, sourceParent)
         return filterRegExp.indexIn(sourceModel.data(indexBody)) != -1
 
+class MyTableView(QTableView):
+
+    def __init__(self, parent: QWidget) -> None:
+        super().__init__(parent)
+
+    def setHighlightingRules(self, rules: HighlightingRules):
+        self.rules = rules
+
+    def keyPressEvent(self, event: QKeyEvent):
+
+        def isEnterPressed():
+            return event.key() in [Qt.Key_Enter, Qt.Key_Return]
+
+        def isCtrlEnterPressed():
+            return isEnterPressed() and  event.modifiers() == Qt.ControlModifier
+
+        if isCtrlEnterPressed():
+            index: QModelIndex = self.selectionModel().currentIndex()
+            if index.isValid():
+                model = index.model()
+                if isinstance(model, CustomSortProxyModel):
+                    self.doubleClicked.emit(index)
+
+        elif isEnterPressed():
+            index: QModelIndex = self.selectionModel().currentIndex()
+            if index.isValid():
+                model = index.model()
+                if isinstance(model, CustomSortProxyModel):
+                    index = model.mapToSource(index)
+
+                proxyModel: CustomSortProxyModel = self.model()
+                model: QStandardItemModel = proxyModel.sourceModel()
+                tagName = model.item(index.row(), Columns.tagName).text()
+                logLevel = model.item(index.row(), Columns.logLevel).text()
+                logMessage = model.item(index.row(), Columns.logMessage).text()
+                data: HighlightingData = model.item(index.row(), Columns.logMessage).data(Qt.UserRole)
+                viewPane = LogMessageViewPane(self)
+                viewPane.setLogLevel(logLevel)
+                viewPane.setLogMessage(logMessage)
+                viewPane.setTag(tagName)
+
+                if logLevel == "S":
+                    color = QColor("#CECECE")
+                    color.setAlphaF(0.4)
+                elif logLevel == "F":
+                    color = QColor("#FF2635")
+                    color.setAlphaF(0.4)
+                elif logLevel == "E":
+                    color = QColor("#FF2635")
+                    color.setAlphaF(0.4)
+                elif logLevel == "I":
+                    color = QColor("#C7CFFF")
+                elif logLevel == "W":
+                    color = QColor("#FFBC00")
+                    color.setAlphaF(0.5)
+                elif logLevel == "D":
+                    color = QColor("green")
+                    color.setAlphaF(0.4)
+                else:  # V
+                    color = QColor("orange")
+                    color.setAlphaF(0.4)
+
+                viewPane.setItemBackgroundColor(color)
+                viewPane.applyHighlighting(self.rules, data.items)
+                viewPane.exec_()
+        else:
+            super().keyPressEvent(event)
+
+
 
 class LogMessagesPane(QWidget):
 
@@ -222,13 +301,14 @@ class LogMessagesPane(QWidget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.initUserInterface()
-        self.initHighlightning()
+        self.initHighlighting()
 
-    def initHighlightning(self):
+    def initHighlighting(self):
         self._delegate = HighlightingDelegate(self._tableView)
         self._tableView.setItemDelegate(self._delegate)
 
     def setHighlightingRules(self, rules: HighlightingRules):
+        self._tableView.setHighlightingRules(rules)
         self._delegate.setHighlightingRules(rules)
 
     def initUserInterface(self):
@@ -240,7 +320,7 @@ class LogMessagesPane(QWidget):
         proxyModel.setSourceModel(dataModel)
         proxyModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
 
-        tableView = QTableView(self)
+        tableView = MyTableView(self)
         tableView.setModel(proxyModel)
 
         tableView.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -262,7 +342,7 @@ class LogMessagesPane(QWidget):
 
         self._searchField = QLineEdit(self)
         self._searchField.setPlaceholderText("Search log message")
-        self._searchField.addAction(QIcon(":search.svg"), QLineEdit.LeadingPosition)
+        self._searchField.addAction(QIcon(iconPath("search")), QLineEdit.LeadingPosition)
 
         self._searchButton = QPushButton()
         self._searchButton.setText("Search")
