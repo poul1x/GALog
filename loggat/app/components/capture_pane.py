@@ -1,4 +1,3 @@
-
 from typing import List, Optional
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -6,14 +5,24 @@ from PyQt5.QtWidgets import *
 
 from loggat.app.util.paths import iconFile
 
+
 class MyProxyStyle(QProxyStyle):
     def standardIcon(self, standardIcon, option=None, widget=None):
         if standardIcon == QStyle.SP_LineEditClearButton:
             return QIcon(iconFile("clear"))
         return super().standardIcon(standardIcon, option, widget)
 
-class NewCapturePane(QDialog):
+class MyListView(QListView):
+    itemActivated = pyqtSignal(QModelIndex)
 
+    def keyPressEvent(self, event: QKeyEvent):
+        if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
+            self.itemActivated.emit(self.currentIndex())
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
+class CapturePane(QDialog):
     deviceChanged = pyqtSignal(str)
     packageSelected = pyqtSignal(str)
 
@@ -24,6 +33,7 @@ class NewCapturePane(QDialog):
         super().__init__(parent, self._defaultFlags())
         self.initUserInterface()
         self.setGeometryAuto()
+        self.selectedPackageName = None
 
     def setGeometryAuto(self):
         screen = QApplication.desktop().screenGeometry()
@@ -37,19 +47,33 @@ class NewCapturePane(QDialog):
         assert len(devices) > 0, "At least one device required"
         self.deviceDropDown.addItems(devices)
 
+    def setPackagesEmpty(self):
+        self.model.removeRows(0, self.model.rowCount())
+        item = QStandardItem()
+        item.setFlags(item.flags() & ~Qt.ItemIsSelectable)
+        self.model.appendRow(QStandardItem())
+
+        item = QStandardItem("¯\_(ツ)_/¯")
+        item.setFlags(item.flags() & ~Qt.ItemIsSelectable)
+        item.setData(Qt.AlignCenter, Qt.TextAlignmentRole)
+        font = QFont("Arial")
+        font.setPointSize(12)
+        item.setFont(font)
+        self.model.appendRow(item)
+
     def setPackages(self, packages: List[str]):
         self.model.removeRows(0, self.model.rowCount())
         for package in packages:
             self.model.appendRow(QStandardItem(package))
-        if len(packages) > 0:
-            index = self.packagesListView.model().index(0, 0)
-            self.packagesListView.setCurrentIndex(index)
-            self.selectButton.setEnabled(True)
+
+        index = self.packagesListView.model().index(0, 0)
+        self.packagesListView.setCurrentIndex(index)
+        self.selectButton.setEnabled(True)
 
     def initUserInterface(self):
         self.setWindowTitle("New capture")
-        self.setMinimumHeight(200)
-        self.setMinimumWidth(100)
+        self.setMinimumHeight(500)
+        self.setMinimumWidth(600)
 
         vBoxLayout = QVBoxLayout()
         hBoxLayoutTop = QHBoxLayout()
@@ -66,7 +90,6 @@ class NewCapturePane(QDialog):
         self.deviceLabel = QLabel(self)
         self.deviceLabel.setText("Device:")
         self.deviceDropDown = QComboBox(self)
-        self.deviceDropDown.currentIndexChanged.connect(self.deviceSelected)
         self.reloadButton = QPushButton(self)
         self.reloadButton.setIcon(QIcon(iconFile("reload")))
         self.reloadButton.setText("Reload packages")
@@ -79,8 +102,10 @@ class NewCapturePane(QDialog):
         hBoxLayoutTop.addLayout(hBoxLayoutTopRight)
         vBoxLayout.addLayout(hBoxLayoutTop)
 
-        self.packagesListView = QListView(self)
+        self.packagesListView = MyListView(self)
         self.packagesListView.setEditTriggers(QListView.NoEditTriggers)
+        self.packagesListView.doubleClicked.connect(self.onPackageSelected)
+        self.packagesListView.itemActivated.connect(self.onPackageSelected)
         self.model = QStandardItemModel(self)
         self.proxyModel = QSortFilterProxyModel()
         self.proxyModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
@@ -92,7 +117,9 @@ class NewCapturePane(QDialog):
         self.searchLineEdit = QLineEdit(self)
         self.searchLineEdit.textChanged.connect(self.proxyModel.setFilterFixedString)
         self.searchLineEdit.setPlaceholderText("Search package")
-        self.searchLineEdit.addAction(QIcon(iconFile("search")), QLineEdit.LeadingPosition)
+        self.searchLineEdit.addAction(
+            QIcon(iconFile("search")), QLineEdit.LeadingPosition
+        )
         self.searchLineEdit.setStyle(MyProxyStyle(self.searchLineEdit.style()))
         self.searchLineEdit.setClearButtonEnabled(True)
         vBoxLayout.addWidget(self.searchLineEdit)
@@ -118,18 +145,29 @@ class NewCapturePane(QDialog):
         vBoxLayout.addLayout(hBoxLayoutBottom)
         self.setLayout(vBoxLayout)
 
+    def onPackageSelected(self, index: QModelIndex):
+        model = self.packagesListView.model()
+        self.packageSelected.emit(model.data(index))
+        self.close()
+
     def fromApkButtonClicked(self):
         pass
 
     def reloadButtonClicked(self):
-        pass
+        device = self.deviceDropDown.currentText()
+        self.deviceChanged.emit(device)
 
     def cancelButtonClicked(self):
-        pass
+        self.close()
 
     def selectButtonClicked(self):
-        pass
+        self.onPackageSelected(self.packagesListView.currentIndex())
 
-    def deviceSelected(self, index: QModelIndex):
-        selectedItem = self.deviceDropDown.itemText(index)
-        print(f"Selected Item: {selectedItem}")
+    def selectedPackage(self):
+        return self.selectedPackageName
+
+    def selectedDevice(self):
+        return self.deviceDropDown.currentText()
+
+    def setSelectedDevice(self, device: str):
+        return self.deviceDropDown.setCurrentText(device)

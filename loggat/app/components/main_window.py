@@ -8,7 +8,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import yaml
-from loggat.app.components.new_capture_pane import NewCapturePane
+from loggat.app.components.capture_pane import CapturePane
+from loggat.app.controllers.capture_pane import CapturePaneController
 from loggat.app.highlighting_rules import HighlightingRules
 from loggat.app.components.message_view_pane import LogMessageViewPane
 
@@ -65,39 +66,13 @@ class MainWindow(QMainWindow):
         self.initHighlighting()
         self._searchPane = None
         self._liveReload = True
+        self.capturePaneController = CapturePaneController(ADB_HOST, ADB_PORT)
 
         # self.readSomeAndroidLogs()
         # self.lineRead(LogcatLine("W", "TAG", 12, "Visit https://aaa.ru"))
         # self.lineRead(LogcatLine("E", "TAG", "Buffer overflow 0xffffff"))
 
-    def newCapture(self):
-        try:
-            devices: List[Device] = Client(ADB_HOST, ADB_PORT).devices()
-        except Exception as e:
-            msg = f"Failed to get devices. Reason - {str(e)}"
-            QMessageBox.critical(self, "Error", msg)
-            return
 
-        if len(devices) == 0:
-            msg = f"No devices connected to adb"
-            QMessageBox.critical(self, "Error", msg)
-            return
-
-        deviceSelected = devices[0]
-        packages = []
-
-        try:
-            packages = deviceSelected.list_packages()
-        except Exception as e:
-            name = deviceSelected.serial
-            msg = f"Failed to packages for device {name}. Reason - {str(e)}"
-            QMessageBox.critical(self, "Error", msg)
-            return
-
-        self.capturePane = NewCapturePane(self)
-        self.capturePane.setDevices([dev.serial for dev in devices])
-        self.capturePane.setPackages(packages)
-        self.capturePane.show()
 
     def styleSheetFiles(self, path: str = STYLES_DIR):
         result = []
@@ -206,6 +181,17 @@ class MainWindow(QMainWindow):
             event.accept()
         else:
             event.ignore()
+
+    def newCapture(self):
+        capturePane = CapturePane(self)
+        self.capturePaneController.setWidget(capturePane)
+        self.capturePaneController.newCaptureDialog()
+
+        if self.capturePaneController.captureTargetSelected():
+            device = self.capturePaneController.getSelectedDevice()
+            package = self.capturePaneController.getSelectedPackage()
+            # self.logMessagesPaneController.startCapture(device, package)
+            print(f"Start capture: {device} {package}")
 
     def actionStub(self):
         QMessageBox.information(self, "Stub", "Action stub")
