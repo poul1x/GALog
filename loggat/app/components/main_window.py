@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import yaml
+from loggat.app.components.new_capture_pane import NewCapturePane
 from loggat.app.highlighting_rules import HighlightingRules
 from loggat.app.components.message_view_pane import LogMessageViewPane
 
@@ -19,10 +20,16 @@ from loggat.app.logcat import (
     ProcessStartedEvent,
 )
 from loggat.app.mtsearch import SearchItem, SearchItemTask, SearchResult
-from loggat.app.util.paths import stylesPath
+from loggat.app.util.paths import HIGHLIGHTING_RULES_FILE, STYLES_DIR
+
+from ppadb.client import Client
+from ppadb.device import Device
 
 
 from .log_messages_pane import LogMessagesPane
+
+ADB_HOST = "127.0.0.1"
+ADB_PORT = 5037
 
 
 class CentralWidget(QWidget):
@@ -59,12 +66,40 @@ class MainWindow(QMainWindow):
         self._searchPane = None
         self._liveReload = True
 
-        self.readSomeAndroidLogs()
+        # self.readSomeAndroidLogs()
         # self.lineRead(LogcatLine("W", "TAG", 12, "Visit https://aaa.ru"))
         # self.lineRead(LogcatLine("E", "TAG", "Buffer overflow 0xffffff"))
 
-    def styleSheetFiles(self, path: str = stylesPath()):
+    def newCapture(self):
+        try:
+            devices: List[Device] = Client(ADB_HOST, ADB_PORT).devices()
+        except Exception as e:
+            msg = f"Failed to get devices. Reason - {str(e)}"
+            QMessageBox.critical(self, "Error", msg)
+            return
 
+        if len(devices) == 0:
+            msg = f"No devices connected to adb"
+            QMessageBox.critical(self, "Error", msg)
+            return
+
+        deviceSelected = devices[0]
+        packages = []
+
+        try:
+            packages = deviceSelected.list_packages()
+        except Exception as e:
+            name = deviceSelected.serial
+            msg = f"Failed to packages for device {name}. Reason - {str(e)}"
+            QMessageBox.critical(self, "Error", msg)
+            return
+
+        self.capturePane = NewCapturePane(self)
+        self.capturePane.setDevices([dev.serial for dev in devices])
+        self.capturePane.setPackages(packages)
+        self.capturePane.show()
+
+    def styleSheetFiles(self, path: str = STYLES_DIR):
         result = []
         for entry in os.scandir(path):
             if entry.is_file() and entry.path.endswith(".qss"):
@@ -75,7 +110,6 @@ class MainWindow(QMainWindow):
         return result
 
     def loadStyleSheet(self):
-
         style = ""
         for filepath in self.styleSheetFiles():
             with open(filepath, "r", encoding="utf-8") as f:
@@ -83,10 +117,9 @@ class MainWindow(QMainWindow):
 
         self.setStyleSheet(style)
 
-
     def initHighlighting(self):
         self.highlightingRules = HighlightingRules()
-        with open("config/highlighting_rules.yaml") as f:
+        with open(HIGHLIGHTING_RULES_FILE) as f:
             rules = yaml.load_all(f, yaml.SafeLoader)
             self.highlightingRules.load(rules)
 
@@ -102,7 +135,6 @@ class MainWindow(QMainWindow):
         )
 
     def appStarted(self, packageName: str):
-
         centralWidget: CentralWidget = self.centralWidget()
 
         if self._liveReload:
@@ -175,40 +207,62 @@ class MainWindow(QMainWindow):
         else:
             event.ignore()
 
-    def setupExitAction(self):
-        exitAction = QAction("&Exit", self)
-        exitAction.setShortcut("Ctrl+Q")
-        exitAction.setStatusTip("Exit application")
-        exitAction.triggered.connect(lambda: self.close())
+    def actionStub(self):
+        QMessageBox.information(self, "Stub", "Action stub")
 
-        menubar = self.menuBar()
-        fileMenu = menubar.addMenu("&File")
-        fileMenu.addAction(exitAction)
+    def newCaptureAction(self):
+        action = QAction("&New", self)
+        action.setShortcut("Ctrl+N")
+        action.setStatusTip("Start new log capture")
+        action.triggered.connect(lambda: self.newCapture())
+        return action
 
-    def setupSearchAction(self):
-        action = QAction("&Search", self)
-        action.setShortcut("Ctrl+F")
-        action.setStatusTip("Search")
-        action.triggered.connect(self.showSearchPane)
+    def startCaptureAction(self):
+        action = QAction("&Start", self)
+        # action.setShortcut("Ctrl+N")
+        action.setStatusTip("Start log capture")
+        action.triggered.connect(lambda: self.actionStub())
+        return action
 
-        menubar = self.menuBar()
-        menu = menubar.addMenu("&Messages")
-        menu.addAction(action)
+    def stopCaptureAction(self):
+        action = QAction("&Stop", self)
+        # action.setShortcut("Ctrl+N")
+        action.setStatusTip("Stop log capture")
+        action.triggered.connect(lambda: self.actionStub())
+        return action
 
-    def setupViewAction(self):
-        action = QAction("&View", self)
-        action.setShortcut("Ctrl+W")
-        action.setStatusTip("View")
-        action.triggered.connect(self.openLogMessageViewPane)
+    def openLogFileAction(self):
+        action = QAction("&Open", self)
+        action.setShortcut("Ctrl+O")
+        action.setStatusTip("Open log capture from file")
+        action.triggered.connect(lambda: self.actionStub())
+        return action
 
-        menubar = self.menuBar()
-        menu = menubar.addMenu("&Qwerty")
-        menu.addAction(action)
+    def saveLogFileAction(self):
+        action = QAction("&Save", self)
+        action.setShortcut("Ctrl+S")
+        action.setStatusTip("Save log capture to file")
+        action.triggered.connect(lambda: self.actionStub())
+        return action
+
+    def installApkAction(self):
+        action = QAction("&Install APK", self)
+        action.setShortcut("Ctrl+I")
+        action.setStatusTip("Install APK file")
+        action.triggered.connect(lambda: self.actionStub())
+        return action
 
     def setupMenuBar(self):
-        self.setupExitAction()
-        self.setupSearchAction()
-        self.setupViewAction()
+        menubar = self.menuBar()
+        captureMenu = menubar.addMenu("&Capture")
+        captureMenu.addAction(self.newCaptureAction())
+        captureMenu.addAction(self.startCaptureAction())
+        captureMenu.addAction(self.stopCaptureAction())
+        captureMenu.addAction(self.openLogFileAction())
+        captureMenu.addAction(self.saveLogFileAction())
+
+        adbMenu = menubar.addMenu("&ADB")
+        adbMenu.addAction(self.installApkAction())
 
     def initUserInterface(self):
         screen = QApplication.desktop().screenGeometry()

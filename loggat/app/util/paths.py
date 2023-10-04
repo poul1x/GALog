@@ -1,9 +1,8 @@
 import os
 
 
-def stylesPath():
-    return os.path.join("resources", "styles")
+STYLES_DIR = os.path.join("resources", "styles")
+HIGHLIGHTING_RULES_FILE = os.path.join("config", "highlighting_rules.yaml")
 
-
-def iconPath(iconName: str):
+def iconFile(iconName: str):
     return os.path.join("resources", "icons", iconName + ".svg")

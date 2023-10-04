@@ -10,7 +10,7 @@ from enum import Enum
 from loggat.app.highlighting_rules import HighlightingRules
 from loggat.app.mtsearch import SearchResult
 
-from loggat.app.util.paths import iconPath
+from loggat.app.util.paths import iconFile
 
 
 class LogMessageViewPane(QDialog):
@@ -60,7 +60,7 @@ class LogMessageViewPane(QDialog):
         self._tagNameLabel.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
 
         self._copyButton = QPushButton()
-        self._copyButton.setIcon(QIcon(iconPath("copy")))
+        self._copyButton.setIcon(QIcon(iconFile("copy")))
         self._copyButton.setText("Copy contents")
         self._copyButton.setFixedWidth(190)
         self._copyButton.clicked.connect(self.copyButtonClicked)

@@ -15,7 +15,7 @@ from loggat.app.highlighting_rules import HighlightingRules
 from loggat.app.mtsearch import SearchItem, SearchItemTask, SearchResult
 
 from loggat.app.util.painter import painterSaveRestore
-from loggat.app.util.paths import iconPath
+from loggat.app.util.paths import iconFile
 
 
 class Columns(int, Enum):
@@ -342,7 +342,7 @@ class LogMessagesPane(QWidget):
 
         self._searchField = QLineEdit(self)
         self._searchField.setPlaceholderText("Search log message")
-        self._searchField.addAction(QIcon(iconPath("search")), QLineEdit.LeadingPosition)
+        self._searchField.addAction(QIcon(iconFile("search")), QLineEdit.LeadingPosition)
 
         self._searchButton = QPushButton()
         self._searchButton.setText("Search")
