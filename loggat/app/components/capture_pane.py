@@ -12,6 +12,7 @@ class MyProxyStyle(QProxyStyle):
             return QIcon(iconFile("clear"))
         return super().standardIcon(standardIcon, option, widget)
 
+
 class MyListView(QListView):
     itemActivated = pyqtSignal(QModelIndex)
 
@@ -21,6 +22,7 @@ class MyListView(QListView):
             event.accept()
             return
         super().keyPressEvent(event)
+
 
 class CapturePane(QDialog):
     deviceChanged = pyqtSignal(str)
@@ -43,9 +45,8 @@ class CapturePane(QDialog):
         y = (screen.height() - height) // 2
         self.setGeometry(x, y, width, height)
 
-    def setDevices(self, devices: List[str]):
-        assert len(devices) > 0, "At least one device required"
-        self.deviceDropDown.addItems(devices)
+    def addDevice(self, deviceName: str, deviceState: str):
+        self.deviceDropDown.addItem(deviceName, deviceState)
 
     def setPackagesEmpty(self):
         self.model.removeRows(0, self.model.rowCount())
@@ -169,5 +170,5 @@ class CapturePane(QDialog):
     def selectedDevice(self):
         return self.deviceDropDown.currentText()
 
-    def setSelectedDevice(self, device: str):
-        return self.deviceDropDown.setCurrentText(device)
+    def setSelectedDevice(self, deviceName: str):
+        self.deviceDropDown.setCurrentText(deviceName)

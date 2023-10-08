@@ -158,13 +158,12 @@ class LogcatReaderThread(QThread):
             return
 
         self.lineRead.emit(line)
-        QThread.msleep(10)
 
     def run(self):
         reader = LogcatLineReader()
         conn: Connection = self._device.create_connection()
         conn.send("shell:{}".format(LOGCAT_CMD))
-        # conn.socket.setblocking(False)
+        conn.socket.setblocking(False)
 
         while True:
             with suppress(BlockingIOError):
@@ -175,7 +174,7 @@ class LogcatReaderThread(QThread):
                 reader.addDataChunk(data)
                 for line in reader.readParsedLines():
                     self._processLine(line)
-                    # QThread.msleep(10)  # Use delay to avoid UI freezing
+                    QThread.msleep(10)  # Use delay to avoid UI freezing
 
             self._stopEvent.wait(IDLE_INTERVAL_MS)
             if self._stopEvent.isSet():
