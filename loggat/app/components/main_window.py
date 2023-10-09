@@ -188,8 +188,8 @@ class MainWindow(QMainWindow):
         self.capturePaneController.newCaptureDialog()
 
         if self.capturePaneController.captureTargetSelected():
-            device = self.capturePaneController.getSelectedDevice()
-            package = self.capturePaneController.getSelectedPackage()
+            device = self.capturePaneController.selectedDevice()
+            package = self.capturePaneController.selectedPackage()
             # self.logMessagesPaneController.startCapture(device, package)
             print(f"Start capture: {device} {package}")
 

@@ -16,20 +16,10 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import yaml
 
-from loggat.app.controllers.loading_dialog import LoadingDialog
+from loggat.app.components.loading_dialog import LoadingDialog
 from ..components.capture_pane import CapturePane
 from loggat.app.highlighting_rules import HighlightingRules
 from loggat.app.components.message_view_pane import LogMessageViewPane
-
-from loggat.app.logcat import (
-    AndroidAppLogReader,
-    AndroidLogReader,
-    LogcatLine,
-    ProcessEndedEvent,
-    ProcessStartedEvent,
-)
-from loggat.app.mtsearch import SearchItem, SearchItemTask, SearchResult
-from loggat.app.util.paths import HIGHLIGHTING_RULES_FILE, STYLES_DIR
 
 from ppadb.client import Client as AdbClient
 from ppadb.device import Device as AdbDevice
@@ -40,12 +30,6 @@ class ErrorType(int, Enum):
     NoDevicesFound = auto()
     DeviceNotFound = auto()
     DeviceStateInvalid = auto()
-
-
-@dataclass
-class AdbDeviceInfo:
-    name: str
-    state: str
 
 
 DEVICE_STATE_OK = "device"
@@ -77,58 +61,74 @@ class PackageLoaderError(BaseError):
     pass
 
 
-class DeviceLoader(QObject):
-    def __init__(self, client: AdbClient, lastSelectedDevice: Optional[str] = None):
-        super().__init__()
-        self._lastSelectedDevice = lastSelectedDevice
-        self._client = client
-
-    exited = pyqtSignal()
-    succeeded = pyqtSignal(list, AdbDeviceInfo)
+class DeviceLoaderSignals(QObject):
+    succeeded = pyqtSignal(list, str)
     failed = pyqtSignal(ErrorType)
 
-    def _getDevices(self):
-        result: List[AdbDeviceInfo] = []
 
+class PackageLoaderSignals(QObject):
+    succeeded = pyqtSignal(list, str)
+    failed = pyqtSignal(ErrorType, str)
+
+
+class DeviceLoader(QRunnable):
+    _client: AdbClient
+    _lastSelectedDevice: Optional[str]
+    _msDelay: Optional[int]
+
+    succeeded = pyqtSignal(list, str)
+    failed = pyqtSignal(ErrorType)
+
+    def __init__(self, client: AdbClient, lastSelectedDevice: Optional[str] = None):
+        super().__init__()
+        self.signals = DeviceLoaderSignals()
+        self._lastSelectedDevice = lastSelectedDevice
+        self._client = client
+        self._msDelay = None
+
+    def _getDevices(self):
         try:
-            device: AdbDevice
-            for device in self._client.devices():
-                devInfo = AdbDeviceInfo(device.serial, device.get_state())
-                result.append(devInfo)
+            devices: List[AdbDevice] = self._client.devices()
 
         except RuntimeError:
             raise DeviceLoaderError(ErrorType.ConnectionFailure)
 
-        if len(result) == 0:
+        if len(devices) == 0:
             raise DeviceLoaderError(ErrorType.NoDevicesFound)
 
-        return result
+        return [dev.serial for dev in devices]
 
-    def _selectDevice(self, devices: List[AdbDeviceInfo]):
-        result = devices[0]
-        for device in devices:
-            if device.name == self._lastSelectedDevice:
-                result = device.name
+    def _selectDevice(self, devices: List[str]):
+        i = 0
+        with suppress(ValueError):
+            i = devices.index(self._lastSelectedDevice)
 
-        return result
+        return devices[i]
+
+    def setStartDelay(self, ms: int):
+        self._msDelay = ms
+
+    def _delayIfNeeded(self):
+        if self._msDelay:
+            QThread.msleep(self._msDelay)
 
     def run(self):
         try:
+            self._delayIfNeeded()
             devices = self._getDevices()
             device = self._selectDevice(devices)
-            self.succeeded.emit(devices, device)
+            self.signals.succeeded.emit(devices, device)
 
         except DeviceLoaderError as e:
-            self.failed.emit(e.errorType)
-
-        self.exited.emit()
+            self.signals.failed.emit(e.errorType)
 
 
-class PackageLoader(QObject):
-    _lastSelectedPackage: str
+class PackageLoader(QRunnable):
     _client: AdbClient
+    _lastSelectedPackage: str
+    _msDelay: Optional[int]
 
-    succeeded = pyqtSignal(list)
+    succeeded = pyqtSignal(list, str)
     failed = pyqtSignal(ErrorType, str)
 
     def __init__(
@@ -138,23 +138,61 @@ class PackageLoader(QObject):
         lastSelectedPackage: Optional[str] = None,
     ):
         super().__init__()
+        self.signals = PackageLoaderSignals()
         self._lastSelectedPackage = lastSelectedPackage
         self._deviceName = deviceName
         self._client = client
+        self._msDelay = None
+
+    def setStartDelay(self, ms: int):
+        self._msDelay = ms
+
+    def _delayIfNeeded(self):
+        if self._msDelay:
+            QThread.msleep(self._msDelay)
+
+    def _ppadbDeviceMonkeyPatch(self, deviceName: str):
+        class MyAdbDevice(AdbDevice):
+            def __init__(self, client, serial, state):
+                super().__init__(client, serial)
+                self.state = state
+
+        cmd = "host:devices"
+        result: str = self._client._execute_cmd(cmd)
+        if not result:
+            return None
+
+        for line in result.split("\n"):
+            serial, state = line.split()
+            if serial == deviceName:
+                return MyAdbDevice(self._client, serial, state)
+
+        return None
 
     def _getPackages(self):
         try:
-            device: AdbDevice = self._client.device(self._deviceName)
+            #
+            # XXX: Now ppadb does not save the device status
+            #      in client.devices() and device.get_state() raises
+            #      RuntimeError, so there's no way to get status via
+            #      public API. So, I had to create a monkey patch for this
+            #
+            # device: AdbDevice = self._client.device(self._deviceName)
+            # if not device:
+            #     raise PackageLoaderError(ErrorType.DeviceNotFound)
+            # state = device.get_state()
+            #
+
+            device = self._ppadbDeviceMonkeyPatch(self._deviceName)
             if not device:
                 raise PackageLoaderError(ErrorType.DeviceNotFound)
 
-            state = device.get_state()
-            if state != DEVICE_STATE_OK:
-                raise DeviceStateInvalid(state)
+            if device.state != DEVICE_STATE_OK:
+                raise DeviceStateInvalid(device.state)
 
             packages = device.list_packages()
 
-        except RuntimeError:
+        except RuntimeError as e:
             raise PackageLoaderError(ErrorType.ConnectionFailure)
 
         return packages
@@ -168,15 +206,16 @@ class PackageLoader(QObject):
 
     def run(self):
         try:
+            self._delayIfNeeded()
             packages = self._getPackages()
             package = self._selectPackage(packages)
-            self.succeeded.emit(packages, package)
+            self.signals.succeeded.emit(packages, package)
 
         except DeviceStateInvalid as e:
-            self.failed.emit(e.errorType, e.deviceState)
+            self.signals.failed.emit(e.errorType, e.deviceState)
 
         except PackageLoaderError as e:
-            self.failed.emit(e.errorType, None)
+            self.signals.failed.emit(e.errorType, None)
 
 
 class CapturePaneController:
@@ -186,64 +225,140 @@ class CapturePaneController:
         self._client = AdbClient(adb_host, adb_port)
         self._lastSelectedDevice = None
         self._lastSelectedPackage = None
+        self._nothingSelected = False
         self._capturePane = None
 
-    def getSelectedDevice(self):
-        assert self.selectedDevice is not None
-        return self.selectedDevice
+    def selectedDevice(self):
+        return self._lastSelectedDevice
 
-    def getSelectedPackage(self):
-        assert self.selectedPackage is not None
-        return self.selectedPackage
+    def selectedPackage(self):
+        return self._lastSelectedPackage
 
     def captureTargetSelected(self):
-        return self.selectedPackage is not None and self.selectedAdbDevice is not None
+        return (
+            self._nothingSelected == False
+            and self._lastSelectedDevice is not None
+            and self._lastSelectedPackage is not None
+        )
 
     def setWidget(self, capturePane: CapturePane) -> None:
         self._capturePane = capturePane
         self._capturePane.deviceChanged.connect(self.deviceChanged)
         self._capturePane.packageSelected.connect(self.packageSelected)
+        self._capturePane.rejected.connect(self.nothingSelected)
+        self._nothingSelected = False
+
+    def nothingSelected(self):
+        self._nothingSelected = True
 
     def packageSelected(self, packageName: str):
-        self.selectedPackage = packageName
+        self._lastSelectedPackage = packageName
 
     def deviceChanged(self, deviceName: str):
-        self.selectedAdbDevice = deviceName
+        self._lastSelectedDevice = deviceName
+        self._capturePane.clearPackages()
 
-    def deviceLoaderSucceded(
-        self, deviceList: List[AdbDeviceInfo], selectedDevice: AdbDeviceInfo
-    ):
-        for device in deviceList:
-            self._capturePane.addDevice(device.name, device.state)
+        packageLoader = PackageLoader(self._client, deviceName)
+        packageLoader.setStartDelay(750)
+        packageLoader.signals.succeeded.connect(self.packageReloadSucceeded)
+        packageLoader.signals.failed.connect(self.packageLoaderFailed)
+        QThreadPool.globalInstance().start(packageLoader)
 
-        self._capturePane.setSelectedDevice(selectedDevice.name)
+        self._dialog = LoadingDialog()
+        self._dialog.setText("Fetching packages...")
+        self._dialog.exec_()
+
+    def packageReloadSucceeded(self, packageList: List[str], selectedPackage: str):
+        self._dialog.close()
+        self._capturePane.setPackages(packageList)
+        self._capturePane.setSelectedPackage(selectedPackage)
+
+    def packageReloadFailed(self, errorType: ErrorType, deviceState: Optional[str]):
+        self._dialog.close()
+        self._capturePane.setPackagesEmpty()
+
+        messageBox = QMessageBox()
+        messageBox.setIcon(QMessageBox.Critical)
+        messageBox.setWindowTitle("Error")
+
+        if errorType == ErrorType.ConnectionFailure:
+            messageBox.setText("Failed to connect to the adb server")
+            text = "Have you started the adb server with 'adb server' command?"
+            messageBox.setInformativeText(text)
+        elif errorType == ErrorType.DeviceNotFound:
+            messageBox.setText("No connected devices found")
+            text = "Please, connect your device to the PC via USB cable"
+            messageBox.setInformativeText(text)
+        elif errorType == ErrorType.DeviceStateInvalid:
+            assert deviceState is not None, "deviceState must have a value"
+            assert deviceState != "device", "deviceState can't have a 'device' value"
+            if deviceState == "unauthorized":
+                messageBox.setText("This device is not authorized")
+                text = "Please, allow USB debugging on your device after connecting it to PC"
+                messageBox.setInformativeText(text)
+            else:
+                messageBox.setText("Unable to get logs in the current device state")
+                text = "Please, ensure that your device has a 'device' state in the 'adb devices' command output"
+                messageBox.setInformativeText(text)
+        else:
+            messageBox.setText("Unknown error")
+            text = "Please, enable logging to get more info"
+            messageBox.setInformativeText(text)
+
+        messageBox.setStandardButtons(QMessageBox.Ok)
+        messageBox.exec_()
+
+    def packageLoaderSucceeded(self, packageList: List[str], selectedPackage: str):
+        self.packageReloadSucceeded(packageList, selectedPackage)
+        self._capturePane.exec_()
+
+    def packageLoaderFailed(self, errorType: ErrorType, deviceState: Optional[str]):
+        self.packageReloadFailed(errorType, deviceState)
+        self._capturePane.exec_()
+
+    def deviceLoaderSucceeded(self, deviceList: List[str], selectedDevice: str):
+        self._capturePane.setDevices(deviceList)
+        self._capturePane.setSelectedDevice(selectedDevice)
+        self._lastSelectedDevice = selectedDevice
+        self._dialog.setText("Fetching packages...")
+
+        packageLoader = PackageLoader(
+            self._client, selectedDevice, self._lastSelectedPackage
+        )
+        packageLoader.setStartDelay(500)
+        packageLoader.signals.succeeded.connect(self.packageLoaderSucceeded)
+        packageLoader.signals.failed.connect(self.packageLoaderFailed)
+        QThreadPool.globalInstance().start(packageLoader)
 
     def deviceLoaderFailed(self, errorType: ErrorType):
-        error_msg = QMessageBox()
-        error_msg.setIcon(QMessageBox.Critical)
-        error_msg.setWindowTitle("Error")
-        error_msg.setText("An error occurred.")
-        error_msg.setInformativeText("This is an example of an error message.")
-        error_msg.setStandardButtons(QMessageBox.Ok)
-        print("AAAA")
+        self._dialog.close()
+        messageBox = QMessageBox()
+        messageBox.setIcon(QMessageBox.Critical)
+        messageBox.setWindowTitle("Error")
 
-    def deviceLoaderThreadExited(self):
-        print("BBB")
-        self.dialog.close()
-        self.thread.quit()
-        self.thread.wait()
+        if errorType == ErrorType.ConnectionFailure:
+            messageBox.setText("Failed to connect to the adb server")
+            text = "Have you started the adb server with 'adb server' command?"
+            messageBox.setInformativeText(text)
+        elif errorType == ErrorType.NoDevicesFound:
+            messageBox.setText("No connected devices found")
+            text = "Please, connect your device to the PC via USB cable"
+            messageBox.setInformativeText(text)
+        else:
+            messageBox.setText("Unknown error")
+            text = "Please, enable logging to get more info"
+            messageBox.setInformativeText(text)
+
+        messageBox.setStandardButtons(QMessageBox.Ok)
+        messageBox.exec_()
 
     def newCaptureDialog(self):
-        self.thread = QThread()
-        self.deviceLoader = DeviceLoader(self._client)
-        self.deviceLoader.succeeded.connect(self.deviceLoaderSucceded)
-        self.deviceLoader.failed.connect(self.deviceLoaderFailed)
-        self.deviceLoader.moveToThread(self.thread)
-        self.thread.started.connect(self.deviceLoader.run)
-        self.deviceLoader.exited.connect(self.deviceLoaderThreadExited)
+        deviceLoader = DeviceLoader(self._client, self._lastSelectedDevice)
+        deviceLoader.setStartDelay(500)
+        deviceLoader.signals.succeeded.connect(self.deviceLoaderSucceeded)
+        deviceLoader.signals.failed.connect(self.deviceLoaderFailed)
+        QThreadPool.globalInstance().start(deviceLoader)
 
-        QTimer.singleShot(1000, self.thread.start)
-        self.dialog = LoadingDialog()
-        self.dialog.exec_()
-
-        self._capturePane.exec_()
+        self._dialog = LoadingDialog()
+        self._dialog.setText("Connecting to ADB server...")
+        self._dialog.exec_()

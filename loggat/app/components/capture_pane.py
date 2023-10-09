@@ -4,6 +4,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from loggat.app.util.paths import iconFile
+from loggat.app.util.signals import blockSignals
 
 
 class MyProxyStyle(QProxyStyle):
@@ -45,8 +46,10 @@ class CapturePane(QDialog):
         y = (screen.height() - height) // 2
         self.setGeometry(x, y, width, height)
 
-    def addDevice(self, deviceName: str, deviceState: str):
-        self.deviceDropDown.addItem(deviceName, deviceState)
+    def setDevices(self, devices: List[str]):
+        with blockSignals(self.deviceDropDown):
+            self.model.removeRows(0, self.model.rowCount())
+            self.deviceDropDown.addItems(devices)
 
     def setPackagesEmpty(self):
         self.model.removeRows(0, self.model.rowCount())
@@ -63,13 +66,18 @@ class CapturePane(QDialog):
         self.model.appendRow(item)
 
     def setPackages(self, packages: List[str]):
+        assert len(packages) > 0, "Non empty list expected"
         self.model.removeRows(0, self.model.rowCount())
+
         for package in packages:
             self.model.appendRow(QStandardItem(package))
 
         index = self.packagesListView.model().index(0, 0)
         self.packagesListView.setCurrentIndex(index)
         self.selectButton.setEnabled(True)
+
+    def clearPackages(self):
+        self.model.removeRows(0, self.model.rowCount())
 
     def initUserInterface(self):
         self.setWindowTitle("New capture")
@@ -90,7 +98,10 @@ class CapturePane(QDialog):
 
         self.deviceLabel = QLabel(self)
         self.deviceLabel.setText("Device:")
+
         self.deviceDropDown = QComboBox(self)
+        self.deviceDropDown.currentTextChanged.connect(self.onDeviceChanged)
+
         self.reloadButton = QPushButton(self)
         self.reloadButton.setIcon(QIcon(iconFile("reload")))
         self.reloadButton.setText("Reload packages")
@@ -107,6 +118,8 @@ class CapturePane(QDialog):
         self.packagesListView.setEditTriggers(QListView.NoEditTriggers)
         self.packagesListView.doubleClicked.connect(self.onPackageSelected)
         self.packagesListView.itemActivated.connect(self.onPackageSelected)
+        self.packagesListView.setStyleSheet("QListView::item:selected { background-color: #CDE3FF; color: highlightedText;}")
+
         self.model = QStandardItemModel(self)
         self.proxyModel = QSortFilterProxyModel()
         self.proxyModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
@@ -149,26 +162,45 @@ class CapturePane(QDialog):
     def onPackageSelected(self, index: QModelIndex):
         model = self.packagesListView.model()
         self.packageSelected.emit(model.data(index))
-        self.close()
+        self.accept()
 
     def fromApkButtonClicked(self):
         pass
 
+    def onDeviceChanged(self, newDevice: str):
+        self.deviceChanged.emit(newDevice)
+
     def reloadButtonClicked(self):
         device = self.deviceDropDown.currentText()
-        self.deviceChanged.emit(device)
+        self.onDeviceChanged(device)
 
     def cancelButtonClicked(self):
-        self.close()
+        self.reject()
 
     def selectButtonClicked(self):
         self.onPackageSelected(self.packagesListView.currentIndex())
 
     def selectedPackage(self):
-        return self.selectedPackageName
+        index = self.packagesListView.currentIndex()
+        return index.data() if index.isValid() else None
 
     def selectedDevice(self):
         return self.deviceDropDown.currentText()
 
     def setSelectedDevice(self, deviceName: str):
-        self.deviceDropDown.setCurrentText(deviceName)
+        with blockSignals(self.deviceDropDown):
+            self.deviceDropDown.setCurrentText(deviceName)
+
+    def _selectIndex(self, index: QModelIndex):
+        selectionModel = self.packagesListView.selectionModel()
+        selectionModel.clear()
+
+        self.packagesListView.setCurrentIndex(index)
+        selectionModel.select(index, QItemSelectionModel.Select)
+        self.packagesListView.scrollTo(index, QListView.PositionAtCenter)
+
+    def setSelectedPackage(self, packageName: str):
+        items = self.model.findItems(packageName, Qt.MatchExactly)
+        if items:
+            self._selectIndex(items[0].index())
+
