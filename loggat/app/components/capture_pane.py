@@ -54,11 +54,13 @@ class CapturePane(QDialog):
     def setPackagesEmpty(self):
         self.model.removeRows(0, self.model.rowCount())
         item = QStandardItem()
-        item.setFlags(item.flags() & ~Qt.ItemIsSelectable)
-        self.model.appendRow(QStandardItem())
+        item.setSelectable(False)
+        item.setEnabled(False)
+        self.model.appendRow(item)
 
         item = QStandardItem("¯\_(ツ)_/¯")
-        item.setFlags(item.flags() & ~Qt.ItemIsSelectable)
+        item.setSelectable(False)
+        item.setEnabled(False)
         item.setData(Qt.AlignCenter, Qt.TextAlignmentRole)
         font = QFont("Arial")
         font.setPointSize(12)
