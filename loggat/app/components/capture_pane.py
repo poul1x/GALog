@@ -28,6 +28,7 @@ class MyListView(QListView):
 class CapturePane(QDialog):
     deviceChanged = pyqtSignal(str)
     packageSelected = pyqtSignal(str)
+    packageNameFromApk = pyqtSignal()
 
     def _defaultFlags(self):
         return Qt.Window | Qt.Dialog | Qt.WindowCloseButtonHint
@@ -167,7 +168,7 @@ class CapturePane(QDialog):
         self.accept()
 
     def fromApkButtonClicked(self):
-        pass
+        self.packageNameFromApk.emit()
 
     def onDeviceChanged(self, newDevice: str):
         self.deviceChanged.emit(newDevice)
@@ -205,4 +206,8 @@ class CapturePane(QDialog):
         items = self.model.findItems(packageName, Qt.MatchExactly)
         if items:
             self._selectIndex(items[0].index())
+
+    def isPackageInstalled(self, packageName: str):
+        items = self.model.findItems(packageName, Qt.MatchExactly)
+        return bool(items)
 

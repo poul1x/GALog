@@ -1,6 +1,8 @@
 from datetime import datetime
 import os
 from queue import Queue
+import shutil
+import subprocess
 from threading import Thread
 from time import sleep
 from typing import Dict, List, Optional
@@ -71,8 +73,6 @@ class MainWindow(QMainWindow):
         # self.readSomeAndroidLogs()
         # self.lineRead(LogcatLine("W", "TAG", 12, "Visit https://aaa.ru"))
         # self.lineRead(LogcatLine("E", "TAG", "Buffer overflow 0xffffff"))
-
-
 
     def styleSheetFiles(self, path: str = STYLES_DIR):
         result = []

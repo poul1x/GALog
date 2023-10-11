@@ -1,3 +1,4 @@
 -r requirements-base.txt
+pyqt5-tools
 pyqt5-stubs
 black

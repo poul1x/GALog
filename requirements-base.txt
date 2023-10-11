@@ -1,4 +1,6 @@
 PyYAML
 coloredlogs
-pyqt5-tools
+PyQt5
+# adbutils
 pure-python-adb
+pyaxmlparser

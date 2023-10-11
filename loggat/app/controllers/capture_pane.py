@@ -16,6 +16,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import yaml
 
+from pyaxmlparser import APK
+
 from loggat.app.components.loading_dialog import LoadingDialog
 from ..components.capture_pane import CapturePane
 from loggat.app.highlighting_rules import HighlightingRules
@@ -256,6 +258,7 @@ class CapturePaneController:
         self._capturePane = capturePane
         self._capturePane.deviceChanged.connect(self.deviceChanged)
         self._capturePane.packageSelected.connect(self.packageSelected)
+        self._capturePane.packageNameFromApk.connect(self.packageNameFromApk)
         self._capturePane.rejected.connect(self.nothingSelected)
         self._nothingSelected = False
 
@@ -380,3 +383,33 @@ class CapturePaneController:
         self._dialog = LoadingDialog()
         self._dialog.setText("Connecting to ADB server...")
         self._dialog.exec_()
+
+    def packageNameFromApk(self):
+        openFileDialog = QFileDialog()
+        openFileDialog.setFileMode(QFileDialog.ExistingFile)  # Allow selecting an existing file
+        openFileDialog.setNameFilter("APK Files (*.apk)")
+
+        if not openFileDialog.exec_():
+            return
+
+        selected_files = openFileDialog.selectedFiles()
+        if not selected_files:
+            return
+
+        apk = APK(selected_files[0])
+        packageName = apk.packagename
+
+        if self._capturePane.isPackageInstalled(packageName):
+            self._lastSelectedPackage = packageName
+            self._capturePane.accept()
+        else:
+            messageBox = QMessageBox()
+            messageBox.setIcon(QMessageBox.Critical)
+            messageBox.setWindowTitle("Error")
+            messageBox.setText(f"Package '{packageName}' is not installed")
+            text = "Please, install the package first (ADB -> Install APK)"
+            messageBox.setInformativeText(text)
+            messageBox.exec_()
+
+        # dumpsys package ru.vk.store | grep -B 2 'android.intent.category.LAUNCHER'
+        # apk.get_main_activity()
