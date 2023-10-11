@@ -278,12 +278,12 @@ class CapturePaneController:
         packageLoader.signals.failed.connect(self.packageReloadFailed)
         QThreadPool.globalInstance().start(packageLoader)
 
-        self._dialog = LoadingDialog()
-        self._dialog.setText("Fetching packages...")
-        self._dialog.exec_()
+        self._loadingDialog = LoadingDialog()
+        self._loadingDialog.setText("Fetching packages...")
+        self._loadingDialog.exec_()
 
     def packageReloadSucceeded(self, packageList: List[str], selectedPackage: str):
-        self._dialog.close()
+        self._loadingDialog.close()
         self._capturePane.setPackages(packageList)
         self._capturePane.setSelectedPackage(selectedPackage)
 
@@ -293,7 +293,7 @@ class CapturePaneController:
         deviceName: Optional[str],
         deviceState: Optional[str],
     ):
-        self._dialog.close()
+        self._loadingDialog.close()
         self._capturePane.setPackagesEmpty()
 
         messageBox = QMessageBox()
@@ -312,7 +312,7 @@ class CapturePaneController:
         elif errorType == ErrorType.DeviceStateInvalid:
             assert deviceName is not None, "deviceName must not be None"
             assert deviceState is not None, "deviceState must have a value"
-            assert deviceState != "device", "deviceState can't have a 'device' value"
+            assert deviceState != DEVICE_STATE_OK, "deviceState must not be DEVICE_STATE_OK"
             if deviceState == "unauthorized":
                 messageBox.setText(f"Device '{deviceName}' is not authorized")
                 text = "Please, allow USB debugging on your device after connecting it to PC"
@@ -341,7 +341,7 @@ class CapturePaneController:
         self._capturePane.setDevices(deviceList)
         self._capturePane.setSelectedDevice(selectedDevice)
         self._lastSelectedDevice = selectedDevice
-        self._dialog.setText("Fetching packages...")
+        self._loadingDialog.setText("Fetching packages...")
 
         packageLoader = PackageLoader(
             self._client, selectedDevice, self._lastSelectedPackage
@@ -352,7 +352,7 @@ class CapturePaneController:
         QThreadPool.globalInstance().start(packageLoader)
 
     def deviceLoaderFailed(self, errorType: ErrorType):
-        self._dialog.close()
+        self._loadingDialog.close()
         messageBox = QMessageBox()
         messageBox.setIcon(QMessageBox.Critical)
         messageBox.setWindowTitle("Error")
@@ -380,9 +380,9 @@ class CapturePaneController:
         deviceLoader.signals.failed.connect(self.deviceLoaderFailed)
         QThreadPool.globalInstance().start(deviceLoader)
 
-        self._dialog = LoadingDialog()
-        self._dialog.setText("Connecting to ADB server...")
-        self._dialog.exec_()
+        self._loadingDialog = LoadingDialog()
+        self._loadingDialog.setText("Connecting to ADB server...")
+        self._loadingDialog.exec_()
 
     def packageNameFromApk(self):
         openFileDialog = QFileDialog()
