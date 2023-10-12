@@ -68,6 +68,9 @@ class CapturePane(QDialog):
         item.setFont(font)
         self.model.appendRow(item)
 
+        self.selectButton.setEnabled(False)
+        self.fromApkButton.setEnabled(False)
+
     def setPackages(self, packages: List[str]):
         assert len(packages) > 0, "Non empty list expected"
         self.model.removeRows(0, self.model.rowCount())
@@ -75,9 +78,11 @@ class CapturePane(QDialog):
         for package in packages:
             self.model.appendRow(QStandardItem(package))
 
-        index = self.packagesListView.model().index(0, 0)
-        self.packagesListView.setCurrentIndex(index)
+        index = self.proxyModel.index(0, 0)
+        self._selectIndex(index)
+
         self.selectButton.setEnabled(True)
+        self.fromApkButton.setEnabled(True)
 
     def clearPackages(self):
         self.model.removeRows(0, self.model.rowCount())
@@ -174,6 +179,8 @@ class CapturePane(QDialog):
         self.deviceChanged.emit(newDevice)
 
     def reloadButtonClicked(self):
+        self.selectButton.setEnabled(False)
+        self.fromApkButton.setEnabled(False)
         device = self.deviceDropDown.currentText()
         self.onDeviceChanged(device)
 
@@ -205,7 +212,9 @@ class CapturePane(QDialog):
     def setSelectedPackage(self, packageName: str):
         items = self.model.findItems(packageName, Qt.MatchExactly)
         if items:
-            self._selectIndex(items[0].index())
+            index = items[0].index()
+            proxyIndex = self.proxyModel.mapFromSource(index)
+            self._selectIndex(proxyIndex)
 
     def isPackageInstalled(self, packageName: str):
         items = self.model.findItems(packageName, Qt.MatchExactly)

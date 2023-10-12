@@ -1,0 +1,19 @@
+deviceErrors:
+  connectionError:
+    brief: 'Failed to connect to the adb server'
+    verbose: "Have you started the adb server with 'adb server' command?"
+  noDevicesFound:
+    brief: "No connected devices found"
+    verbose: "Please, connect your device to the PC via USB cable"
+  deviceNotFound:
+    brief: "Device '{}' is no longer available"
+    verbose: "Please, reconnect your device to the PC"
+  deviceStateUnauthorized:
+    brief: "Device '{}' is not authorized"
+    verbose: "Please, allow USB debugging on your device after connecting it to PC"
+  deviceStateInvalid:
+    brief: "Unable to communicate with device '{}'"
+    verbose: "Unable to communicate with device which state is '{}'"
+  runtimeError:
+    brief: "ADB command failed on device '{}'"
+    verbose: "Please, enable logging to get more info"

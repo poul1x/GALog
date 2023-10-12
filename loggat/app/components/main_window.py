@@ -25,9 +25,7 @@ from loggat.app.logcat import (
 from loggat.app.mtsearch import SearchItem, SearchItemTask, SearchResult
 from loggat.app.util.paths import HIGHLIGHTING_RULES_FILE, STYLES_DIR
 
-from ppadb.client import Client
-from ppadb.device import Device
-
+from .. import app_strings
 
 from .log_messages_pane import LogMessagesPane
 
@@ -63,6 +61,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self) -> None:
         super().__init__()
+        self.loadAppStrings()
         self.loadStyleSheet()
         self.initUserInterface()
         self.initHighlighting()
@@ -73,6 +72,9 @@ class MainWindow(QMainWindow):
         # self.readSomeAndroidLogs()
         # self.lineRead(LogcatLine("W", "TAG", 12, "Visit https://aaa.ru"))
         # self.lineRead(LogcatLine("E", "TAG", "Buffer overflow 0xffffff"))
+
+    def loadAppStrings(self):
+        app_strings.init("en")
 
     def styleSheetFiles(self, path: str = STYLES_DIR):
         result = []

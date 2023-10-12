@@ -21,7 +21,7 @@ from loggat.app.components.error_dialog import ErrorDialog
 from loggat.app.components.loading_dialog import LoadingDialog
 
 from loggat.app.device import AdbClient, AdbDevice
-from loggat.app.device.errors import DeviceError, DeviceNotFound, DeviceStateInvalid, ErrorType
+from loggat.app.device.errors import DeviceError, DeviceNotFound, DeviceStateInvalid
 
 from ...components.capture_pane import CapturePane
 from loggat.app.highlighting_rules import HighlightingRules
@@ -29,7 +29,7 @@ from loggat.app.components.message_view_pane import LogMessageViewPane
 
 class DeviceLoaderSignals(QObject):
     succeeded = pyqtSignal(list, str)
-    failed = pyqtSignal(ErrorType)
+    failed = pyqtSignal(str, str)
 
 class DeviceLoader(QRunnable):
     _client: AdbClient
@@ -68,4 +68,4 @@ class DeviceLoader(QRunnable):
             self.signals.succeeded.emit(devices, device)
 
         except DeviceError as e:
-            self.signals.failed.emit(e.errorType)
+            self.signals.failed.emit(e.msgBrief, e.msgVerbose)

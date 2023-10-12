@@ -8,10 +8,12 @@ from .errors import (
     DeviceNotFound,
     DeviceRuntimeError,
     DeviceStateInvalid,
+    DeviceStateUnauthorized,
     NoDevicesFound,
 )
 
 DEVICE_STATE_OK = "device"
+DEVICE_STATE_NO_AUTH = "unauthorized"
 
 
 class AdbDevice(Device):
@@ -49,15 +51,18 @@ class AdbClient(Client):
             raise AdbConnectionError()
 
         if device is None:
-            raise DeviceNotFound()
+            raise DeviceNotFound(deviceName)
 
         if device.state != DEVICE_STATE_OK:
-            raise DeviceStateInvalid(device.serial, device.state)
+            if device.state == DEVICE_STATE_NO_AUTH:
+                raise DeviceStateUnauthorized(device.serial)
+            else:
+                raise DeviceStateInvalid(device.serial, device.state)
 
         try:
             yield device
         except RuntimeError as e:
-            raise DeviceRuntimeError(device.serial, e)
+            raise DeviceRuntimeError(device.serial, str(e))
 
     def devicesRestricted(self):
         try:
