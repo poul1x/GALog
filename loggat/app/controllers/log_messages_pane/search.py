@@ -6,14 +6,6 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from enum import IntEnum, auto
 
-# class SearchItemType(IntEnum):
-#     url = auto()
-#     decimalNumber = auto()
-#     hexadecimalNumber = auto()
-#     singleQuotedString = auto()
-#     doubleQuotedString = auto()
-
-
 @dataclass
 class SearchItem:
     name: str

@@ -7,16 +7,19 @@ from typing import Callable, List, Optional, Tuple
 from ppadb.client import Client
 from ppadb.device import Device
 from ppadb.connection import Connection
-from threading import Thread, Event
-from .util.event import Event
 import socket
 
 
 from PyQt5.QtCore import *
+from loggat.app.device import AdbClient, deviceRestricted
+from loggat.app.device.device import AdbDevice
+from loggat.app.device.errors import DeviceError, AdbConnectionError
+
+from loggat.app.util.event import Event
 
 
 @dataclass
-class LogcatLine:
+class LogLine:
     level: str
     tag: str
     pid: str
@@ -53,7 +56,7 @@ PID_DEATH = re.compile(r"^Process ([a-zA-Z0-9._:]+) \(pid (\d+)\) has died.?$")
 # fmt: on
 
 
-class LogcatLineReader:
+class LogLineReader:
     _buf: bytes
 
     def __init__(self) -> None:
@@ -73,7 +76,7 @@ class LogcatLineReader:
                 continue
 
             groups: Tuple[str] = match.groups()
-            yield LogcatLine(
+            yield LogLine(
                 level=groups[0],
                 tag=groups[1].strip(),
                 pid=groups[2].strip(),
@@ -82,16 +85,18 @@ class LogcatLineReader:
 
 
 class LogcatReaderThread(QThread):
-    lineRead = pyqtSignal(LogcatLine)
+    failed = pyqtSignal(str, str)
+    lineRead = pyqtSignal(LogLine)
     processStarted = pyqtSignal(ProcessStartedEvent)
     processEnded = pyqtSignal(ProcessEndedEvent)
 
-    def __init__(self, device: Device) -> None:
+    def __init__(self, client: AdbClient, device: str) -> None:
         super().__init__()
-        self._device = device
+        self._client = client
+        self._deviceName = device
         self._stopEvent = Event()
 
-    def _parseProcessStart(self, line: LogcatLine):
+    def _parseProcessStart(self, line: LogLine):
         match: re.Match = PID_START_5_1.match(line.msg)
         if match is not None:
             return ProcessStartedEvent(
@@ -118,7 +123,7 @@ class LogcatReaderThread(QThread):
 
         return None
 
-    def _parseProcessEnd(self, line: LogcatLine):
+    def _parseProcessEnd(self, line: LogLine):
         if line.tag != "ActivityManager":
             return None
 
@@ -145,8 +150,7 @@ class LogcatReaderThread(QThread):
 
         return None
 
-    def _processLine(self, line: LogcatLine):
-
+    def _processLine(self, line: LogLine):
         processStart = self._parseProcessStart(line)
         if processStart is not None:
             self.processStarted.emit(processStart)
@@ -159,9 +163,9 @@ class LogcatReaderThread(QThread):
 
         self.lineRead.emit(line)
 
-    def run(self):
-        reader = LogcatLineReader()
-        conn: Connection = self._device.create_connection()
+    def _liveLogRead(self, device: AdbDevice):
+        reader = LogLineReader()
+        conn: Connection = device.create_connection()
         conn.send("shell:{}".format(LOGCAT_CMD))
         conn.socket.setblocking(False)
 
@@ -169,7 +173,7 @@ class LogcatReaderThread(QThread):
             with suppress(BlockingIOError):
                 data = conn.read(RECV_CHUNK_SIZE)
                 if not data:
-                    break
+                    raise AdbConnectionError()
 
                 reader.addDataChunk(data)
                 for line in reader.readParsedLines():
@@ -180,79 +184,85 @@ class LogcatReaderThread(QThread):
             if self._stopEvent.isSet():
                 break
 
+    def run(self):
+        try:
+            with deviceRestricted(self._client, self._deviceName) as device:
+                self._liveLogRead(device)
+
+        except DeviceError as e:
+            self.failed.emit(e.msgBrief, e.msgVerbose)
+
     def stop(self):
         self._stopEvent.set()
 
+class Worker(QRunnable):
+    pass
+
+
 class LogReaderSignals(QObject):
-    lineRead = pyqtSignal(LogcatLine)
+    failed = pyqtSignal(str, str)
+    lineRead = pyqtSignal(LogLine)
     processStarted = pyqtSignal(ProcessStartedEvent)
     processEnded = pyqtSignal(ProcessEndedEvent)
+    initialized = pyqtSignal(str, list)
     appStarted = pyqtSignal(str)
     appEnded = pyqtSignal(str)
 
+
 class AndroidAppLogReader:
-
-    def __init__(self, host: str, port: str, serial: str, package: str):
+    def __init__(self, client: AdbClient, device: str, package: str):
         super().__init__()
-        try:
-            device: Device = Client(host, port).device(serial)
-            if device is None:
-                raise Exception("No such device")
-        except Exception:
-            raise
-
-        self.packageName = package
-        self._readerThread = LogcatReaderThread(device)
-
-        output: str = device.shell(f"pidof {package}")
-        self._pids = set(output.split())
+        self._client = client
+        self._deviceName = device
+        self._packageName = package
+        self._readerThread = LogcatReaderThread(client, device)
+        self._pids = set()
 
         self.signals = LogReaderSignals()
         self._readerThread.lineRead.connect(self.onLineRead)
         self._readerThread.processStarted.connect(self.onProcessStarted)
         self._readerThread.processEnded.connect(self.onProcessEnded)
+        self._readerThread.failed.connect(self.onFailed)
 
-    def onLineRead(self, line: LogcatLine):
+    def onLineRead(self, line: LogLine):
         if line.pid in self._pids:
             self.signals.lineRead.emit(line)
 
     def onProcessStarted(self, event: ProcessStartedEvent):
-        if event.packageName == self.packageName:
+        if event.packageName == self._packageName:
             if not self._pids:
                 self.signals.appStarted.emit(event.packageName)
             self._pids.add(event.processId)
             self.signals.processStarted.emit(event)
 
     def onProcessEnded(self, event: ProcessEndedEvent):
-        if event.packageName == self.packageName:
+        if event.packageName == self._packageName:
             self._pids.discard(event.processId)
             self.signals.processEnded.emit(event)
             if not self._pids:
                 self.signals.appEnded.emit(event.packageName)
 
-    def start(self):
-        self._readerThread.start()
+    def onFailed(self, msgBrief: str, msgVerbose: str):
+        self.signals.failed.emit(msgBrief, msgVerbose)
 
-    def stop(self):
-        self._readerThread.stop()
-        self._readerThread.wait()
-
-
-class AndroidLogReader:
-    def __init__(self, host: str, port: str, serial: str):
+    def _getAppPidsAndStartReaderThread(self):
         try:
-            device = Client(host, port).device(serial)
-            if device is None:
-                raise Exception("No such device")
-        except Exception:
-            raise
+            with deviceRestricted(self._client, self._deviceName) as device:
+                output: str = device.shell(f"pidof {self._packageName}")
+                self._pids = set(output.split())
 
-        self._readerThread = LogcatReaderThread(device)
-        self.lineRead = self._readerThread.lineRead
+        except DeviceError as e:
+            self.signals.failed.emit(e.msgBrief, e.msgVerbose)
 
-    def start(self):
+        self.signals.initialized.emit(self._packageName, list(self._pids))
         self._readerThread.start()
 
+    def start(self):
+        QThreadPool.globalInstance().start(
+            self._getAppPidsAndStartReaderThread,
+        )
+
     def stop(self):
-        self._readerThread.stop()
-        self._readerThread.wait()
+        if self._readerThread.isRunning():
+            self._readerThread.stop()
+            self._readerThread.wait()

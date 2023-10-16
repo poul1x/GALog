@@ -33,7 +33,7 @@ from ...components.capture_pane import CapturePane
 from loggat.app.highlighting_rules import HighlightingRules
 from loggat.app.components.message_view_pane import LogMessageViewPane
 
-
+# TODO: controller.py, camelCase
 class CapturePaneController:
     _capturePane: Optional[CapturePane]
 

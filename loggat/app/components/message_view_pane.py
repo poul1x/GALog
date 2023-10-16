@@ -8,9 +8,9 @@ from dataclasses import dataclass
 from typing import List
 from enum import Enum
 from loggat.app.highlighting_rules import HighlightingRules
-from loggat.app.mtsearch import SearchResult
-
 from loggat.app.util.paths import iconFile
+
+from loggat.app.controllers.log_messages_pane.search import SearchResult
 
 
 class LogMessageViewPane(QDialog):
@@ -34,7 +34,6 @@ class LogMessageViewPane(QDialog):
         return cursor
 
     def highlightKeyword(self, keyword: SearchResult, charFormat: QTextCharFormat):
-
         if keyword.name == "genericUrl":
             charFormat.setAnchor(True)
             doc = self._logMsgTextBrowser.document()

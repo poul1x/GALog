@@ -12,18 +12,13 @@ from PyQt5.QtGui import *
 import yaml
 from loggat.app.components.capture_pane import CapturePane
 from loggat.app.controllers.capture_pane.capture_pane import CapturePaneController
+from loggat.app.controllers.log_messages_pane.controller import LogMessagesPaneController
+from loggat.app.controllers.log_messages_pane.log_reader import AndroidAppLogReader, LogLine, ProcessEndedEvent, ProcessStartedEvent
 from loggat.app.device.device import AdbClient
 from loggat.app.highlighting_rules import HighlightingRules
 from loggat.app.components.message_view_pane import LogMessageViewPane
+from loggat.app.util.style import CustomStyle
 
-from loggat.app.logcat import (
-    AndroidAppLogReader,
-    AndroidLogReader,
-    LogcatLine,
-    ProcessEndedEvent,
-    ProcessStartedEvent,
-)
-from loggat.app.mtsearch import SearchItem, SearchItemTask, SearchResult
 from loggat.app.util.paths import HIGHLIGHTING_RULES_FILE, STYLES_DIR
 
 from .. import app_strings
@@ -38,41 +33,30 @@ class CentralWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.initUserInterface()
-        self.applyStyleSheets()
-
-    def applyStyleSheets(self):
-        file = QFile(":splitter.qss")
-        if not file.open(QIODevice.ReadOnly):
-            return
-
-        self.setStyleSheet(file.readAll().data().decode())
-        file.close()
 
     def initUserInterface(self):
-        self.pane = LogMessagesPane(self)
         hBoxLayout = QHBoxLayout()
-        hBoxLayout.addWidget(self.pane)
+        self.logMessagesPane = LogMessagesPane(self)
+        hBoxLayout.addWidget(self.logMessagesPane)
         self.setLayout(hBoxLayout)
 
 
 class MainWindow(QMainWindow):
-    _logReader: Optional[AndroidLogReader]
     _viewWindows: List[LogMessageViewPane]
     _liveReload: bool
 
     def __init__(self) -> None:
         super().__init__()
-        self.loadAppStrings()
-        self.loadStyleSheet()
-        self.initUserInterface()
-        self.initHighlighting()
         self._searchPane = None
         self._liveReload = True
         self.capturePaneController = CapturePaneController(ADB_HOST, ADB_PORT)
+        self.logMessagesPaneController = LogMessagesPaneController(ADB_HOST, ADB_PORT)
+        self.loadAppStrings()
+        self.loadStyleSheet()
+        self.initHighlighting()
+        self.initUserInterface()
+        self.setStyle(CustomStyle())
 
-        # self.readSomeAndroidLogs()
-        # self.lineRead(LogcatLine("W", "TAG", 12, "Visit https://aaa.ru"))
-        # self.lineRead(LogcatLine("E", "TAG", "Buffer overflow 0xffffff"))
 
     def loadAppStrings(self):
         app_strings.init("en")
@@ -96,79 +80,16 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(style)
 
     def initHighlighting(self):
-        self.highlightingRules = HighlightingRules()
+        rules = HighlightingRules()
         with open(HIGHLIGHTING_RULES_FILE) as f:
-            rules = yaml.load_all(f, yaml.SafeLoader)
-            self.highlightingRules.load(rules)
+            content = yaml.load_all(f, yaml.SafeLoader)
+            rules.load(content)
 
-        pane = self.centralWidget().pane
-        pane.setHighlightingRules(self.highlightingRules)
-
-    def lineRead(self, parsedLine: LogcatLine):
-        centralWidget: CentralWidget = self.centralWidget()
-        centralWidget.pane.appendRow(
-            parsedLine.level,
-            parsedLine.tag,
-            parsedLine.msg,
-        )
-
-    def appStarted(self, packageName: str):
-        centralWidget: CentralWidget = self.centralWidget()
-
-        if self._liveReload:
-            centralWidget.pane.clear()
-        # TODO: disable filter
-
-        msg = f"App '{packageName}' started"
-        centralWidget.pane.appendRow("S", "loggat", msg)
-
-    def processStarted(self, event: ProcessStartedEvent):
-        centralWidget: CentralWidget = self.centralWidget()
-        msg = f"Process <PID={event.processId}> started for {event.target}"
-        centralWidget.pane.appendRow("S", "loggat", msg)
-
-    def processEnded(self, event: ProcessEndedEvent):
-        centralWidget: CentralWidget = self.centralWidget()
-        msg = f"Process <PID={event.processId}> ended"
-        centralWidget.pane.appendRow("S", "loggat", msg)
-
-    def appEnded(self, packageName: str):
-        centralWidget: CentralWidget = self.centralWidget()
-        msg = f"App '{packageName}' ended"
-        centralWidget.pane.appendRow("S", "loggat", msg)
+        self.logMessagesPaneController.setHighlightingRules(rules)
 
     def centralWidget(self) -> CentralWidget:
         return super().centralWidget()
 
-    def showSearchPane(self):
-        self.centralWidget().pane.enableDisableFilter()
-
-    def openLogMessageViewPane(self):
-        window = LogMessageViewPane(self)
-        window.setTag("Portswertive")
-        window.setLogLevel("I")
-        window.setLogMessage("qwerty efdfdfdasasa sasasasa https://google.com")
-        window.exec_()
-
-    def readSomeAndroidLogs(self):
-        self.startReadingAndroidLog()
-        # sleep(0.5)
-        # self.stopReadingAndroidLog()
-
-    def startReadingAndroidLog(self):
-        self._logReader = AndroidAppLogReader(
-            "127.0.0.1", 5037, "15151JEC210855", "org.telegram.messenger"
-        )
-        self._logReader.signals.appStarted.connect(self.appStarted)
-        self._logReader.signals.processStarted.connect(self.processStarted)
-        self._logReader.signals.processEnded.connect(self.processEnded)
-        self._logReader.signals.appEnded.connect(self.appEnded)
-        self._logReader.signals.lineRead.connect(self.lineRead)
-        self._logReader.start()
-
-    def stopReadingAndroidLog(self):
-        self._logReader.stop()
-        # self._logReader = None
 
     def closeEvent(self, event: QEvent):
         reply = QMessageBox.question(
@@ -180,7 +101,7 @@ class MainWindow(QMainWindow):
         )
 
         if reply == QMessageBox.Yes:
-            self.stopReadingAndroidLog()
+            self.logMessagesPaneController.stopCapture()
             event.accept()
         else:
             event.ignore()
@@ -193,8 +114,7 @@ class MainWindow(QMainWindow):
         if self.capturePaneController.captureTargetSelected():
             device = self.capturePaneController.selectedDevice()
             package = self.capturePaneController.selectedPackage()
-            # self.logMessagesPaneController.startCapture(device, package)
-            print(f"Start capture: {device} {package}")
+            self.logMessagesPaneController.startCapture(device, package)
 
     def actionStub(self):
         QMessageBox.information(self, "Stub", "Action stub")
@@ -261,7 +181,9 @@ class MainWindow(QMainWindow):
         y = (screen.height() - height) // 2
         self.setGeometry(x, y, width, height)
 
-        self.setCentralWidget(CentralWidget())
+        centralWidget = CentralWidget()
+        self.logMessagesPaneController.takeControl(centralWidget.logMessagesPane)
+        self.setCentralWidget(centralWidget)
         # self.statusBar().showMessage('Ready')
         self.setWindowTitle("Loggat")
         self.setupMenuBar()

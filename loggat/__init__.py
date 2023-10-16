@@ -1,7 +1,7 @@
 # Registers application resources (images, icons, etc...)
 # Resources compiled with: pyrcc5.exe -o ./sqs_gui/app/resources.py ./resources.qrc
-from .app import resources
+# from .app import resources # noqa
 
 # Explicitly import some dependencies
 # to make them fetched by pyinstaller
-import coloredlogs
+import coloredlogs # noqa
