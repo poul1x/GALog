@@ -253,6 +253,7 @@ class AndroidAppLogReader:
 
         except DeviceError as e:
             self.signals.failed.emit(e.msgBrief, e.msgVerbose)
+            return
 
         self.signals.initialized.emit(self._packageName, list(self._pids))
         self._readerThread.start()

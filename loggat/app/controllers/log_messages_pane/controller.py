@@ -128,6 +128,7 @@ class LogMessagesPaneController:
 
     def logReaderInitialized(self, packageName: str, pids: List[str]):
 
+        assert self._loadingDialog
         self._loadingDialog.close()
         self._loadingDialog = None
 
@@ -144,6 +145,7 @@ class LogMessagesPaneController:
             self._loadingDialog.close()
             self._loadingDialog = None
 
+
         messageBox = ErrorDialog()
         messageBox.setText(msgBrief)
         messageBox.setInformativeText(msgVerbose)
@@ -159,10 +161,11 @@ class LogMessagesPaneController:
         self._logReader.signals.processStarted.connect(self.processStarted)
         self._logReader.signals.processEnded.connect(self.processEnded)
         self._logReader.signals.lineRead.connect(self.lineRead)
-        QTimer.singleShot(500, lambda: self._logReader.start())
+        QTimer.singleShot(750, lambda: self._logReader.start())
+        # QTimer.singleShot(750, lambda: self.logReaderFailed("A","b"))
 
         self._loadingDialog = LoadingDialog()
-        self._loadingDialog.setText(f"Reading logs of '{package}'...")
+        self._loadingDialog.setText(f"Connecting to ADB server...")
         self._loadingDialog.exec_()
 
     def stopCapture(self):
