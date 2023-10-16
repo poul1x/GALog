@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from ppadb.client import Client
 from ppadb.device import Device
 
@@ -16,61 +16,76 @@ DEVICE_STATE_OK = "device"
 DEVICE_STATE_NO_AUTH = "unauthorized"
 
 
+# Use this as alias
+# https://github.com/microsoft/pylance-release/discussions/2695
 class AdbDevice(Device):
-    def __init__(self, client, serial, state):
-        super().__init__(client, serial)
-        self.state = state
+    pass
 
 
 class AdbClient(Client):
-    def devices(self, state=None):
+    def devices_with_states(self) -> List[Tuple[Device, str]]:
         cmd = "host:devices"
         result: str = self._execute_cmd(cmd)
 
         devices = []
-        for line in result.split("\n"):
-            if not line:
-                break
+        for line in filter(None, result.split("\n")):
             try:
-                serial, state_ = line.split()
+                serial, state = line.split()
             except ValueError:
                 raise RuntimeError("Adb response parse error")
 
-            if state and state != state_:
+            device_with_state = (Device(self, serial), state)
+            devices.append(device_with_state)
+
+        return devices
+
+    def devices(self, state=None) -> List[Device]:
+        result = []
+        for device, state_ in self.devices_with_states():
+            if state is not None and state != state_:
                 continue
+            result.append(device)
 
-            devices.append(AdbDevice(self, serial, state_))
+        return result
 
-        return devices
+    def device_with_state(self, serial: str):
+        for device, status in self.devices_with_states():
+            if device.serial == serial:
+                return device, status
 
-    @contextmanager
-    def deviceRestricted(self, deviceName: str):
-        try:
-            device: AdbDevice = self.device(deviceName)
-        except RuntimeError:
-            raise AdbConnectionError()
+        return None, None
 
-        if device is None:
-            raise DeviceNotFound(deviceName)
 
-        if device.state != DEVICE_STATE_OK:
-            if device.state == DEVICE_STATE_NO_AUTH:
-                raise DeviceStateUnauthorized(device.serial)
-            else:
-                raise DeviceStateInvalid(device.serial, device.state)
+@contextmanager
+def deviceRestricted(client: AdbClient, deviceName: str):
+    try:
+        device, state = client.device_with_state(deviceName)
+    except RuntimeError:
+        raise AdbConnectionError()
 
-        try:
-            yield device
-        except RuntimeError as e:
-            raise DeviceRuntimeError(device.serial, str(e))
+    if device is None:
+        raise DeviceNotFound(deviceName)
 
-    def devicesRestricted(self):
-        try:
-            devices: List[AdbDevice] = self.devices()
-        except RuntimeError:
-            raise AdbConnectionError()
+    assert state is not None
+    if state != DEVICE_STATE_OK:
+        if state == DEVICE_STATE_NO_AUTH:
+            raise DeviceStateUnauthorized(device.serial)
+        else:
+            raise DeviceStateInvalid(device.serial, state)
 
-        if len(devices) == 0:
-            raise NoDevicesFound()
+    try:
+        yield device
+    except RuntimeError as e:
+        raise DeviceRuntimeError(device.serial, str(e))
 
-        return devices
+
+def devicesRestricted(client: AdbClient):
+    try:
+        devices: List[AdbDevice] = client.devices()
+    except RuntimeError:
+        raise AdbConnectionError()
+
+    if len(devices) == 0:
+        raise NoDevicesFound()
+
+    return devices

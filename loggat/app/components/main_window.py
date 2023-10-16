@@ -12,6 +12,7 @@ from PyQt5.QtGui import *
 import yaml
 from loggat.app.components.capture_pane import CapturePane
 from loggat.app.controllers.capture_pane.capture_pane import CapturePaneController
+from loggat.app.device.device import AdbClient
 from loggat.app.highlighting_rules import HighlightingRules
 from loggat.app.components.message_view_pane import LogMessageViewPane
 

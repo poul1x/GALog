@@ -20,7 +20,7 @@ from loggat.app.components.error_dialog import ErrorDialog
 
 from loggat.app.components.loading_dialog import LoadingDialog
 
-from loggat.app.device import AdbClient, AdbDevice
+from loggat.app.device import AdbClient, AdbDevice, devicesRestricted
 from loggat.app.device.errors import DeviceError, DeviceNotFound, DeviceStateInvalid
 
 from ...components.capture_pane import CapturePane
@@ -44,7 +44,7 @@ class DeviceLoader(QRunnable):
         self._msDelay = None
 
     def _getDevices(self):
-        return [dev.serial for dev in self._client.devicesRestricted()]
+        return [dev.serial for dev in devicesRestricted(self._client)]
 
     def _selectDevice(self, devices: List[str]):
         i = 0

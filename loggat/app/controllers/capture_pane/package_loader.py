@@ -20,8 +20,8 @@ from loggat.app.components.error_dialog import ErrorDialog
 
 from loggat.app.components.loading_dialog import LoadingDialog
 
-from loggat.app.device import AdbClient, AdbDevice
-from loggat.app.device.errors import  DeviceError
+from loggat.app.device import AdbClient, AdbDevice, deviceRestricted
+from loggat.app.device.errors import DeviceError
 
 from ...components.capture_pane import CapturePane
 from loggat.app.highlighting_rules import HighlightingRules
@@ -59,7 +59,7 @@ class PackageLoader(QRunnable):
             QThread.msleep(self._msDelay)
 
     def _getPackages(self):
-        with self._client.deviceRestricted(self._deviceName) as device:
+        with deviceRestricted(self._client, self._deviceName) as device:
             packages = device.list_packages()
 
         return packages
