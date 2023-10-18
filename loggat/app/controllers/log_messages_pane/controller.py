@@ -30,6 +30,7 @@ class LogMessagesPaneController:
         self._client = AdbClient(adbHost, adbPort)
         self._viewPaneController = None
         self._highlightingRules = None
+        self._logReader = None
         self._liveReload = True
         self._scrolling = True
 
@@ -191,5 +192,6 @@ class LogMessagesPaneController:
         self._loadingDialog.exec_()
 
     def stopCapture(self):
-        self._logReader.stop()
-        self._logReader = None
+        if self._logReader:
+            self._logReader.stop()
+            self._logReader = None

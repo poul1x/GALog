@@ -4,6 +4,7 @@ import os
 from queue import Queue
 import shutil
 import subprocess
+import sys
 from threading import Thread
 from time import sleep
 from typing import Dict, List, Optional
@@ -13,8 +14,15 @@ from PyQt5.QtGui import *
 import yaml
 from loggat.app.components.capture_pane import CapturePane
 from loggat.app.controllers.capture_pane.capture_pane import CapturePaneController
-from loggat.app.controllers.log_messages_pane.controller import LogMessagesPaneController
-from loggat.app.controllers.log_messages_pane.log_reader import AndroidAppLogReader, LogLine, ProcessEndedEvent, ProcessStartedEvent
+from loggat.app.controllers.log_messages_pane.controller import (
+    LogMessagesPaneController,
+)
+from loggat.app.controllers.log_messages_pane.log_reader import (
+    AndroidAppLogReader,
+    LogLine,
+    ProcessEndedEvent,
+    ProcessStartedEvent,
+)
 from loggat.app.device.device import AdbClient
 from loggat.app.highlighting_rules import HighlightingRules
 from loggat.app.components.message_view_pane import LogMessageViewPane
@@ -60,21 +68,20 @@ class MainWindow(QMainWindow):
         self.setStyle(CustomStyle())
 
     def startAdbServer(self):
-
-        # TODO:
-        # start_new_session=True stdout=subprocess.DEVNULL
-        #
-
         adb = shutil.which("adb")
         if not adb:
             return
 
         def execAdbServer():
             with suppress(subprocess.SubprocessError):
-                subprocess.call([adb, "server"])
+                subprocess.call(
+                    args=[adb, "server"],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    start_new_session=True,
+                )
 
         QThreadPool.globalInstance().start(execAdbServer)
-
 
     def loadAppStrings(self):
         app_strings.init("en")

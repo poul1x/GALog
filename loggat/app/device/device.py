@@ -60,7 +60,7 @@ class AdbClient(Client):
 def deviceRestricted(client: AdbClient, deviceName: str):
     try:
         device, state = client.device_with_state(deviceName)
-    except RuntimeError:
+    except (RuntimeError, ConnectionError):
         raise AdbConnectionError()
 
     if device is None:
@@ -75,14 +75,14 @@ def deviceRestricted(client: AdbClient, deviceName: str):
 
     try:
         yield device
-    except RuntimeError as e:
+    except (RuntimeError, ConnectionError) as e:
         raise DeviceRuntimeError(device.serial, str(e))
 
 
 def devicesRestricted(client: AdbClient):
     try:
         devices: List[AdbDevice] = client.devices()
-    except RuntimeError:
+    except (RuntimeError, ConnectionError):
         raise AdbConnectionError()
 
     if len(devices) == 0:
