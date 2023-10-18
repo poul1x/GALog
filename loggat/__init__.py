@@ -1,5 +1,5 @@
 # Registers application resources (images, icons, etc...)
-# Resources compiled with: pyrcc5.exe -o ./sqs_gui/app/resources.py ./resources.qrc
+# Resources compiled with: pyrcc5.exe -o ./loggat/app/resources.py ./resources.qrc
 # from .app import resources # noqa
 
 # Explicitly import some dependencies
