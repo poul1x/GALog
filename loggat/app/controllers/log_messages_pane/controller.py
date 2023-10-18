@@ -9,6 +9,7 @@ from loggat.app.components.log_messages_pane.delegate import (
     LazyHighlightingState,
 )
 from loggat.app.components.log_messages_pane.pane import LogMessagesPane
+from loggat.app.controllers.run_app.controller import RunAppController
 from loggat.app.device.device import AdbClient
 
 from loggat.app.highlighting_rules import HighlightingRules
@@ -126,7 +127,18 @@ class LogMessagesPaneController:
         msg = f"App '{packageName}' ended"
         self._pane.addLogLine("S", "loggat", msg)
 
-    def logReaderInitialized(self, packageName: str, pids: List[str]):
+    def _promptRunApp(self, deviceName: str, packageName: str):
+        buttons = QMessageBox.Yes|QMessageBox.No
+        text = "This app is not running. Would you like to start it?"
+        reply = QMessageBox.question(None, "Run app", text, buttons)
+
+        if reply == QMessageBox.Yes:
+            adbHost = self._client.host
+            adbPort = self._client.port
+            controller = RunAppController(adbHost, adbPort)
+            controller.runApp(deviceName, packageName)
+
+    def logReaderInitialized(self, deviceName: str, packageName: str, pids: List[str]):
 
         assert self._loadingDialog
         self._loadingDialog.close()
@@ -135,9 +147,9 @@ class LogMessagesPaneController:
         if pids:
             msg = f"App '{packageName}' is running. PIDs: {', '.join(pids)}"
             self._pane.addLogLine("S", "loggat", msg)
-        # else:
-        #     pass
-        # Would you like to start the app
+        else:
+            self._promptRunApp(deviceName, packageName)
+
 
     def logReaderFailed(self, msgBrief: str, msgVerbose: str):
 
@@ -162,7 +174,6 @@ class LogMessagesPaneController:
         self._logReader.signals.processEnded.connect(self.processEnded)
         self._logReader.signals.lineRead.connect(self.lineRead)
         QTimer.singleShot(750, lambda: self._logReader.start())
-        # QTimer.singleShot(750, lambda: self.logReaderFailed("A","b"))
 
         self._loadingDialog = LoadingDialog()
         self._loadingDialog.setText(f"Connecting to ADB server...")

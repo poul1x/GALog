@@ -1,3 +1,4 @@
+from contextlib import suppress
 from datetime import datetime
 import os
 from queue import Queue
@@ -51,11 +52,23 @@ class MainWindow(QMainWindow):
         self._liveReload = True
         self.capturePaneController = CapturePaneController(ADB_HOST, ADB_PORT)
         self.logMessagesPaneController = LogMessagesPaneController(ADB_HOST, ADB_PORT)
+        self.startAdbServer()
         self.loadAppStrings()
         self.loadStyleSheet()
         self.initHighlighting()
         self.initUserInterface()
         self.setStyle(CustomStyle())
+
+    def startAdbServer(self):
+        adb = shutil.which("adb")
+        if not adb:
+            return
+
+        def execAdbServer():
+            with suppress(subprocess.SubprocessError):
+                subprocess.call([adb, "server"])
+
+        QThreadPool.globalInstance().start(execAdbServer)
 
 
     def loadAppStrings(self):
@@ -86,10 +99,6 @@ class MainWindow(QMainWindow):
             rules.load(content)
 
         self.logMessagesPaneController.setHighlightingRules(rules)
-
-    def centralWidget(self) -> CentralWidget:
-        return super().centralWidget()
-
 
     def closeEvent(self, event: QEvent):
         reply = QMessageBox.question(

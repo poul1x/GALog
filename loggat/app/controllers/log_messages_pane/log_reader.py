@@ -195,16 +195,13 @@ class LogcatReaderThread(QThread):
     def stop(self):
         self._stopEvent.set()
 
-class Worker(QRunnable):
-    pass
-
 
 class LogReaderSignals(QObject):
     failed = pyqtSignal(str, str)
     lineRead = pyqtSignal(LogLine)
     processStarted = pyqtSignal(ProcessStartedEvent)
     processEnded = pyqtSignal(ProcessEndedEvent)
-    initialized = pyqtSignal(str, list)
+    initialized = pyqtSignal(str, str, list)
     appStarted = pyqtSignal(str)
     appEnded = pyqtSignal(str)
 
@@ -255,7 +252,11 @@ class AndroidAppLogReader:
             self.signals.failed.emit(e.msgBrief, e.msgVerbose)
             return
 
-        self.signals.initialized.emit(self._packageName, list(self._pids))
+        self.signals.initialized.emit(
+            self._deviceName,
+            self._packageName,
+            list(self._pids),
+        )
         self._readerThread.start()
 
     def start(self):
