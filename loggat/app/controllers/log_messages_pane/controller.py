@@ -2,24 +2,33 @@ from typing import List
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from loggat.app.components.error_dialog import ErrorDialog
-from loggat.app.components.loading_dialog import LoadingDialog
+from loggat.app.components.dialogs import ErrorDialog, LoadingDialog
 from loggat.app.components.log_messages_pane.delegate import (
     HighlightingData,
     LazyHighlightingState,
 )
 from loggat.app.components.log_messages_pane.pane import LogMessagesPane
+from loggat.app.components.message_view_pane import LogMessageViewPane
+from loggat.app.controllers.message_view_pane.controller import (
+    LogMessageViewPaneController,
+)
 from loggat.app.controllers.run_app.controller import RunAppController
 from loggat.app.device.device import AdbClient
 
 from loggat.app.highlighting_rules import HighlightingRules
 from .search import SearchItem, SearchItemTask, SearchResult
-from .log_reader import AndroidAppLogReader, LogLine, ProcessEndedEvent, ProcessStartedEvent
+from .log_reader import (
+    AndroidAppLogReader,
+    LogLine,
+    ProcessEndedEvent,
+    ProcessStartedEvent,
+)
 
 
 class LogMessagesPaneController:
     def __init__(self, adbHost: str, adbPort: int):
         self._client = AdbClient(adbHost, adbPort)
+        self._viewPaneController = None
         self._highlightingRules = None
         self._liveReload = True
         self._scrolling = True
@@ -38,6 +47,11 @@ class LogMessagesPaneController:
         self._pane = pane
         self._scrolling = True
 
+        assert self._highlightingRules
+        self._viewPaneController = LogMessageViewPaneController(
+            pane.dataModel, self._highlightingRules
+        )
+
     def setLiveReloadEnabled(self, enabled: bool):
         self._liveReload = enabled
 
@@ -53,8 +67,9 @@ class LogMessagesPaneController:
             index = self._pane.filterModel.index(dataModelIndex.row(), 0)
             self._pane.tableView.scrollTo(index, QTableView.PositionAtCenter)
         else:
-            # view window
-            pass
+            viewPane = LogMessageViewPane(self._pane)
+            self._viewPaneController.takeControl(viewPane)
+            self._viewPaneController.showContentFor(index.row())
 
     def beforeRowInserted(self):
         vbar = self._pane.tableView.verticalScrollBar()
@@ -128,7 +143,7 @@ class LogMessagesPaneController:
         self._pane.addLogLine("S", "loggat", msg)
 
     def _promptRunApp(self, deviceName: str, packageName: str):
-        buttons = QMessageBox.Yes|QMessageBox.No
+        buttons = QMessageBox.Yes | QMessageBox.No
         text = "This app is not running. Would you like to start it?"
         reply = QMessageBox.question(None, "Run app", text, buttons)
 
@@ -139,7 +154,6 @@ class LogMessagesPaneController:
             controller.runApp(deviceName, packageName)
 
     def logReaderInitialized(self, deviceName: str, packageName: str, pids: List[str]):
-
         assert self._loadingDialog
         self._loadingDialog.close()
         self._loadingDialog = None
@@ -150,13 +164,10 @@ class LogMessagesPaneController:
         else:
             self._promptRunApp(deviceName, packageName)
 
-
     def logReaderFailed(self, msgBrief: str, msgVerbose: str):
-
         if self._loadingDialog:
             self._loadingDialog.close()
             self._loadingDialog = None
-
 
         messageBox = ErrorDialog()
         messageBox.setText(msgBrief)

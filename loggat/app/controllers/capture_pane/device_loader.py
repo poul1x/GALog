@@ -16,9 +16,6 @@ from PyQt5.QtGui import *
 import yaml
 
 from pyaxmlparser import APK
-from loggat.app.components.error_dialog import ErrorDialog
-
-from loggat.app.components.loading_dialog import LoadingDialog
 
 from loggat.app.device import AdbClient, AdbDevice, devicesRestricted
 from loggat.app.device.errors import DeviceError, DeviceNotFound, DeviceStateInvalid

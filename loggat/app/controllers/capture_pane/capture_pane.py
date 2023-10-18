@@ -16,18 +16,11 @@ from PyQt5.QtGui import *
 import yaml
 
 from pyaxmlparser import APK
-from loggat.app.components.error_dialog import ErrorDialog
-
-from loggat.app.components.loading_dialog import LoadingDialog
+from loggat.app.components.dialogs import ErrorDialog, LoadingDialog
 from .device_loader import DeviceLoader
 from .package_loader import PackageLoader
 
 from loggat.app.device import AdbClient, AdbDevice
-from loggat.app.device.errors import (
-    DeviceError,
-    DeviceNotFound,
-    DeviceStateInvalid,
-)
 
 from ...components.capture_pane import CapturePane
 from loggat.app.highlighting_rules import HighlightingRules

@@ -3,9 +3,7 @@ from typing import Optional
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from loggat.app.components.error_dialog import ErrorDialog
-
-from loggat.app.components.loading_dialog import LoadingDialog
+from loggat.app.components.dialogs import ErrorDialog, LoadingDialog
 from loggat.app.device import AdbClient, AdbDevice, deviceRestricted
 from loggat.app.device.errors import DeviceError
 from .app_runner import AppRunner

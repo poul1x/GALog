@@ -60,6 +60,11 @@ class MainWindow(QMainWindow):
         self.setStyle(CustomStyle())
 
     def startAdbServer(self):
+
+        # TODO:
+        # start_new_session=True stdout=subprocess.DEVNULL
+        #
+
         adb = shutil.which("adb")
         if not adb:
             return
