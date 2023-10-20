@@ -3,12 +3,14 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from loggat.app.components.dialogs import ErrorDialog, LoadingDialog
+from loggat.app.components.dialogs.stop_capture_dialog import StopCaptureDialog, StopCaptureDialogResult
 from loggat.app.components.log_messages_pane.delegate import (
     HighlightingData,
     LazyHighlightingState,
 )
 from loggat.app.components.log_messages_pane.pane import LogMessagesPane
 from loggat.app.components.message_view_pane import LogMessageViewPane
+from loggat.app.controllers.kill_app.controller import KillAppController
 from loggat.app.controllers.message_view_pane.controller import (
     LogMessageViewPaneController,
 )
@@ -191,6 +193,26 @@ class LogMessagesPaneController:
         self._loadingDialog = LoadingDialog()
         self._loadingDialog.setText(f"Connecting to ADB server...")
         self._loadingDialog.exec_()
+
+    def promptStopCapture(self):
+        dialog = StopCaptureDialog()
+        dialog.setText("Stop capture?")
+
+        result = dialog.exec_()
+        if result == StopCaptureDialogResult.Rejected:
+            return
+
+        assert self._client is not None
+        assert self._logReader is not None
+        if result == StopCaptureDialogResult.AcceptedKillApp:
+            adbHost = self._client.host
+            adbPort = self._client.port
+            device = self._logReader.device
+            package = self._logReader.package
+            controller = KillAppController(adbHost, adbPort)
+            controller.killApp(device, package)
+
+        self.stopCapture()
 
     def stopCapture(self):
         if self._logReader:

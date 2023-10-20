@@ -14,6 +14,7 @@ from PyQt5.QtGui import *
 import yaml
 from loggat.app.components.capture_pane import CapturePane
 from loggat.app.controllers.capture_pane.capture_pane import CapturePaneController
+from loggat.app.controllers.kill_app.controller import KillAppController
 from loggat.app.controllers.log_messages_pane.controller import (
     LogMessagesPaneController,
 )
@@ -127,15 +128,27 @@ class MainWindow(QMainWindow):
         else:
             event.ignore()
 
-    def newCapture(self):
+    def setCaptureSpecificActionsEnabled(self, enabled: bool):
+        menuBar = self.menuBar()
+        for fileMenu in menuBar.findChildren(QMenu):
+            for action in fileMenu.actions():
+                if action.data() == True:
+                    action.setEnabled(enabled)
+
+    def startCapture(self):
         capturePane = CapturePane(self)
         self.capturePaneController.setWidget(capturePane)
-        self.capturePaneController.newCaptureDialog()
+        self.capturePaneController.startCaptureDialog()
 
         if self.capturePaneController.captureTargetSelected():
             device = self.capturePaneController.selectedDevice()
             package = self.capturePaneController.selectedPackage()
             self.logMessagesPaneController.startCapture(device, package)
+            self.setCaptureSpecificActionsEnabled(True)
+
+    def stopCapture(self):
+        self.logMessagesPaneController.promptStopCapture()
+        self.setCaptureSpecificActionsEnabled(False)
 
     def toggleMessageFilter(self):
         if self.logMessagesPaneController.messageFilterEnabled():
@@ -146,11 +159,13 @@ class MainWindow(QMainWindow):
     def actionStub(self):
         QMessageBox.information(self, "Stub", "Action stub")
 
-    def newCaptureAction(self):
+    def startCaptureAction(self):
         action = QAction("&New", self)
         action.setShortcut("Ctrl+N")
         action.setStatusTip("Start new log capture")
-        action.triggered.connect(lambda: self.newCapture())
+        action.triggered.connect(lambda: self.startCapture())
+        action.setEnabled(True)
+        action.setData(False)
         return action
 
     def toggleMessageFilterAction(self):
@@ -158,20 +173,26 @@ class MainWindow(QMainWindow):
         action.setShortcut("Ctrl+F")
         action.setStatusTip("Toggle message filter mode")
         action.triggered.connect(lambda: self.toggleMessageFilter())
+        action.setEnabled(False)
+        action.setData(True)
         return action
 
-    def startCaptureAction(self):
-        action = QAction("&Start", self)
-        # action.setShortcut("Ctrl+N")
-        action.setStatusTip("Start log capture")
+    def clearCapturedLogsAction(self):
+        action = QAction("&Clear", self)
+        action.setShortcut("Ctrl+X")
+        action.setStatusTip("Clear captured logs")
         action.triggered.connect(lambda: self.actionStub())
+        action.setEnabled(False)
+        action.setData(True)
         return action
 
     def stopCaptureAction(self):
         action = QAction("&Stop", self)
-        # action.setShortcut("Ctrl+N")
-        action.setStatusTip("Stop log capture")
-        action.triggered.connect(lambda: self.actionStub())
+        action.setShortcut("Ctrl+Q")
+        action.setStatusTip("Stop capture")
+        action.triggered.connect(lambda: self.stopCapture())
+        action.setEnabled(False)
+        action.setData(True)
         return action
 
     def openLogFileAction(self):
@@ -179,6 +200,8 @@ class MainWindow(QMainWindow):
         action.setShortcut("Ctrl+O")
         action.setStatusTip("Open log capture from file")
         action.triggered.connect(lambda: self.actionStub())
+        action.setEnabled(True)
+        action.setData(False)
         return action
 
     def saveLogFileAction(self):
@@ -186,6 +209,8 @@ class MainWindow(QMainWindow):
         action.setShortcut("Ctrl+S")
         action.setStatusTip("Save log capture to file")
         action.triggered.connect(lambda: self.actionStub())
+        action.setEnabled(False)
+        action.setData(True)
         return action
 
     def installApkAction(self):
@@ -193,14 +218,16 @@ class MainWindow(QMainWindow):
         action.setShortcut("Ctrl+I")
         action.setStatusTip("Install APK file")
         action.triggered.connect(lambda: self.actionStub())
+        action.setEnabled(True)
+        action.setData(False)
         return action
 
     def setupMenuBar(self):
         menubar = self.menuBar()
         captureMenu = menubar.addMenu("&Capture")
-        captureMenu.addAction(self.newCaptureAction())
         captureMenu.addAction(self.startCaptureAction())
         captureMenu.addAction(self.stopCaptureAction())
+        captureMenu.addAction(self.clearCapturedLogsAction())
         captureMenu.addAction(self.openLogFileAction())
         captureMenu.addAction(self.saveLogFileAction())
         captureMenu.addAction(self.toggleMessageFilterAction())

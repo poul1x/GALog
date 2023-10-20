@@ -221,6 +221,14 @@ class AndroidAppLogReader:
         self._readerThread.processEnded.connect(self.onProcessEnded)
         self._readerThread.failed.connect(self.onFailed)
 
+    @property
+    def device(self):
+        return self._deviceName
+
+    @property
+    def package(self):
+        return self._packageName
+
     def onLineRead(self, line: LogLine):
         if line.pid in self._pids:
             self.signals.lineRead.emit(line)

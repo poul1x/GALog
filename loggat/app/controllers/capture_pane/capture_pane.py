@@ -121,7 +121,7 @@ class CapturePaneController:
         messageBox.setInformativeText(msgVerbose)
         messageBox.exec_()
 
-    def newCaptureDialog(self):
+    def startCaptureDialog(self):
         deviceLoader = DeviceLoader(self._client, self._lastSelectedDevice)
         deviceLoader.setStartDelay(500)
         deviceLoader.signals.succeeded.connect(self.deviceLoaderSucceeded)
