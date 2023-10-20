@@ -48,6 +48,13 @@ class StyledItemDelegate(QStyledItemDelegate):
         self._doc.setPlainText(elidedText)
         viewItem.text = ""
 
+    def highlightSelectedRow(self, viewItem: QStyleOptionViewItem, index: QModelIndex):
+        if index.column() != Columns.logMessage:
+            if viewItem.state & QStyle.State_Selected:
+                fmt = QTextCharFormat()
+                fmt.setFontWeight(QFont.DemiBold)
+                self.highlightAllText(fmt)
+
     def applyHighlighting(self, index: QModelIndex):
         if index.column() != Columns.logMessage:
             return
@@ -86,12 +93,6 @@ class StyledItemDelegate(QStyledItemDelegate):
         else:
             color = self.rowColor(logLevel)
             painter.fillRect(viewItem.rect, color)
-
-        if viewItem.state & QStyle.State_Selected:
-            if index.column() in [Columns.logLevel, Columns.tagName]:
-                fmt = QTextCharFormat()
-                fmt.setFontWeight(QFont.DemiBold)
-                self.highlightAllText(fmt)
 
 
     def draw(self, viewItem: QStyleOptionViewItem, painter: QPainter):
@@ -144,6 +145,7 @@ class StyledItemDelegate(QStyledItemDelegate):
             self.initStyleOption(viewItem, index)
             self.fillCellBackground(index, viewItem, painter)
             self.setTextForDisplay(viewItem)
+            self.highlightSelectedRow(viewItem, index)
             self.applyHighlighting(index)
             self.draw(viewItem, painter)
 

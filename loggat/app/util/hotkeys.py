@@ -6,6 +6,9 @@ class HotkeyHelper:
     def __init__(self, event: QKeyEvent) -> None:
         self._event = event
 
+    def isEscapePressed(self):
+        return self._event.key() == Qt.Key_Escape
+
     def isEnterPressed(self):
         return self._event.key() in [Qt.Key_Enter, Qt.Key_Return]
 

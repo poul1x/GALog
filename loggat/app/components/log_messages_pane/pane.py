@@ -1,24 +1,15 @@
-from copy import copy
-from random import randint
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-
-from dataclasses import dataclass
-from typing import List
-from enum import Enum, auto
-
 from PyQt5.QtWidgets import QWidget
-from loggat.app.components.message_view_pane import LogMessageViewPane
-from loggat.app.highlighting_rules import HighlightingRules
 
-from loggat.app.util.paths import iconFile
 
 from .delegate import HighlightingData, LazyHighlightingState
 from .filter_model import FilterModel
 from .data_model import DataModel, Columns
 from .table_view import TableView
+from .search_field import SearchField
 
 
 class LogMessagesPane(QWidget):
@@ -43,11 +34,8 @@ class LogMessagesPane(QWidget):
         vHeader.setDefaultSectionSize(vHeader.minimumSectionSize())
         vHeader.setVisible(False)
 
-        self.searchField = QLineEdit(self)
-        self.searchField.setPlaceholderText("Search log message")
-        self.searchField.addAction(QIcon(iconFile("search")), QLineEdit.LeadingPosition)
-
-        self.searchButton = QPushButton()
+        self.searchField = SearchField(self)
+        self.searchButton = QPushButton(self)
         self.searchButton.setText("Search")
 
         hLayout = QHBoxLayout()

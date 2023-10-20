@@ -137,6 +137,12 @@ class MainWindow(QMainWindow):
             package = self.capturePaneController.selectedPackage()
             self.logMessagesPaneController.startCapture(device, package)
 
+    def toggleMessageFilter(self):
+        if self.logMessagesPaneController.messageFilterEnabled():
+            self.logMessagesPaneController.disableMessageFilter()
+        else:
+            self.logMessagesPaneController.enableMessageFilter()
+
     def actionStub(self):
         QMessageBox.information(self, "Stub", "Action stub")
 
@@ -145,6 +151,13 @@ class MainWindow(QMainWindow):
         action.setShortcut("Ctrl+N")
         action.setStatusTip("Start new log capture")
         action.triggered.connect(lambda: self.newCapture())
+        return action
+
+    def toggleMessageFilterAction(self):
+        action = QAction("&Find", self)
+        action.setShortcut("Ctrl+F")
+        action.setStatusTip("Toggle message filter mode")
+        action.triggered.connect(lambda: self.toggleMessageFilter())
         return action
 
     def startCaptureAction(self):
@@ -190,6 +203,7 @@ class MainWindow(QMainWindow):
         captureMenu.addAction(self.stopCaptureAction())
         captureMenu.addAction(self.openLogFileAction())
         captureMenu.addAction(self.saveLogFileAction())
+        captureMenu.addAction(self.toggleMessageFilterAction())
 
         adbMenu = menubar.addMenu("&ADB")
         adbMenu.addAction(self.installApkAction())

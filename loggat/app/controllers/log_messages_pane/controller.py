@@ -33,6 +33,7 @@ class LogMessagesPaneController:
         self._logReader = None
         self._liveReload = True
         self._scrolling = True
+        self._backToFilter = False
 
     def setHighlightingRules(self, rules: HighlightingRules):
         self._highlightingRules = rules
@@ -41,36 +42,53 @@ class LogMessagesPaneController:
         pane.tableView.activated.connect(self.rowActivated)
         pane.tableView.delegate.setHighlightingRules(self._highlightingRules)
         pane.tableView.delegate.lazyHighlighting.connect(self.lazyHighlighting)
+        pane.tableView.toggleMessageFilter.connect(self.toggleMessageFilter)
         pane.dataModel.rowsAboutToBeInserted.connect(self.beforeRowInserted)
         pane.dataModel.rowsInserted.connect(self.afterRowInserted)
-        pane.searchField.returnPressed.connect(self.applyFilter)
-        pane.searchButton.clicked.connect(self.applyFilter)
+        pane.searchField.returnPressed.connect(self.applyMessageFilter)
+        pane.searchField.toggleMessageFilter.connect(self.toggleMessageFilter)
+        pane.searchButton.clicked.connect(self.applyMessageFilter)
         self._pane = pane
         self._scrolling = True
+        self._backToFilter = False
 
         assert self._highlightingRules
         self._viewPaneController = LogMessageViewPaneController(
             pane.dataModel, self._highlightingRules
         )
 
+    def toggleMessageFilter(self):
+        if self.messageFilterEnabled():
+            self.disableMessageFilter()
+        else:
+            if self._backToFilter:
+                self.enableMessageFilter(reset=False)
+                self._pane.tableView.setFocus()
+
+        self._backToFilter = False
+
     def setLiveReloadEnabled(self, enabled: bool):
         self._liveReload = enabled
 
-    # TODO: inspect this function
+    def jumpToRow(self, index: QModelIndex):
+        dataModelIndex = self._pane.filterModel.mapToSource(index)
+        self.disableMessageFilter()
+        index = self._pane.filterModel.index(dataModelIndex.row(), 0)
+        self._backToFilter = True
+        self._pane.tableView.selectRow(index.row())
+        flags = QTableView.PositionAtCenter | QTableView.PositionAtTop
+        self._pane.tableView.scrollTo(index, flags)
+
+    def showContent(self, index: QModelIndex):
+        viewPane = LogMessageViewPane(self._pane)
+        self._viewPaneController.takeControl(viewPane)
+        self._viewPaneController.showContentFor(index.row())
+
     def rowActivated(self, index: QModelIndex):
         if self._pane.filterModel.filteringEnabled():
-            dataModelIndex = self._pane.filterModel.mapToSource(index)
-            self.disableFilter()
-
-            # self._pane.tableView.
-            self._pane.tableView.reset()  # ? disableFilter
-            # self._pane.tableView.scrollToBottom()
-            index = self._pane.filterModel.index(dataModelIndex.row(), 0)
-            self._pane.tableView.scrollTo(index, QTableView.PositionAtCenter)
+            self.jumpToRow(index)
         else:
-            viewPane = LogMessageViewPane(self._pane)
-            self._viewPaneController.takeControl(viewPane)
-            self._viewPaneController.showContentFor(index.row())
+            self.showContent(index)
 
     def beforeRowInserted(self):
         vbar = self._pane.tableView.verticalScrollBar()
@@ -79,23 +97,6 @@ class LogMessagesPaneController:
     def afterRowInserted(self):
         if self._scrolling:
             self._pane.tableView.scrollToBottom()
-
-    def enableFilter(self):
-        self._pane.filterModel.setFilteringEnabled(True)
-        self._pane.tableView.verticalHeader().setVisible(True)
-        self._pane.searchField.setFocus()
-        self._pane.searchButton.show()
-        self._pane.searchField.show()
-
-    def disableFilter(self):
-        self._pane.filterModel.setFilteringEnabled(False)
-        self._pane.tableView.verticalHeader().setVisible(False)
-        self._pane.searchButton.hide()
-        self._pane.searchField.hide()
-
-    def applyFilter(self):
-        text = self._pane.searchField.text()
-        self._pane.filterModel.setFilterFixedString(text)
 
     def searchDone(self, index: QModelIndex, results: List[SearchResult]):
         data = HighlightingData(
@@ -126,7 +127,7 @@ class LogMessagesPaneController:
     def appStarted(self, packageName: str):
         if self._liveReload:
             self._pane.clear()
-            self.disableFilter()
+            self.disableMessageFilter()
 
         msg = f"App '{packageName}' started"
         self._pane.addLogLine("S", "loggat", msg)
@@ -195,3 +196,31 @@ class LogMessagesPaneController:
         if self._logReader:
             self._logReader.stop()
             self._logReader = None
+
+    def applyMessageFilter(self):
+        text = self._pane.searchField.text()
+        self._pane.filterModel.setFilterFixedString(text)
+
+    def resetMessageFilter(self):
+        self._pane.searchField.setText("")
+        self._pane.filterModel.setFilterFixedString("")
+
+    def enableMessageFilter(self, reset: bool = True):
+        self._pane.filterModel.setFilteringEnabled(True)
+        self._pane.tableView.verticalHeader().setVisible(True)
+        self._pane.searchField.setFocus()
+        self._pane.searchButton.show()
+        self._pane.searchField.show()
+
+        if reset == True:
+            self.resetMessageFilter()
+
+    def disableMessageFilter(self):
+        self._pane.filterModel.setFilteringEnabled(False)
+        self._pane.tableView.verticalHeader().setVisible(False)
+        self._pane.tableView.reset()
+        self._pane.searchButton.hide()
+        self._pane.searchField.hide()
+
+    def messageFilterEnabled(self):
+        return self._pane.filterModel.filteringEnabled()
