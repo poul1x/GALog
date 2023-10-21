@@ -1,8 +1,8 @@
 from dataclasses import dataclass
+import re
 from typing import Dict
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+
+from PyQt5.QtGui import QTextCharFormat, QColor, QFont
 
 
 class RuleNotFoundError(Exception):
@@ -19,7 +19,7 @@ class RuleParseError(Exception):
 
 @dataclass
 class HighlightingRule:
-    pattern: QRegExp
+    pattern: re.Pattern
     style: QTextCharFormat
 
 
@@ -40,11 +40,11 @@ class HighlightingRules:
 
     def _loadPattern(self, rule: dict):
         try:
-            pattern = QRegExp(str(rule["pattern"]))
+            pattern = re.compile(str(rule["pattern"]))
         except KeyError as e:
             msg = "Expected key 'pattern: <regular-expression>'"
             raise RuleParseError(msg) from e
-        except TypeError as e:
+        except re.error as e:
             name = str(rule["name"])
             msg = f"Invalid pattern '{name}': {e}"
             raise RuleParseError(msg) from e
