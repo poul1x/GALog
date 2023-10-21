@@ -166,6 +166,8 @@ class LogMessagesPaneController:
             msg = f"App '{packageName}' is running. PIDs: {', '.join(pids)}"
             self._pane.addLogLine("S", "loggat", msg)
         else:
+            msg = f"App '{packageName}' is not running. Waiting for its start..."
+            self._pane.addLogLine("S", "loggat", msg)
             self._promptRunApp(deviceName, packageName)
 
     def logReaderFailed(self, msgBrief: str, msgVerbose: str):

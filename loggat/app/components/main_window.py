@@ -13,8 +13,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import yaml
 from loggat.app.components.capture_pane import CapturePane
-from loggat.app.controllers.capture_pane.capture_pane import CapturePaneController
-from loggat.app.controllers.kill_app.controller import KillAppController
+from loggat.app.controllers.capture_pane import CapturePaneController
 from loggat.app.controllers.log_messages_pane.controller import (
     LogMessagesPaneController,
 )
@@ -137,7 +136,7 @@ class MainWindow(QMainWindow):
 
     def startCapture(self):
         capturePane = CapturePane(self)
-        self.capturePaneController.setWidget(capturePane)
+        self.capturePaneController.takeControl(capturePane)
         self.capturePaneController.startCaptureDialog()
 
         if self.capturePaneController.captureTargetSelected():

@@ -1,4 +1,4 @@
-from .capture_pane import CapturePaneController
+from .controller import CapturePaneController
 
 __all__ = [
     "CapturePaneController",

@@ -3,14 +3,17 @@ from PyQt5.QtCore import Qt
 
 
 class HotkeyHelper:
-    def __init__(self, event: QKeyEvent) -> None:
+    def __init__(self, event: QKeyEvent):
         self._event = event
+
+    def isCtrlPressed(self):
+        return self._event.modifiers() == Qt.ControlModifier
 
     def isEscapePressed(self):
         return self._event.key() == Qt.Key_Escape
 
-    def isEnterPressed(self):
-        return self._event.key() in [Qt.Key_Enter, Qt.Key_Return]
+    def isCtrlDPressed(self):
+        return self._event.key() == Qt.Key_D and self.isCtrlPressed()
 
-    def isCtrlEnterPressed(self):
-        return self.isEnterPressed() and self._event.modifiers() == Qt.ControlModifier
+    def isCtrlRPressed(self):
+        return self._event.key() == Qt.Key_R and self.isCtrlPressed()
