@@ -23,5 +23,5 @@ class DataModel(QStandardItemModel):
         itemLogLevel: QStandardItem,
         itemLogMessage: QStandardItem,
     ):
-        row = [itemTagName, itemLogLevel,itemLogMessage]
+        row = [itemTagName, itemLogLevel, itemLogMessage]
         self.appendRow(row)

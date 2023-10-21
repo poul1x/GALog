@@ -213,6 +213,7 @@ class AndroidAppLogReader:
         self._deviceName = device
         self._packageName = package
         self._readerThread = LogcatReaderThread(client, device)
+        self._startDelay = 0
         self._pids = set()
 
         self.signals = LogReaderSignals()
@@ -228,6 +229,13 @@ class AndroidAppLogReader:
     @property
     def package(self):
         return self._packageName
+
+    def setStartDelay(self, startDelay: str):
+        self._startDelay = startDelay
+
+    def _delayIfNeeded(self):
+        if self._startDelay:
+            QThread.msleep(self._startDelay)
 
     def onLineRead(self, line: LogLine):
         if line.pid in self._pids:
@@ -252,6 +260,7 @@ class AndroidAppLogReader:
 
     def _getAppPidsAndStartReaderThread(self):
         try:
+            self._delayIfNeeded()
             with deviceRestricted(self._client, self._deviceName) as device:
                 output: str = device.shell(f"pidof {self._packageName}")
                 self._pids = set(output.split())

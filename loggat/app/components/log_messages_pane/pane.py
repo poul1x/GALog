@@ -48,26 +48,3 @@ class LogMessagesPane(QWidget):
         vLayout.addWidget(self.tableView)
         vLayout.addLayout(hLayout)
         self.setLayout(vLayout)
-
-    def clear(self):
-        cnt = self.dataModel.rowCount()
-        self.dataModel.removeRows(0, cnt)
-
-    def addLogLine(self, logLevel: str, tagName: str, logMessage: str):
-        flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
-        itemLogLevel = QStandardItem(logLevel)
-        itemLogLevel.setFlags(flags)
-
-        itemTagName = QStandardItem(tagName)
-        itemTagName.setFlags(flags)
-
-        data = HighlightingData(
-            state=LazyHighlightingState.pending,
-            items=[],
-        )
-
-        itemLogMessage = QStandardItem(logMessage)
-        itemLogMessage.setData(data, Qt.UserRole)
-        itemLogMessage.setFlags(flags)
-
-        self.dataModel.append(itemTagName, itemLogLevel, itemLogMessage)
