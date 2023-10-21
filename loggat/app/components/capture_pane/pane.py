@@ -1,16 +1,28 @@
-from typing import List, Optional
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt, QSortFilterProxyModel
+from PyQt5.QtWidgets import (
+    QDialog,
+    QWidget,
+    QApplication,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QListView,
+    QComboBox,
+    QSizePolicy,
+)
+from PyQt5.QtGui import (
+    QKeyEvent,
+    QIcon,
+    QStandardItemModel,
+)
+
 from loggat.app.components.reusable.search_input import SearchInput
 from loggat.app.util.hotkeys import HotkeyHelper
-
 from loggat.app.util.paths import iconFile
-from loggat.app.util.signals import blockSignals
 
 
 class CapturePane(QDialog):
-
     def _defaultFlags(self):
         return Qt.Window | Qt.Dialog | Qt.WindowCloseButtonHint
 
@@ -18,14 +30,14 @@ class CapturePane(QDialog):
         super().__init__(parent, self._defaultFlags())
         self.initUserInterface()
         self.setGeometryAuto()
-        self.selectedPackageName = None
 
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
+        if helper.isCtrlFPressed():
+            self.searchInput.setFocus()
         if helper.isCtrlDPressed():
-            self.deviceDropDown.setFocus()
             self.deviceDropDown.showPopup()
-        if helper.isCtrlRPressed():
+        elif helper.isCtrlRPressed():
             self.reloadButton.clicked.emit()
         else:
             super().keyPressEvent(event)
@@ -58,12 +70,11 @@ class CapturePane(QDialog):
         self.deviceLabel = QLabel(self)
         self.deviceLabel.setText("Device:")
 
-        self.deviceDropDown = QComboBox(self)
-
         self.reloadButton = QPushButton(self)
         self.reloadButton.setIcon(QIcon(iconFile("reload")))
         self.reloadButton.setText("Reload packages")
 
+        self.deviceDropDown = QComboBox(self)
         hBoxLayoutTopLeft.addWidget(self.deviceLabel)
         hBoxLayoutTopLeft.addWidget(self.deviceDropDown)
         hBoxLayoutTopRight.addWidget(self.reloadButton)
@@ -73,8 +84,9 @@ class CapturePane(QDialog):
 
         self.packagesList = QListView(self)
         self.packagesList.setEditTriggers(QListView.NoEditTriggers)
-        self.packagesList.setStyleSheet("QListView::item:selected { background-color: #CDE3FF; color: highlightedText;}")
-        self.packagesList.setFocus()
+        self.packagesList.setStyleSheet(
+            "QListView::item:selected { background-color: #CDE3FF; color: highlightedText;}"
+        )
 
         self.dataModel = QStandardItemModel(self)
         self.filterModel = QSortFilterProxyModel()
@@ -107,4 +119,12 @@ class CapturePane(QDialog):
         vBoxLayout.addLayout(hBoxLayoutBottom)
         self.setLayout(vBoxLayout)
 
+        self.selectButton.setFocusPolicy(Qt.NoFocus)
+        self.cancelButton.setFocusPolicy(Qt.NoFocus)
+        self.fromApkButton.setFocusPolicy(Qt.NoFocus)
+        self.reloadButton.setFocusPolicy(Qt.NoFocus)
+        self.deviceDropDown.setFocusPolicy(Qt.NoFocus)
 
+        self.searchInput.setFocus()
+        self.setTabOrder(self.searchInput, self.packagesList)
+        self.setTabOrder(self.packagesList, self.searchInput)

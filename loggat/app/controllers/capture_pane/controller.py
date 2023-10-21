@@ -72,6 +72,7 @@ class CapturePaneController:
         self._pane.selectButton.setEnabled(False)
         self._pane.fromApkButton.setEnabled(False)
         self._lastSelectedDevice = deviceName
+        self._pane.searchInput.setFocus()
         self.clearPackagesList()
 
         packageLoader = PackageLoader(self._client, deviceName)
