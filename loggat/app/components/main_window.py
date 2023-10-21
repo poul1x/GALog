@@ -146,8 +146,8 @@ class MainWindow(QMainWindow):
             self.setCaptureSpecificActionsEnabled(True)
 
     def stopCapture(self):
-        self.logMessagesPaneController.promptStopCapture()
-        self.setCaptureSpecificActionsEnabled(False)
+        if self.logMessagesPaneController.promptStopCapture():
+            self.setCaptureSpecificActionsEnabled(False)
 
     def toggleMessageFilter(self):
         if self.logMessagesPaneController.messageFilterEnabled():

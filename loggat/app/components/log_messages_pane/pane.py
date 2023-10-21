@@ -11,7 +11,6 @@ from .filter_model import FilterModel
 from .data_model import DataModel, Columns
 from .table_view import TableView
 
-
 class LogMessagesPane(QWidget):
     toggleMessageFilter = pyqtSignal()
 
@@ -59,3 +58,12 @@ class LogMessagesPane(QWidget):
         vLayout.addWidget(self.tableView)
         vLayout.addLayout(hLayout)
         self.setLayout(vLayout)
+
+        self.searchButton.setFocusPolicy(Qt.NoFocus)
+        self.searchInput.setFocusPolicy(Qt.NoFocus)
+        self.tableView.setFocusPolicy(Qt.StrongFocus)
+        self.tableView.setFocus()
+
+        self.setTabOrder(self.tableView, self.searchInput)
+        self.setTabOrder(self.searchInput, self.tableView)
+

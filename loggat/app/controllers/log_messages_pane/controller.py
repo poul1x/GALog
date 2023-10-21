@@ -206,7 +206,7 @@ class LogMessagesPaneController:
 
         result = dialog.exec_()
         if result == StopCaptureDialogResult.Rejected:
-            return
+            return False
 
         assert self._client is not None
         assert self._logReader is not None
@@ -219,6 +219,7 @@ class LogMessagesPaneController:
             controller.killApp(device, package)
 
         self.stopCapture()
+        return True
 
     def stopCapture(self):
         if self._logReader:
@@ -236,6 +237,7 @@ class LogMessagesPaneController:
     def enableMessageFilter(self, reset: bool = True):
         self._pane.filterModel.setFilteringEnabled(True)
         self._pane.tableView.verticalHeader().setVisible(True)
+        self._pane.searchInput.setFocusPolicy(Qt.TabFocus)
         self._pane.searchInput.setFocus()
         self._pane.searchButton.show()
         self._pane.searchInput.show()
@@ -247,8 +249,9 @@ class LogMessagesPaneController:
         self._pane.filterModel.setFilteringEnabled(False)
         self._pane.tableView.verticalHeader().setVisible(False)
         self._pane.tableView.reset()
-        self._pane.searchButton.hide()
+        self._pane.searchInput.setFocusPolicy(Qt.NoFocus)
         self._pane.searchInput.hide()
+        self._pane.searchButton.hide()
 
     def messageFilterEnabled(self):
         return self._pane.filterModel.filteringEnabled()

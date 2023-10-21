@@ -1,3 +1,4 @@
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QTableView, QWidget, QAbstractItemView
 from loggat.app.highlighting_rules import HighlightingRules
@@ -19,4 +20,5 @@ class TableView(QTableView):
         self.setSelectionMode(QTableView.SingleSelection)
         self.setColumnWidth(Columns.logLevel, 20)
         self.setColumnWidth(Columns.tagName, 200)
+        self.setTabKeyNavigation(False)
         self.setShowGrid(False)
