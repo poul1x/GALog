@@ -1,7 +1,8 @@
 from typing import List
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import QModelIndex, QThreadPool, Qt
+from PyQt5.QtGui import QStandardItem
+from PyQt5.QtWidgets import QTableView, QMessageBox
+
 from loggat.app.components.dialogs import ErrorDialog, LoadingDialog
 from loggat.app.components.dialogs.stop_capture_dialog import (
     StopCaptureDialog,
@@ -47,12 +48,11 @@ class LogMessagesPaneController:
         pane.tableView.activated.connect(self._rowActivated)
         pane.tableView.delegate.setHighlightingRules(self._highlightingRules)
         pane.tableView.delegate.lazyHighlighting.connect(self._lazyHighlighting)
-        pane.tableView.toggleMessageFilter.connect(self.toggleMessageFilter)
         pane.dataModel.rowsAboutToBeInserted.connect(self._beforeRowInserted)
         pane.dataModel.rowsInserted.connect(self._afterRowInserted)
-        pane.searchField.returnPressed.connect(self._applyMessageFilter)
-        pane.searchField.toggleMessageFilter.connect(self.toggleMessageFilter)
+        pane.searchInput.returnPressed.connect(self._applyMessageFilter)
         pane.searchButton.clicked.connect(self._applyMessageFilter)
+        pane.toggleMessageFilter.connect(self._toggleMessageFilter)
         self._pane = pane
         self._scrolling = True
         self._backToFilter = False
@@ -62,12 +62,12 @@ class LogMessagesPaneController:
             pane.dataModel, self._highlightingRules
         )
 
-    def toggleMessageFilter(self):
-        if self._messageFilterEnabled():
-            self._disableMessageFilter()
+    def _toggleMessageFilter(self):
+        if self.messageFilterEnabled():
+            self.disableMessageFilter()
         else:
             if self._backToFilter:
-                self._enableMessageFilter(reset=False)
+                self.enableMessageFilter(reset=False)
                 self._pane.tableView.setFocus()
 
         self._backToFilter = False
@@ -77,7 +77,7 @@ class LogMessagesPaneController:
 
     def _jumpToRow(self, index: QModelIndex):
         dataModelIndex = self._pane.filterModel.mapToSource(index)
-        self._disableMessageFilter()
+        self.disableMessageFilter()
         index = self._pane.filterModel.index(dataModelIndex.row(), 0)
         self._backToFilter = True
         self._pane.tableView.selectRow(index.row())
@@ -132,7 +132,7 @@ class LogMessagesPaneController:
     def _appStarted(self, packageName: str):
         if self._liveReload:
             self._clearLogMessages()
-            self._disableMessageFilter()
+            self.disableMessageFilter()
 
         msg = f"App '{packageName}' started"
         self._addLogLine("S", "loggat", msg)
@@ -226,31 +226,31 @@ class LogMessagesPaneController:
             self._logReader = None
 
     def _applyMessageFilter(self):
-        text = self._pane.searchField.text()
+        text = self._pane.searchInput.text()
         self._pane.filterModel.setFilterFixedString(text)
 
     def _resetMessageFilter(self):
-        self._pane.searchField.setText("")
+        self._pane.searchInput.setText("")
         self._pane.filterModel.setFilterFixedString("")
 
-    def _enableMessageFilter(self, reset: bool = True):
+    def enableMessageFilter(self, reset: bool = True):
         self._pane.filterModel.setFilteringEnabled(True)
         self._pane.tableView.verticalHeader().setVisible(True)
-        self._pane.searchField.setFocus()
+        self._pane.searchInput.setFocus()
         self._pane.searchButton.show()
-        self._pane.searchField.show()
+        self._pane.searchInput.show()
 
         if reset == True:
             self._resetMessageFilter()
 
-    def _disableMessageFilter(self):
+    def disableMessageFilter(self):
         self._pane.filterModel.setFilteringEnabled(False)
         self._pane.tableView.verticalHeader().setVisible(False)
         self._pane.tableView.reset()
         self._pane.searchButton.hide()
-        self._pane.searchField.hide()
+        self._pane.searchInput.hide()
 
-    def _messageFilterEnabled(self):
+    def messageFilterEnabled(self):
         return self._pane.filterModel.filteringEnabled()
 
     def _clearLogMessages(self):

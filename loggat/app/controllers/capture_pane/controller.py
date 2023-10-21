@@ -1,8 +1,7 @@
 from typing import Dict, List, Optional
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-import yaml
+from PyQt5.QtWidgets import QFileDialog, QListView
+from PyQt5.QtCore import QModelIndex, QThreadPool, Qt, QItemSelectionModel
+from PyQt5.QtGui import QStandardItem, QFont
 
 from pyaxmlparser import APK
 from loggat.app.components.dialogs import ErrorDialog, LoadingDialog
@@ -42,74 +41,73 @@ class CapturePaneController:
 
     def takeControl(self, capturePane: CapturePane) -> None:
         self._pane = capturePane
-        self._pane.reloadButton.clicked.connect(self.reloadButtonClicked)
-        self._pane.deviceDropDown.currentTextChanged.connect(self.deviceChanged)
-        self._pane.fromApkButton.clicked.connect(self.fromApkButtonClicked)
-        self._pane.packagesList.doubleClicked.connect(self.packageSelected)
-        self._pane.packagesList.activated.connect(self.packageSelected)
-        self._pane.selectButton.clicked.connect(self.selectButtonClicked)
+        self._pane.reloadButton.clicked.connect(self._reloadButtonClicked)
+        self._pane.deviceDropDown.currentTextChanged.connect(self._deviceChanged)
+        self._pane.fromApkButton.clicked.connect(self._fromApkButtonClicked)
+        self._pane.packagesList.doubleClicked.connect(self._packageSelected)
+        self._pane.packagesList.activated.connect(self._packageSelected)
+        self._pane.selectButton.clicked.connect(self._selectButtonClicked)
         self._pane.cancelButton.clicked.connect(self._pane.reject)
-        self._pane.rejected.connect(self.rejected)
+        self._pane.rejected.connect(self._rejected)
         self._nothingSelected = False
 
-    def rejected(self):
+    def _rejected(self):
         self._nothingSelected = True
 
-    def packageSelected(self, index: QModelIndex):
+    def _packageSelected(self, index: QModelIndex):
         self._lastSelectedPackage = index.data()
         self._pane.accept()
 
-    def selectButtonClicked(self):
+    def _selectButtonClicked(self):
         index = self._pane.packagesList.currentIndex()
-        self.packageSelected(index)
+        self._packageSelected(index)
 
-    def reloadButtonClicked(self):
+    def _reloadButtonClicked(self):
         deviceName = self._pane.deviceDropDown.currentText()
-        self.deviceChanged(deviceName)
+        self._deviceChanged(deviceName)
 
-
-    def deviceChanged(self, deviceName: str):
+    def _deviceChanged(self, deviceName: str):
         self._pane.selectButton.setEnabled(False)
         self._pane.fromApkButton.setEnabled(False)
         self._lastSelectedDevice = deviceName
         self._pane.searchInput.setFocus()
-        self.clearPackagesList()
+        self._clearPackagesList()
 
         packageLoader = PackageLoader(self._client, deviceName)
         packageLoader.setStartDelay(750)
-        packageLoader.signals.succeeded.connect(self.packageReloadSucceeded)
-        packageLoader.signals.failed.connect(self.packageReloadFailed)
+        packageLoader.signals.succeeded.connect(self._packageReloadSucceeded)
+        packageLoader.signals.failed.connect(self._packageReloadFailed)
         QThreadPool.globalInstance().start(packageLoader)
 
         self._loadingDialog = LoadingDialog()
         self._loadingDialog.setText("Fetching packages...")
         self._loadingDialog.exec_()
 
-    def packageReloadSucceeded(self, packageList: List[str], selectedPackage: str):
+    def _packageReloadSucceeded(self, packageList: List[str], selectedPackage: str):
         self._loadingDialog.close()
-        self.setPackages(packageList)
-        self.setSelectedPackage(selectedPackage)
+        self._setPackages(packageList)
+        self._setSelectedPackage(selectedPackage)
 
-    def packageReloadFailed(self, msgBrief: str, msgVerbose: str):
+    def _packageReloadFailed(self, msgBrief: str, msgVerbose: str):
         self._loadingDialog.close()
-        self.setPackagesEmpty()
+        self.__setPackagesEmpty()
 
         messageBox = ErrorDialog()
         messageBox.setText(msgBrief)
         messageBox.setInformativeText(msgVerbose)
         messageBox.exec_()
 
-    def packageLoaderSucceeded(self, packageList: List[str], selectedPackage: str):
-        self.packageReloadSucceeded(packageList, selectedPackage)
+    def _packageLoaderSucceeded(self, packageList: List[str], selectedPackage: str):
+        self._packageReloadSucceeded(packageList, selectedPackage)
         self._pane.exec_()
 
-    def packageLoaderFailed(self, deviceName, deviceState):
-        self.packageReloadFailed(deviceName, deviceState)
+    def _packageLoaderFailed(self, deviceName, deviceState):
+        self._packageReloadFailed(deviceName, deviceState)
         self._pane.exec_()
 
-    def deviceLoaderSucceeded(self, deviceList: List[str], selectedDevice: str):
-        self.setDevices(deviceList)
-        self.setSelectedDevice(selectedDevice)
+    def _deviceLoaderSucceeded(self, deviceList: List[str], selectedDevice: str):
+        self._setDevices(deviceList)
+        self._setSelectedDevice(selectedDevice)
         self._lastSelectedDevice = selectedDevice
         self._loadingDialog.setText("Fetching packages...")
 
@@ -117,11 +115,11 @@ class CapturePaneController:
             self._client, selectedDevice, self._lastSelectedPackage
         )
         packageLoader.setStartDelay(500)
-        packageLoader.signals.succeeded.connect(self.packageLoaderSucceeded)
-        packageLoader.signals.failed.connect(self.packageLoaderFailed)
+        packageLoader.signals.succeeded.connect(self._packageLoaderSucceeded)
+        packageLoader.signals.failed.connect(self._packageLoaderFailed)
         QThreadPool.globalInstance().start(packageLoader)
 
-    def deviceLoaderFailed(self, msgBrief: str, msgVerbose: str):
+    def _deviceLoaderFailed(self, msgBrief: str, msgVerbose: str):
         self._loadingDialog.close()
         messageBox = ErrorDialog()
         messageBox.setText(msgBrief)
@@ -131,15 +129,15 @@ class CapturePaneController:
     def startCaptureDialog(self):
         deviceLoader = DeviceLoader(self._client, self._lastSelectedDevice)
         deviceLoader.setStartDelay(500)
-        deviceLoader.signals.succeeded.connect(self.deviceLoaderSucceeded)
-        deviceLoader.signals.failed.connect(self.deviceLoaderFailed)
+        deviceLoader.signals.succeeded.connect(self._deviceLoaderSucceeded)
+        deviceLoader.signals.failed.connect(self._deviceLoaderFailed)
         QThreadPool.globalInstance().start(deviceLoader)
 
         self._loadingDialog = LoadingDialog()
         self._loadingDialog.setText("Connecting to ADB server...")
         self._loadingDialog.exec_()
 
-    def fromApkButtonClicked(self):
+    def _fromApkButtonClicked(self):
         openFileDialog = QFileDialog()
         openFileDialog.setFileMode(QFileDialog.ExistingFile)
         openFileDialog.setNameFilter("APK Files (*.apk)")
@@ -154,7 +152,7 @@ class CapturePaneController:
         apk = APK(selected_files[0])
         packageName = apk.packagename
 
-        if self.isPackageInstalled(packageName):
+        if self._isPackageInstalled(packageName):
             self._lastSelectedPackage = packageName
             self._pane.accept()
         else:
@@ -164,15 +162,15 @@ class CapturePaneController:
             messageBox.setInformativeText(text)
             messageBox.exec_()
 
-    def setDevices(self, devices: List[str]):
+    def _setDevices(self, devices: List[str]):
         with blockSignals(self._pane.deviceDropDown):
             self._pane.deviceDropDown.addItems(devices)
-            self.clearPackagesList()
+            self._clearPackagesList()
 
-    def setPackagesEmpty(self):
+    def __setPackagesEmpty(self):
         self._pane.selectButton.setEnabled(False)
         self._pane.fromApkButton.setEnabled(False)
-        self.clearPackagesList()
+        self._clearPackagesList()
 
         item = QStandardItem()
         item.setSelectable(False)
@@ -188,10 +186,10 @@ class CapturePaneController:
         item.setFont(font)
         self._pane.dataModel.appendRow(item)
 
-    def setPackages(self, packages: List[str]):
+    def _setPackages(self, packages: List[str]):
         assert len(packages) > 0, "Non empty list expected"
 
-        self.clearPackagesList()
+        self._clearPackagesList()
         for package in packages:
             self._pane.dataModel.appendRow(QStandardItem(package))
 
@@ -201,11 +199,11 @@ class CapturePaneController:
         self._pane.selectButton.setEnabled(True)
         self._pane.fromApkButton.setEnabled(True)
 
-    def clearPackagesList(self):
+    def _clearPackagesList(self):
         rowCount = self._pane.dataModel.rowCount()
         self._pane.dataModel.removeRows(0, rowCount)
 
-    def setSelectedDevice(self, deviceName: str):
+    def _setSelectedDevice(self, deviceName: str):
         with blockSignals(self._pane.deviceDropDown):
             self._pane.deviceDropDown.setCurrentText(deviceName)
 
@@ -221,7 +219,7 @@ class CapturePaneController:
         items = self._pane.dataModel.findItems(packageName, Qt.MatchExactly)
         return items[0] if items else None
 
-    def setSelectedPackage(self, packageName: str):
+    def _setSelectedPackage(self, packageName: str):
         item = self._findPackageItemByName(packageName)
         if not item:
             return
@@ -229,5 +227,5 @@ class CapturePaneController:
         proxyIndex = self._pane.filterModel.mapFromSource(item.index())
         self._selectPackagesListRowByIndex(proxyIndex)
 
-    def isPackageInstalled(self, packageName: str):
+    def _isPackageInstalled(self, packageName: str):
         return self._findPackageItemByName(packageName) is not None

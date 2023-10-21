@@ -1,7 +1,21 @@
-from traceback import print_tb
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import (
+    QTextCursor,
+    QTextCharFormat,
+    QIcon,
+    QColor,
+)
+from PyQt5.QtWidgets import (
+    QSizePolicy,
+    QLabel,
+    QDialog,
+    QWidget,
+    QPushButton,
+    QHBoxLayout,
+    QVBoxLayout,
+    QTextBrowser,
+    QApplication,
+)
 
 
 from dataclasses import dataclass
@@ -14,9 +28,13 @@ from loggat.app.controllers.log_messages_pane.search import SearchResult
 
 
 class LogMessageViewPane(QDialog):
-
     def _defaultFlags(self):
-        return Qt.Window | Qt.Dialog | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint
+        return (
+            Qt.Window
+            | Qt.Dialog
+            | Qt.WindowMaximizeButtonHint
+            | Qt.WindowCloseButtonHint
+        )
 
     def __init__(self, parent: QWidget):
         super().__init__(parent, self._defaultFlags())
@@ -38,7 +56,7 @@ class LogMessageViewPane(QDialog):
             charFormat.setAnchor(True)
             doc = self.logMsgTextBrowser.document()
             text = doc.toPlainText()
-            addr = text[keyword.begin: keyword.end]
+            addr = text[keyword.begin : keyword.end]
             charFormat.setAnchorHref(addr)
             charFormat.setToolTip(addr)
 
@@ -49,11 +67,15 @@ class LogMessageViewPane(QDialog):
         self.logLevelLabel = QLabel()
         self.logLevelLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.logLevelLabel.setFixedWidth(200)
-        self.logLevelLabel.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
+        self.logLevelLabel.setTextInteractionFlags(
+            Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard
+        )
 
         self.tagNameLabel = QLabel()
         self.tagNameLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.tagNameLabel.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
+        self.tagNameLabel.setTextInteractionFlags(
+            Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard
+        )
 
         self.copyButton = QPushButton()
         self.copyButton.setIcon(QIcon(iconFile("copy")))
@@ -94,13 +116,10 @@ class LogMessageViewPane(QDialog):
         y = (screen.height() - height) // 2
         self.setGeometry(x, y, width, height)
 
-
-
     def setTag(self, tag: str):
         self.tagNameLabel.setText(f"Tag: {tag}")
 
     def setLogLevel(self, logLevel: str):
-
         if logLevel == "S":
             desc = "Silent"
         elif logLevel == "F":

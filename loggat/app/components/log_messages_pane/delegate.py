@@ -1,8 +1,17 @@
 from copy import copy
 from dataclasses import dataclass
 from typing import List
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PyQt5.QtCore import Qt, QModelIndex, pyqtSignal, QSortFilterProxyModel
+from PyQt5.QtGui import (
+    QFont,
+    QFontMetrics,
+    QTextDocument,
+    QTextCharFormat,
+    QTextCursor,
+    QPainter,
+    QAbstractTextDocumentLayout,
+    QColor,
+)
 from PyQt5.QtWidgets import *
 from enum import Enum, auto
 from loggat.app.controllers.log_messages_pane.search import SearchResult
@@ -93,7 +102,6 @@ class StyledItemDelegate(QStyledItemDelegate):
         else:
             color = self.rowColor(logLevel)
             painter.fillRect(viewItem.rect, color)
-
 
     def draw(self, viewItem: QStyleOptionViewItem, painter: QPainter):
         style = self.style(viewItem)

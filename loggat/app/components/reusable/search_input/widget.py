@@ -1,7 +1,6 @@
 from typing import List, Optional
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QStyle, QProxyStyle, QLineEdit, QWidget
 
 from loggat.app.util.paths import iconFile
 
