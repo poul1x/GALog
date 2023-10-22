@@ -6,9 +6,11 @@ from PyQt5.QtGui import *
 from loggat.app.device import AdbClient, AdbDevice, deviceRestricted
 from loggat.app.device.errors import DeviceError
 
+
 class AppRunnerSignals(QObject):
     succeeded = pyqtSignal()
     failed = pyqtSignal(str, str)
+
 
 class AppRunner(QRunnable):
     _client: AdbClient
@@ -20,7 +22,11 @@ class AppRunner(QRunnable):
         self._deviceName = deviceName
         self._packageName = packageName
         self._client = client
+        self._appDebug = False
         self._msDelay = None
+
+    def setAppDebug(self, debug: bool):
+        self._appDebug = debug
 
     def setStartDelay(self, ms: int):
         self._msDelay = ms
@@ -31,7 +37,8 @@ class AppRunner(QRunnable):
 
     def _execRunApp(self):
         with deviceRestricted(self._client, self._deviceName) as device:
-            device.shell(f"monkey -p {self._packageName} 1")
+            waitDebugOpt = "--wait-dbg" if self._appDebug else ""
+            device.shell(f"monkey {waitDebugOpt} -p {self._packageName} 1")
 
     def run(self):
         try:

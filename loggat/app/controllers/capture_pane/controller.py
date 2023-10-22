@@ -4,7 +4,9 @@ from PyQt5.QtCore import QModelIndex, QThreadPool, Qt, QItemSelectionModel
 from PyQt5.QtGui import QStandardItem, QFont
 
 from pyaxmlparser import APK
+from loggat.app.components.capture_pane.pane import RunAppAction
 from loggat.app.components.dialogs import ErrorDialog, LoadingDialog
+from loggat.app.controllers.run_app.controller import RunAppController
 from loggat.app.util.signals import blockSignals
 from .device_loader import DeviceLoader
 from .package_loader import PackageLoader
@@ -23,6 +25,7 @@ class CapturePaneController:
         self._client = AdbClient(adbHost, adbPort)
         self._lastSelectedDevice = None
         self._lastSelectedPackage = None
+        self._lastSelectedAction = RunAppAction.StartApp
         self._nothingSelected = False
         self._pane = None
 
@@ -31,6 +34,9 @@ class CapturePaneController:
 
     def selectedPackage(self):
         return self._lastSelectedPackage
+
+    def selectedAction(self):
+        return self._lastSelectedAction
 
     def captureTargetSelected(self):
         return (
@@ -41,6 +47,7 @@ class CapturePaneController:
 
     def takeControl(self, capturePane: CapturePane) -> None:
         self._pane = capturePane
+        self._setAppRunAction(self._lastSelectedAction)
         self._pane.reloadButton.clicked.connect(self._reloadButtonClicked)
         self._pane.deviceDropDown.currentTextChanged.connect(self._deviceChanged)
         self._pane.fromApkButton.clicked.connect(self._fromApkButtonClicked)
@@ -51,10 +58,16 @@ class CapturePaneController:
         self._pane.rejected.connect(self._rejected)
         self._nothingSelected = False
 
+    def _setAppRunAction(self, action: RunAppAction):
+        i = self._pane.actionDropDown.findData(action, Qt.UserRole)
+        assert i != -1, "Current action must be present in RunAppAction"
+        self._pane.actionDropDown.setCurrentIndex(i)
+
     def _rejected(self):
         self._nothingSelected = True
 
     def _packageSelected(self, index: QModelIndex):
+        self._lastSelectedAction = self._pane.actionDropDown.currentData(Qt.UserRole)
         self._lastSelectedPackage = index.data()
         self._pane.accept()
 
@@ -90,7 +103,7 @@ class CapturePaneController:
 
     def _packageReloadFailed(self, msgBrief: str, msgVerbose: str):
         self._loadingDialog.close()
-        self.__setPackagesEmpty()
+        self._setPackagesEmpty()
 
         messageBox = ErrorDialog()
         messageBox.setText(msgBrief)
@@ -167,7 +180,7 @@ class CapturePaneController:
             self._pane.deviceDropDown.addItems(devices)
             self._clearPackagesList()
 
-    def __setPackagesEmpty(self):
+    def _setPackagesEmpty(self):
         self._pane.selectButton.setEnabled(False)
         self._pane.fromApkButton.setEnabled(False)
         self._clearPackagesList()

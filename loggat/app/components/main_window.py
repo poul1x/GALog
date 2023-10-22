@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import yaml
-from loggat.app.components.capture_pane import CapturePane
+from loggat.app.components.capture_pane import CapturePane, RunAppAction
 from loggat.app.controllers.capture_pane import CapturePaneController
 from loggat.app.controllers.log_messages_pane.controller import (
     LogMessagesPaneController,
@@ -23,6 +23,7 @@ from loggat.app.controllers.log_messages_pane.log_reader import (
     ProcessEndedEvent,
     ProcessStartedEvent,
 )
+from loggat.app.controllers.run_app.controller import RunAppController
 from loggat.app.device.device import AdbClient
 from loggat.app.highlighting_rules import HighlightingRules
 from loggat.app.components.message_view_pane import LogMessageViewPane
@@ -142,6 +143,13 @@ class MainWindow(QMainWindow):
         if self.capturePaneController.captureTargetSelected():
             device = self.capturePaneController.selectedDevice()
             package = self.capturePaneController.selectedPackage()
+            action = self.capturePaneController.selectedAction()
+
+            if action != RunAppAction.DoNotStartApp:
+                controller = RunAppController(ADB_HOST, ADB_PORT)
+                controller.setAppDebug(action == RunAppAction.StartAppDebug)
+                controller.runApp(device, package)
+
             self.logMessagesPaneController.startCapture(device, package)
             self.setCaptureSpecificActionsEnabled(True)
 

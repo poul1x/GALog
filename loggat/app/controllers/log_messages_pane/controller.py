@@ -149,17 +149,6 @@ class LogMessagesPaneController:
         msg = f"App '{packageName}' ended"
         self._addLogLine("S", "loggat", msg)
 
-    def _promptRunApp(self, deviceName: str, packageName: str):
-        buttons = QMessageBox.Yes | QMessageBox.No
-        text = "This app is not running. Would you like to start it?"
-        reply = QMessageBox.question(None, "Run app", text, buttons)
-
-        if reply == QMessageBox.Yes:
-            adbHost = self._client.host
-            adbPort = self._client.port
-            controller = RunAppController(adbHost, adbPort)
-            controller.runApp(deviceName, packageName)
-
     def _logReaderInitialized(self, deviceName: str, packageName: str, pids: List[str]):
         assert self._loadingDialog
         self._loadingDialog.close()
@@ -171,7 +160,6 @@ class LogMessagesPaneController:
         else:
             msg = f"App '{packageName}' is not running. Waiting for its start..."
             self._addLogLine("S", "loggat", msg)
-            self._promptRunApp(deviceName, packageName)
 
     def _logReaderFailed(self, msgBrief: str, msgVerbose: str):
         if self._loadingDialog:

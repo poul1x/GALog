@@ -21,6 +21,14 @@ from loggat.app.components.reusable.search_input import SearchInput
 from loggat.app.util.hotkeys import HotkeyHelper
 from loggat.app.util.paths import iconFile
 
+from enum import Enum, auto
+
+
+class RunAppAction(int, Enum):
+    StartApp = auto()
+    StartAppDebug = auto()
+    DoNotStartApp = auto()
+
 
 class CapturePane(QDialog):
     def _defaultFlags(self):
@@ -69,14 +77,23 @@ class CapturePane(QDialog):
 
         self.deviceLabel = QLabel(self)
         self.deviceLabel.setText("Device:")
+        self.deviceDropDown = QComboBox(self)
 
         self.reloadButton = QPushButton(self)
         self.reloadButton.setIcon(QIcon(iconFile("reload")))
         self.reloadButton.setText("Reload packages")
 
-        self.deviceDropDown = QComboBox(self)
+        self.actionLabel = QLabel(self)
+        self.actionLabel.setText("Action:")
+        self.actionDropDown = QComboBox(self)
+        self.actionDropDown.addItem("Start app", RunAppAction.StartApp)
+        self.actionDropDown.addItem("Start app (debug)", RunAppAction.StartAppDebug)
+        self.actionDropDown.addItem("Don't start app", RunAppAction.DoNotStartApp)
+
         hBoxLayoutTopLeft.addWidget(self.deviceLabel)
         hBoxLayoutTopLeft.addWidget(self.deviceDropDown)
+        hBoxLayoutTopLeft.addWidget(self.actionLabel)
+        hBoxLayoutTopLeft.addWidget(self.actionDropDown)
         hBoxLayoutTopRight.addWidget(self.reloadButton)
         hBoxLayoutTop.addLayout(hBoxLayoutTopLeft)
         hBoxLayoutTop.addLayout(hBoxLayoutTopRight)
