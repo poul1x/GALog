@@ -13,7 +13,9 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import yaml
 from loggat.app.components.capture_pane import CapturePane, RunAppAction
+from loggat.app.components.dialogs.stop_capture_dialog import StopCaptureDialog, StopCaptureDialogResult
 from loggat.app.controllers.capture_pane import CapturePaneController
+from loggat.app.controllers.kill_app.controller import KillAppController
 from loggat.app.controllers.log_messages_pane.controller import (
     LogMessagesPaneController,
 )
@@ -154,8 +156,21 @@ class MainWindow(QMainWindow):
             self.setCaptureSpecificActionsEnabled(True)
 
     def stopCapture(self):
-        if self.logMessagesPaneController.promptStopCapture():
-            self.setCaptureSpecificActionsEnabled(False)
+        dialog = StopCaptureDialog()
+        dialog.setText("Stop capture?")
+
+        result = dialog.exec_()
+        if result == StopCaptureDialogResult.Rejected:
+            return
+
+        if result == StopCaptureDialogResult.AcceptedKillApp:
+            device = self.logMessagesPaneController.device
+            package = self.logMessagesPaneController.package
+            controller = KillAppController(ADB_HOST, ADB_PORT)
+            controller.killApp(device, package)
+
+        self.logMessagesPaneController.stopCapture()
+        self.setCaptureSpecificActionsEnabled(False)
 
     def toggleMessageFilter(self):
         if self.logMessagesPaneController.messageFilterEnabled():
@@ -180,8 +195,8 @@ class MainWindow(QMainWindow):
         action.setShortcut("Ctrl+F")
         action.setStatusTip("Toggle message filter mode")
         action.triggered.connect(lambda: self.toggleMessageFilter())
-        action.setEnabled(False)
-        action.setData(True)
+        action.setEnabled(True)
+        action.setData(False)
         return action
 
     def clearCapturedLogsAction(self):

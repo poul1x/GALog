@@ -94,14 +94,23 @@ class StyledItemDelegate(QStyledItemDelegate):
     ):
         model = index.model()
         newIndex = model.index(index.row(), Columns.logLevel)
+        inverted = model.data(newIndex, Qt.UserRole)
         logLevel = model.data(newIndex)
 
-        if viewItem.state & QStyle.State_Selected:
-            color = self.rowColorSelected(logLevel)
-            painter.fillRect(viewItem.rect, color)
+        if inverted:
+            if viewItem.state & QStyle.State_Selected:
+                color = self.rowColor(logLevel)
+                painter.fillRect(viewItem.rect, color)
+            else:
+                color = self.rowColorSelected(logLevel)
+                painter.fillRect(viewItem.rect, color)
         else:
-            color = self.rowColor(logLevel)
-            painter.fillRect(viewItem.rect, color)
+            if viewItem.state & QStyle.State_Selected:
+                color = self.rowColorSelected(logLevel)
+                painter.fillRect(viewItem.rect, color)
+            else:
+                color = self.rowColor(logLevel)
+                painter.fillRect(viewItem.rect, color)
 
     def draw(self, viewItem: QStyleOptionViewItem, painter: QPainter):
         style = self.style(viewItem)

@@ -1,5 +1,5 @@
 from typing import List
-from PyQt5.QtCore import QModelIndex, QThreadPool, Qt
+from PyQt5.QtCore import QModelIndex, QThreadPool, Qt, QThread, QTimer
 from PyQt5.QtGui import QStandardItem
 from PyQt5.QtWidgets import QTableView, QMessageBox
 
@@ -8,6 +8,7 @@ from loggat.app.components.dialogs.stop_capture_dialog import (
     StopCaptureDialog,
     StopCaptureDialogResult,
 )
+from loggat.app.components.log_messages_pane.data_model import Columns
 from loggat.app.components.log_messages_pane.delegate import (
     HighlightingData,
     LazyHighlightingState,
@@ -15,6 +16,7 @@ from loggat.app.components.log_messages_pane.delegate import (
 from loggat.app.components.log_messages_pane.pane import LogMessagesPane
 from loggat.app.components.message_view_pane import LogMessageViewPane
 from loggat.app.controllers.kill_app.controller import KillAppController
+from .blinking_row import RowBlinkingController
 from loggat.app.controllers.message_view_pane.controller import (
     LogMessageViewPaneController,
 )
@@ -34,12 +36,23 @@ from .log_reader import (
 class LogMessagesPaneController:
     def __init__(self, adbHost: str, adbPort: int):
         self._client = AdbClient(adbHost, adbPort)
+        self._rowBlinkingController = None
         self._viewPaneController = None
         self._highlightingRules = None
         self._logReader = None
         self._liveReload = True
         self._scrolling = True
-        self._backToFilter = False
+        self._backToFilter = None
+
+    @property
+    def device(self):
+        assert self._logReader is not None
+        return self._logReader.device
+
+    @property
+    def package(self):
+        assert self._logReader is not None
+        return self._logReader.package
 
     def setHighlightingRules(self, rules: HighlightingRules):
         self._highlightingRules = rules
@@ -55,34 +68,58 @@ class LogMessagesPaneController:
         pane.toggleMessageFilter.connect(self._toggleMessageFilter)
         self._pane = pane
         self._scrolling = True
-        self._backToFilter = False
+        self._backToFilter = None
 
-        assert self._highlightingRules
+        assert self._highlightingRules is not None
         self._viewPaneController = LogMessageViewPaneController(
             pane.dataModel, self._highlightingRules
         )
+
+        self._rowBlinkingController = RowBlinkingController(self._pane)
 
     def _toggleMessageFilter(self):
         if self.messageFilterEnabled():
             self.disableMessageFilter()
         else:
-            if self._backToFilter:
-                self.enableMessageFilter(reset=False)
-                self._pane.tableView.setFocus()
+            if self._backToFilter is not None:
+                self._jumpBack()
 
-        self._backToFilter = False
 
     def setLiveReloadEnabled(self, enabled: bool):
         self._liveReload = enabled
 
-    def _jumpToRow(self, index: QModelIndex):
-        dataModelIndex = self._pane.filterModel.mapToSource(index)
-        self.disableMessageFilter()
-        index = self._pane.filterModel.index(dataModelIndex.row(), 0)
-        self._backToFilter = True
+    def _blinkRow(self):
+        model = self._pane.tableView.model()
+        for _ in range(10):
+            for column in Columns:
+                index = model.index(0, column)
+                color1 = model.data(index, Qt.TextColorRole)
+                color2 = model.data(index, Qt.BackgroundRole)
+                model.setData(index, color1, Qt.BackgroundRole)
+                model.setData(index, color2, Qt.TextColorRole)
+            QThread.msleep(500)
+            print("AAAA")
+
+    def _jumpBack(self):
+        self.enableMessageFilter(reset=False)
+        index = self._pane.filterModel.index(self._backToFilter, 0)
+        self._backToFilter = None
         self._pane.tableView.selectRow(index.row())
         flags = QTableView.PositionAtCenter | QTableView.PositionAtTop
         self._pane.tableView.scrollTo(index, flags)
+        self._pane.tableView.setFocus()
+        self._rowBlinkingController.startBlinking(index.row())
+
+    def _jumpToRow(self, index: QModelIndex):
+        self._backToFilter = index.row()
+        dataModelIndex = self._pane.filterModel.mapToSource(index)
+        self.disableMessageFilter()
+        index = self._pane.filterModel.index(dataModelIndex.row(), 0)
+        self._pane.tableView.selectRow(index.row())
+        flags = QTableView.PositionAtCenter | QTableView.PositionAtTop
+        self._pane.tableView.scrollTo(index, flags)
+        self._rowBlinkingController.startBlinking(index.row())
+
 
     def _showContentFor(self, index: QModelIndex):
         viewPane = LogMessageViewPane(self._pane)
@@ -155,7 +192,7 @@ class LogMessagesPaneController:
         self._loadingDialog = None
 
         if pids:
-            msg = f"App '{packageName}' is running. PIDs: {', '.join(pids)}"
+            msg = f"App '{packageName}' is running. PID(s): {', '.join(pids)}"
             self._addLogLine("S", "loggat", msg)
         else:
             msg = f"App '{packageName}' is not running. Waiting for its start..."
@@ -251,6 +288,7 @@ class LogMessagesPaneController:
     def _addLogLine(self, logLevel: str, tagName: str, logMessage: str):
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
         itemLogLevel = QStandardItem(logLevel)
+        itemLogLevel.setData(False, Qt.UserRole) # is row color inverted
         itemLogLevel.setFlags(flags)
 
         itemTagName = QStandardItem(tagName)
