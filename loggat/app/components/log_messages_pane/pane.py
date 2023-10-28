@@ -17,6 +17,7 @@ class LogMessagesPane(QWidget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.initUserInterface()
+        self.setObjectName("LogMessagesPane")
 
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
@@ -35,7 +36,7 @@ class LogMessagesPane(QWidget):
 
         hHeader = self.tableView.horizontalHeader()
         hHeader.setSectionResizeMode(Columns.logMessage, QHeaderView.Stretch)
-        hHeader.setDefaultAlignment(Qt.AlignLeft)
+        hHeader.setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
         vHeader = self.tableView.verticalHeader()
         vHeader.setSectionResizeMode(QHeaderView.Fixed)

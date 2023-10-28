@@ -98,7 +98,6 @@ class LogMessagesPaneController:
                 model.setData(index, color1, Qt.BackgroundRole)
                 model.setData(index, color2, Qt.TextColorRole)
             QThread.msleep(500)
-            print("AAAA")
 
     def _jumpBack(self):
         self.enableMessageFilter(reset=False)
@@ -224,27 +223,6 @@ class LogMessagesPaneController:
         self._loadingDialog = LoadingDialog()
         self._loadingDialog.setText(f"Connecting to ADB server...")
         self._loadingDialog.exec_()
-
-    def promptStopCapture(self):
-        dialog = StopCaptureDialog()
-        dialog.setText("Stop capture?")
-
-        result = dialog.exec_()
-        if result == StopCaptureDialogResult.Rejected:
-            return False
-
-        assert self._client is not None
-        assert self._logReader is not None
-        if result == StopCaptureDialogResult.AcceptedKillApp:
-            adbHost = self._client.host
-            adbPort = self._client.port
-            device = self._logReader.device
-            package = self._logReader.package
-            controller = KillAppController(adbHost, adbPort)
-            controller.killApp(device, package)
-
-        self.stopCapture()
-        return True
 
     def stopCapture(self):
         if self._logReader:
