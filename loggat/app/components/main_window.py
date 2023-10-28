@@ -40,19 +40,6 @@ from .log_messages_pane import LogMessagesPane
 ADB_HOST = "127.0.0.1"
 ADB_PORT = 5037
 
-
-class CentralWidget(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.initUserInterface()
-
-    def initUserInterface(self):
-        hBoxLayout = QHBoxLayout()
-        self.logMessagesPane = LogMessagesPane(self)
-        hBoxLayout.addWidget(self.logMessagesPane)
-        self.setLayout(hBoxLayout)
-
-
 class MainWindow(QMainWindow):
     _viewWindows: List[LogMessageViewPane]
     _liveReload: bool
@@ -265,9 +252,9 @@ class MainWindow(QMainWindow):
         y = (screen.height() - height) // 2
         self.setGeometry(x, y, width, height)
 
-        centralWidget = CentralWidget()
-        self.logMessagesPaneController.takeControl(centralWidget.logMessagesPane)
-        self.setCentralWidget(centralWidget)
+        pane = LogMessagesPane(self)
+        self.logMessagesPaneController.takeControl(pane)
+        self.setCentralWidget(pane)
         # self.statusBar().showMessage('Ready')
         self.setWindowTitle("Loggat")
         self.setupMenuBar()
