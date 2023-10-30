@@ -6,6 +6,10 @@
     padding: 10px;
 }
 
+#MainWindowHeader QPushButton[type="close"]::hover {
+    background: #ff6565;
+}
+
 #MainWindowHeader QLabel {
     color: #353535;
     font-family: Arial, sans-serif;
@@ -33,10 +37,6 @@ QMenu {
     background-color: #e7e7e7;
 }
 
-#LogMessagesPane QTableView{
-    background: white;
-    border: none;
-}
 
 QHeaderView::section:horizontal {
     background-color: #464646;
@@ -57,15 +57,55 @@ QMenuBar {
     font-size: 20px;
 }
 
+QMenuBar::item {
+    background-color: #ffffff;
+    font-family: Arial, sans-serif;
+    min-height: 30px;
+    font-size: 20px;
+    padding: 5px;
+    margin: 0px;
+}
+
 QMenuBar::item:selected {
     background: #464646;
     color: #ffffff;
 }
 
-QMainWindow {
-    border: 5px solid red;
+#LogMessagesPane QTableView{
+    background: white;
+    border: none;
 }
 
-/* QMenuBar::item:pressed {
-    background: #888888;
-} */
+#LogMessagesSearchPane {
+    min-height: 20px;
+    padding: 15px;
+    background: #7b7b7b;
+}
+
+#LogMessagesSearchPane QLineEdit {
+    border: none;
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    padding: 2px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+#LogMessagesSearchPane QPushButton {
+    border: none;
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    color: #464646;
+    background: #ffffff;
+}
+
+#LogMessagesSearchPane QPushButton:hover {
+    color: #ffffff;
+    background: #464646;
+}

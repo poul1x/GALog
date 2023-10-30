@@ -63,8 +63,8 @@ class LogMessagesPaneController:
         pane.tableView.delegate.lazyHighlighting.connect(self._lazyHighlighting)
         pane.dataModel.rowsAboutToBeInserted.connect(self._beforeRowInserted)
         pane.dataModel.rowsInserted.connect(self._afterRowInserted)
-        pane.searchInput.returnPressed.connect(self._applyMessageFilter)
-        pane.searchButton.clicked.connect(self._applyMessageFilter)
+        pane.searchPane.input.returnPressed.connect(self._applyMessageFilter)
+        pane.searchPane.button.clicked.connect(self._applyMessageFilter)
         pane.toggleMessageFilter.connect(self._toggleMessageFilter)
         self._pane = pane
         self._scrolling = True
@@ -230,20 +230,19 @@ class LogMessagesPaneController:
             self._logReader = None
 
     def _applyMessageFilter(self):
-        text = self._pane.searchInput.text()
+        text = self._pane.searchPane.input.text()
         self._pane.filterModel.setFilterFixedString(text)
 
     def _resetMessageFilter(self):
-        self._pane.searchInput.setText("")
+        self._pane.searchPane.input.setText("")
         self._pane.filterModel.setFilterFixedString("")
 
     def enableMessageFilter(self, reset: bool = True):
         self._pane.filterModel.setFilteringEnabled(True)
         self._pane.tableView.verticalHeader().setVisible(True)
-        self._pane.searchInput.setFocusPolicy(Qt.TabFocus)
-        self._pane.searchInput.setFocus()
-        self._pane.searchButton.show()
-        self._pane.searchInput.show()
+        self._pane.searchPane.input.setFocusPolicy(Qt.TabFocus)
+        self._pane.searchPane.input.setFocus()
+        self._pane.searchPane.show()
 
         if reset == True:
             self._resetMessageFilter()
@@ -252,9 +251,8 @@ class LogMessagesPaneController:
         self._pane.filterModel.setFilteringEnabled(False)
         self._pane.tableView.verticalHeader().setVisible(False)
         self._pane.tableView.reset()
-        self._pane.searchInput.setFocusPolicy(Qt.NoFocus)
-        self._pane.searchInput.hide()
-        self._pane.searchButton.hide()
+        self._pane.searchPane.input.setFocusPolicy(Qt.NoFocus)
+        self._pane.searchPane.hide()
 
     def messageFilterEnabled(self):
         return self._pane.filterModel.filteringEnabled()

@@ -1,15 +1,44 @@
+from typing import Optional
+from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QHeaderView, QPushButton, QHBoxLayout, QVBoxLayout
+from PyQt5.QtGui import QKeyEvent, QIcon
+from PyQt5.QtWidgets import QHeaderView, QPushButton, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy, QLineEdit
 
 from PyQt5.QtWidgets import QWidget
-from galog.app.components.reusable.search_input.widget import SearchInput
+from galog.app.components.reusable.search_input.widget import SearchInput, SearchInputStyleAddon
 
 from galog.app.util.hotkeys import HotkeyHelper
+from galog.app.util.paths import iconFile
 
 from .filter_model import FilterModel
 from .data_model import DataModel, Columns
 from .table_view import TableView
+
+class SearchPane(QWidget):
+
+    def __init__(self, parent: Optional[QWidget] = None):
+        super().__init__(parent)
+        self.initUserInterface()
+        self.setObjectName("LogMessagesSearchPane")
+        self.setAttribute(Qt.WA_StyledBackground)
+
+    def initUserInterface(self):
+        self.input = SearchInput(self)
+        self.input.setPlaceholderText("Search message")
+
+        self.button = QPushButton(self)
+        self.button.setText("Search")
+
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0,0,0,0)
+        layout.setSpacing(0)
+        layout.setAlignment(Qt.AlignVCenter)
+
+        layout.addWidget(self.input, 1)
+        layout.addWidget(self.button)
+
+        self.setLayout(layout)
+        self.hide()
 
 class LogMessagesPane(QWidget):
     toggleMessageFilter = pyqtSignal()
@@ -18,6 +47,7 @@ class LogMessagesPane(QWidget):
         super().__init__(parent)
         self.initUserInterface()
         self.setObjectName("LogMessagesPane")
+        self.setAttribute(Qt.WA_StyledBackground)
 
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
@@ -43,28 +73,19 @@ class LogMessagesPane(QWidget):
         vHeader.setDefaultSectionSize(vHeader.minimumSectionSize())
         vHeader.setVisible(False)
 
-        self.searchInput = SearchInput(self)
-        self.searchInput.setPlaceholderText("Search message")
+        layout = QVBoxLayout()
+        self.searchPane = SearchPane(self)
+        layout.addWidget(self.tableView, 1)
+        layout.addWidget(self.searchPane)
+        layout.setContentsMargins(0,0,0,0)
+        layout.setSpacing(0)
+        self.setLayout(layout)
 
-        self.searchButton = QPushButton(self)
-        self.searchButton.setText("Search")
-
-        hLayout = QHBoxLayout()
-        hLayout.addWidget(self.searchInput)
-        hLayout.addWidget(self.searchButton)
-        self.searchButton.hide()
-        self.searchInput.hide()
-
-        vLayout = QVBoxLayout()
-        vLayout.addWidget(self.tableView)
-        vLayout.addLayout(hLayout)
-        self.setLayout(vLayout)
-
-        self.searchButton.setFocusPolicy(Qt.NoFocus)
-        self.searchInput.setFocusPolicy(Qt.NoFocus)
+        self.searchPane.button.setFocusPolicy(Qt.NoFocus)
+        self.searchPane.input.setFocusPolicy(Qt.NoFocus)
         self.tableView.setFocusPolicy(Qt.StrongFocus)
         self.tableView.setFocus()
 
-        self.setTabOrder(self.tableView, self.searchInput)
-        self.setTabOrder(self.searchInput, self.tableView)
+        self.setTabOrder(self.tableView, self.searchPane.input)
+        self.setTabOrder(self.searchPane.input, self.tableView)
 

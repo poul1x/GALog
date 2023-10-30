@@ -1,6 +1,7 @@
 from typing import List, Optional
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QStyle, QProxyStyle, QLineEdit, QWidget
+from PyQt5.QtCore import Qt, pyqtSignal
 
 from galog.app.util.paths import iconFile
 
@@ -15,6 +16,7 @@ class SearchInputStyleAddon(QProxyStyle):
 class SearchInput(QLineEdit):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
+        self.setAttribute(Qt.WA_StyledBackground)
         self.initUserInterface()
 
     def initUserInterface(self):

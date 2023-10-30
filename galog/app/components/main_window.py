@@ -51,8 +51,8 @@ class TitleBar(QWidget):
         super().__init__(parent)
 
         iconLabel = QLabel()
-        iconLabel.setPixmap(QIcon(iconFile("galog")).pixmap(32, 32))
-        titleLabel = QLabel("galog")
+        iconLabel.setPixmap(QIcon(iconFile("GALog")).pixmap(32, 32))
+        titleLabel = QLabel("GALog")
 
         self.minimizeButton = QPushButton()
         self.minimizeButton.setIcon(QIcon(iconFile("minimize")))
@@ -65,6 +65,7 @@ class TitleBar(QWidget):
 
         self.closeButton = QPushButton()
         self.closeButton.setIcon(QIcon(iconFile("close")))
+        self.closeButton.setProperty("type", "close")
 
         layout = QHBoxLayout()
         layout.setSpacing(0)
@@ -325,7 +326,9 @@ class MainWindow(QMainWindow):
 
     def setupMenuBar(self):
         menuBar = self.header.menuBar
-        captureMenu = menuBar.addMenu("&Capture")
+        # captureMenu = menuBar.addMenu("⛶ &Capture")
+        captureMenu = menuBar.addMenu("📱 &Capture")
+        # captureMenu = menuBar.addMenu("👓 &Capture")
         captureMenu.addAction(self.startCaptureAction())
         captureMenu.addAction(self.stopCaptureAction())
         captureMenu.addAction(self.clearCapturedLogsAction())
@@ -333,8 +336,11 @@ class MainWindow(QMainWindow):
         captureMenu.addAction(self.saveLogFileAction())
         captureMenu.addAction(self.toggleMessageFilterAction())
 
-        adbMenu = menuBar.addMenu("&ADB")
+        adbMenu = menuBar.addMenu("🐞 &ADB")
         adbMenu.addAction(self.installApkAction())
+
+        automationMenu = menuBar.addMenu("⚡ &Automation")
+        automationMenu.addAction("Start frida server", self.actionStub)
 
     def mousePressEvent(self, event: QMouseEvent):
         if event.button() == Qt.LeftButton:
@@ -363,7 +369,6 @@ class MainWindow(QMainWindow):
         self.logMessagesPaneController.takeControl(pane)
         self.setCentralWidget(pane)
         # self.statusBar().showMessage('Ready')
-        self.setWindowTitle("galog")
 
         self.setupMenuBar()
 
