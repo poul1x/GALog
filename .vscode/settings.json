@@ -2,10 +2,10 @@
   "python.formatting.provider": "black",
   "files.exclude": {
     "venv/": true,
-    "loggat/app/resources.py": true
+    "galog/app/resources.py": true
   },
   "python.testing.pytestArgs": [
-    "loggat"
+    "galog"
   ],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,

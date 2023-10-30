@@ -1,6 +1,6 @@
-# Loggat
+# galog
 
-Loggat = Logcat GUI
+galog = Logcat GUI
 
 ## Local development
 

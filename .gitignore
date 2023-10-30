@@ -43,7 +43,7 @@ venv/
 /*.tar.gz
 links.txt
 plan.txt
-loggat.drawio
+galog.drawio
 
 # Release files
 /release
