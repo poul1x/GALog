@@ -1,6 +1,6 @@
 # galog
 
-galog = Logcat GUI
+GALog = Graphical Android Log
 
 ## Local development
 
@@ -33,7 +33,7 @@ TODO
 ### Build
 
 ```bash
-pyinstaller --onefile "sqs_gui\__main__.py"
+pyinstaller --onefile "galog\__main__.py"
 # Copy logging.yaml
 ```
 
