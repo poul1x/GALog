@@ -38,6 +38,7 @@ class LogMessageViewPane(QDialog):
 
     def __init__(self, parent: QWidget):
         super().__init__(parent, self._defaultFlags())
+        self.setObjectName("LogMessageViewPane")
         self.initUserInterface()
 
     def highlightAllText(self, charFormat: QTextCharFormat):
