@@ -1,0 +1,51 @@
+QMenu {
+    background-color: #ffffff;
+	border: none;
+}
+
+QMenu::item {
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-left: 15px;
+	padding-right: 15px;
+	font-family: Arial, sans-serif;
+	font-size: 20px;
+}
+
+QMenu::item:selected {
+	background: #464646;
+	color: #ffffff;
+}
+
+QMenuBar {
+	background-color: #ffffff;
+	min-height: 30px;
+	font-family: Arial, sans-serif;
+	font-size: 20px;
+}
+
+QMenuBar::item {
+	background-color: #ffffff;
+	font-family: Arial, sans-serif;
+	min-height: 30px;
+	font-size: 20px;
+	padding: 5px;
+	margin: 0px;
+}
+
+QMenuBar::item:selected {
+	background: #464646;
+	color: #ffffff;
+}
+
+QStatusBar {
+    background-color: #464646;
+	color: #eeeeee;
+	font-family: Arial, sans-serif;
+	font-size: 20px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-left: 2px;
+	padding-right: 2px;
+	min-height: 22px;
+}
