@@ -58,6 +58,17 @@ class CapturePaneController:
         self._pane.rejected.connect(self._rejected)
         self._nothingSelected = False
 
+    def startCaptureDialog(self):
+        deviceLoader = DeviceLoader(self._client, self._lastSelectedDevice)
+        deviceLoader.setStartDelay(500)
+        deviceLoader.signals.succeeded.connect(self._deviceLoaderSucceeded)
+        deviceLoader.signals.failed.connect(self._deviceLoaderFailed)
+        QThreadPool.globalInstance().start(deviceLoader)
+
+        self._loadingDialog = LoadingDialog()
+        self._loadingDialog.setText("Connecting to ADB server...")
+        self._loadingDialog.exec_()
+
     def _setAppRunAction(self, action: RunAppAction):
         i = self._pane.actionDropDown.findData(action, Qt.UserRole)
         assert i != -1, "Current action must be present in RunAppAction"
@@ -138,17 +149,6 @@ class CapturePaneController:
         messageBox.setText(msgBrief)
         messageBox.setInformativeText(msgVerbose)
         messageBox.exec_()
-
-    def startCaptureDialog(self):
-        deviceLoader = DeviceLoader(self._client, self._lastSelectedDevice)
-        deviceLoader.setStartDelay(500)
-        deviceLoader.signals.succeeded.connect(self._deviceLoaderSucceeded)
-        deviceLoader.signals.failed.connect(self._deviceLoaderFailed)
-        QThreadPool.globalInstance().start(deviceLoader)
-
-        self._loadingDialog = LoadingDialog()
-        self._loadingDialog.setText("Connecting to ADB server...")
-        self._loadingDialog.exec_()
 
     def _fromApkButtonClicked(self):
         openFileDialog = QFileDialog()

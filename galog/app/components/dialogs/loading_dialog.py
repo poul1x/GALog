@@ -1,20 +1,28 @@
+from typing import Optional
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+
+from galog.app.util.paths import styleSheetFile
 
 class LoadingDialog(QDialog):
 
     def __init__(self):
         super().__init__()
         self.setWindowFlags(Qt.FramelessWindowHint)
-        self.initUI()
+        self.setAccessibleName("LoadingDialog")
+        self.initUserInterface()
+        self.loadStyleSheet()
 
-    def initUI(self):
+    def loadStyleSheet(self):
+        with open(styleSheetFile("loading_dialog")) as f:
+            self.setStyleSheet(f.read())
+
+    def initUserInterface(self):
         layout = QVBoxLayout()
         self.label = QLabel(self)
         self.progressBar = QProgressBar(self)
-        self.progressBar.setRange(0, 0)  # Set range to make it indeterminate
-        self.progressBar.setStyleSheet("margin: 0px; padding: 0px;")
+        self.progressBar.setRange(0, 0)
         layout.addWidget(self.label)
         layout.addWidget(self.progressBar)
         self.setLayout(layout)

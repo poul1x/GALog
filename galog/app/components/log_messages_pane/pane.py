@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QWidget
 from galog.app.components.reusable.search_input.widget import SearchInput, SearchInputStyleAddon
 
 from galog.app.util.hotkeys import HotkeyHelper
-from galog.app.util.paths import iconFile
+from galog.app.util.paths import iconFile, styleSheetFile
 
 from .filter_model import FilterModel
 from .data_model import DataModel, Columns
@@ -18,9 +18,9 @@ class SearchPane(QWidget):
 
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
-        self.initUserInterface()
         self.setObjectName("LogMessagesSearchPane")
         self.setAttribute(Qt.WA_StyledBackground)
+        self.initUserInterface()
 
     def initUserInterface(self):
         self.input = SearchInput(self)
@@ -45,9 +45,9 @@ class LogMessagesPane(QWidget):
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.initUserInterface()
         self.setObjectName("LogMessagesPane")
         self.setAttribute(Qt.WA_StyledBackground)
+        self.initUserInterface()
 
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
