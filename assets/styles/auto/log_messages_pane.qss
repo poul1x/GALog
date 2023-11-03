@@ -10,6 +10,12 @@
     min-height: 30px;
 }
 
+#LogMessagesPane QHeaderView::section:vertical {
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    font-size: 19px;
+}
+
 #LogMessagesPane QTableView{
     background: white;
     border: none;
