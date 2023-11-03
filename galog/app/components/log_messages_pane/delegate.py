@@ -47,7 +47,7 @@ class StyledItemDelegate(QStyledItemDelegate):
 
     def _initTextDocument(self):
         font = QFont()
-        font.setPointSize(10)
+        font.setPixelSize(20)
         self._doc = QTextDocument(self)
         self._doc.setDefaultFont(font)
 
@@ -127,12 +127,10 @@ class StyledItemDelegate(QStyledItemDelegate):
         self._doc.documentLayout().draw(painter, ctx)
 
     def rowColorSelected(self, logLevel: str):
-        return QColor("#DCDBFF")
+        return QColor("white")
 
     def rowColor(self, logLevel: str):
-        if logLevel == "S":
-            color = QColor("#E8E8E8")
-        elif logLevel == "F":
+        if logLevel == "F":
             color = QColor("#FF2635")
             color.setAlphaF(0.4)
         elif logLevel == "E":
@@ -146,9 +144,11 @@ class StyledItemDelegate(QStyledItemDelegate):
         elif logLevel == "D":
             color = QColor("green")
             color.setAlphaF(0.4)
-        else:  # V
+        elif logLevel == "V":
             color = QColor("orange")
             color.setAlphaF(0.4)
+        else: # logLevel == "S"
+            color = QColor("#FFFFFF")
 
         return color
 

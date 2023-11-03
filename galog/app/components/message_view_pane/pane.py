@@ -39,6 +39,7 @@ class LogMessageViewPane(QDialog):
     def __init__(self, parent: QWidget):
         super().__init__(parent, self._defaultFlags())
         self.setObjectName("LogMessageViewPane")
+        self.setWindowTitle("View log message")
         self.initUserInterface()
 
     def highlightAllText(self, charFormat: QTextCharFormat):
@@ -144,10 +145,17 @@ class LogMessageViewPane(QDialog):
         self.logMsgTextBrowser.setPlainText(msg)
 
     def setItemBackgroundColor(self, color: QColor):
-        stylesheet = f"background-color: {color.name(QColor.HexArgb)};"
+        colorName = color.name(QColor.HexArgb)
+        colorNameHover = color.lighter().name(QColor.HexArgb)
+
+        stylesheet = f"background: {colorName};"
         self.logLevelLabel.setStyleSheet(stylesheet)
         self.tagNameLabel.setStyleSheet(stylesheet)
         self.logMsgTextBrowser.setStyleSheet(stylesheet)
+
+        stylesheet = r"QPushButton {background: %s;}" % colorName
+        stylesheet += r"QPushButton:hover {background: %s;}" % colorNameHover
+        self.setStyleSheet(stylesheet)
 
     def applyHighlighting(self, rules: HighlightingRules, items: List[SearchResult]):
         for item in items:

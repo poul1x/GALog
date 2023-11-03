@@ -30,13 +30,8 @@
 	font-family: Arial, sans-serif;
 	font-size: 20px;
 
-	background: #ffffff;
-	color: #464646;
+	color: black;
 
-	border: 2px solid #464646;
+	border: 2px solid black;
 	border-radius: 5px;
-}
-
-#LogMessageViewPane QPushButton:hover {
-	background: #e3e3e3;
 }
