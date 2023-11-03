@@ -74,6 +74,9 @@ QMenuBar::item:selected {
 #LogMessagesPane QTableView{
     background: white;
     border: none;
+    background-image: url('assets/images/galog.png');
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 #LogMessagesSearchPane {

@@ -208,6 +208,9 @@ class LogMessagesPaneController:
         messageBox.exec_()
 
     def startCapture(self, device: str, package: str):
+
+        self._pane.tableView.setStyleSheet(" background: white;")
+
         self._clearLogMessages()
         self._logReader = AndroidAppLogReader(self._client, device, package)
         self._logReader.signals.failed.connect(self._logReaderFailed)

@@ -131,7 +131,7 @@ class StyledItemDelegate(QStyledItemDelegate):
 
     def rowColor(self, logLevel: str):
         if logLevel == "S":
-            color = QColor("#FFFFFF")
+            color = QColor("#E8E8E8")
         elif logLevel == "F":
             color = QColor("#FF2635")
             color.setAlphaF(0.4)

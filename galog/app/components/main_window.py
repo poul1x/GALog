@@ -46,93 +46,6 @@ ADB_HOST = "127.0.0.1"
 ADB_PORT = 5037
 
 
-class TitleBar(QWidget):
-    def __init__(self, parent: QWidget):
-        super().__init__(parent)
-
-        iconLabel = QLabel()
-        iconLabel.setPixmap(QIcon(iconFile("GALog")).pixmap(32, 32))
-        titleLabel = QLabel("GALog")
-
-        self.minimizeButton = QPushButton()
-        self.minimizeButton.setIcon(QIcon(iconFile("minimize")))
-
-        self.normalButton = QPushButton()
-        self.normalButton.setIcon(QIcon(iconFile("normal")))
-
-        self.maximizeButton = QPushButton()
-        self.maximizeButton.setIcon(QIcon(iconFile("maximize")))
-
-        self.closeButton = QPushButton()
-        self.closeButton.setIcon(QIcon(iconFile("close")))
-        self.closeButton.setProperty("type", "close")
-
-        layout = QHBoxLayout()
-        layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
-
-        layout.addWidget(iconLabel)
-        layout.addWidget(titleLabel)
-        layout.addStretch(1)
-        layout.addWidget(self.minimizeButton)
-        layout.addWidget(self.maximizeButton)
-        layout.addWidget(self.normalButton)
-        layout.addWidget(self.closeButton)
-        self.setLayout(layout)
-
-
-class TitleBarController:
-    def __init__(self, titleBar: TitleBar, mainWindow: QMainWindow):
-        self._titleBar = titleBar
-        self._mainWindow = mainWindow
-
-        if mainWindow.isMaximized():
-            titleBar.maximizeButton.hide()
-            titleBar.normalButton.show()
-        else:
-            titleBar.maximizeButton.show()
-            titleBar.normalButton.hide()
-
-        titleBar.minimizeButton.clicked.connect(self._minimizeButtonClicked)
-        titleBar.maximizeButton.clicked.connect(self._maximizeButtonClicked)
-        titleBar.normalButton.clicked.connect(self._normalButtonClicked)
-        titleBar.closeButton.clicked.connect(self._closeButtonClicked)
-
-    def _minimizeButtonClicked(self):
-        self._mainWindow.showMinimized()
-
-    def _maximizeButtonClicked(self):
-        self._titleBar.normalButton.show()
-        self._titleBar.maximizeButton.hide()
-        self._mainWindow.showMaximized()
-
-    def _normalButtonClicked(self):
-        self._titleBar.normalButton.hide()
-        self._titleBar.maximizeButton.show()
-        self._mainWindow.showNormal()
-
-    def _closeButtonClicked(self):
-        self._mainWindow.close()
-
-
-class MainWindowHeader(QWidget):
-    def __init__(self, parent: QWidget):
-        super().__init__(parent)
-        self.initUserInterface()
-        self.setObjectName("MainWindowHeader")
-        self.setAttribute(Qt.WA_StyledBackground)
-
-    def initUserInterface(self):
-        layout = QVBoxLayout()
-        layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
-        self.titleBar = TitleBar(self)
-        self.menuBar = QMenuBar(self)
-        layout.addWidget(self.titleBar)
-        layout.addWidget(self.menuBar)
-        self.setLayout(layout)
-
-
 class MainWindow(QMainWindow):
     _viewWindows: List[LogMessageViewPane]
     _liveReload: bool
@@ -211,7 +124,7 @@ class MainWindow(QMainWindow):
             event.ignore()
 
     def setCaptureSpecificActionsEnabled(self, enabled: bool):
-        menuBar = self.header.menuBar
+        menuBar = self.menuBar()
         for fileMenu in menuBar.findChildren(QMenu):
             for action in fileMenu.actions():
                 if action.data() == True:
@@ -325,10 +238,8 @@ class MainWindow(QMainWindow):
         return action
 
     def setupMenuBar(self):
-        menuBar = self.header.menuBar
-        # captureMenu = menuBar.addMenu("⛶ &Capture")
+        menuBar = self.menuBar()
         captureMenu = menuBar.addMenu("📱 &Capture")
-        # captureMenu = menuBar.addMenu("👓 &Capture")
         captureMenu.addAction(self.startCaptureAction())
         captureMenu.addAction(self.stopCaptureAction())
         captureMenu.addAction(self.clearCapturedLogsAction())
@@ -342,22 +253,7 @@ class MainWindow(QMainWindow):
         automationMenu = menuBar.addMenu("⚡ &Automation")
         automationMenu.addAction("Start frida server", self.actionStub)
 
-    def mousePressEvent(self, event: QMouseEvent):
-        if event.button() == Qt.LeftButton:
-            self._mousePressPos = event.globalPos()
-            self._windowPos = self.pos()
-
-    def mouseMoveEvent(self, event: QMouseEvent):
-        if event.buttons() == Qt.LeftButton:
-            globalPos = event.globalPos()
-            moved = globalPos - self._mousePressPos
-            self.move(self._windowPos + moved)
-
     def initUserInterface(self):
-        self.header = MainWindowHeader(self)
-        self.titleBarController = TitleBarController(self.header.titleBar, self)
-        self.setMenuWidget(self.header)
-
         screen = QApplication.desktop().screenGeometry()
         width = int(screen.width() * 0.8)
         height = int(screen.height() * 0.8)
@@ -368,12 +264,10 @@ class MainWindow(QMainWindow):
         pane = LogMessagesPane(self)
         self.logMessagesPaneController.takeControl(pane)
         self.setCentralWidget(pane)
-        # self.statusBar().showMessage('Ready')
+        self.setWindowTitle("galog")
+        self.setWindowIcon(QIcon(iconFile("galog")))
 
         self.setupMenuBar()
 
-        self.setWindowFlag(Qt.FramelessWindowHint, True)
         self.statusBar().show()
         self.centralWidget().layout().setContentsMargins(0,0,0,0)
-        # titleBar = TitleBar(self)
-        # self.setMenuWidget(titleBar)
