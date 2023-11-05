@@ -53,7 +53,7 @@
 }
 
 #CapturePaneHeader QPushButton:hover {
-	background: #cccccc;
+	background: #dddddd;
 }
 
 /* -------------------------- */
