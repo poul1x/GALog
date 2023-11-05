@@ -209,7 +209,7 @@ class LogMessagesPaneController:
 
     def startCapture(self, device: str, package: str):
 
-        self._pane.tableView.setStyleSheet(" background: white;")
+        self._pane.tableView.setStyleSheet("background: white;")
 
         self._clearLogMessages()
         self._logReader = AndroidAppLogReader(self._client, device, package)
@@ -224,7 +224,7 @@ class LogMessagesPaneController:
         self._logReader.start()
 
         self._loadingDialog = LoadingDialog()
-        self._loadingDialog.setText(f"Connecting to ADB server...")
+        self._loadingDialog.setText(f"Fetching app logs...")
         self._loadingDialog.exec_()
 
     def stopCapture(self):

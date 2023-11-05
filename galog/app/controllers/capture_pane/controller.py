@@ -4,7 +4,7 @@ from PyQt5.QtCore import QModelIndex, QThreadPool, Qt, QItemSelectionModel
 from PyQt5.QtGui import QStandardItem, QFont
 
 from pyaxmlparser import APK
-from galog.app.components.capture_pane.pane import RunAppAction
+from galog.app.components.capture_pane import RunAppAction
 from galog.app.components.dialogs import ErrorDialog, LoadingDialog
 from galog.app.controllers.run_app.controller import RunAppController
 from galog.app.util.signals import blockSignals

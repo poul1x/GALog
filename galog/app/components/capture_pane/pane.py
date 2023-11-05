@@ -10,12 +10,17 @@ from PyQt5.QtWidgets import (
     QListView,
     QComboBox,
     QSizePolicy,
+    QFrame,
 )
 from PyQt5.QtGui import (
     QKeyEvent,
     QIcon,
     QStandardItemModel,
 )
+
+from .header import CapturePaneHeader
+from .body import CapturePaneBody
+from .footer import CapturePaneFooter
 
 from galog.app.components.reusable.search_input import SearchInput
 from galog.app.util.hotkeys import HotkeyHelper
@@ -24,20 +29,17 @@ from galog.app.util.paths import iconFile
 from enum import Enum, auto
 
 
-class RunAppAction(int, Enum):
-    StartApp = auto()
-    StartAppDebug = auto()
-    DoNotStartApp = auto()
-
-
 class CapturePane(QDialog):
     def _defaultFlags(self):
         return Qt.Window | Qt.Dialog | Qt.WindowCloseButtonHint
 
     def __init__(self, parent: QWidget):
         super().__init__(parent, self._defaultFlags())
+        self.setObjectName("CapturePane")
+        self.setAttribute(Qt.WA_StyledBackground)
         self.initUserInterface()
         self.setGeometryAuto()
+        self.initFocusPolicy()
 
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
@@ -63,85 +65,75 @@ class CapturePane(QDialog):
         self.setMinimumHeight(500)
         self.setMinimumWidth(600)
 
-        vBoxLayout = QVBoxLayout()
-        hBoxLayoutTop = QHBoxLayout()
-        hBoxLayoutBottom = QHBoxLayout()
-        hBoxLayoutTopLeft = QHBoxLayout()
-        hBoxLayoutTopLeft.setAlignment(Qt.AlignLeft)
-        hBoxLayoutTopRight = QHBoxLayout()
-        hBoxLayoutTopRight.setAlignment(Qt.AlignRight)
-        hBoxLayoutBottomLeft = QHBoxLayout()
-        hBoxLayoutBottomLeft.setAlignment(Qt.AlignLeft)
-        hBoxLayoutBottomRight = QHBoxLayout()
-        hBoxLayoutBottomRight.setAlignment(Qt.AlignRight)
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
 
-        self.deviceLabel = QLabel(self)
-        self.deviceLabel.setText("Device:")
-        self.deviceDropDown = QComboBox(self)
+        self.header = CapturePaneHeader(self)
+        self.body = CapturePaneBody(self)
+        self.footer = CapturePaneFooter(self)
 
-        self.reloadButton = QPushButton(self)
-        self.reloadButton.setIcon(QIcon(iconFile("reload")))
-        self.reloadButton.setText("Reload packages")
+        layout.addWidget(self.header)
+        layout.addWidget(self.body)
+        layout.addWidget(self.footer)
+        self.setLayout(layout)
 
-        self.actionLabel = QLabel(self)
-        self.actionLabel.setText("Action:")
-        self.actionDropDown = QComboBox(self)
-        self.actionDropDown.addItem("Start app", RunAppAction.StartApp)
-        self.actionDropDown.addItem("Start app (debug)", RunAppAction.StartAppDebug)
-        self.actionDropDown.addItem("Don't start app", RunAppAction.DoNotStartApp)
-
-        hBoxLayoutTopLeft.addWidget(self.deviceLabel)
-        hBoxLayoutTopLeft.addWidget(self.deviceDropDown)
-        hBoxLayoutTopLeft.addWidget(self.actionLabel)
-        hBoxLayoutTopLeft.addWidget(self.actionDropDown)
-        hBoxLayoutTopRight.addWidget(self.reloadButton)
-        hBoxLayoutTop.addLayout(hBoxLayoutTopLeft)
-        hBoxLayoutTop.addLayout(hBoxLayoutTopRight)
-        vBoxLayout.addLayout(hBoxLayoutTop)
-
-        self.packagesList = QListView(self)
-        self.packagesList.setEditTriggers(QListView.NoEditTriggers)
-        self.packagesList.setStyleSheet(
-            "QListView::item:selected { background-color: #CDE3FF; color: highlightedText;}"
-        )
-
-        self.dataModel = QStandardItemModel(self)
-        self.filterModel = QSortFilterProxyModel()
-        self.filterModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
-        self.filterModel.setSourceModel(self.dataModel)
-        self.filterModel.setDynamicSortFilter(True)
-        self.packagesList.setModel(self.filterModel)
-        vBoxLayout.addWidget(self.packagesList)
-
-        self.searchInput = SearchInput(self)
-        self.searchInput.textChanged.connect(self.filterModel.setFilterFixedString)
-        self.searchInput.setPlaceholderText("Search package")
-        vBoxLayout.addWidget(self.searchInput)
-
-        self.selectButton = QPushButton("Select")
-        self.selectButton.setEnabled(False)
-        self.selectButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        hBoxLayoutBottomLeft.addWidget(self.selectButton)
-
-        self.fromApkButton = QPushButton("From APK")
-        self.fromApkButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        hBoxLayoutBottomLeft.addWidget(self.fromApkButton)
-
-        self.cancelButton = QPushButton("Cancel")
-        self.cancelButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        hBoxLayoutBottomRight.addWidget(self.cancelButton)
-
-        hBoxLayoutBottom.addLayout(hBoxLayoutBottomLeft)
-        hBoxLayoutBottom.addLayout(hBoxLayoutBottomRight)
-        vBoxLayout.addLayout(hBoxLayoutBottom)
-        self.setLayout(vBoxLayout)
-
+    def initFocusPolicy(self):
+        self.reloadButton.setFocusPolicy(Qt.NoFocus)
+        self.deviceDropDown.setFocusPolicy(Qt.NoFocus)
+        self.actionDropDown.setFocusPolicy(Qt.NoFocus)
         self.selectButton.setFocusPolicy(Qt.NoFocus)
         self.cancelButton.setFocusPolicy(Qt.NoFocus)
         self.fromApkButton.setFocusPolicy(Qt.NoFocus)
-        self.reloadButton.setFocusPolicy(Qt.NoFocus)
-        self.deviceDropDown.setFocusPolicy(Qt.NoFocus)
 
         self.searchInput.setFocus()
         self.setTabOrder(self.searchInput, self.packagesList)
         self.setTabOrder(self.packagesList, self.searchInput)
+
+    @property
+    def deviceLabel(self):
+        return self.header.deviceLabel
+
+    @property
+    def deviceDropDown(self):
+        return self.header.deviceDropDown
+
+    @property
+    def actionLabel(self):
+        return self.header.actionLabel
+
+    @property
+    def actionDropDown(self):
+        return self.header.actionDropDown
+
+    @property
+    def reloadButton(self):
+        return self.header.reloadButton
+
+    @property
+    def packagesList(self):
+        return self.body.packagesList
+
+    @property
+    def searchInput(self):
+        return self.body.searchInput
+
+    @property
+    def dataModel(self):
+        return self.body.dataModel
+
+    @property
+    def filterModel(self):
+        return self.body.filterModel
+
+    @property
+    def selectButton(self):
+        return self.footer.selectButton
+
+    @property
+    def fromApkButton(self):
+        return self.footer.fromApkButton
+
+    @property
+    def cancelButton(self):
+        return self.footer.cancelButton
