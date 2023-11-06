@@ -247,9 +247,7 @@ class MainWindow(QMainWindow):
 
         adbMenu = menuBar.addMenu("🐞 &ADB")
         adbMenu.addAction(self.installApkAction())
-
-        # automationMenu = menuBar.addMenu("⚡ &Automation")
-        # automationMenu.addAction("Start frida server", self.actionNotImp)
+        adbMenu.addAction(self.takeScreenshotAction())
 
     def initUserInterface(self):
         screen = QApplication.desktop().screenGeometry()

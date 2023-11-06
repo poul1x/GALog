@@ -18,6 +18,14 @@ class MessageBox(QMessageBox):
             self.setStyleSheet(f.read())
 
     def exec_(self):
+        #
+        # QMessageBox resets its layout when
+        # setText or setInformativeText methods are called.
+        # So, if we want to remove contents margins and spacing
+        # in grid layout, we must call appropriate functions
+        # there, just before exec() call.
+        #
+
         QApplication.beep()
         self.buttonBox.layout().setContentsMargins(0,0,0,0)
         self.buttonBox.layout().setSpacing(0)

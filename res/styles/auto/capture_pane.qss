@@ -22,7 +22,7 @@
 }
 
 #CapturePaneHeader QComboBox::down-arrow {
-    image: url(assets/icons/dropdown.svg);
+    image: url(res/icons/dropdown.svg);
 }
 
 #CapturePaneHeader QComboBox QAbstractItemView

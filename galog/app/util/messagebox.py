@@ -16,7 +16,7 @@ def showQuitMsgBox():
     messageBox.setStandardButtons(MessageBox.Yes | MessageBox.No)
     messageBox.setDefaultButton(MessageBox.No)
     messageBox.setWindowTitle("Close window")
-    messageBox.exec_()
+    return messageBox.exec_() == MessageBox.Yes
 
 def showNotImpMsgBox():
     messageBox = MessageBox()
