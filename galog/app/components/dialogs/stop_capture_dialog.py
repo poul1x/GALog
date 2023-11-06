@@ -3,54 +3,31 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
+from .message_box import MessageBox
 from enum import Enum, auto
 
-class StopCaptureDialogResult(Enum):
+class StopCaptureDialogResult(int, Enum):
     AcceptedDetachApp = auto()
     AcceptedKillApp = auto()
     Rejected = auto()
 
-class StopCaptureDialog(QDialog):
 
-    def _defaultFlags(self):
-        return Qt.Window | Qt.Dialog | Qt.WindowCloseButtonHint
+class StopCaptureDialog(MessageBox):
+    def __init__(self):
+        super().__init__()
+        self.setText("Stop capture")
+        self.setInformativeText("All captured logs will remain there")
+        self.setStandardButtons(MessageBox.Yes | MessageBox.No)
+        self.setDefaultButton(MessageBox.Yes)
 
-    def __init__(self, parent: Optional[QWidget] = None):
-        super().__init__(parent, self._defaultFlags())
-        self.initUI()
-
-    def initUI(self):
-        vBoxLayout = QVBoxLayout()
-        hBoxLayoutButtons = QHBoxLayout()
-        hBoxLayoutLabels = QHBoxLayout()
-
-        self.label = QLabel(self)
-        self.label.setAlignment(Qt.AlignCenter)
-        self.setWindowTitle("Stop capture")
-
-        buttonYes = QPushButton("Yes", self)
-        buttonYes.clicked.connect(self.accept)
-
-        buttonNo = QPushButton("No", self)
-        buttonNo.clicked.connect(self.reject)
-        self.checkBox = QCheckBox("Kill app process", self)
-        self.checkBox.setChecked(True)
-
-        hBoxLayoutButtons.addWidget(buttonYes)
-        hBoxLayoutButtons.addWidget(buttonNo)
-        hBoxLayoutLabels.addWidget(self.label, 1)
-        vBoxLayout.addLayout(hBoxLayoutLabels)
-        vBoxLayout.addLayout(hBoxLayoutButtons)
-        vBoxLayout.addWidget(self.checkBox, alignment=Qt.AlignLeft)
-        self.setLayout(vBoxLayout)
-
-    def setText(self, text: str):
-        self.label.setText(text)
+        checkBox = QCheckBox("Kill app process", self)
+        checkBox.setChecked(True)
+        self.setCheckBox(checkBox)
 
     def exec_(self) -> int:
         result = super().exec_()
-        if result == QDialog.Accepted:
-            if self.checkBox.isChecked():
+        if result == MessageBox.Yes:
+            if self.checkBox().isChecked():
                 return StopCaptureDialogResult.AcceptedKillApp
             else:
                 return StopCaptureDialogResult.AcceptedDetachApp

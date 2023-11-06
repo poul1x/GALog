@@ -6,4 +6,5 @@ __all__ = [
     "LoadingDialog",
     "StopCaptureDialog",
     "StopCaptureDialogResult",
+    "MessageBox",
 ]

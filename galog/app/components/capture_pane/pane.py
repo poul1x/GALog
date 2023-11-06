@@ -86,7 +86,7 @@ class CapturePane(QDialog):
         self.cancelButton.setFocusPolicy(Qt.NoFocus)
         self.fromApkButton.setFocusPolicy(Qt.NoFocus)
 
-        self.searchInput.setFocus()
+        self.packagesList.setFocus()
         self.setTabOrder(self.searchInput, self.packagesList)
         self.setTabOrder(self.packagesList, self.searchInput)
 

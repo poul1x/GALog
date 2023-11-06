@@ -143,8 +143,6 @@ class MainWindow(QMainWindow):
 
     def stopCapture(self):
         dialog = StopCaptureDialog()
-        dialog.setText("Stop capture?")
-
         result = dialog.exec_()
         if result == StopCaptureDialogResult.Rejected:
             return

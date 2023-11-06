@@ -6,6 +6,12 @@ QMessageBox > QLabel{
 	min-width: 300px;
 }
 
+QMessageBox > QCheckBox{
+	font-family: Arial, sans-serif;
+	font-size: 9pt;
+	font-style: italic
+}
+
 #qt_msgbox_label {
 	font-family: Arial, sans-serif;
 	font-size: 10pt;
