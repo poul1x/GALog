@@ -237,6 +237,15 @@ class MainWindow(QMainWindow):
         action.setData(False)
         return action
 
+    def takeScreenshotAction(self):
+        action = QAction("&Take screenshot", self)
+        action.setShortcut("Ctrl+P")
+        action.setStatusTip("Take screenshot")
+        action.triggered.connect(lambda: self.actionStub())
+        action.setEnabled(False)
+        action.setData(True)
+        return action
+
     def setupMenuBar(self):
         menuBar = self.menuBar()
         captureMenu = menuBar.addMenu("📱 &Capture")
@@ -250,8 +259,8 @@ class MainWindow(QMainWindow):
         adbMenu = menuBar.addMenu("🐞 &ADB")
         adbMenu.addAction(self.installApkAction())
 
-        automationMenu = menuBar.addMenu("⚡ &Automation")
-        automationMenu.addAction("Start frida server", self.actionStub)
+        # automationMenu = menuBar.addMenu("⚡ &Automation")
+        # automationMenu.addAction("Start frida server", self.actionStub)
 
     def initUserInterface(self):
         screen = QApplication.desktop().screenGeometry()
@@ -268,6 +277,4 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QIcon(iconFile("galog")))
 
         self.setupMenuBar()
-
         self.statusBar().show()
-        self.centralWidget().layout().setContentsMargins(0,0,0,0)

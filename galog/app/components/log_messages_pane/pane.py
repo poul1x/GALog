@@ -30,9 +30,9 @@ class SearchPane(QWidget):
         self.button.setText("Search")
 
         layout = QHBoxLayout()
+        layout.setAlignment(Qt.AlignVCenter)
         layout.setContentsMargins(0,0,0,0)
         layout.setSpacing(0)
-        layout.setAlignment(Qt.AlignVCenter)
 
         layout.addWidget(self.input, 1)
         layout.addWidget(self.button)
