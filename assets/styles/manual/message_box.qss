@@ -2,12 +2,16 @@ QMessageBox {
     background-color: #ffffff;
 }
 
+QMessageBox > QLabel{
+	min-width: 300px;
+}
+
 #qt_msgbox_label {
 	font-family: Arial, sans-serif;
 	font-size: 10pt;
 	font-weight: bold;
 	color: #464646;
-    margin: 5px;
+    margin-top: 2px;
 }
 
 #qt_msgbox_informativelabel {
@@ -31,15 +35,16 @@ QMessageBox {
     padding-left: 30px;
     padding-right: 30px;
     margin-bottom: 10px;
+	margin-right: 10px;
 	background: #c8dcff;
     border: none;
+}
+
+#qt_msgbox_buttonbox > QPushButton:focus {
+	background: #a0c3ff;
 }
 
 #qt_msgbox_buttonbox > QPushButton:hover {
 	background: #739fff;
 	color: white;
-}
-
-#qt_msgbox_buttonbox > QPushButton[text="OK"] {
-    margin-right: 20px;
 }

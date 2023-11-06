@@ -11,14 +11,16 @@ class MessageBox(QMessageBox):
 
     def initUserInterface(self):
         self.setWindowIcon(QIcon(iconFile("galog")))
-        buttonBox = self.findChild(QWidget, "qt_msgbox_buttonbox")
-        buttonBox.setAttribute(Qt.WA_StyledBackground)
+        self.buttonBox = self.findChild(QWidget, "qt_msgbox_buttonbox")
+        self.buttonBox.setAttribute(Qt.WA_StyledBackground)
 
         with open(styleSheetFile("message_box")) as f:
             self.setStyleSheet(f.read())
 
     def exec_(self):
         QApplication.beep()
+        self.buttonBox.layout().setContentsMargins(0,0,0,0)
+        self.buttonBox.layout().setSpacing(0)
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
         return super().exec_()

@@ -26,11 +26,7 @@ class StopCaptureDialog(QDialog):
 
         self.label = QLabel(self)
         self.label.setAlignment(Qt.AlignCenter)
-
-        labelForIcon = QLabel()
-        icon = QApplication.style().standardIcon(QStyle.SP_MessageBoxQuestion)
-        pixmap = icon.pixmap(48, 48)
-        labelForIcon.setPixmap(pixmap)
+        self.setWindowTitle("Stop capture")
 
         buttonYes = QPushButton("Yes", self)
         buttonYes.clicked.connect(self.accept)
@@ -42,7 +38,6 @@ class StopCaptureDialog(QDialog):
 
         hBoxLayoutButtons.addWidget(buttonYes)
         hBoxLayoutButtons.addWidget(buttonNo)
-        hBoxLayoutLabels.addWidget(labelForIcon)
         hBoxLayoutLabels.addWidget(self.label, 1)
         vBoxLayout.addLayout(hBoxLayoutLabels)
         vBoxLayout.addLayout(hBoxLayoutButtons)

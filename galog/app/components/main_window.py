@@ -34,6 +34,7 @@ from galog.app.controllers.run_app.controller import RunAppController
 from galog.app.device.device import AdbClient
 from galog.app.highlighting_rules import HighlightingRules
 from galog.app.components.message_view_pane import LogMessageViewPane
+from galog.app.util.messagebox import showNotImpMsgBox, showQuitMsgBox
 from galog.app.util.style import CustomStyle
 
 from galog.app.util.paths import HIGHLIGHTING_RULES_FILE, STYLES_DIR, iconFile
@@ -109,15 +110,7 @@ class MainWindow(QMainWindow):
         self.logMessagesPaneController.setHighlightingRules(rules)
 
     def closeEvent(self, event: QEvent):
-        reply = QMessageBox.question(
-            self,
-            "Window Close",
-            "Are you sure you want to close the window?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
-        )
-
-        if reply == QMessageBox.Yes:
+        if showQuitMsgBox():
             self.logMessagesPaneController.stopCapture()
             event.accept()
         else:
@@ -171,8 +164,6 @@ class MainWindow(QMainWindow):
         else:
             self.logMessagesPaneController.enableMessageFilter()
 
-    def actionStub(self):
-        QMessageBox.information(self, "Stub", "Action stub")
 
     def startCaptureAction(self):
         action = QAction("&New", self)
@@ -196,7 +187,7 @@ class MainWindow(QMainWindow):
         action = QAction("&Clear", self)
         action.setShortcut("Ctrl+X")
         action.setStatusTip("Clear captured logs")
-        action.triggered.connect(lambda: self.actionStub())
+        action.triggered.connect(lambda: showNotImpMsgBox())
         action.setEnabled(False)
         action.setData(True)
         return action
@@ -214,7 +205,7 @@ class MainWindow(QMainWindow):
         action = QAction("&Open", self)
         action.setShortcut("Ctrl+O")
         action.setStatusTip("Open log capture from file")
-        action.triggered.connect(lambda: self.actionStub())
+        action.triggered.connect(lambda: showNotImpMsgBox())
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -223,7 +214,7 @@ class MainWindow(QMainWindow):
         action = QAction("&Save", self)
         action.setShortcut("Ctrl+S")
         action.setStatusTip("Save log capture to file")
-        action.triggered.connect(lambda: self.actionStub())
+        action.triggered.connect(lambda: showNotImpMsgBox())
         action.setEnabled(False)
         action.setData(True)
         return action
@@ -232,7 +223,7 @@ class MainWindow(QMainWindow):
         action = QAction("&Install APK", self)
         action.setShortcut("Ctrl+I")
         action.setStatusTip("Install APK file")
-        action.triggered.connect(lambda: self.actionStub())
+        action.triggered.connect(lambda: showNotImpMsgBox())
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -241,7 +232,7 @@ class MainWindow(QMainWindow):
         action = QAction("&Take screenshot", self)
         action.setShortcut("Ctrl+P")
         action.setStatusTip("Take screenshot")
-        action.triggered.connect(lambda: self.actionStub())
+        action.triggered.connect(lambda: showNotImpMsgBox())
         action.setEnabled(False)
         action.setData(True)
         return action
@@ -260,7 +251,7 @@ class MainWindow(QMainWindow):
         adbMenu.addAction(self.installApkAction())
 
         # automationMenu = menuBar.addMenu("⚡ &Automation")
-        # automationMenu.addAction("Start frida server", self.actionStub)
+        # automationMenu.addAction("Start frida server", self.actionNotImp)
 
     def initUserInterface(self):
         screen = QApplication.desktop().screenGeometry()

@@ -49,11 +49,11 @@
     padding-right: 5px;
     padding-top: 4px;
     padding-bottom: 4px;
-    color: #464646;
-    background: #ffffff;
+    color: black;
+    background: #c8dcff;
 }
 
 #LogMessagesSearchPane QPushButton:hover {
     color: #ffffff;
-    background: #464646;
+    background: #739fff;
 }

@@ -103,7 +103,7 @@
 }
 
 #CapturePaneFooter QPushButton[name="select"] {
-	background: #c8dcff;
+	background: #a0c3ff;
 }
 
 #CapturePaneFooter QPushButton[name="select"]:hover {
