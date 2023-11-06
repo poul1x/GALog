@@ -5,8 +5,9 @@ from PyQt5.QtGui import QStandardItem, QFont
 
 from pyaxmlparser import APK
 from galog.app.components.capture_pane import RunAppAction
-from galog.app.components.dialogs import ErrorDialog, LoadingDialog
+from galog.app.components.dialogs import MessageBox, LoadingDialog
 from galog.app.controllers.run_app.controller import RunAppController
+from galog.app.util.messagebox import showErrorMsgBox
 from galog.app.util.signals import blockSignals
 from .device_loader import DeviceLoader
 from .package_loader import PackageLoader
@@ -115,11 +116,7 @@ class CapturePaneController:
     def _packageReloadFailed(self, msgBrief: str, msgVerbose: str):
         self._loadingDialog.close()
         self._setPackagesEmpty()
-
-        messageBox = ErrorDialog()
-        messageBox.setText(msgBrief)
-        messageBox.setInformativeText(msgVerbose)
-        messageBox.exec_()
+        showErrorMsgBox(msgBrief, msgVerbose)
 
     def _packageLoaderSucceeded(self, packageList: List[str], selectedPackage: str):
         self._packageReloadSucceeded(packageList, selectedPackage)
@@ -145,10 +142,7 @@ class CapturePaneController:
 
     def _deviceLoaderFailed(self, msgBrief: str, msgVerbose: str):
         self._loadingDialog.close()
-        messageBox = ErrorDialog()
-        messageBox.setText(msgBrief)
-        messageBox.setInformativeText(msgVerbose)
-        messageBox.exec_()
+        showErrorMsgBox(msgBrief, msgVerbose)
 
     def _fromApkButtonClicked(self):
         openFileDialog = QFileDialog()
@@ -169,11 +163,10 @@ class CapturePaneController:
             self._lastSelectedPackage = packageName
             self._pane.accept()
         else:
-            messageBox = ErrorDialog()
-            messageBox.setText(f"Package '{packageName}' is not installed")
-            text = "Please, install the package first (ADB -> Install APK)"
-            messageBox.setInformativeText(text)
-            messageBox.exec_()
+            showErrorMsgBox(
+                msgBrief=f"Package '{packageName}' is not installed",
+                msgVerbose="Please, install the package first (ADB -> Install APK)",
+            )
 
     def _setDevices(self, devices: List[str]):
         with blockSignals(self._pane.deviceDropDown):

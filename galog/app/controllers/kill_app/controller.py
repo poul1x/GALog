@@ -3,9 +3,10 @@ from typing import Optional
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from galog.app.components.dialogs import ErrorDialog, LoadingDialog
+from galog.app.components.dialogs import LoadingDialog
 from galog.app.device import AdbClient, AdbDevice, deviceRestricted
 from galog.app.device.errors import DeviceError
+from galog.app.util.messagebox import showErrorMsgBox
 from .app_killer import AppKiller
 
 class KillAppController:
@@ -17,10 +18,7 @@ class KillAppController:
 
     def appKillerFailed(self, msgBrief: str, msgVerbose: str):
         self._loadingDialog.close()
-        errorDialog = ErrorDialog()
-        errorDialog.setText(msgBrief)
-        errorDialog.setInformativeText(msgVerbose)
-        errorDialog.exec_()
+        showErrorMsgBox(msgBrief, msgVerbose)
 
     def killApp(self, device: str, package: str):
         appKiller = AppKiller(self._client, device, package)

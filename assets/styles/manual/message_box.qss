@@ -1,0 +1,45 @@
+QMessageBox {
+    background-color: #ffffff;
+}
+
+#qt_msgbox_label {
+	font-family: Arial, sans-serif;
+	font-size: 10pt;
+	font-weight: bold;
+	color: #464646;
+    margin: 5px;
+}
+
+#qt_msgbox_informativelabel {
+	font-family: Arial, sans-serif;
+	font-size: 10pt;
+	color: #464646;
+    margin: 5px;
+}
+
+#qt_msgbox_buttonbox {
+	background: #464646;
+    height: 60px;
+}
+
+#qt_msgbox_buttonbox > QPushButton {
+	font-family: Arial, sans-serif;
+	font-size: 11pt;
+	color: #000000;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 30px;
+    padding-right: 30px;
+    margin-bottom: 10px;
+	background: #c8dcff;
+    border: none;
+}
+
+#qt_msgbox_buttonbox > QPushButton:hover {
+	background: #739fff;
+	color: white;
+}
+
+#qt_msgbox_buttonbox > QPushButton[text="OK"] {
+    margin-right: 20px;
+}

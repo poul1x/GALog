@@ -107,7 +107,7 @@
 }
 
 #CapturePaneFooter QPushButton[name="select"]:hover {
-	background: #578dff;
+	background: #739fff;
 	color: white;
 }
 
@@ -116,7 +116,7 @@
 }
 
 #CapturePaneFooter QPushButton[name="fromAPK"]:hover {
-	background: #578dff;
+	background: #739fff;
 	color: white;
 }
 
