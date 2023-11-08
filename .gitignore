@@ -40,8 +40,6 @@ venv/
 /resources_rc.py
 
 # Development files
-*.tar.gz
-galog.drawio
 /test.py
 
 # Release files
