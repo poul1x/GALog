@@ -251,6 +251,31 @@ class MainWindow(QMainWindow):
         action.setData(True)
         return action
 
+    def rootModeAction(self):
+        action = QAction("&Root mode", self)
+        action.setStatusTip("Enable/Disable root mode")
+        action.triggered.connect(lambda: showNotImpMsgBox())
+        action.setEnabled(True)
+        action.setData(False)
+        return action
+
+    def rebootDeviceAction(self):
+        action = QAction("&Reboot device", self)
+        action.setStatusTip("Reboot device")
+        action.triggered.connect(lambda: showNotImpMsgBox())
+        action.setEnabled(True)
+        action.setData(False)
+        return action
+
+    def shutdownDeviceAction(self):
+        action = QAction("&Shutdown device", self)
+        action.setStatusTip("Shutdown device")
+        action.triggered.connect(lambda: showNotImpMsgBox())
+        action.setEnabled(True)
+        action.setData(False)
+        return action
+
+
     def setupMenuBar(self):
         menuBar = self.menuBar()
         captureMenu = menuBar.addMenu("📱 &Capture")
@@ -264,6 +289,9 @@ class MainWindow(QMainWindow):
         adbMenu = menuBar.addMenu("🐞 &ADB")
         adbMenu.addAction(self.installApkAction())
         adbMenu.addAction(self.takeScreenshotAction())
+        adbMenu.addAction(self.rootModeAction())
+        adbMenu.addAction(self.rebootDeviceAction())
+        adbMenu.addAction(self.shutdownDeviceAction())
 
     def initUserInterface(self):
         screen = QApplication.desktop().screenGeometry()

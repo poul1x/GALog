@@ -187,9 +187,6 @@ class CapturePaneController:
         item.setSelectable(False)
         item.setEnabled(False)
         item.setData(Qt.AlignCenter, Qt.TextAlignmentRole)
-        font = QFont("Arial")
-        font.setPointSize(12)
-        item.setFont(font)
         self._pane.dataModel.appendRow(item)
 
     def _setPackages(self, packages: List[str]):
