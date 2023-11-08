@@ -1,6 +1,7 @@
 import os
 
 
+FONTS_DIR = os.path.join("res", "fonts")
 STYLES_DIR = os.path.join("res", "styles")
 HIGHLIGHTING_RULES_FILE = os.path.join("config", "highlighting_rules.yaml")
 

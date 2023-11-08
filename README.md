@@ -37,6 +37,14 @@ pyinstaller --onefile "galog\__main__.py"
 # Copy logging.yaml
 ```
 
+### Fonts
+
+Roboto Mono
+
+```
+https://github.com/googlefonts/RobotoMono/tree/main/fonts/ttf
+```
+
 ### VSCode extensions
 
 - `ms-python.python`

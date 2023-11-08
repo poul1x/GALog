@@ -47,7 +47,8 @@ class StyledItemDelegate(QStyledItemDelegate):
 
     def _initTextDocument(self):
         font = QFont()
-        font.setPixelSize(20)
+        font.setFamily("Roboto Mono")
+        font.setPointSize(10)
         self._doc = QTextDocument(self)
         self._doc.setDefaultFont(font)
 

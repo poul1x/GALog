@@ -37,7 +37,7 @@ from galog.app.components.message_view_pane import LogMessageViewPane
 from galog.app.util.messagebox import showNotImpMsgBox, showQuitMsgBox
 from galog.app.util.style import CustomStyle
 
-from galog.app.util.paths import HIGHLIGHTING_RULES_FILE, STYLES_DIR, iconFile
+from galog.app.util.paths import FONTS_DIR, HIGHLIGHTING_RULES_FILE, STYLES_DIR, iconFile
 
 from .. import app_strings
 
@@ -60,6 +60,7 @@ class MainWindow(QMainWindow):
         self.startAdbServer()
         self.loadAppStrings()
         self.loadStyleSheet()
+        self.loadFonts()
         self.initHighlighting()
         self.initUserInterface()
         self.setStyle(CustomStyle())
@@ -83,6 +84,16 @@ class MainWindow(QMainWindow):
     def loadAppStrings(self):
         app_strings.init("en")
 
+    def fontFiles(self, path: str = FONTS_DIR):
+        result = []
+        for entry in os.scandir(path):
+            if entry.is_file() and entry.path.endswith(".ttf"):
+                result.append(entry.path)
+            elif entry.is_dir():
+                result.extend(self.styleSheetFiles(entry.path))
+
+        return result
+
     def styleSheetFiles(self, path: str = STYLES_DIR):
         result = []
         for entry in os.scandir(path):
@@ -92,6 +103,11 @@ class MainWindow(QMainWindow):
                 result.extend(self.styleSheetFiles(entry.path))
 
         return result
+
+    def loadFonts(self):
+        fontDB = QFontDatabase()
+        for filepath in self.fontFiles():
+            fontDB.addApplicationFont(filepath)
 
     def loadStyleSheet(self):
         style = ""

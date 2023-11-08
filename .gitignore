@@ -32,18 +32,17 @@ venv/
 *.gpg
 *.key
 
+# PyQt5 res
+*.ttf
+
 # PyQt5 related
 /sqs_gui/app/resources.py
 /resources_rc.py
 
 # Development files
-/.env*
-/docker-compose.yml
-/elasticmq.conf
-/*.tar.gz
-links.txt
-plan.txt
+*.tar.gz
 galog.drawio
+/test.py
 
 # Release files
 /release
