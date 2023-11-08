@@ -37,7 +37,12 @@ from galog.app.components.message_view_pane import LogMessageViewPane
 from galog.app.util.messagebox import showNotImpMsgBox, showQuitMsgBox
 from galog.app.util.style import CustomStyle
 
-from galog.app.util.paths import FONTS_DIR, HIGHLIGHTING_RULES_FILE, STYLES_DIR, iconFile
+from galog.app.util.paths import (
+    FONTS_DIR,
+    HIGHLIGHTING_RULES_FILE,
+    STYLES_DIR,
+    iconFile,
+)
 
 from .. import app_strings
 
@@ -172,12 +177,12 @@ class MainWindow(QMainWindow):
         self.logMessagesPaneController.stopCapture()
         self.setCaptureSpecificActionsEnabled(False)
 
-    def toggleMessageFilter(self):
-        if self.logMessagesPaneController.messageFilterEnabled():
-            self.logMessagesPaneController.disableMessageFilter()
-        else:
-            self.logMessagesPaneController.enableMessageFilter()
+    def enableMessageFilter(self):
+        self.logMessagesPaneController.enableMessageFilter()
 
+    def toggleLiveReload(self):
+        checked = self.findChild(QAction, "actionLiveReload").isChecked()
+        self.logMessagesPaneController.setLiveReloadEnabled(checked)
 
     def startCaptureAction(self):
         action = QAction("&New", self)
@@ -188,11 +193,11 @@ class MainWindow(QMainWindow):
         action.setData(False)
         return action
 
-    def toggleMessageFilterAction(self):
+    def messageFilterAction(self):
         action = QAction("&Find", self)
         action.setShortcut("Ctrl+F")
         action.setStatusTip("Toggle message filter mode")
-        action.triggered.connect(lambda: self.toggleMessageFilter())
+        action.triggered.connect(lambda: self.enableMessageFilter())
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -233,6 +238,18 @@ class MainWindow(QMainWindow):
         action.setData(True)
         return action
 
+    def liveReloadAction(self):
+        action = QAction("&Live reload", self)
+        action.setShortcut("Ctrl+S")
+        action.setStatusTip("Enable/disable log pane reload on app restart")
+        action.setCheckable(True)
+        action.setChecked(True)
+        action.triggered.connect(self.toggleLiveReload)
+        action.setObjectName("actionLiveReload")
+        action.setEnabled(True)
+        action.setData(False)
+        return action
+
     def installApkAction(self):
         action = QAction("&Install APK", self)
         action.setShortcut("Ctrl+I")
@@ -253,7 +270,7 @@ class MainWindow(QMainWindow):
 
     def rootModeAction(self):
         action = QAction("&Root mode", self)
-        action.setStatusTip("Enable/Disable root mode")
+        action.setStatusTip("Enable/disable root mode")
         action.triggered.connect(lambda: showNotImpMsgBox())
         action.setEnabled(True)
         action.setData(False)
@@ -275,7 +292,6 @@ class MainWindow(QMainWindow):
         action.setData(False)
         return action
 
-
     def setupMenuBar(self):
         menuBar = self.menuBar()
         captureMenu = menuBar.addMenu("📱 &Capture")
@@ -284,7 +300,8 @@ class MainWindow(QMainWindow):
         captureMenu.addAction(self.clearCapturedLogsAction())
         captureMenu.addAction(self.openLogFileAction())
         captureMenu.addAction(self.saveLogFileAction())
-        captureMenu.addAction(self.toggleMessageFilterAction())
+        captureMenu.addAction(self.messageFilterAction())
+        captureMenu.addAction(self.liveReloadAction())
 
         adbMenu = menuBar.addMenu("🐞 &ADB")
         adbMenu.addAction(self.installApkAction())
