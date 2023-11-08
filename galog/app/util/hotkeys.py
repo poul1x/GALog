@@ -6,6 +6,9 @@ class HotkeyHelper:
     def __init__(self, event: QKeyEvent):
         self._event = event
 
+    def isEnterPressed(self):
+        return self._event.key() in [Qt.Key_Enter, Qt.Key_Return]
+
     def isCtrlPressed(self):
         return self._event.modifiers() == Qt.ControlModifier
 

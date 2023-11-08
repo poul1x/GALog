@@ -54,6 +54,8 @@ class CapturePaneController:
         self._pane.fromApkButton.clicked.connect(self._fromApkButtonClicked)
         self._pane.packagesList.doubleClicked.connect(self._packageSelected)
         self._pane.packagesList.activated.connect(self._packageSelected)
+        self._pane.searchInput.activate.connect(self._packageMayBeSelected)
+        self._pane.searchInput.textChanged.connect(self._searchQueryChanged)
         self._pane.selectButton.clicked.connect(self._selectButtonClicked)
         self._pane.cancelButton.clicked.connect(self._pane.reject)
         self._pane.rejected.connect(self._rejected)
@@ -70,6 +72,12 @@ class CapturePaneController:
         self._loadingDialog.setText("Connecting to ADB server...")
         self._loadingDialog.exec_()
 
+    def _searchQueryChanged(self, query: str):
+        self._pane.filterModel.setFilterFixedString(query)
+        if self._pane.filterModel.rowCount() > 0:
+            proxyIndex = self._pane.filterModel.index(0, 0)
+            self._selectPackagesListRowByIndex(proxyIndex)
+
     def _setAppRunAction(self, action: RunAppAction):
         i = self._pane.actionDropDown.findData(action, Qt.UserRole)
         assert i != -1, "Current action must be present in RunAppAction"
@@ -82,6 +90,14 @@ class CapturePaneController:
         self._lastSelectedAction = self._pane.actionDropDown.currentData(Qt.UserRole)
         self._lastSelectedPackage = index.data()
         self._pane.accept()
+
+    def _packageMayBeSelected(self):
+        index = self._pane.packagesList.currentIndex()
+        if not index.isValid():
+            return
+
+        self._packageSelected(index)
+
 
     def _selectButtonClicked(self):
         index = self._pane.packagesList.currentIndex()
