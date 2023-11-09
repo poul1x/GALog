@@ -1,22 +1,3 @@
-QMenu {
-    background-color: #ffffff;
-	border: none;
-}
-
-QMenu::item {
-	padding-top: 2px;
-	padding-bottom: 2px;
-	padding-left: 15px;
-	padding-right: 15px;
-	font-family: Arial, sans-serif;
-	font-size: 20px;
-}
-
-QMenu::item:selected {
-	background: #464646;
-	color: #ffffff;
-}
-
 QMenuBar {
 	background-color: #ffffff;
 	min-height: 30px;
@@ -38,9 +19,58 @@ QMenuBar::item:selected {
 	color: #ffffff;
 }
 
+QMenu {
+    background-color: #ffffff;
+	border: none;
+}
+
+QMenu::item {
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-left: 30px;
+	padding-right: 15px;
+	font-family: Arial, sans-serif;
+	font-size: 20px;
+}
+
+QMenu::item:selected {
+	background: #464646;
+	color: #ffffff;
+}
+
+QMenu QCheckBox {
+	margin: 0px;
+	font-family: Arial;
+	font-size: 20px;
+	border: none;
+
+	padding-left: 1px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-right: 15px;
+}
+
+QMenu QCheckBox:hover {
+	background: #464646;
+	color: #ffffff;
+}
+
+QMenu QCheckBox::indicator {
+	background: none;
+	border: none;
+}
+
+QMenu QCheckBox::indicator:checked {
+	background: url(res/icons/checked-black.svg)
+}
+
+QMenu QCheckBox::indicator:checked:hover {
+	background: url(res/icons/checked-white.svg)
+}
+
 QStatusBar {
     background-color: #464646;
-	color: #eeeeee;
+	color: #ffffff;
 	font-family: Arial, sans-serif;
 	font-size: 20px;
 	padding-top: 5px;

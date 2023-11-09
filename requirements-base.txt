@@ -1,6 +1,6 @@
 PyYAML
 coloredlogs
-PyQt5
+PyQt5==5.15.9
 # adbutils
 pure-python-adb
 pyaxmlparser

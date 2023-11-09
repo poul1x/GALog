@@ -180,9 +180,8 @@ class MainWindow(QMainWindow):
     def enableMessageFilter(self):
         self.logMessagesPaneController.enableMessageFilter()
 
-    def toggleLiveReload(self):
-        checked = self.findChild(QAction, "actionLiveReload").isChecked()
-        self.logMessagesPaneController.setLiveReloadEnabled(checked)
+    def toggleLiveReload(self, checkBox: QCheckBox):
+        self.logMessagesPaneController.setLiveReloadEnabled(checkBox.isChecked())
 
     def startCaptureAction(self):
         action = QAction("&New", self)
@@ -200,15 +199,6 @@ class MainWindow(QMainWindow):
         action.triggered.connect(lambda: self.enableMessageFilter())
         action.setEnabled(True)
         action.setData(False)
-        return action
-
-    def clearCapturedLogsAction(self):
-        action = QAction("&Clear", self)
-        action.setShortcut("Ctrl+X")
-        action.setStatusTip("Clear captured logs")
-        action.triggered.connect(lambda: showNotImpMsgBox())
-        action.setEnabled(False)
-        action.setData(True)
         return action
 
     def stopCaptureAction(self):
@@ -239,12 +229,12 @@ class MainWindow(QMainWindow):
         return action
 
     def liveReloadAction(self):
-        action = QAction("&Live reload", self)
-        action.setShortcut("Ctrl+S")
+        action = QWidgetAction(self)
+        checkBox = QCheckBox("&Live reload")
+        checkBox.setChecked(True)
+        checkBox.stateChanged.connect(lambda: self.toggleLiveReload(checkBox))
+        action.setDefaultWidget(checkBox)
         action.setStatusTip("Enable/disable log pane reload on app restart")
-        action.setCheckable(True)
-        action.setChecked(True)
-        action.triggered.connect(self.toggleLiveReload)
         action.setObjectName("actionLiveReload")
         action.setEnabled(True)
         action.setData(False)
@@ -297,7 +287,6 @@ class MainWindow(QMainWindow):
         captureMenu = menuBar.addMenu("📱 &Capture")
         captureMenu.addAction(self.startCaptureAction())
         captureMenu.addAction(self.stopCaptureAction())
-        captureMenu.addAction(self.clearCapturedLogsAction())
         captureMenu.addAction(self.openLogFileAction())
         captureMenu.addAction(self.saveLogFileAction())
         captureMenu.addAction(self.messageFilterAction())
