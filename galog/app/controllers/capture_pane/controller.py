@@ -1,4 +1,5 @@
 from typing import Dict, List, Optional
+from zipfile import BadZipFile
 from PyQt5.QtWidgets import QFileDialog, QListView
 from PyQt5.QtCore import QModelIndex, QThreadPool, Qt, QItemSelectionModel
 from PyQt5.QtGui import QStandardItem, QFont
@@ -98,7 +99,6 @@ class CapturePaneController:
 
         self._packageSelected(index)
 
-
     def _selectButtonClicked(self):
         index = self._pane.packagesList.currentIndex()
         self._packageSelected(index)
@@ -168,21 +168,30 @@ class CapturePaneController:
         if not openFileDialog.exec_():
             return
 
-        selected_files = openFileDialog.selectedFiles()
-        if not selected_files:
+        selectedFiles = openFileDialog.selectedFiles()
+        if not selectedFiles:
             return
 
-        apk = APK(selected_files[0])
-        packageName = apk.packagename
+        try:
+            apk = APK(selectedFiles[0])
+            packageName = apk.packagename
+            if not packageName:
+                raise ValueError("Not a valid APK")
 
-        if self._isPackageInstalled(packageName):
-            self._lastSelectedPackage = packageName
-            self._pane.accept()
-        else:
-            showErrorMsgBox(
-                msgBrief=f"Package '{packageName}' is not installed",
-                msgVerbose="Please, install the package first (ADB -> Install APK)",
-            )
+        except (BadZipFile, ValueError):
+            msgBrief = "Operation failed"
+            msgVerbose = "Provided file is not a valid APK"
+            showErrorMsgBox(msgBrief, msgVerbose)
+            return
+
+        if not self._isPackageInstalled(packageName):
+            msgBrief = f"Package '{packageName}' is not installed"
+            msgVerbose = ("Please, install the package first (ADB -> Install APK)",)
+            showErrorMsgBox(msgBrief, msgVerbose)
+            return
+
+        self._lastSelectedPackage = packageName
+        self._pane.accept()
 
     def _setDevices(self, devices: List[str]):
         with blockSignals(self._pane.deviceDropDown):

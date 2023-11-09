@@ -1,7 +1,7 @@
 from abc import abstractmethod, ABCMeta
 from enum import Enum, auto
 from galog.app.app_strings import appStrings
-
+from ppadb import InstallError, ClearError # noqa
 
 class DeviceError(Exception, metaclass=ABCMeta):
 

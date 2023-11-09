@@ -10,11 +10,15 @@ class MessageBox(QMessageBox):
         super().__init__()
         self.initUserInterface()
         self.setStyle(CustomStyle())
+        self._beep = True
+
+    def setBeepEnabled(self, enabled: bool):
+        self._beep = enabled
 
     def initUserInterface(self):
         self.setWindowIcon(QIcon(iconFile("galog")))
-        self.buttonBox = self.findChild(QWidget, "qt_msgbox_buttonbox")
-        self.buttonBox.setAttribute(Qt.WA_StyledBackground)
+        self._buttonBox = self.findChild(QWidget, "qt_msgbox_buttonbox")
+        self._buttonBox.setAttribute(Qt.WA_StyledBackground)
 
         with open(styleSheetFile("message_box")) as f:
             self.setStyleSheet(f.read())
@@ -28,9 +32,11 @@ class MessageBox(QMessageBox):
         # there, just before exec() call.
         #
 
-        QApplication.beep()
-        self.buttonBox.layout().setContentsMargins(0,0,0,0)
-        self.buttonBox.layout().setSpacing(0)
+        if self._beep:
+            QApplication.beep()
+
+        self._buttonBox.layout().setContentsMargins(0,0,0,0)
+        self._buttonBox.layout().setSpacing(0)
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
         return super().exec_()

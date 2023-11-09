@@ -20,7 +20,8 @@ from galog.app.components.dialogs.stop_capture_dialog import (
     StopCaptureDialogResult,
 )
 from galog.app.controllers.capture_pane import CapturePaneController
-from galog.app.controllers.kill_app.controller import KillAppController
+from galog.app.controllers.install_app import InstallAppController
+from galog.app.controllers.kill_app import KillAppController
 from galog.app.controllers.log_messages_pane.controller import (
     LogMessagesPaneController,
 )
@@ -34,7 +35,7 @@ from galog.app.controllers.run_app.controller import RunAppController
 from galog.app.device.device import AdbClient
 from galog.app.highlighting_rules import HighlightingRules
 from galog.app.components.message_view_pane import LogMessageViewPane
-from galog.app.util.messagebox import showNotImpMsgBox, showQuitMsgBox
+from galog.app.util.messagebox import showErrorMsgBox, showNotImpMsgBox, showQuitMsgBox
 from galog.app.util.style import CustomStyle
 
 from galog.app.util.paths import (
@@ -223,6 +224,17 @@ class MainWindow(QMainWindow):
     def toggleShowLineNumbers(self, checkBox: QCheckBox):
         self.logMessagesPaneController.setShowLineNumbers(checkBox.isChecked())
 
+    def handleInstallApkAction(self):
+        device = self.capturePaneController.selectedDevice()
+        if device is None:
+            msgBrief = "Operation failed"
+            msgVerbose = "No device selected (Select device in 'Capture->New' [tmp])"
+            showErrorMsgBox(msgBrief, msgVerbose)
+            return
+
+        controller = InstallAppController(ADB_HOST, ADB_PORT)
+        controller.promptInstallApp(device)
+
     def startCaptureAction(self):
         action = QAction("&New", self)
         action.setShortcut("Ctrl+N")
@@ -293,10 +305,19 @@ class MainWindow(QMainWindow):
     def installApkAction(self):
         action = QAction("&Install APK", self)
         action.setShortcut("Ctrl+I")
-        action.setStatusTip("Install APK file")
-        action.triggered.connect(lambda: showNotImpMsgBox())
+        action.setStatusTip("Install app from APK file")
+        action.triggered.connect(self.handleInstallApkAction)
         action.setEnabled(True)
         action.setData(False)
+        return action
+
+    def clearAppDataAction(self):
+        action = QAction("&Clear app data", self)
+        action.setShortcut("Ctrl+P")
+        action.setStatusTip("Clear user data associated with the app")
+        action.triggered.connect(lambda: showNotImpMsgBox())
+        action.setEnabled(False)
+        action.setData(True)
         return action
 
     def takeScreenshotAction(self):
@@ -307,6 +328,7 @@ class MainWindow(QMainWindow):
         action.setEnabled(False)
         action.setData(True)
         return action
+
 
     def rootModeAction(self):
         action = QAction("&Root mode", self)
