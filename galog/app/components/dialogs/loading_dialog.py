@@ -4,11 +4,13 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
 from galog.app.util.paths import styleSheetFile
+from galog.app.util.style import CustomStyle
 
 class LoadingDialog(QDialog):
 
     def __init__(self):
         super().__init__()
+        self.setStyle(CustomStyle())
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAccessibleName("LoadingDialog")
         self.initUserInterface()

@@ -3,11 +3,13 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication
 from PyQt5.QtGui import QIcon
 
 from galog.app.util.paths import iconFile, styleSheetFile
+from galog.app.util.style import CustomStyle
 
 class MessageBox(QMessageBox):
     def __init__(self):
         super().__init__()
         self.initUserInterface()
+        self.setStyle(CustomStyle())
 
     def initUserInterface(self):
         self.setWindowIcon(QIcon(iconFile("galog")))
