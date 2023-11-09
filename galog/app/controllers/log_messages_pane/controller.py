@@ -42,6 +42,7 @@ class LogMessagesPaneController:
         self._highlightingRules = None
         self._logReader = None
         self._liveReload = True
+        self._lineNumbersVisible = False
         self._scrolling = True
         self._backToFilter = None
 
@@ -88,6 +89,25 @@ class LogMessagesPaneController:
 
     def setLiveReloadEnabled(self, enabled: bool):
         self._liveReload = enabled
+
+    def _showLineNumbers(self):
+        self._pane.tableView.verticalHeader().setVisible(True)
+
+    def _hideLineNumbers(self):
+        if self._lineNumbersVisible:
+            return
+
+        self._pane.tableView.verticalHeader().setVisible(False)
+
+    def setShowLineNumbers(self, enabled: bool):
+        self._lineNumbersVisible = enabled
+        if self.messageFilterEnabled():
+            return
+
+        if self._lineNumbersVisible:
+            self._showLineNumbers()
+        else:
+            self._hideLineNumbers()
 
     def _blinkRow(self):
         model = self._pane.tableView.model()
@@ -239,8 +259,8 @@ class LogMessagesPaneController:
         self._pane.filterModel.setFilterFixedString("")
 
     def enableMessageFilter(self, reset: bool = True):
+        self._showLineNumbers()
         self._pane.filterModel.setFilteringEnabled(True)
-        self._pane.tableView.verticalHeader().setVisible(True)
         self._pane.searchPane.input.setFocusPolicy(Qt.TabFocus)
         self._pane.searchPane.input.setFocus()
         self._pane.searchPane.show()
@@ -249,8 +269,8 @@ class LogMessagesPaneController:
             self._resetMessageFilter()
 
     def disableMessageFilter(self):
+        self._hideLineNumbers()
         self._pane.filterModel.setFilteringEnabled(False)
-        self._pane.tableView.verticalHeader().setVisible(False)
         self._pane.tableView.reset()
         self._pane.searchPane.input.setFocusPolicy(Qt.NoFocus)
         self._pane.searchPane.hide()

@@ -183,6 +183,9 @@ class MainWindow(QMainWindow):
     def toggleLiveReload(self, checkBox: QCheckBox):
         self.logMessagesPaneController.setLiveReloadEnabled(checkBox.isChecked())
 
+    def toggleShowLineNumbers(self, checkBox: QCheckBox):
+        self.logMessagesPaneController.setShowLineNumbers(checkBox.isChecked())
+
     def startCaptureAction(self):
         action = QAction("&New", self)
         action.setShortcut("Ctrl+N")
@@ -235,7 +238,17 @@ class MainWindow(QMainWindow):
         checkBox.stateChanged.connect(lambda: self.toggleLiveReload(checkBox))
         action.setDefaultWidget(checkBox)
         action.setStatusTip("Enable/disable log pane reload on app restart")
-        action.setObjectName("actionLiveReload")
+        action.setEnabled(True)
+        action.setData(False)
+        return action
+
+    def showLineNumbersAction(self):
+        action = QWidgetAction(self)
+        checkBox = QCheckBox("&Show line numbers")
+        checkBox.setChecked(False)
+        checkBox.stateChanged.connect(lambda: self.toggleShowLineNumbers(checkBox))
+        action.setDefaultWidget(checkBox)
+        action.setStatusTip("Show/Hide log line numbers")
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -291,6 +304,7 @@ class MainWindow(QMainWindow):
         captureMenu.addAction(self.saveLogFileAction())
         captureMenu.addAction(self.messageFilterAction())
         captureMenu.addAction(self.liveReloadAction())
+        captureMenu.addAction(self.showLineNumbersAction())
 
         adbMenu = menuBar.addMenu("🐞 &ADB")
         adbMenu.addAction(self.installApkAction())
