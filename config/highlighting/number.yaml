@@ -1,0 +1,20 @@
+version: 0.1.0
+rules:
+  - name: DecimalNumber
+    pattern: '\b-?\d+(?:\.\d+)?\b'
+    priority: 500
+    style:
+      formatting:
+        - italic
+  - name: HashSymbolWithDigits
+    pattern: '#\d+'
+    priority: 501
+    style:
+      formatting:
+        - italic
+  - name: HexadecimalNumber
+    pattern: '0x[0-9a-fA-F]+'
+    priority: 501
+    style:
+      formatting:
+        - medium

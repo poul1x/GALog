@@ -7,7 +7,7 @@ from galog.app.components.log_messages_pane.data_model import Columns
 from galog.app.components.log_messages_pane.delegate import HighlightingData
 from galog.app.components.message_view_pane import LogMessageViewPane
 from galog.app.controllers.log_messages_pane.search import SearchResult
-from galog.app.highlighting_rules import HighlightingRules
+from galog.app.highlighting import HighlightingRules
 from galog.app.util.colors import logLevelColor
 
 

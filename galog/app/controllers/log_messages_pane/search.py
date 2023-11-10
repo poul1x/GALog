@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from time import sleep
-from typing import List
+from typing import List, Optional
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -13,11 +13,14 @@ from re import Pattern
 class SearchItem:
     name: str
     pattern: Pattern
+    priority: int
+    groups: Optional[List[int]]
 
 
 @dataclass
 class SearchResult:
     name: int
+    priority: int
     begin: int
     end: int
 
@@ -39,21 +42,26 @@ class SearchItemTask(QRunnable):
             for found in self._search(item):
                 result.append(found)
 
-        self.signals.finished.emit(result)
+        def key(item: SearchItem):
+            return item.priority
+
+        self.signals.finished.emit(sorted(result, key=key))
 
     def _search(self, item: SearchItem):
-        if item.pattern.groups:
-            return self._searchGroups(item)
-        else:
+        if item.groups is None or item.pattern.groups == 0:
             return self._searchPattern(item)
+        else:
+            return self._searchGroups(item)
 
     def _searchPattern(self, item: SearchItem):
         for match in item.pattern.finditer(self.text):
-            yield SearchResult(item.name, match.start(), match.end())
+            yield SearchResult(item.name, item.priority, match.start(), match.end())
 
     def _searchGroups(self, item: SearchItem):
         for match in item.pattern.finditer(self.text):
             for groupNum in range(1, len(match.groups()) + 1):
-                start, end = match.start(groupNum), match.end(groupNum)
-                yield SearchResult(item.name, start, end)
+                if item.groups and groupNum not in item.groups:
+                    continue
 
+                start, end = match.start(groupNum), match.end(groupNum)
+                yield SearchResult(item.name, item.priority, start, end)

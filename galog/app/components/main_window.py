@@ -33,14 +33,14 @@ from galog.app.controllers.log_messages_pane.log_reader import (
 )
 from galog.app.controllers.run_app.controller import RunAppController
 from galog.app.device.device import AdbClient
-from galog.app.highlighting_rules import HighlightingRules
+from galog.app.highlighting import HighlightingRules
 from galog.app.components.message_view_pane import LogMessageViewPane
 from galog.app.util.messagebox import showErrorMsgBox, showNotImpMsgBox, showQuitMsgBox
 from galog.app.util.style import CustomStyle
 
 from galog.app.util.paths import (
     FONTS_DIR,
-    HIGHLIGHTING_RULES_FILE,
+    HIGHLIGHTING_DIR,
     STYLES_DIR,
     iconFile,
 )
@@ -110,6 +110,16 @@ class MainWindow(QMainWindow):
 
         return result
 
+    def highlightingFiles(self, path: str = HIGHLIGHTING_DIR):
+        result = []
+        for entry in os.scandir(path):
+            if entry.is_file() and entry.path.endswith(".yaml"):
+                result.append(entry.path)
+            elif entry.is_dir():
+                result.extend(self.styleSheetFiles(entry.path))
+
+        return result
+
     def loadFonts(self):
         fontDB = QFontDatabase()
         for filepath in self.fontFiles():
@@ -125,9 +135,8 @@ class MainWindow(QMainWindow):
 
     def initHighlighting(self):
         rules = HighlightingRules()
-        with open(HIGHLIGHTING_RULES_FILE) as f:
-            content = yaml.load_all(f, yaml.SafeLoader)
-            rules.load(content)
+        for filepath in self.highlightingFiles():
+            rules.addRuleSet(filepath)
 
         self.logMessagesPaneController.setHighlightingRules(rules)
 

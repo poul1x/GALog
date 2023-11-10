@@ -42,27 +42,7 @@ style:
   color:
     background: "#10000000"
 ---
-name: boolean
-pattern: '\bTRUE|True|true|FALSE|False|false\b'
-style:
-  color:
-    background: "#10000000"
 
-########################################
-# Network addresses
-########################################
----
-name: IPv4Address
-pattern: '(?:[0-9]{1,3}\.){3}[0-9]{1,3}'
-style:
-  color:
-    background: "#10000000"
----
-name: MacAddress
-pattern: '([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})'
-style:
-  color:
-    background: "#10000000"
 ########################################
 # Packages & file paths
 ########################################
@@ -81,31 +61,7 @@ style:
     underline: true
     mediumbold: true
 ---
-name: genericUrl
-pattern: \w+://\S+
-style:
-  formatting:
-    underline: true
-    mediumbold: true
 ####
----
-name: singleQuotedString
-pattern: "'[^']*'"
-style:
-  color:
-    background: "#10000000"
-# style:
-#   formatting:
-#     demibold: true
----
-name: doubleQuotedString
-pattern: '"[^"]*"'
-style:
-  color:
-    background: "#10000000"
-# style:
-#   formatting:
-#     demibold: true
 ########################################
 # Exception
 ########################################

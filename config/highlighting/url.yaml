@@ -1,0 +1,9 @@
+version: 0.1.0
+rules:
+  - name: GenericUrl
+    pattern: \w+://\S+
+    priority: 1000
+    style:
+      formatting:
+        - underline
+        - semibold

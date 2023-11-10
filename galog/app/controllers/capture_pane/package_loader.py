@@ -21,7 +21,7 @@ from galog.app.device import AdbClient, AdbDevice, deviceRestricted
 from galog.app.device.errors import DeviceError
 
 from ...components.capture_pane import CapturePane
-from galog.app.highlighting_rules import HighlightingRules
+from galog.app.highlighting import HighlightingRules
 from galog.app.components.message_view_pane import LogMessageViewPane
 
 

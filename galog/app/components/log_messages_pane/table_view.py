@@ -3,7 +3,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, QModelIndex, QRect, QRect
 from PyQt5.QtGui import QKeyEvent, QPainter, QColor, QTextDocument, QFont, QPen
 from PyQt5.QtWidgets import QTableView, QWidget, QAbstractItemView, QHeaderView, QStyle, QStyleOptionViewItem
-from galog.app.highlighting_rules import HighlightingRules
+from galog.app.highlighting import HighlightingRules
 from galog.app.util.hotkeys import HotkeyHelper
 from galog.app.util.painter import painterSaveRestore
 

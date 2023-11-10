@@ -24,7 +24,7 @@ from galog.app.controllers.message_view_pane.controller import (
 from galog.app.controllers.run_app.controller import RunAppController
 from galog.app.device.device import AdbClient
 
-from galog.app.highlighting_rules import HighlightingRules
+from galog.app.highlighting import HighlightingRules
 from .search import SearchItem, SearchItemTask, SearchResult
 from .log_reader import (
     AndroidAppLogReader,
@@ -86,7 +86,6 @@ class LogMessagesPaneController:
             if self._backToFilter is not None:
                 self._jumpBack()
 
-
     def setLiveReloadEnabled(self, enabled: bool):
         self._liveReload = enabled
 
@@ -140,7 +139,6 @@ class LogMessagesPaneController:
         self._pane.tableView.scrollTo(index, flags)
         self._rowBlinkingController.startBlinking(index.row())
 
-
     def _showContentFor(self, index: QModelIndex):
         viewPane = LogMessageViewPane(self._pane)
         self._viewPaneController.takeControl(viewPane)
@@ -172,8 +170,9 @@ class LogMessagesPaneController:
 
     def _lazyHighlighting(self, index: QModelIndex):
         items = []
-        for name, pattern in self._highlightingRules.iter():
-            items.append(SearchItem(name, pattern))
+        for name, rule in self._highlightingRules.items():
+            item = SearchItem(name, rule.pattern, rule.priority, rule.groups)
+            items.append(item)
 
         task = SearchItemTask(index.data(), items)
         task.signals.finished.connect(lambda results: self._searchDone(index, results))
@@ -226,7 +225,6 @@ class LogMessagesPaneController:
         showErrorMsgBox(msgBrief, msgVerbose)
 
     def startCapture(self, device: str, package: str):
-
         self._pane.tableView.setStyleSheet("background: white;")
 
         self._clearLogMessages()
@@ -285,7 +283,7 @@ class LogMessagesPaneController:
     def _addLogLine(self, logLevel: str, tagName: str, logMessage: str):
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
         itemLogLevel = QStandardItem(logLevel)
-        itemLogLevel.setData(False, Qt.UserRole) # is row color inverted
+        itemLogLevel.setData(False, Qt.UserRole)  # is row color inverted
         itemLogLevel.setFlags(flags)
 
         itemTagName = QStandardItem(tagName)

@@ -1,0 +1,16 @@
+version: 0.1.0
+rules:
+  - name: UndefinedOrNullSmall
+    pattern: '\bundefined|null\b'
+    priority: 600
+    style:
+      formatting:
+        - italic
+        - medium
+  - name: UndefinedOrNullBig
+    pattern: '\bUNDEFINED|NULL\b'
+    priority: 600
+    style:
+      formatting:
+        - italic
+        - bold

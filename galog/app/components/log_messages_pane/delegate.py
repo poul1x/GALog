@@ -15,7 +15,7 @@ from PyQt5.QtGui import (
 from PyQt5.QtWidgets import *
 from enum import Enum, auto
 from galog.app.controllers.log_messages_pane.search import SearchResult
-from galog.app.highlighting_rules import HighlightingRules
+from galog.app.highlighting import HighlightingRules
 
 from galog.app.util.painter import painterSaveRestore
 
@@ -169,8 +169,6 @@ class StyledItemDelegate(QStyledItemDelegate):
     def highlightKeywords(self, items: List[SearchResult]):
         n = self._doc.characterCount() - 2
         for item in items:
-            style = self._rules.getStyle(item.name)
-
             itemCopy = copy(item)
             if itemCopy.begin >= n:
                 continue
@@ -178,7 +176,8 @@ class StyledItemDelegate(QStyledItemDelegate):
             if itemCopy.end > n + 1:
                 itemCopy.end = n
 
-            self.highlightKeyword(itemCopy, style)
+            rule = self._rules.findRule(item.name)
+            self.highlightKeyword(itemCopy, rule.charFormat)
 
     def highlightAllText(self, charFormat: QTextCharFormat):
         cursor = QTextCursor(self._doc)

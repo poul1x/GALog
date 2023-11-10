@@ -1,0 +1,21 @@
+version: 0.1.0
+rules:
+  - name: FatalExceptionMain
+    pattern: 'FATAL EXCEPTION: main'
+    style:
+      formatting:
+        - bold
+  - name: ExceptionProcess
+    pattern: 'Process:\s+ (.+), PID: (\d+)'
+    groups: []
+    style:
+      colors:
+        background:
+          value: black
+          alpha: 0.1
+  - name: Exception
+    pattern: '\S*Exception:'
+    groups: []
+    style:
+      formatting:
+        - bold

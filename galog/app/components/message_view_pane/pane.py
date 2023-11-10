@@ -22,7 +22,7 @@ from PyQt5.QtWidgets import (
 from dataclasses import dataclass
 from typing import List
 from enum import Enum
-from galog.app.highlighting_rules import HighlightingRules
+from galog.app.highlighting import HighlightingRules
 from galog.app.util.paths import iconFile
 
 from galog.app.controllers.log_messages_pane.search import SearchResult
