@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QFileDialog, QListView
 from PyQt5.QtCore import QModelIndex, QThreadPool, Qt, QItemSelectionModel
 from PyQt5.QtGui import QStandardItem, QFont
 
-from pyaxmlparser import APK
+from galog.app.apk_info import APK
 from galog.app.components.capture_pane import RunAppAction
 from galog.app.components.dialogs import MessageBox, LoadingDialog
 from galog.app.controllers.run_app.controller import RunAppController
@@ -185,8 +185,8 @@ class CapturePaneController:
             return
 
         if not self._isPackageInstalled(packageName):
-            msgBrief = f"Package '{packageName}' is not installed"
-            msgVerbose = ("Please, install the package first (ADB -> Install APK)",)
+            msgBrief = "Package not installed"
+            msgVerbose = f"Please, install the package '{packageName}' first"
             showErrorMsgBox(msgBrief, msgVerbose)
             return
 

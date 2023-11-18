@@ -15,8 +15,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import yaml
 
-from pyaxmlparser import APK
-
 from galog.app.device import AdbClient, AdbDevice, devicesRestricted
 from galog.app.device.errors import DeviceError, DeviceNotFound, DeviceStateInvalid
 
