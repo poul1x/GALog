@@ -32,15 +32,10 @@ venv/
 *.gpg
 *.key
 
-# PyQt5 res
-*.ttf
-
-# PyQt5 related
-/sqs_gui/app/resources.py
-/resources_rc.py
-
 # Development files
 /test.py
 
-# Release files
-/release
+# pyinstaller
+/*.spec
+/build
+/dist

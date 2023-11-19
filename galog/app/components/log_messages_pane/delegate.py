@@ -42,6 +42,9 @@ class StyledItemDelegate(QStyledItemDelegate):
         self._initTextDocument()
         self._rules = None
 
+    def sizeHint(self, viewItem: QStyleOptionViewItem, index: QModelIndex):
+        return QStyledItemDelegate.sizeHint(self, viewItem, index)
+
     def setHighlightingRules(self, rules: HighlightingRules):
         self._rules = rules
 
@@ -148,7 +151,7 @@ class StyledItemDelegate(QStyledItemDelegate):
         elif logLevel == "V":
             color = QColor("orange")
             color.setAlphaF(0.4)
-        else: # logLevel == "S"
+        else:  # logLevel == "S"
             color = QColor("#FFFFFF")
 
         return color

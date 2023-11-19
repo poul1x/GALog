@@ -9,7 +9,7 @@ from galog.app.device import AdbClient, AdbDevice, deviceRestricted
 from galog.app.device.errors import DeviceError
 from galog.app.util.messagebox import showErrorMsgBox, showInfoMsgBox
 from .app_installer import AppInstaller
-from pyaxmlparser import APK
+from galog.app.apk_info import APK
 
 class InstallAppController:
     def __init__(self, adbHost: str, adbPort: int):

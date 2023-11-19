@@ -12,7 +12,7 @@ class Columns(int, Enum):
 class DataModel(QStandardItemModel):
     def __init__(self):
         super().__init__(0, len(Columns))
-        labels = ["Tag", "Log level", "Message"]
+        labels = ["Tag", "Level", "Message"]
         self.setHorizontalHeaderLabels(labels)
 
     def append(

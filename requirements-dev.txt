@@ -1,4 +1,4 @@
 -r requirements-base.txt
-pyqt5-tools
-pyqt5-stubs
-black
+pyqt5-tools==5.15.9.3.3
+pyqt5-stubs==5.15.9.2.3
+black==23.3.0

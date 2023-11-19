@@ -63,6 +63,8 @@ class LogMessagesPane(QWidget):
 
         self.tableView = TableView(self)
         self.tableView.setModel(self.filterModel)
+        self.tableView.setColumnWidth(Columns.logLevel, 10)
+        self.tableView.setColumnWidth(Columns.tagName, 200)
 
         hHeader = self.tableView.horizontalHeader()
         hHeader.setSectionResizeMode(Columns.logMessage, QHeaderView.Stretch)

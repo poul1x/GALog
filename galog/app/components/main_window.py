@@ -5,6 +5,7 @@ from queue import Queue
 import shutil
 import subprocess
 import sys
+import tarfile
 from threading import Thread
 from time import sleep
 from typing import Dict, List, Optional
@@ -14,6 +15,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QWidget
 import yaml
+
 from galog.app.components.capture_pane import CapturePane, RunAppAction
 from galog.app.components.dialogs.stop_capture_dialog import (
     StopCaptureDialog,
@@ -39,9 +41,9 @@ from galog.app.util.messagebox import showErrorMsgBox, showNotImpMsgBox, showQui
 from galog.app.util.style import CustomStyle
 
 from galog.app.util.paths import (
-    FONTS_DIR,
-    HIGHLIGHTING_DIR,
-    STYLES_DIR,
+    highlightingFiles,
+    styleSheetFiles,
+    fontFiles,
     iconFile,
 )
 
@@ -90,52 +92,29 @@ class MainWindow(QMainWindow):
     def loadAppStrings(self):
         app_strings.init("en")
 
-    def fontFiles(self, path: str = FONTS_DIR):
-        result = []
-        for entry in os.scandir(path):
-            if entry.is_file() and entry.path.endswith(".ttf"):
-                result.append(entry.path)
-            elif entry.is_dir():
-                result.extend(self.styleSheetFiles(entry.path))
-
-        return result
-
-    def styleSheetFiles(self, path: str = STYLES_DIR):
-        result = []
-        for entry in os.scandir(path):
-            if entry.is_file() and entry.path.endswith(".qss"):
-                result.append(entry.path)
-            elif entry.is_dir():
-                result.extend(self.styleSheetFiles(entry.path))
-
-        return result
-
-    def highlightingFiles(self, path: str = HIGHLIGHTING_DIR):
-        result = []
-        for entry in os.scandir(path):
-            if entry.is_file() and entry.path.endswith(".yaml"):
-                result.append(entry.path)
-            elif entry.is_dir():
-                result.extend(self.styleSheetFiles(entry.path))
-
-        return result
+    def loadFontsFromTar(self, fontDB: QFontDatabase, tar: tarfile.TarFile):
+        for member in tar.getmembers():
+            if member.path.endswith(".ttf"):
+                with tar.extractfile(member) as f:
+                    fontDB.addApplicationFontFromData(f.read())
 
     def loadFonts(self):
         fontDB = QFontDatabase()
-        for filepath in self.fontFiles():
-            fontDB.addApplicationFont(filepath)
+        for archive in fontFiles():
+            with tarfile.open(archive, "r") as tar:
+                self.loadFontsFromTar(fontDB, tar)
 
     def loadStyleSheet(self):
-        style = ""
-        for filepath in self.styleSheetFiles():
+        styleSheet = ""
+        for filepath in styleSheetFiles():
             with open(filepath, "r", encoding="utf-8") as f:
-                style += f.read() + "\n"
+                styleSheet += f.read() + "\n"
 
-        self.setStyleSheet(style)
+        self.setStyleSheet(styleSheet)
 
     def initHighlighting(self):
         rules = HighlightingRules()
-        for filepath in self.highlightingFiles():
+        for filepath in highlightingFiles():
             rules.addRuleSet(filepath)
 
         self.logMessagesPaneController.setHighlightingRules(rules)
@@ -178,14 +157,14 @@ class MainWindow(QMainWindow):
         # with spaces which leads to hover area expansion
         #
 
-        maxLength = 15 # Approximate menu item text max length in spaces
+        maxLength = 15  # Approximate menu item text max length in spaces
         for action in self._iterateCheckableWidgetActions():
             checkBox: QCheckBox = action.defaultWidget()
             textLength = len(checkBox.text())
             if textLength > maxLength:
                 maxLength = textLength
 
-        addSpacesDefault = 2 # even
+        addSpacesDefault = 2  # even
         for action in self._iterateCheckableWidgetActions():
             checkBox: QCheckBox = action.defaultWidget()
             addSpaces = addSpacesDefault + 2 * (maxLength - len(checkBox.text()))
@@ -337,7 +316,6 @@ class MainWindow(QMainWindow):
         action.setEnabled(False)
         action.setData(True)
         return action
-
 
     def rootModeAction(self):
         action = QAction("&Root mode", self)

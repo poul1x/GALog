@@ -51,7 +51,5 @@ class TableView(QTableView):
         self.setVerticalHeader(VerticalHeader(self))
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setSelectionMode(QTableView.SingleSelection)
-        self.setColumnWidth(Columns.logLevel, 20)
-        self.setColumnWidth(Columns.tagName, 200)
         self.setTabKeyNavigation(False)
         self.setShowGrid(False)

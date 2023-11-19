@@ -116,6 +116,6 @@ class LogMessageViewPaneController:
 
     def applyHighlighting(self, rules: HighlightingRules, items: List[SearchResult]):
         for item in items:
-            style = rules.getStyle(item.name)
-            self.highlightKeyword(item, style)
+            rule = rules.findRule(item.name)
+            self.highlightKeyword(item, rule.charFormat)
 
