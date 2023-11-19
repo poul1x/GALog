@@ -1,5 +1,7 @@
 from contextlib import contextmanager
+
 from PyQt5.QtWidgets import QWidget
+
 
 @contextmanager
 def blockSignals(widget: QWidget):

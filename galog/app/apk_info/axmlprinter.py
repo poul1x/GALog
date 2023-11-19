@@ -16,16 +16,13 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with Androguard.  If not, see <http://www.gnu.org/licenses/>.
 
-from  . import bytecode
+
+from struct import pack, unpack
+from xml.sax import saxutils
 
 from . import typeconstants as tc
 from .axmlparser import AXMLParser
-from .bytecode import SV
 
-from io import StringIO
-from struct import pack, unpack
-from xml.dom import minidom
-from xml.sax import saxutils
 
 class AXMLPrinter:
     def __init__(self, raw_buff):
@@ -36,25 +33,38 @@ class AXMLPrinter:
 
         while 1:
             _type = self.axml.next()
-            #print "tagtype = ", _type
+            # print "tagtype = ", _type
 
             if _type == tc.START_DOCUMENT:
-                self.buff += "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+                self.buff += '<?xml version="1.0" encoding="utf-8"?>\n'
             elif _type == tc.START_TAG:
-                self.buff += "<%s%s\n" % (self.getPrefix(self.axml.getPrefix()), self.axml.getName())
+                self.buff += "<%s%s\n" % (
+                    self.getPrefix(self.axml.getPrefix()),
+                    self.axml.getName(),
+                )
 
                 # FIXME: use namespace
                 if self.xmlns == False:
-                    self.buff += "xmlns:%s=\"%s\"\n" % (self.axml.getNamespacePrefix(0), self.axml.getNamespaceUri(0))
+                    self.buff += 'xmlns:%s="%s"\n' % (
+                        self.axml.getNamespacePrefix(0),
+                        self.axml.getNamespaceUri(0),
+                    )
                     self.xmlns = True
 
                 for i in range(0, self.axml.getAttributeCount()):
-                    self.buff += "%s%s=\"%s\"\n" % (self.getPrefix(self.axml.getAttributePrefix(i)), self.axml.getAttributeName(i), self.getAttributeValue(i))
+                    self.buff += '%s%s="%s"\n' % (
+                        self.getPrefix(self.axml.getAttributePrefix(i)),
+                        self.axml.getAttributeName(i),
+                        self.getAttributeValue(i),
+                    )
 
                 self.buff += ">\n"
 
             elif _type == tc.END_TAG:
-                self.buff += "</%s%s>\n" % (self.getPrefix(self.axml.getPrefix()), self.axml.getName())
+                self.buff += "</%s%s>\n" % (
+                    self.getPrefix(self.axml.getPrefix()),
+                    self.axml.getName(),
+                )
 
             elif _type == tc.TEXT:
                 self.buff += "%s\n" % self.axml.getText()
@@ -75,9 +85,11 @@ class AXMLPrinter:
         _type = self.axml.getAttributeValueType(index)
         _data = self.axml.getAttributeValueData(index)
 
-        #print _type, _data
+        # print _type, _data
         if _type == tc.TYPE_STRING:
-            return saxutils.escape(self.axml.getAttributeValue(index), entities={'"': '&quot;'})
+            return saxutils.escape(
+                self.axml.getAttributeValue(index), entities={'"': "&quot;"}
+            )
 
         elif _type == tc.TYPE_ATTRIBUTE:
             return "?%s%08X" % (self.getPackage(_data), _data)
@@ -98,17 +110,23 @@ class AXMLPrinter:
             return "true"
 
         elif _type == tc.TYPE_DIMENSION:
-            return "%f%s" % (self.complexToFloat(_data), tc.DIMENSION_UNITS[_data & tc.COMPLEX_UNIT_MASK])
+            return "%f%s" % (
+                self.complexToFloat(_data),
+                tc.DIMENSION_UNITS[_data & tc.COMPLEX_UNIT_MASK],
+            )
 
         elif _type == tc.TYPE_FRACTION:
-            return "%f%s" % (self.complexToFloat(_data), tc.FRACTION_UNITS[_data & tc.COMPLEX_UNIT_MASK])
+            return "%f%s" % (
+                self.complexToFloat(_data),
+                tc.FRACTION_UNITS[_data & tc.COMPLEX_UNIT_MASK],
+            )
 
         elif _type >= tc.TYPE_FIRST_COLOR_INT and _type <= tc.TYPE_LAST_COLOR_INT:
             return "#%08X" % _data
 
         elif _type >= tc.TYPE_FIRST_INT and _type <= tc.TYPE_LAST_INT:
-            if _data > 0x7fffffff:
-                _data = (0x7fffffff & _data) - 0x80000000
+            if _data > 0x7FFFFFFF:
+                _data = (0x7FFFFFFF & _data) - 0x80000000
                 return "%d" % _data
             elif _type == tc.TYPE_INT_DEC:
                 return "%d" % _data
@@ -117,10 +135,9 @@ class AXMLPrinter:
         return "<0x%X, type 0x%02X>" % (_data, _type)
 
     def complexToFloat(self, xcomplex):
-        return (float)(xcomplex & 0xFFFFFF00) * tc.RADIX_MULTS[(xcomplex>>4) & 3];
+        return (float)(xcomplex & 0xFFFFFF00) * tc.RADIX_MULTS[(xcomplex >> 4) & 3]
 
     def getPackage(self, id):
         if id >> 24 == 1:
             return "android:"
         return ""
-

@@ -13,40 +13,20 @@
 # limitations under the License.
 
 
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, print_function
 
-from builtins import str
-from struct import unpack
-from xml.dom import minidom
+import logging
+import xml.etree.ElementTree as ET
+import zipfile
+from io import BytesIO
 
 from .axmlprinter import AXMLPrinter
-from .axmlparser import AXMLParser
-from . import typeconstants as const
-
-
-import io
-from zlib import crc32
-import os
-import re
-import zipfile
-import logging
-import hashlib
-import binascii
-
-import lxml.sax
-from xml.dom.pulldom import SAX2DOM
-
-
-import xml.etree.ElementTree as ET
-from io import BytesIO, StringIO
 
 # Used for reading Certificates
-from asn1crypto import cms, x509, keys
 
 
-NS_ANDROID_URI = 'http://schemas.android.com/apk/res/android'
-NS_ANDROID = '{{{}}}'.format(NS_ANDROID_URI)  # Namespace as used by etree
+NS_ANDROID_URI = "http://schemas.android.com/apk/res/android"
+NS_ANDROID = "{{{}}}".format(NS_ANDROID_URI)  # Namespace as used by etree
 
 log = logging.getLogger("pyaxmlparser.core")
 
@@ -98,20 +78,28 @@ class APK:
             return
 
         if self.xml[i].tag != "manifest":
-            log.error("AndroidManifest.xml does not start with a <manifest> tag! Is this a valid APK?")
+            log.error(
+                "AndroidManifest.xml does not start with a <manifest> tag! Is this a valid APK?"
+            )
             return
 
         self.package = self.get_attribute_value("manifest", "package")
-        self.androidversion["Code"] = self.get_attribute_value("manifest", "versionCode")
-        self.androidversion["Name"] = self.get_attribute_value("manifest", "versionName")
+        self.androidversion["Code"] = self.get_attribute_value(
+            "manifest", "versionCode"
+        )
+        self.androidversion["Name"] = self.get_attribute_value(
+            "manifest", "versionName"
+        )
         permission = list(self.get_all_attribute_value("uses-permission", "name"))
         self.permissions = list(set(self.permissions + permission))
 
         for uses_permission in self.find_tags("uses-permission"):
-            self.uses_permissions.append([
-                self.get_value_from_tag(uses_permission, "name"),
-                self._get_permission_maxsdk(uses_permission)
-            ])
+            self.uses_permissions.append(
+                [
+                    self.get_value_from_tag(uses_permission, "name"),
+                    self._get_permission_maxsdk(uses_permission),
+                ]
+            )
 
         self.valid_apk = True
 
@@ -120,7 +108,10 @@ class APK:
         try:
             maxSdkVersion = int(self.get_value_from_tag(item, "maxSdkVersion"))
         except ValueError:
-            log.warning(self.get_max_sdk_version() + 'is not a valid value for <uses-permission> maxSdkVersion')
+            log.warning(
+                self.get_max_sdk_version()
+                + "is not a valid value for <uses-permission> maxSdkVersion"
+            )
         except TypeError:
             pass
         return maxSdkVersion
@@ -227,7 +218,8 @@ class APK:
         """
 
         for value in self.get_all_attribute_value(
-                tag_name, attribute, format_value, **attribute_filter):
+            tag_name, attribute, format_value, **attribute_filter
+        ):
             if value is not None:
                 return value
 
@@ -271,8 +263,12 @@ class APK:
 
             if value:
                 # If value is still None, the attribute could not be found, thus is not present
-                log.warning("Failed to get the attribute '{}' on tag '{}' with namespace. "
-                            "But found the same attribute without namespace!".format(attribute, tag.tag))
+                log.warning(
+                    "Failed to get the attribute '{}' on tag '{}' with namespace. "
+                    "But found the same attribute without namespace!".format(
+                        attribute, tag.tag
+                    )
+                )
         return value
 
     def find_tags(self, tag_name, **attribute_filter):
@@ -282,16 +278,11 @@ class APK:
         :type tag: string
         """
         all_tags = [
-            self.find_tags_from_xml(
-                i, tag_name, **attribute_filter
-            )
-            for i in self.xml
+            self.find_tags_from_xml(i, tag_name, **attribute_filter) for i in self.xml
         ]
         return [tag for tag_list in all_tags for tag in tag_list]
 
-    def find_tags_from_xml(
-        self, xml_name, tag_name, **attribute_filter
-    ):
+    def find_tags_from_xml(self, xml_name, tag_name, **attribute_filter):
         """
         Return a list of all the matched tags in a specific xml
         :param xml_name: specify from which xml to pick the tag from
@@ -303,17 +294,11 @@ class APK:
         if xml is None:
             return []
         if xml.tag == tag_name:
-            if self.is_tag_matched(
-                xml.tag, **attribute_filter
-            ):
+            if self.is_tag_matched(xml.tag, **attribute_filter):
                 return [xml]
             return []
         tags = xml.findall(".//" + tag_name)
-        return [
-            tag for tag in tags if self.is_tag_matched(
-                tag, **attribute_filter
-            )
-        ]
+        return [tag for tag in tags if self.is_tag_matched(tag, **attribute_filter)]
 
     def is_tag_matched(self, tag, **attribute_filter):
         """
@@ -356,8 +341,9 @@ class APK:
         for i in self.xml:
             if self.xml[i] is None:
                 continue
-            activities_and_aliases = self.xml[i].findall(".//activity") + \
-                self.xml[i].findall(".//activity-alias")
+            activities_and_aliases = self.xml[i].findall(".//activity") + self.xml[
+                i
+            ].findall(".//activity-alias")
 
             for item in activities_and_aliases:
                 # Some applications have more than one MAIN activity.
@@ -373,7 +359,7 @@ class APK:
                         if activity is not None:
                             x.add(item.get(self._ns("name")))
                         else:
-                            log.warning('Main activity without name')
+                            log.warning("Main activity without name")
 
                 for sitem in item.findall(".//category"):
                     val = sitem.get(self._ns("name"))
@@ -382,7 +368,7 @@ class APK:
                         if activity is not None:
                             y.add(item.get(self._ns("name")))
                         else:
-                            log.warning('Launcher activity without name')
+                            log.warning("Launcher activity without name")
 
         return x.intersection(y)
 
@@ -484,19 +470,19 @@ class APK:
 
     def get_uses_implied_permission_list(self):
         """
-            Return all permissions implied by the target SDK or other permissions.
+        Return all permissions implied by the target SDK or other permissions.
 
-            :rtype: list of string
+        :rtype: list of string
         """
         target_sdk_version = self.get_effective_target_sdk_version()
 
-        READ_CALL_LOG = 'android.permission.READ_CALL_LOG'
-        READ_CONTACTS = 'android.permission.READ_CONTACTS'
-        READ_EXTERNAL_STORAGE = 'android.permission.READ_EXTERNAL_STORAGE'
-        READ_PHONE_STATE = 'android.permission.READ_PHONE_STATE'
-        WRITE_CALL_LOG = 'android.permission.WRITE_CALL_LOG'
-        WRITE_CONTACTS = 'android.permission.WRITE_CONTACTS'
-        WRITE_EXTERNAL_STORAGE = 'android.permission.WRITE_EXTERNAL_STORAGE'
+        READ_CALL_LOG = "android.permission.READ_CALL_LOG"
+        READ_CONTACTS = "android.permission.READ_CONTACTS"
+        READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE"
+        READ_PHONE_STATE = "android.permission.READ_PHONE_STATE"
+        WRITE_CALL_LOG = "android.permission.WRITE_CALL_LOG"
+        WRITE_CONTACTS = "android.permission.WRITE_CONTACTS"
+        WRITE_EXTERNAL_STORAGE = "android.permission.WRITE_EXTERNAL_STORAGE"
 
         implied = []
 
@@ -508,8 +494,9 @@ class APK:
             if READ_PHONE_STATE not in self.permissions:
                 implied.append([READ_PHONE_STATE, None])
 
-        if (WRITE_EXTERNAL_STORAGE in self.permissions or implied_WRITE_EXTERNAL_STORAGE) \
-           and READ_EXTERNAL_STORAGE not in self.permissions:
+        if (
+            WRITE_EXTERNAL_STORAGE in self.permissions or implied_WRITE_EXTERNAL_STORAGE
+        ) and READ_EXTERNAL_STORAGE not in self.permissions:
             maxSdkVersion = None
             for name, version in self.uses_permissions:
                 if name == WRITE_EXTERNAL_STORAGE:
@@ -518,48 +505,52 @@ class APK:
             implied.append([READ_EXTERNAL_STORAGE, maxSdkVersion])
 
         if target_sdk_version < 16:
-            if READ_CONTACTS in self.permissions \
-               and READ_CALL_LOG not in self.permissions:
+            if (
+                READ_CONTACTS in self.permissions
+                and READ_CALL_LOG not in self.permissions
+            ):
                 implied.append([READ_CALL_LOG, None])
-            if WRITE_CONTACTS in self.permissions \
-               and WRITE_CALL_LOG not in self.permissions:
+            if (
+                WRITE_CONTACTS in self.permissions
+                and WRITE_CALL_LOG not in self.permissions
+            ):
                 implied.append([WRITE_CALL_LOG, None])
 
         return implied
 
     def get_max_sdk_version(self):
         """
-            Return the android:maxSdkVersion attribute
+        Return the android:maxSdkVersion attribute
 
-            :rtype: string
+        :rtype: string
         """
         return self.get_attribute_value("uses-sdk", "maxSdkVersion")
 
     def get_min_sdk_version(self):
         """
-            Return the android:minSdkVersion attribute
+        Return the android:minSdkVersion attribute
 
-            :rtype: string
+        :rtype: string
         """
         return self.get_attribute_value("uses-sdk", "minSdkVersion")
 
     def get_target_sdk_version(self):
         """
-            Return the android:targetSdkVersion attribute
+        Return the android:targetSdkVersion attribute
 
-            :rtype: string
+        :rtype: string
         """
         return self.get_attribute_value("uses-sdk", "targetSdkVersion")
 
     def get_effective_target_sdk_version(self):
         """
-            Return the effective targetSdkVersion, always returns int > 0.
+        Return the effective targetSdkVersion, always returns int > 0.
 
-            If the targetSdkVersion is not set, it defaults to 1.  This is
-            set based on defaults as defined in:
-            https://developer.android.com/guide/topics/manifest/uses-sdk-element.html
+        If the targetSdkVersion is not set, it defaults to 1.  This is
+        set based on defaults as defined in:
+        https://developer.android.com/guide/topics/manifest/uses-sdk-element.html
 
-            :rtype: int
+        :rtype: int
         """
         target_sdk_version = self.get_target_sdk_version()
         if not target_sdk_version:
@@ -571,9 +562,9 @@ class APK:
 
     def get_libraries(self):
         """
-            Return the android:name attributes for libraries
+        Return the android:name attributes for libraries
 
-            :rtype: list
+        :rtype: list
         """
         return list(self.get_all_attribute_value("uses-library", "name"))
 
@@ -597,7 +588,7 @@ class APK:
 
         :return: True if wearable, False otherwise
         """
-        return 'android.hardware.type.watch' in self.get_features()
+        return "android.hardware.type.watch" in self.get_features()
 
     def is_leanback(self):
         """
@@ -606,7 +597,7 @@ class APK:
 
         :return: True if leanback feature is used, false otherwise
         """
-        return 'android.software.leanback' in self.get_features()
+        return "android.software.leanback" in self.get_features()
 
     def is_androidtv(self):
         """
@@ -616,16 +607,21 @@ class APK:
 
         :return: True if 'android.hardware.touchscreen' is not required, False otherwise
         """
-        return self.get_attribute_value(
-            'uses-feature', 'name', required="false",
-            name="android.hardware.touchscreen"
-        ) == "android.hardware.touchscreen"
+        return (
+            self.get_attribute_value(
+                "uses-feature",
+                "name",
+                required="false",
+                name="android.hardware.touchscreen",
+            )
+            == "android.hardware.touchscreen"
+        )
 
     def get_android_manifest_axml(self):
         """
-            Return the :class:`AXMLPrinter` object which corresponds to the AndroidManifest.xml file
+        Return the :class:`AXMLPrinter` object which corresponds to the AndroidManifest.xml file
 
-            :rtype: :class:`~androguard.core.bytecodes.axml.AXMLPrinter`
+        :rtype: :class:`~androguard.core.bytecodes.axml.AXMLPrinter`
         """
         try:
             return self.axml["AndroidManifest.xml"]

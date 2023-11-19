@@ -1,8 +1,15 @@
 from re import Pattern
 from typing import List, Optional, Union
-from typing_extensions import Literal
+
+from pydantic import (
+    BaseModel,
+    NonNegativeFloat,
+    NonNegativeInt,
+    PositiveInt,
+    model_validator,
+)
 from pydantic.types import Annotated, StringConstraints
-from pydantic import BaseModel, NonNegativeInt, PositiveInt, model_validator, NonNegativeFloat
+from typing_extensions import Literal
 
 NonEmptyStr = Annotated[str, StringConstraints(min_length=1)]
 ColorHexRgb = Annotated[str, StringConstraints(pattern=r"#[0-9a-fA-F]{6}")]
@@ -63,15 +70,18 @@ FormattingEntry = Literal[
     "strikeout",
 ]
 
+
 def validate_at_least_one_key_set(fields: dict):
     if all(not x for x in fields.values()):
         keys = "{%s}" % ", ".join(fields.keys())
         msg = "At least one property must be set: %s" % keys
         raise ValueError(msg)
 
+
 class ColorEntry(BaseModel):
     value: Union[ColorName, ColorHexRgb]
     alpha: NonNegativeFloat = 1.0
+
 
 class LogMessageColors(BaseModel):
     foreground: Optional[ColorEntry] = None
@@ -81,6 +91,7 @@ class LogMessageColors(BaseModel):
     def at_least_one_set(cls, obj: "ColorEntry"):
         validate_at_least_one_key_set(obj.model_dump())
         return obj
+
 
 class StyleEntry(BaseModel):
     colors: Optional[LogMessageColors] = None
@@ -102,6 +113,7 @@ class HRuleConfigEntry(BaseModel):
     # [] -> Highlight all groups
     # [1,2,3] -> Highlight groups 1,2,3
     groups: Optional[List[PositiveInt]] = None
+
 
 class HRulesConfig(BaseModel):
     rules: List[HRuleConfigEntry]

@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QStyle, QProxyStyle
+from PyQt5.QtWidgets import QProxyStyle, QStyle
+
 
 class CustomStyle(QProxyStyle):
     def drawPrimitive(self, element, option, painter, widget):

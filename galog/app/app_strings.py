@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from galog.app.util.paths import stringsFile
 import yaml
+
+from galog.app.util.paths import stringsFile
 
 
 @dataclass
@@ -20,6 +21,7 @@ class DeviceErrors:
     deviceStateInvalid: DeviceError
     runtimeError: DeviceError
 
+
 @dataclass
 class AppStrings:
     deviceErrors: DeviceErrors
@@ -27,12 +29,13 @@ class AppStrings:
 
 _APP_STRINGS: Optional[AppStrings] = None
 
+
 def appStrings() -> AppStrings:
     assert _APP_STRINGS is not None
     return _APP_STRINGS
 
-def init(lang: str):
 
+def init(lang: str):
     global _APP_STRINGS
 
     filepath = stringsFile(lang)
@@ -66,7 +69,4 @@ def init(lang: str):
                 msgVerbose=d["deviceErrors"]["runtimeError"]["verbose"],
             ),
         )
-
     )
-
-

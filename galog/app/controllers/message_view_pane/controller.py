@@ -1,8 +1,9 @@
+from typing import List
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from typing import List
 from galog.app.components.log_messages_pane.data_model import Columns
 from galog.app.components.log_messages_pane.delegate import HighlightingData
 from galog.app.components.message_view_pane import LogMessageViewPane
@@ -118,4 +119,3 @@ class LogMessageViewPaneController:
         for item in items:
             rule = rules.findRule(item.name)
             self.highlightKeyword(item, rule.charFormat)
-

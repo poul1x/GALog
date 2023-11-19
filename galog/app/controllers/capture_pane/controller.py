@@ -1,23 +1,20 @@
-from typing import Dict, List, Optional
+from typing import List, Optional
 from zipfile import BadZipFile
+
+from PyQt5.QtCore import QItemSelectionModel, QModelIndex, Qt, QThreadPool
+from PyQt5.QtGui import QStandardItem
 from PyQt5.QtWidgets import QFileDialog, QListView
-from PyQt5.QtCore import QModelIndex, QThreadPool, Qt, QItemSelectionModel
-from PyQt5.QtGui import QStandardItem, QFont
 
 from galog.app.apk_info import APK
 from galog.app.components.capture_pane import RunAppAction
-from galog.app.components.dialogs import MessageBox, LoadingDialog
-from galog.app.controllers.run_app.controller import RunAppController
+from galog.app.components.dialogs import LoadingDialog
+from galog.app.device import AdbClient
 from galog.app.util.messagebox import showErrorMsgBox
 from galog.app.util.signals import blockSignals
-from .device_loader import DeviceLoader
-from .package_loader import PackageLoader
-
-from galog.app.device import AdbClient, AdbDevice
 
 from ...components.capture_pane import CapturePane
-from galog.app.highlighting import HighlightingRules
-from galog.app.components.message_view_pane import LogMessageViewPane
+from .device_loader import DeviceLoader
+from .package_loader import PackageLoader
 
 
 class CapturePaneController:

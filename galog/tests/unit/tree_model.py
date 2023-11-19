@@ -1,7 +1,8 @@
 from __future__ import annotations
-from typing import List, Optional, Any
 
-from PyQt5.QtCore import Qt, QAbstractItemModel, QModelIndex
+from typing import Any, List, Optional
+
+from PyQt5.QtCore import QAbstractItemModel, QModelIndex, Qt
 from PyQt5.QtWidgets import QWidget
 
 # See https://doc.qt.io/qt-5/qtwidgets-itemviews-simpletreemodel-example.html

@@ -1,31 +1,18 @@
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import (
-    QTextCursor,
-    QTextCharFormat,
-    QIcon,
-    QColor,
-    QFont,
-)
+from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
-    QSizePolicy,
-    QLabel,
-    QDialog,
-    QWidget,
-    QPushButton,
-    QHBoxLayout,
-    QVBoxLayout,
-    QTextBrowser,
     QApplication,
+    QDialog,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QSizePolicy,
+    QTextBrowser,
+    QVBoxLayout,
+    QWidget,
 )
 
-
-from dataclasses import dataclass
-from typing import List
-from enum import Enum
-from galog.app.highlighting import HighlightingRules
 from galog.app.util.paths import iconFile
-
-from galog.app.controllers.log_messages_pane.search import SearchResult
 
 
 class LogMessageViewPane(QDialog):

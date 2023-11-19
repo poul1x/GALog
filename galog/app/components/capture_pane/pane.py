@@ -1,32 +1,12 @@
-from PyQt5.QtCore import Qt, QSortFilterProxyModel
-from PyQt5.QtWidgets import (
-    QDialog,
-    QWidget,
-    QApplication,
-    QVBoxLayout,
-    QHBoxLayout,
-    QLabel,
-    QPushButton,
-    QListView,
-    QComboBox,
-    QSizePolicy,
-    QFrame,
-)
-from PyQt5.QtGui import (
-    QKeyEvent,
-    QIcon,
-    QStandardItemModel,
-)
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QWidget
 
-from .header import CapturePaneHeader
+from galog.app.util.hotkeys import HotkeyHelper
+
 from .body import CapturePaneBody
 from .footer import CapturePaneFooter
-
-from galog.app.components.reusable.search_input import SearchInput
-from galog.app.util.hotkeys import HotkeyHelper
-from galog.app.util.paths import iconFile
-
-from enum import Enum, auto
+from .header import CapturePaneHeader
 
 
 class CapturePane(QDialog):

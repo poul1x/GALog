@@ -1,13 +1,13 @@
-import re
-from typing import Optional
-from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
 from galog.app.components.dialogs import LoadingDialog
-from galog.app.device import AdbClient, AdbDevice, deviceRestricted
-from galog.app.device.errors import DeviceError
+from galog.app.device import AdbClient
 from galog.app.util.messagebox import showErrorMsgBox
+
 from .app_killer import AppKiller
+
 
 class KillAppController:
     def __init__(self, adbHost: str, adbPort: int):

@@ -1,7 +1,8 @@
-from typing import List, Optional
+from typing import Optional
+
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QStyle, QProxyStyle, QLineEdit, QWidget
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QLineEdit, QProxyStyle, QStyle, QWidget
 
 from galog.app.util.paths import iconFile
 

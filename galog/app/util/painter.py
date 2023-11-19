@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QPainter
 
+
 class PainterStateContextManager:
     def __init__(self, painter: QPainter):
         self.painter = painter
@@ -10,6 +11,7 @@ class PainterStateContextManager:
 
     def __exit__(self, *unused):
         self.painter.restore()
+
 
 def painterSaveRestore(painter: QPainter):
     return PainterStateContextManager(painter)

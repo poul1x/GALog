@@ -1,34 +1,14 @@
-
-from PyQt5.QtCore import Qt, QSortFilterProxyModel
-from PyQt5.QtWidgets import (
-    QDialog,
-    QWidget,
-    QApplication,
-    QVBoxLayout,
-    QHBoxLayout,
-    QLabel,
-    QPushButton,
-    QListView,
-    QComboBox,
-    QSizePolicy,
-    QFrame,
-)
-from PyQt5.QtGui import (
-    QKeyEvent,
-    QIcon,
-    QStandardItemModel,
-)
-
-from galog.app.components.reusable.search_input import SearchInput
-from galog.app.util.hotkeys import HotkeyHelper
-from galog.app.util.paths import iconFile
-
 from enum import Enum, auto
+
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QSizePolicy, QWidget
+
 
 class RunAppAction(int, Enum):
     StartApp = auto()
     StartAppDebug = auto()
     DoNotStartApp = auto()
+
 
 class CapturePaneFooter(QWidget):
     def __init__(self, parent: QWidget):
@@ -36,7 +16,6 @@ class CapturePaneFooter(QWidget):
         self.setObjectName("CapturePaneFooter")
         self.setAttribute(Qt.WA_StyledBackground)
         self.initUserInterface()
-
 
     def initUserInterface(self):
         layout = QHBoxLayout()
@@ -65,4 +44,3 @@ class CapturePaneFooter(QWidget):
         layout.addLayout(layoutLeft)
         layout.addLayout(layoutRight)
         self.setLayout(layout)
-

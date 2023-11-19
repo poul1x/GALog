@@ -1,5 +1,6 @@
 from PyQt5.QtCore import QMutex, QMutexLocker, QWaitCondition
 
+
 class Event:
     def __init__(self):
         self._mutex = QMutex()

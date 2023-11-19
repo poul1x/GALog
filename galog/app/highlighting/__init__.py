@@ -1,4 +1,4 @@
-from .highlighting import HighlightingRules, HighlightingRule
+from .highlighting import HighlightingRule, HighlightingRules
 
 __all__ = [
     "HighlightingRules",

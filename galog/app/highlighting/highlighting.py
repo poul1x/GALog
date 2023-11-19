@@ -1,12 +1,12 @@
 from dataclasses import dataclass
-from typing import Dict, List, Optional
 from re import Pattern
+from typing import Dict, List, Optional
 
-from PyQt5.QtGui import QTextCharFormat, QColor, QFont
 import yaml
+from PyQt5.QtGui import QColor, QFont, QTextCharFormat
 
-from .model import ColorEntry, HRulesConfig, HRuleConfigEntry, LogMessageColors, StyleEntry
-from .errors import RuleAlreadyExistsError, RuleNotFoundError, RuleParseError
+from .errors import RuleAlreadyExistsError, RuleNotFoundError
+from .model import HRuleConfigEntry, HRulesConfig, LogMessageColors, StyleEntry
 
 
 class HighlightingMode:

@@ -1,21 +1,18 @@
 from typing import Optional
-from PyQt5 import QtCore
+
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent, QIcon
-from PyQt5.QtWidgets import QHeaderView, QPushButton, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy, QLineEdit
+from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtWidgets import QHBoxLayout, QHeaderView, QPushButton, QVBoxLayout, QWidget
 
-from PyQt5.QtWidgets import QWidget
-from galog.app.components.reusable.search_input.widget import SearchInput, SearchInputStyleAddon
-
+from galog.app.components.reusable.search_input.widget import SearchInput
 from galog.app.util.hotkeys import HotkeyHelper
-from galog.app.util.paths import iconFile, styleSheetFile
 
+from .data_model import Columns, DataModel
 from .filter_model import FilterModel
-from .data_model import DataModel, Columns
 from .table_view import TableView
 
-class SearchPane(QWidget):
 
+class SearchPane(QWidget):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.setObjectName("LogMessagesSearchPane")
@@ -31,7 +28,7 @@ class SearchPane(QWidget):
 
         layout = QHBoxLayout()
         layout.setAlignment(Qt.AlignVCenter)
-        layout.setContentsMargins(0,0,0,0)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
         layout.addWidget(self.input, 1)
@@ -39,6 +36,7 @@ class SearchPane(QWidget):
 
         self.setLayout(layout)
         self.hide()
+
 
 class LogMessagesPane(QWidget):
     toggleMessageFilter = pyqtSignal()
@@ -79,7 +77,7 @@ class LogMessagesPane(QWidget):
         self.searchPane = SearchPane(self)
         layout.addWidget(self.tableView, 1)
         layout.addWidget(self.searchPane)
-        layout.setContentsMargins(0,0,0,0)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         self.setLayout(layout)
 
@@ -90,4 +88,3 @@ class LogMessagesPane(QWidget):
 
         self.setTabOrder(self.tableView, self.searchPane.input)
         self.setTabOrder(self.searchPane.input, self.tableView)
-

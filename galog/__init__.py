@@ -4,4 +4,4 @@
 
 # Explicitly import some dependencies
 # to make them fetched by pyinstaller
-import coloredlogs # noqa
+import coloredlogs  # noqa

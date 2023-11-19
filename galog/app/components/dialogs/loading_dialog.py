@@ -1,13 +1,12 @@
-from typing import Optional
 from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 from galog.app.util.paths import styleSheetFile
 from galog.app.util.style import CustomStyle
 
-class LoadingDialog(QDialog):
 
+class LoadingDialog(QDialog):
     def __init__(self):
         super().__init__()
         self.setStyle(CustomStyle())

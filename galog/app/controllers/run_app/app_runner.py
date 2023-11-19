@@ -1,9 +1,10 @@
-import re
 from typing import Optional
-from PyQt5.QtWidgets import *
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from galog.app.device import AdbClient, AdbDevice, deviceRestricted
+from PyQt5.QtWidgets import *
+
+from galog.app.device import AdbClient, deviceRestricted
 from galog.app.device.errors import DeviceError
 
 

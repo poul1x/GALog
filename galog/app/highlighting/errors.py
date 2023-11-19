@@ -1,6 +1,7 @@
 class HighlightingEngineError(Exception):
     pass
 
+
 class RuleNotFoundError(HighlightingEngineError):
     pass
 

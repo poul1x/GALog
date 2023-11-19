@@ -1,20 +1,14 @@
+import re
 from contextlib import suppress
 from dataclasses import dataclass
-import re
+from typing import Optional, Tuple
 
-from time import sleep
-from typing import Callable, List, Optional, Tuple
-from ppadb.client import Client
-from ppadb.device import Device
 from ppadb.connection import Connection
-import socket
-
-
 from PyQt5.QtCore import *
+
 from galog.app.device import AdbClient, deviceRestricted
 from galog.app.device.device import AdbDevice
-from galog.app.device.errors import DeviceError, AdbConnectionError
-
+from galog.app.device.errors import AdbConnectionError, DeviceError
 from galog.app.util.event import Event
 
 

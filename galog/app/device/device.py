@@ -1,5 +1,6 @@
 from contextlib import contextmanager
-from typing import List, Optional, Tuple
+from typing import List, Tuple
+
 from ppadb.client import Client
 from ppadb.device import Device
 

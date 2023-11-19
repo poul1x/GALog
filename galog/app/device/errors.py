@@ -1,10 +1,11 @@
-from abc import abstractmethod, ABCMeta
-from enum import Enum, auto
+from abc import ABCMeta, abstractmethod
+
+from ppadb import ClearError, InstallError  # noqa
+
 from galog.app.app_strings import appStrings
-from ppadb import InstallError, ClearError # noqa
+
 
 class DeviceError(Exception, metaclass=ABCMeta):
-
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
         self._strings = appStrings()
@@ -69,6 +70,7 @@ class DeviceNotFound(DeviceError):
     @property
     def msgVerbose(self):
         return self._strings.deviceErrors.deviceNotFound.msgVerbose
+
 
 class DeviceStateUnauthorized(DeviceError):
     def __init__(self, deviceName: str):

@@ -1,5 +1,3 @@
 from .widget import SearchInput
 
-__all__ = [
-    "SearchInput"
-]
+__all__ = ["SearchInput"]

@@ -1,4 +1,5 @@
 from typing import Optional
+
 from galog.app.components.dialogs import MessageBox
 
 

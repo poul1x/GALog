@@ -1,12 +1,10 @@
 from dataclasses import dataclass
-from time import sleep
-from typing import List, Optional
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from enum import IntEnum, auto
-
 from re import Pattern
+from typing import List, Optional
+
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 
 @dataclass

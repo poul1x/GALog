@@ -1,54 +1,30 @@
-from contextlib import suppress
-from datetime import datetime
-import os
-from queue import Queue
 import shutil
 import subprocess
-import sys
 import tarfile
-from threading import Thread
-from time import sleep
-from typing import Dict, List, Optional
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import *
+from contextlib import suppress
+from typing import List
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from PyQt5.QtWidgets import QWidget
-import yaml
+from PyQt5.QtWidgets import *
 
 from galog.app.components.capture_pane import CapturePane, RunAppAction
 from galog.app.components.dialogs.stop_capture_dialog import (
     StopCaptureDialog,
     StopCaptureDialogResult,
 )
+from galog.app.components.message_view_pane import LogMessageViewPane
 from galog.app.controllers.capture_pane import CapturePaneController
 from galog.app.controllers.install_app import InstallAppController
 from galog.app.controllers.kill_app import KillAppController
-from galog.app.controllers.log_messages_pane.controller import (
-    LogMessagesPaneController,
-)
-from galog.app.controllers.log_messages_pane.log_reader import (
-    AndroidAppLogReader,
-    LogLine,
-    ProcessEndedEvent,
-    ProcessStartedEvent,
-)
+from galog.app.controllers.log_messages_pane.controller import LogMessagesPaneController
 from galog.app.controllers.run_app.controller import RunAppController
-from galog.app.device.device import AdbClient
 from galog.app.highlighting import HighlightingRules
-from galog.app.components.message_view_pane import LogMessageViewPane
 from galog.app.util.messagebox import showErrorMsgBox, showNotImpMsgBox, showQuitMsgBox
+from galog.app.util.paths import fontFiles, highlightingFiles, iconFile, styleSheetFiles
 from galog.app.util.style import CustomStyle
 
-from galog.app.util.paths import (
-    highlightingFiles,
-    styleSheetFiles,
-    fontFiles,
-    iconFile,
-)
-
 from .. import app_strings
-
 from .log_messages_pane import LogMessagesPane
 
 ADB_HOST = "127.0.0.1"

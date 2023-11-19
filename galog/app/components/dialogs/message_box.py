@@ -1,9 +1,10 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication
 from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QApplication, QMessageBox, QWidget
 
 from galog.app.util.paths import iconFile, styleSheetFile
 from galog.app.util.style import CustomStyle
+
 
 class MessageBox(QMessageBox):
     def __init__(self):
@@ -35,7 +36,7 @@ class MessageBox(QMessageBox):
         if self._beep:
             QApplication.beep()
 
-        self._buttonBox.layout().setContentsMargins(0,0,0,0)
+        self._buttonBox.layout().setContentsMargins(0, 0, 0, 0)
         self._buttonBox.layout().setSpacing(0)
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)

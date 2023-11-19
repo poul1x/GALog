@@ -1,15 +1,17 @@
-import re
 from typing import Optional
 from zipfile import BadZipFile
-from PyQt5.QtWidgets import *
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from galog.app.components.dialogs import LoadingDialog
-from galog.app.device import AdbClient, AdbDevice, deviceRestricted
-from galog.app.device.errors import DeviceError
-from galog.app.util.messagebox import showErrorMsgBox, showInfoMsgBox
-from .app_installer import AppInstaller
+from PyQt5.QtWidgets import *
+
 from galog.app.apk_info import APK
+from galog.app.components.dialogs import LoadingDialog
+from galog.app.device import AdbClient
+from galog.app.util.messagebox import showErrorMsgBox, showInfoMsgBox
+
+from .app_installer import AppInstaller
+
 
 class InstallAppController:
     def __init__(self, adbHost: str, adbPort: int):
@@ -23,7 +25,9 @@ class InstallAppController:
         self._loadingDialog.close()
         showInfoMsgBox("Success", "App installed successfully")
 
-    def _appInstallerFailed(self, msgBrief: str, msgVerbose: str, details: Optional[str]):
+    def _appInstallerFailed(
+        self, msgBrief: str, msgVerbose: str, details: Optional[str]
+    ):
         self._loadingDialog.close()
         showErrorMsgBox(msgBrief, msgVerbose, details)
 

@@ -1,30 +1,18 @@
 from contextlib import suppress
-from dataclasses import dataclass
-from datetime import datetime
-from distutils.log import fatal
-from importlib.resources import Package
-from msilib.schema import Error
-import os
-from pydoc import cli
-from queue import Queue
-from threading import Thread
-from time import sleep
-from typing import Dict, List, Optional
-from PyQt5.QtWidgets import *
+from typing import List, Optional
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-import yaml
+from PyQt5.QtWidgets import *
 
-from galog.app.device import AdbClient, AdbDevice, devicesRestricted
-from galog.app.device.errors import DeviceError, DeviceNotFound, DeviceStateInvalid
+from galog.app.device import AdbClient, devicesRestricted
+from galog.app.device.errors import DeviceError
 
-from ...components.capture_pane import CapturePane
-from galog.app.highlighting import HighlightingRules
-from galog.app.components.message_view_pane import LogMessageViewPane
 
 class DeviceLoaderSignals(QObject):
     succeeded = pyqtSignal(list, str)
     failed = pyqtSignal(str, str)
+
 
 class DeviceLoader(QRunnable):
     _client: AdbClient

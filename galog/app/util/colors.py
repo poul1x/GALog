@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QColor
 
+
 def logLevelColor(logLevel: str):
     if logLevel == "S":
         color = QColor("#CECECE")

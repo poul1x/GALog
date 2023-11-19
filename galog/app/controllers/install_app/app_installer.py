@@ -1,8 +1,9 @@
-import re
 from typing import Optional
-from PyQt5.QtWidgets import *
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
 from galog.app.device import AdbClient, AdbDevice, deviceRestricted
 from galog.app.device.errors import DeviceError, InstallError
 
@@ -19,7 +20,9 @@ class AppInstaller(QRunnable):
     _client: AdbClient
     _msDelay: Optional[int]
 
-    def __init__(self, client: AdbClient, deviceName: str, packageName: str, apkFilePath: str):
+    def __init__(
+        self, client: AdbClient, deviceName: str, packageName: str, apkFilePath: str
+    ):
         super().__init__()
         self.signals = AppInstallerSignals()
         self._deviceName = deviceName
@@ -44,8 +47,6 @@ class AppInstaller(QRunnable):
         self.signals.installingNewApp.emit()
         self._delayIfNeeded()
         device.install(self._apkFilePath)
-
-
 
     def _uninstallApp(self, device: AdbDevice):
         self.signals.uninstallingOldApp.emit()

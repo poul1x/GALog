@@ -26,6 +26,7 @@ def iconFile(name: str):
 def stringsFile(lang: str):
     return _resPathJoin("strings", lang + ".yaml")
 
+
 def dirFilesRecursive(path: str, ext: str):
     result = []
     for entry in os.scandir(path):
@@ -36,11 +37,14 @@ def dirFilesRecursive(path: str, ext: str):
 
     return result
 
+
 def highlightingFiles():
     return dirFilesRecursive(HIGHLIGHTING_DIR, ".yaml")
 
+
 def styleSheetFiles():
     return dirFilesRecursive(STYLESHEET_DIR, ".qss")
+
 
 def fontFiles():
     return dirFilesRecursive(FONTS_DIR, ".tar.xz")

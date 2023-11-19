@@ -1,13 +1,10 @@
 from typing import List
-from PyQt5.QtCore import QModelIndex, QThreadPool, Qt, QThread, QTimer
+
+from PyQt5.QtCore import QModelIndex, Qt, QThread, QThreadPool
 from PyQt5.QtGui import QStandardItem
-from PyQt5.QtWidgets import QTableView, QMessageBox
+from PyQt5.QtWidgets import QTableView
 
 from galog.app.components.dialogs import LoadingDialog
-from galog.app.components.dialogs.stop_capture_dialog import (
-    StopCaptureDialog,
-    StopCaptureDialogResult,
-)
 from galog.app.components.log_messages_pane.data_model import Columns
 from galog.app.components.log_messages_pane.delegate import (
     HighlightingData,
@@ -15,23 +12,21 @@ from galog.app.components.log_messages_pane.delegate import (
 )
 from galog.app.components.log_messages_pane.pane import LogMessagesPane
 from galog.app.components.message_view_pane import LogMessageViewPane
-from galog.app.controllers.kill_app.controller import KillAppController
-from galog.app.util.messagebox import showErrorMsgBox
-from .blinking_row import RowBlinkingController
 from galog.app.controllers.message_view_pane.controller import (
     LogMessageViewPaneController,
 )
-from galog.app.controllers.run_app.controller import RunAppController
 from galog.app.device.device import AdbClient
-
 from galog.app.highlighting import HighlightingRules
-from .search import SearchItem, SearchItemTask, SearchResult
+from galog.app.util.messagebox import showErrorMsgBox
+
+from .blinking_row import RowBlinkingController
 from .log_reader import (
     AndroidAppLogReader,
     LogLine,
     ProcessEndedEvent,
     ProcessStartedEvent,
 )
+from .search import SearchItem, SearchItemTask, SearchResult
 
 
 class LogMessagesPaneController:

@@ -1,14 +1,13 @@
 from typing import Optional
-from PyQt5 import QtCore
-from PyQt5.QtCore import Qt, QModelIndex, QRect, QRect
-from PyQt5.QtGui import QKeyEvent, QPainter, QColor, QTextDocument, QFont, QPen
-from PyQt5.QtWidgets import QTableView, QWidget, QAbstractItemView, QHeaderView, QStyle, QStyleOptionViewItem
-from galog.app.highlighting import HighlightingRules
-from galog.app.util.hotkeys import HotkeyHelper
+
+from PyQt5.QtCore import QRect, Qt
+from PyQt5.QtGui import QColor, QFont, QPainter
+from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QTableView, QWidget
+
 from galog.app.util.painter import painterSaveRestore
 
-from .data_model import Columns
 from .delegate import StyledItemDelegate
+
 
 class VerticalHeader(QHeaderView):
     def __init__(self, parent: Optional[QWidget] = None):
@@ -36,7 +35,6 @@ class VerticalHeader(QHeaderView):
 
             painter.setFont(self._font)
             painter.drawText(rect, align, str(index + 1))
-
 
 
 class TableView(QTableView):

@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QSortFilterProxyModel, QModelIndex, Qt
+from PyQt5.QtCore import QModelIndex, QSortFilterProxyModel, Qt
 
 from .data_model import Columns
 

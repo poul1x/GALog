@@ -1,5 +1,5 @@
-from .pane import CapturePane
 from .header import RunAppAction
+from .pane import CapturePane
 
 __all__ = [
     "CapturePane",
