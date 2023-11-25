@@ -64,11 +64,20 @@ class StyledItemDelegate(QStyledItemDelegate):
         viewItem.text = ""
 
     def highlightSelectedRow(self, viewItem: QStyleOptionViewItem, index: QModelIndex):
-        if index.column() != Columns.logMessage:
-            if viewItem.state & QStyle.State_Selected:
-                fmt = QTextCharFormat()
-                fmt.setFontWeight(QFont.DemiBold)
-                self.highlightAllText(fmt)
+        if index.column() == Columns.logMessage:
+            return
+
+        if index.column() == Columns.logLevel:
+            fmt = QTextCharFormat()
+            fmt.setFontItalic(True)
+            self.highlightAllText(fmt)
+
+        if viewItem.state & QStyle.State_Selected:
+            fmt = QTextCharFormat()
+            fmt.setFontWeight(QFont.DemiBold)
+            fmt.setFontItalic(True)
+            self.highlightAllText(fmt)
+
 
     def applyHighlighting(self, index: QModelIndex):
         if index.column() != Columns.logMessage:
