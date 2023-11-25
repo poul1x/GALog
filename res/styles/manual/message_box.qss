@@ -8,13 +8,13 @@ QMessageBox > QLabel{
 
 QMessageBox > QCheckBox{
 	font-family: Arial, sans-serif;
-	font-size: 9pt;
+	font-size: 20px;
 	font-style: italic
 }
 
 #qt_msgbox_label {
 	font-family: Arial, sans-serif;
-	font-size: 10pt;
+	font-size: 20px;
 	font-weight: bold;
 	color: #464646;
     margin-top: 2px;
@@ -22,28 +22,36 @@ QMessageBox > QCheckBox{
 
 #qt_msgbox_informativelabel {
 	font-family: Arial, sans-serif;
-	font-size: 10pt;
+	font-size: 20px;
 	color: #464646;
     margin: 5px;
 }
 
 #qt_msgbox_buttonbox {
 	background: #464646;
-    height: 60px;
 }
 
 #qt_msgbox_buttonbox > QPushButton {
 	font-family: Arial, sans-serif;
-	font-size: 11pt;
+	font-size: 22px;
 	color: #000000;
     padding-top: 8px;
     padding-bottom: 8px;
     padding-left: 30px;
     padding-right: 30px;
+    margin-top: 10px;
     margin-bottom: 10px;
 	margin-right: 10px;
 	background: #c8dcff;
     border: none;
+}
+
+#qt_msgbox_buttonbox[os=windows] > QPushButton {
+    margin-top: 0px;
+}
+
+#qt_msgbox_buttonbox > QPushButton:disabled {
+	color: #464646
 }
 
 #qt_msgbox_buttonbox > QPushButton:focus {

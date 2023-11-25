@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QApplication, QMessageBox, QWidget
 
 from galog.app.util.paths import iconFile, styleSheetFile
 from galog.app.util.style import CustomStyle
+import platform
 
 
 class MessageBox(QMessageBox):
@@ -19,6 +20,7 @@ class MessageBox(QMessageBox):
     def initUserInterface(self):
         self.setWindowIcon(QIcon(iconFile("galog")))
         self._buttonBox = self.findChild(QWidget, "qt_msgbox_buttonbox")
+        self._buttonBox.setProperty("os", platform.system().lower())
         self._buttonBox.setAttribute(Qt.WA_StyledBackground)
 
         with open(styleSheetFile("message_box")) as f:

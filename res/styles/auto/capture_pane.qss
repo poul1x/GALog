@@ -11,7 +11,7 @@
 	border-radius: 0px;
 
 	font-family: Arial, sans-serif;
-	font-size: 9pt;
+	font-size: 19px;
 }
 
 #CapturePaneHeader QComboBox::drop-down {
@@ -36,14 +36,14 @@
 
 #CapturePaneHeader QLabel {
 	font-family: Arial, sans-serif;
-	font-size: 9pt;
+	font-size: 19px;
 	font-weight: bold;
 }
 
 #CapturePaneHeader QPushButton {
 	font-family: Arial, sans-serif;
 	font-family: Arial, sans-serif;
-	font-size: 9pt;
+	font-size: 20px;
 	background: #ffffff;
 	border: 1px solid #464646;
 	padding-top: 2px;
@@ -60,7 +60,7 @@
 
 #CapturePaneBody QListView{
 	font-family: Arial, sans-serif;
-	font-size: 10pt;
+	font-size: 20px;
 	border: none;
 }
 
@@ -77,7 +77,7 @@
 
 #CapturePaneBody QLineEdit {
 	font-family: Arial, sans-serif;
-    font-size: 9pt;
+    font-size: 20px;
 	background: #eeeeee;
 	padding-top: 5px;
 	padding-bottom: 5px;
@@ -93,13 +93,17 @@
 
 #CapturePaneFooter QPushButton {
 	font-family: Arial, sans-serif;
-	font-size: 10pt;
+	font-size: 20px;
 	background: #ffffff;
 	border: none;
 	padding-top: 8px;
 	padding-bottom: 8px;
 	padding-left: 20px;
 	padding-right: 20px;
+}
+
+#CapturePaneFooter QPushButton:disabled {
+	color: #464646
 }
 
 #CapturePaneFooter QPushButton[name="select"] {

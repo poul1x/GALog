@@ -14,7 +14,7 @@ from .errors import (
 )
 
 DEVICE_STATE_OK = "device"
-DEVICE_STATE_NO_AUTH = "unauthorized"
+DEVICE_STATE_UNAUTHORIZED = "unauthorized"
 
 
 # Use this as alias
@@ -65,19 +65,19 @@ def deviceRestricted(client: AdbClient, deviceName: str):
         raise AdbConnectionError()
 
     if device is None:
-        raise DeviceNotFound(deviceName)
+        raise DeviceNotFound()
 
     assert state is not None
     if state != DEVICE_STATE_OK:
-        if state == DEVICE_STATE_NO_AUTH:
-            raise DeviceStateUnauthorized(device.serial)
+        if state == DEVICE_STATE_UNAUTHORIZED:
+            raise DeviceStateUnauthorized()
         else:
-            raise DeviceStateInvalid(device.serial, state)
+            raise DeviceStateInvalid(state)
 
     try:
         yield device
     except (RuntimeError, ConnectionError) as e:
-        raise DeviceRuntimeError(device.serial, str(e))
+        raise DeviceRuntimeError(str(e))
 
 
 def devicesRestricted(client: AdbClient):

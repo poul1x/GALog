@@ -53,19 +53,9 @@ class NoDevicesFound(DeviceError):
 
 
 class DeviceNotFound(DeviceError):
-    def __init__(self, deviceName: str):
-        super().__init__(deviceName)
-
-    @property
-    def deviceName(self):
-        return self.args[0]
-
     @property
     def msgBrief(self):
-        return self._safeFormatting(
-            self._strings.deviceErrors.deviceNotFound.msgBrief,
-            self.deviceName,
-        )
+        return self._strings.deviceErrors.deviceNotFound.msgBrief
 
     @property
     def msgVerbose(self):
@@ -73,43 +63,26 @@ class DeviceNotFound(DeviceError):
 
 
 class DeviceStateUnauthorized(DeviceError):
-    def __init__(self, deviceName: str):
-        super().__init__(deviceName)
-
-    @property
-    def deviceName(self):
-        return self.args[0]
-
     @property
     def msgBrief(self):
-        return self._safeFormatting(
-            self._strings.deviceErrors.deviceStateUnauthorized.msgBrief,
-            self.deviceName,
-        )
+        return self._strings.deviceErrors.deviceStateUnauthorized.msgBrief
 
     @property
     def msgVerbose(self):
-        self._strings.deviceErrors.deviceStateUnauthorized.msgVerbose,
+        return self._strings.deviceErrors.deviceStateUnauthorized.msgVerbose
 
 
 class DeviceStateInvalid(DeviceError):
-    def __init__(self, deviceName: str, deviceState: str):
-        super().__init__(deviceName, deviceState)
-
-    @property
-    def deviceName(self):
-        return self.args[0]
+    def __init__(self, deviceState: str):
+        super().__init__(deviceState)
 
     @property
     def deviceState(self):
-        return self.args[1]
+        return self.args[0]
 
     @property
     def msgBrief(self):
-        return self._safeFormatting(
-            self._strings.deviceErrors.deviceStateInvalid.msgBrief,
-            self.deviceName,
-        )
+        return self._strings.deviceErrors.deviceStateInvalid.msgBrief
 
     @property
     def msgVerbose(self):
@@ -120,23 +93,16 @@ class DeviceStateInvalid(DeviceError):
 
 
 class DeviceRuntimeError(DeviceError):
-    def __init__(self, deviceName: str, reason: str):
-        super().__init__(deviceName, reason)
-
-    @property
-    def deviceName(self):
-        return self.args[0]
+    def __init__(self, reason: str):
+        super().__init__(reason)
 
     @property
     def reason(self):
-        return self.args[1]
+        return self.args[0]
 
     @property
     def msgBrief(self):
-        return self._safeFormatting(
-            self._strings.deviceErrors.runtimeError.msgBrief,
-            self.deviceName,
-        )
+        return self._strings.deviceErrors.runtimeError.msgBrief
 
     @property
     def msgVerbose(self):
