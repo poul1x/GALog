@@ -208,10 +208,19 @@ class MainWindow(QMainWindow):
         action.setData(False)
         return action
 
+    def restartCaptureAction(self):
+        action = QAction("&Restart", self)
+        action.setShortcut("Ctrl+R")
+        action.setStatusTip("Restart log capture (with app restart)")
+        action.triggered.connect(lambda: showNotImpMsgBox())
+        action.setEnabled(False)
+        action.setData(True)
+        return action
+
     def messageFilterAction(self):
         action = QAction("&Find", self)
         action.setShortcut("Ctrl+F")
-        action.setStatusTip("Toggle message filter mode")
+        action.setStatusTip("Show message filter (hide with ESC)")
         action.triggered.connect(lambda: self.enableMessageFilter())
         action.setEnabled(True)
         action.setData(False)
@@ -321,6 +330,7 @@ class MainWindow(QMainWindow):
         menuBar = self.menuBar()
         captureMenu = menuBar.addMenu("📱 &Capture")
         captureMenu.addAction(self.startCaptureAction())
+        captureMenu.addAction(self.restartCaptureAction())
         captureMenu.addAction(self.stopCaptureAction())
         captureMenu.addAction(self.openLogFileAction())
         captureMenu.addAction(self.saveLogFileAction())
@@ -328,12 +338,13 @@ class MainWindow(QMainWindow):
         captureMenu.addAction(self.liveReloadAction())
         captureMenu.addAction(self.showLineNumbersAction())
 
-        adbMenu = menuBar.addMenu("🐞 &ADB")
-        adbMenu.addAction(self.installApkAction())
-        adbMenu.addAction(self.takeScreenshotAction())
-        adbMenu.addAction(self.rootModeAction())
-        adbMenu.addAction(self.rebootDeviceAction())
-        adbMenu.addAction(self.shutdownDeviceAction())
+        # This will be implemented in the next release
+        # adbMenu = menuBar.addMenu("🐞 &ADB")
+        # adbMenu.addAction(self.installApkAction())
+        # adbMenu.addAction(self.takeScreenshotAction())
+        # adbMenu.addAction(self.rootModeAction())
+        # adbMenu.addAction(self.rebootDeviceAction())
+        # adbMenu.addAction(self.shutdownDeviceAction())
 
         self.increaseHoverAreaForCheckableActions()
 
