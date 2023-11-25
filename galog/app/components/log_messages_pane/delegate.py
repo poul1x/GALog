@@ -18,6 +18,7 @@ from PyQt5.QtWidgets import *
 
 from galog.app.controllers.log_messages_pane.search import SearchResult
 from galog.app.highlighting import HighlightingRules
+from galog.app.util.colors import logLevelColor
 from galog.app.util.painter import painterSaveRestore
 
 from .data_model import Columns
@@ -104,18 +105,16 @@ class StyledItemDelegate(QStyledItemDelegate):
 
         if inverted:
             if viewItem.state & QStyle.State_Selected:
-                color = self.rowColor(logLevel)
-                painter.fillRect(viewItem.rect, color)
+                color = logLevelColor(logLevel)
             else:
-                color = self.rowColorSelected(logLevel)
-                painter.fillRect(viewItem.rect, color)
+                color = QColor("white")
         else:
             if viewItem.state & QStyle.State_Selected:
-                color = self.rowColorSelected(logLevel)
-                painter.fillRect(viewItem.rect, color)
+                color = QColor("white")
             else:
-                color = self.rowColor(logLevel)
-                painter.fillRect(viewItem.rect, color)
+                color = logLevelColor(logLevel)
+
+        painter.fillRect(viewItem.rect, color)
 
     def draw(self, viewItem: QStyleOptionViewItem, painter: QPainter):
         style = self.style(viewItem)
@@ -130,32 +129,6 @@ class StyledItemDelegate(QStyledItemDelegate):
 
         ctx = QAbstractTextDocumentLayout.PaintContext()
         self._doc.documentLayout().draw(painter, ctx)
-
-    def rowColorSelected(self, logLevel: str):
-        return QColor("white")
-
-    def rowColor(self, logLevel: str):
-        if logLevel == "F":
-            color = QColor("#FF2635")
-            color.setAlphaF(0.4)
-        elif logLevel == "E":
-            color = QColor("#FF2635")
-            color.setAlphaF(0.4)
-        elif logLevel == "I":
-            color = QColor("#C7CFFF")
-        elif logLevel == "W":
-            color = QColor("#FFBC00")
-            color.setAlphaF(0.5)
-        elif logLevel == "D":
-            color = QColor("green")
-            color.setAlphaF(0.4)
-        elif logLevel == "V":
-            color = QColor("orange")
-            color.setAlphaF(0.4)
-        else:  # logLevel == "S"
-            color = QColor("#FFFFFF")
-
-        return color
 
     def paint(self, p: QPainter, viewItem: QStyleOptionViewItem, index: QModelIndex):
         model = index.model()

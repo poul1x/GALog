@@ -2,25 +2,34 @@ from PyQt5.QtGui import QColor
 
 
 def logLevelColor(logLevel: str):
-    if logLevel == "S":
-        color = QColor("#CECECE")
-        color.setAlphaF(0.4)
-    elif logLevel == "F":
-        color = QColor("#FF2635")
-        color.setAlphaF(0.4)
+    if logLevel == "F":
+        return QColor("#ffa8ae")
     elif logLevel == "E":
-        color = QColor("#FF2635")
-        color.setAlphaF(0.4)
-    elif logLevel == "I":
-        color = QColor("#C7CFFF")
+        return QColor("#ffa8ae")
     elif logLevel == "W":
-        color = QColor("#FFBC00")
-        color.setAlphaF(0.5)
+        return QColor("#ffdd7f")
+    elif logLevel == "I":
+        return QColor("#c7cfff")
+    elif logLevel == "V":
+        return QColor("#ffc27a")
     elif logLevel == "D":
-        color = QColor("green")
-        color.setAlphaF(0.4)
-    else:  # V
-        color = QColor("orange")
-        color.setAlphaF(0.4)
+        return QColor("#99cc99")
+    else:  # logLevel == "S":
+        return QColor("#EEEEEE")
 
-    return color
+
+def logLevelColorDarker(logLevel: str):
+    if logLevel == "F":
+        return QColor("#DF7C7C")
+    elif logLevel == "E":
+        return QColor("#DF7C7C")
+    elif logLevel == "W":
+        return QColor("#AC8F3D")
+    elif logLevel == "I":
+        return QColor("#6D72B7")
+    elif logLevel == "V":
+        return QColor("#B7965D")
+    elif logLevel == "D":
+        return QColor("#66A262")
+    else:  # logLevel == "S":
+        return QColor("#838383")

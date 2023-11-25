@@ -47,7 +47,7 @@ class LogMessageViewPane(QDialog):
         self.copyButton = QPushButton()
         self.copyButton.setIcon(QIcon(iconFile("copy")))
         self.copyButton.setText("Copy contents")
-        self.copyButton.setFixedWidth(190)
+        self.copyButton.setFixedWidth(220)
 
         self.copyButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.copyButton.setIconSize(QSize(32, 32))

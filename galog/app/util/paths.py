@@ -11,7 +11,7 @@ def _resPathJoin(*args: str):
 
 
 FONTS_DIR = _resPathJoin("fonts")
-STYLESHEET_DIR = _resPathJoin("styles")
+STYLESHEET_DIR = _resPathJoin("styles", "auto")
 HIGHLIGHTING_DIR = _resPathJoin("highlighting")
 
 

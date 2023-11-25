@@ -1,4 +1,5 @@
-from typing import List
+from copy import deepcopy
+from typing import List, Optional
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -9,11 +10,19 @@ from galog.app.components.log_messages_pane.delegate import HighlightingData
 from galog.app.components.message_view_pane import LogMessageViewPane
 from galog.app.controllers.log_messages_pane.search import SearchResult
 from galog.app.highlighting import HighlightingRules
-from galog.app.util.colors import logLevelColor
+from galog.app.util.colors import logLevelColor, logLevelColorDarker
+from galog.app.util.paths import styleSheetFile
 
 
 class LogMessageViewPaneController:
+    QSS_TEMPLATE: Optional[str] = None
+
     def __init__(self, dataModel: QStandardItemModel, hRules: HighlightingRules):
+        if not LogMessageViewPaneController.QSS_TEMPLATE:
+            path = styleSheetFile("log_message_view_pane")
+            with open(path, "r", encoding="utf-8") as f:
+                LogMessageViewPaneController.QSS_TEMPLATE = f.read()
+
         self._dataModel = dataModel
         self._hRules = hRules
         self._pane = None
@@ -34,7 +43,7 @@ class LogMessageViewPaneController:
         self.setTag(tagName)
         self.setLogLevel(logLevel)
         self.setLogMessage(logMessage)
-        self.setItemBackgroundColor(logLevelColor(logLevel))
+        self.setStyleSheetAuto(logLevel)
         self.applyHighlighting(self._hRules, hData.items)
         self._pane.exec_()
 
@@ -102,18 +111,15 @@ class LogMessageViewPaneController:
     def setLogMessage(self, msg: str):
         self._pane.logMsgTextBrowser.setPlainText(msg)
 
-    def setItemBackgroundColor(self, color: QColor):
-        colorName = color.name(QColor.HexArgb)
-        colorNameHover = color.lighter().name(QColor.HexArgb)
+    def setStyleSheetAuto(self, logLevel: str):
+        color = logLevelColor(logLevel).name(QColor.HexRgb)
+        colorDarker = logLevelColorDarker(logLevel).name(QColor.HexRgb)
 
-        stylesheet = f"background: {colorName};"
-        self._pane.logLevelLabel.setStyleSheet(stylesheet)
-        self._pane.tagNameLabel.setStyleSheet(stylesheet)
-        self._pane.logMsgTextBrowser.setStyleSheet(stylesheet)
-
-        stylesheet = r"QPushButton {background: %s;}" % colorName
-        stylesheet += r"QPushButton:hover {background: %s;}" % colorNameHover
-        self._pane.setStyleSheet(stylesheet)
+        assert self.QSS_TEMPLATE is not None
+        styleSheet = deepcopy(self.QSS_TEMPLATE)
+        styleSheet = styleSheet.replace("$color_normal$", color)
+        styleSheet = styleSheet.replace("$color_darker$", colorDarker)
+        self._pane.setStyleSheet(styleSheet)
 
     def applyHighlighting(self, rules: HighlightingRules, items: List[SearchResult]):
         for item in items:
