@@ -1,4 +1,5 @@
 from typing import Optional
+from PyQt5 import QtCore
 
 from PyQt5.QtCore import QRect, Qt, QSize
 from PyQt5.QtGui import QColor, QFont, QPainter, QFontMetrics
@@ -14,7 +15,7 @@ class VerticalHeader(QHeaderView):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(Qt.Vertical, parent)
         self._font = QFont()
-        self._font.setPixelSize(20)
+        self._font.setPixelSize(19)
         self._font.setFamily("Arial")
         self._font.setWeight(QFont.Bold)
 
@@ -36,6 +37,11 @@ class VerticalHeader(QHeaderView):
 
             painter.setFont(self._font)
             painter.drawText(rect, align, str(index + 1))
+
+    def sizeHint(self) -> QSize:
+        fm = QFontMetrics(self._font)
+        rowNum = self.model().rowCount()
+        return QSize(fm.width(str(rowNum)) + 5, 0)
 
 class TableView(QTableView):
     def __init__(self, parent: QWidget) -> None:
