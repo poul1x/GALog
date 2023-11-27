@@ -69,8 +69,7 @@ class LogMessagesPane(QWidget):
         hHeader.setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
         vHeader = self.tableView.verticalHeader()
-        vHeader.setSectionResizeMode(QHeaderView.Fixed)
-        vHeader.setDefaultSectionSize(vHeader.minimumSectionSize())
+        vHeader.setSectionResizeMode(QHeaderView.ResizeToContents)
         vHeader.setVisible(False)
 
         layout = QVBoxLayout()

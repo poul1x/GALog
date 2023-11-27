@@ -298,3 +298,7 @@ class LogMessagesPaneController:
             itemLogLevel,
             itemLogMessage,
         )
+
+        # self._pane.tableView.resizeRowToContents(
+        #     self._pane.dataModel.rowCount() - 1
+        # )
