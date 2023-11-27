@@ -50,16 +50,19 @@ class StyledItemDelegate(QStyledItemDelegate):
         self._rules = None
         self._initFont()
 
+    def setFont(self, font: QFont):
+        self._font = font
+
+    def font(self):
+        return self._font
+
     def setHighlightingRules(self, rules: HighlightingRules):
         self._rules = rules
 
     def _initFont(self):
         self._font = QFont()
         self._font.setFamily("Roboto Mono")
-        self._font.setPixelSize(10)
-
-        fm = QFontMetrics(self._font)
-        self._fontHeight = fm.height()
+        self._font.setPixelSize(20)
 
     def _applyLogMessageHighlighting(self, doc: QTextDocument, index: QModelIndex):
         if index.column() != Columns.logMessage:
@@ -150,10 +153,10 @@ class StyledItemDelegate(QStyledItemDelegate):
         painter.translate(option.rect.left(), option.rect.top() + padding - 4)
         doc.drawContents(painter, QRectF(0, 0, textRect.width(), textRect.height()))
 
-    def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex):
-        return QSize(0, self._fontHeight)
-
     def paint(self, p: QPainter, option: QStyleOptionViewItem, index: QModelIndex):
+        assert self._font is not None
+        assert self._rules is not None
+
         model = index.model()
         if isinstance(model, QSortFilterProxyModel):
             index = model.mapToSource(index)

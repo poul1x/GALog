@@ -1,7 +1,7 @@
 from typing import Optional
 
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtGui import QKeyEvent, QFont, QFontMetrics
 from PyQt5.QtWidgets import QHBoxLayout, QHeaderView, QPushButton, QVBoxLayout, QWidget
 
 from galog.app.components.reusable.search_input.widget import SearchInput
@@ -55,22 +55,9 @@ class LogMessagesPane(QWidget):
             super().keyPressEvent(event)
 
     def initUserInterface(self):
-        self.dataModel = DataModel()
-        self.filterModel = FilterModel()
-        self.filterModel.setSourceModel(self.dataModel)
-
         self.tableView = TableView(self)
-        self.tableView.setModel(self.filterModel)
-        self.tableView.setColumnWidth(Columns.logLevel, 10)
-        self.tableView.setColumnWidth(Columns.tagName, 200)
-
-        hHeader = self.tableView.horizontalHeader()
-        hHeader.setSectionResizeMode(Columns.logMessage, QHeaderView.Stretch)
-        hHeader.setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-
-        vHeader = self.tableView.verticalHeader()
-        vHeader.setSectionResizeMode(QHeaderView.ResizeToContents)
-        vHeader.setVisible(False)
+        self.dataModel = self.tableView.dataModel
+        self.filterModel = self.tableView.filterModel
 
         layout = QVBoxLayout()
         self.searchPane = SearchPane(self)
