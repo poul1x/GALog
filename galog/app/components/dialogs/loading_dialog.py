@@ -11,7 +11,7 @@ class LoadingDialog(QDialog):
         super().__init__()
         self.setStyle(CustomStyle())
         self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setAccessibleName("LoadingDialog")
+        self.setObjectName("LoadingDialog")
         self.initUserInterface()
         self.loadStyleSheet()
 

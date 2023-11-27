@@ -1,23 +1,24 @@
-QWidget[accessibleName="LoadingDialog"] QProgressBar {
+#LoadingDialog QProgressBar {
 	margin: 0px;
 	padding: 0px;
 	border: 2px solid #464646;
     border-radius: 5px;
 }
 
-QWidget[accessibleName="LoadingDialog"] QProgressBar::chunk {
+#LoadingDialog QProgressBar::chunk {
 	background: qlineargradient(spread:pad, x1:0.0, y1:0.5, x2:1, y2:0.5, stop:0 #ffffff, stop: 0.5 #6ca6fd, stop:1 #ffffff);
 }
 
-QWidget[accessibleName="LoadingDialog"] QLabel {
+#LoadingDialog QLabel {
 	font-family: Arial, sans-serif;
 	font-size: 20px;
 	font-weight: bold;
 	color: #464646;
 }
 
-QWidget[accessibleName="LoadingDialog"] {
+#LoadingDialog {
 	background: #ffffff;
 	border: 2px solid #3b3b3b;
     border-radius: 5px;
+	min-width: 250px;
 }
