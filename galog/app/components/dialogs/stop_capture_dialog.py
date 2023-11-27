@@ -17,6 +17,7 @@ class StopCaptureDialog(MessageBox):
     def __init__(self):
         super().__init__()
         self.setText("Stop capture")
+        self.setWindowTitle("Stop capture")
         self.setInformativeText("All captured logs will remain there")
         self.setStandardButtons(MessageBox.Yes | MessageBox.No)
         self.setDefaultButton(MessageBox.Yes)

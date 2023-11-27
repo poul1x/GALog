@@ -256,9 +256,13 @@ class MainWindow(QMainWindow):
 
     def liveReloadAction(self):
         action = QWidgetAction(self)
-        checkBox = QCheckBox("Live reload")
-        checkBox.setChecked(True)
+        checkBox = QCheckBox("Live reload" + " " * 256)
         checkBox.stateChanged.connect(lambda: self.toggleLiveReload(checkBox))
+        checkBox.setChecked(True)
+
+        # HACK: QMenu::item:hover
+        checkBox.setText(checkBox.text() + " " * 256)
+
         action.setDefaultWidget(checkBox)
         action.setStatusTip("Enable/disable log pane reload on app restart")
         action.setEnabled(True)
@@ -268,8 +272,12 @@ class MainWindow(QMainWindow):
     def showLineNumbersAction(self):
         action = QWidgetAction(self)
         checkBox = QCheckBox("Show line numbers")
-        checkBox.setChecked(False)
         checkBox.stateChanged.connect(lambda: self.toggleShowLineNumbers(checkBox))
+        checkBox.setChecked(False)
+
+        # HACK: QMenu::item:hover
+        checkBox.setText(checkBox.text() + " " * 256)
+
         action.setDefaultWidget(checkBox)
         action.setStatusTip("Show/Hide log line numbers")
         action.setEnabled(True)
@@ -347,7 +355,7 @@ class MainWindow(QMainWindow):
         # adbMenu.addAction(self.rebootDeviceAction())
         # adbMenu.addAction(self.shutdownDeviceAction())
 
-        self.increaseHoverAreaForCheckableActions()
+        # self.increaseHoverAreaForCheckableActions()
 
     def initUserInterface(self):
         screen = QApplication.desktop().screenGeometry()
