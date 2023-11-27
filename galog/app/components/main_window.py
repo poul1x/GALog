@@ -2,7 +2,7 @@ import shutil
 import subprocess
 import tarfile
 from contextlib import suppress
-from typing import List
+from typing import List, Optional
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -37,6 +37,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self) -> None:
         super().__init__()
+        self.setObjectName("MainWindow")
         self._searchPane = None
         self._liveReload = True
         self.capturePaneController = CapturePaneController(ADB_HOST, ADB_PORT)

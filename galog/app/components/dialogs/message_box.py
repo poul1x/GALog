@@ -9,10 +9,20 @@ import platform
 
 class MessageBox(QMessageBox):
     def __init__(self):
-        super().__init__()
-        self.initUserInterface()
+        super().__init__(self._mainWindow())
         self.setStyle(CustomStyle())
+        self.initUserInterface()
         self._beep = True
+
+    def _mainWindow(self):
+        result = None
+        for widget in QApplication.topLevelWidgets():
+            if widget.objectName() == "MainWindow":
+                result = widget
+                break
+
+        assert result is not None
+        return result
 
     def setBeepEnabled(self, enabled: bool):
         self._beep = enabled
