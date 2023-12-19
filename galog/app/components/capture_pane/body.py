@@ -8,12 +8,6 @@ from galog.app.components.reusable.search_input import SearchInput
 from galog.app.util.hotkeys import HotkeyHelper
 
 
-class RunAppAction(int, Enum):
-    StartApp = auto()
-    StartAppDebug = auto()
-    DoNotStartApp = auto()
-
-
 class SearchInputCanActivate(SearchInput):
     #
     # Use this signal to give an ability to user

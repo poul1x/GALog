@@ -45,7 +45,7 @@ class CapturePaneHeader(QWidget):
 
         self.actionDropDown = QComboBox(self)
         self.actionDropDown.addItem("Start app", RunAppAction.StartApp)
-        self.actionDropDown.addItem("Start app (debug)", RunAppAction.StartAppDebug)
+        # self.actionDropDown.addItem("Start app (debug)", RunAppAction.StartAppDebug)
         self.actionDropDown.addItem("Don't start app", RunAppAction.DoNotStartApp)
         layoutLeft.addWidget(self.actionDropDown)
 

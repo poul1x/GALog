@@ -154,7 +154,8 @@ class MainWindow(QMainWindow):
 
             if action != RunAppAction.DoNotStartApp:
                 controller = RunAppController(ADB_HOST, ADB_PORT)
-                controller.setAppDebug(action == RunAppAction.StartAppDebug)
+                # controller.setAppDebug(action == RunAppAction.StartAppDebug)
+                controller.setAppDebug(False)
                 controller.runApp(device, package)
 
             self.logMessagesPaneController.startCapture(device, package)
