@@ -27,7 +27,7 @@ QMenu {
 QMenu::item {
 	padding-top: 2px;
 	padding-bottom: 2px;
-	padding-left: 33px;
+	/* padding-left: auto; */
 	padding-right: 50px;
 	font-family: Arial;
 	font-size: 20px;
@@ -44,12 +44,9 @@ QMenu QCheckBox {
 	font-size: 20px;
 	border: none;
 
-	padding-left: 2px;
+	/* padding-left: auto; */
 	padding-top: 2px;
 	padding-bottom: 2px;
-
-	/* HACK: QMenu::item:hover  */
-	width: 0px;
 }
 
 QMenu QCheckBox:hover {

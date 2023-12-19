@@ -38,17 +38,19 @@ class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setObjectName("MainWindow")
+        self.setStyle(CustomStyle())
+        self.startAdbServer()
         self._searchPane = None
         self._liveReload = True
         self.capturePaneController = CapturePaneController(ADB_HOST, ADB_PORT)
         self.logMessagesPaneController = LogMessagesPaneController(ADB_HOST, ADB_PORT)
-        self.startAdbServer()
         self.loadAppStrings()
         self.loadStyleSheet()
         self.loadFonts()
         self.initHighlighting()
         self.initUserInterface()
-        self.setStyle(CustomStyle())
+        self.initLeftPaddingForEachMenu()
+        self.increaseHoverAreaForCheckableActions()
 
     def startAdbServer(self):
         adb = shutil.which("adb")
@@ -103,22 +105,6 @@ class MainWindow(QMainWindow):
         else:
             event.ignore()
 
-    def _iterateActions(self):
-        menuBar = self.menuBar()
-        for fileMenu in menuBar.findChildren(QMenu):
-            for action in fileMenu.actions():
-                yield action
-
-    def _iterateWidgetActions(self):
-        for action in self._iterateActions():
-            if isinstance(action, QWidgetAction):
-                yield action
-
-    def _iterateCheckableWidgetActions(self):
-        for action in self._iterateWidgetActions():
-            if isinstance(action.defaultWidget(), QCheckBox):
-                yield action
-
     def setCaptureSpecificActionsEnabled(self, enabled: bool):
         menuBar = self.menuBar()
         for fileMenu in menuBar.findChildren(QMenu):
@@ -126,26 +112,35 @@ class MainWindow(QMainWindow):
                 if action.data() == True:
                     action.setEnabled(enabled)
 
+    def getCheckBoxRectWidthWithSpacing(self, checkBox: QCheckBox):
+        return self.getCheckBoxRectWidth(checkBox) + self.getCheckBoxLabelSpacing(checkBox)  # fmt: skip
+
+    def initMenuLeftPadding(self, menu: QMenu):
+        paddingLeft = 30  # default
+        for action in menu.actions():
+            if isinstance(action, QWidgetAction):
+                defaultWidget = action.defaultWidget()
+                if isinstance(defaultWidget, QCheckBox):
+                    paddingLeft = self.getCheckBoxRectWidthWithSpacing(defaultWidget)
+                    break
+
+        menu.setStyleSheet("QMenu::item { padding-left: %dpx; }" % paddingLeft)
+
+    def initLeftPaddingForEachMenu(self):
+        menuBar = self.menuBar()
+        for menu in menuBar.findChildren(QMenu):
+            self.initMenuLeftPadding(menu)
+
     def increaseHoverAreaForCheckableActions(self):
-        #
-        # This is a workaround to increase hover area
-        # around checkbox placed inside QWidgetAction.
-        # The idea is to pad the right part of the checkbox text
-        # with spaces which leads to hover area expansion
-        #
-
-        maxLength = 15  # Approximate menu item text max length in spaces
-        for action in self._iterateCheckableWidgetActions():
-            checkBox: QCheckBox = action.defaultWidget()
-            textLength = len(checkBox.text())
-            if textLength > maxLength:
-                maxLength = textLength
-
-        addSpacesDefault = 2  # even
-        for action in self._iterateCheckableWidgetActions():
-            checkBox: QCheckBox = action.defaultWidget()
-            addSpaces = addSpacesDefault + 2 * (maxLength - len(checkBox.text()))
-            checkBox.setText(checkBox.text() + " " * addSpaces)
+        menuBar = self.menuBar()
+        for menu in menuBar.findChildren(QMenu):
+            for action in menu.actions():
+                if isinstance(action, QWidgetAction):
+                    defaultWidget = action.defaultWidget()
+                    if isinstance(defaultWidget, QCheckBox):
+                        # hacky & dirty way to make entire line hoverable
+                        defaultWidget.setText(defaultWidget.text() + " " * 64)
+                        defaultWidget.setStyleSheet("width: 0px;")
 
     def startCapture(self):
         capturePane = CapturePane(self)
@@ -254,14 +249,23 @@ class MainWindow(QMainWindow):
         action.setData(True)
         return action
 
+    def getCheckBoxRectWidth(self, checkBox: QCheckBox):
+        option = QStyleOptionButton()
+        option.initFrom(checkBox)
+        style = checkBox.style()
+        rect = style.subElementRect(QStyle.SE_CheckBoxIndicator, option, checkBox)
+        return rect.width()
+
+    def getCheckBoxLabelSpacing(self, checkBox: QCheckBox):
+        return checkBox.style().pixelMetric(
+            QStyle.PM_CheckBoxLabelSpacing, None, checkBox
+        )
+
     def liveReloadAction(self):
         action = QWidgetAction(self)
-        checkBox = QCheckBox("Live reload" + " " * 256)
+        checkBox = QCheckBox("Live reload")
         checkBox.stateChanged.connect(lambda: self.toggleLiveReload(checkBox))
         checkBox.setChecked(True)
-
-        # HACK: QMenu::item:hover
-        checkBox.setText(checkBox.text() + " " * 256)
 
         action.setDefaultWidget(checkBox)
         action.setStatusTip("Enable/disable log pane reload on app restart")
@@ -274,9 +278,7 @@ class MainWindow(QMainWindow):
         checkBox = QCheckBox("Show line numbers")
         checkBox.stateChanged.connect(lambda: self.toggleShowLineNumbers(checkBox))
         checkBox.setChecked(False)
-
-        # HACK: QMenu::item:hover
-        checkBox.setText(checkBox.text() + " " * 256)
+        self.checkBox = checkBox
 
         action.setDefaultWidget(checkBox)
         action.setStatusTip("Show/Hide log line numbers")
@@ -354,8 +356,6 @@ class MainWindow(QMainWindow):
         # adbMenu.addAction(self.rootModeAction())
         # adbMenu.addAction(self.rebootDeviceAction())
         # adbMenu.addAction(self.shutdownDeviceAction())
-
-        # self.increaseHoverAreaForCheckableActions()
 
     def initUserInterface(self):
         screen = QApplication.desktop().screenGeometry()
