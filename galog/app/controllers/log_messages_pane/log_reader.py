@@ -1,6 +1,7 @@
 import re
 from contextlib import suppress
 from dataclasses import dataclass
+import time
 from typing import Optional, Tuple
 
 from ppadb.connection import Connection
@@ -172,7 +173,6 @@ class LogcatReaderThread(QThread):
                 reader.addDataChunk(data)
                 for line in reader.readParsedLines():
                     self._processLine(line)
-                    QThread.msleep(10)  # Use delay to avoid UI freezing
 
             self._stopEvent.wait(IDLE_INTERVAL_MS)
             if self._stopEvent.isSet():
