@@ -3,14 +3,14 @@ rules:
   - name: UndefinedOrNullSmall
     pattern: '\bundefined|null\b'
     priority: 600
-    style:
+    highlighting:
       formatting:
         - italic
         - medium
   - name: UndefinedOrNullBig
     pattern: '\bUNDEFINED|NULL\b'
     priority: 600
-    style:
+    highlighting:
       formatting:
         - italic
         - bold

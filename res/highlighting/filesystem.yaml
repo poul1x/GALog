@@ -1,0 +1,18 @@
+version: 0.1.0
+rules:
+  - name: LinuxFilePath
+    # Linux file name allows almost all available characters
+    # Use ',', ';', '*', ':' and '\s' as separators to stop highlighting
+    pattern: '((~\/)|(\/)|(\.\/)|(\.\.\/))[^\s,;*:]*'
+    priority: 600
+    highlighting:
+      formatting:
+        - underline
+        - italic
+  - name: WellKnownFileExtensions
+    pattern: '(?i)\b\S+\.(3GP|7Z|APK|APP|ASP|ASPX|AVI|BAK|BAT|BMP|CFG|COM|CSS|CSV|DAT|DB|DLL|DOC|DOCX|EPS|EXE|FLV|GIF|HTM|HTML|JPG|JS|JSP|JAR|M3U|M4A|MDB|MID|MOV|MP4|MPA|MPG|MSG|PDF|PHP|PNG|PPT|PPTX|PSD|RAR|RSS|RTF|SQL|SWF|SYS|SO|TAR|TEX|TIF|TIFF|TMP|TXT|VCD|VOB|WAV|WMA|WMV|WEBP|XLS|XLSX|XML|ZIP|ZIPX)'
+    priority: 600
+    highlighting:
+      formatting:
+        - underline
+        - italic

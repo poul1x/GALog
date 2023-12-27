@@ -121,7 +121,14 @@ class LogMessageViewPaneController:
         styleSheet = styleSheet.replace("$color_darker$", colorDarker)
         self._pane.setStyleSheet(styleSheet)
 
-    def applyHighlighting(self, rules: HighlightingRules, items: List[SearchResult]):
+    def applyHighlighting(self, ruleset: HighlightingRules, items: List[SearchResult]):
         for item in items:
-            rule = rules.findRule(item.name)
-            self.highlightKeyword(item, rule.charFormat)
+            ruleName, groupNumStr = item.name.split(".")
+            rule = ruleset.findRule(ruleName)
+            groupNum = int(groupNumStr)
+
+            charFormat = rule.match
+            if groupNum != 0:
+                charFormat = rule.groups[groupNum]
+
+            self.highlightKeyword(item, charFormat)

@@ -3,7 +3,7 @@ rules:
   - name: SingleQuotedString
     pattern: "'[^']*'"
     priority: 800
-    style:
+    highlighting:
       formatting:
         - medium
       colors:
@@ -13,7 +13,7 @@ rules:
   - name: DoubleQuotedString
     pattern: '"[^"]*"'
     priority: 800
-    style:
+    highlighting:
       formatting:
         - medium
       colors:
@@ -23,6 +23,6 @@ rules:
   - name: UppercaseWord
     pattern: '\b[A-Z_]{5,}\b'
     priority: 800
-    style:
+    highlighting:
       formatting:
         - bold

@@ -94,7 +94,7 @@ class MainWindow(QMainWindow):
     def initHighlighting(self):
         rules = HighlightingRules()
         for filepath in highlightingFiles():
-            rules.addRuleSet(filepath)
+            rules.addRuleset(filepath)
 
         self.logMessagesPaneController.setHighlightingRules(rules)
 

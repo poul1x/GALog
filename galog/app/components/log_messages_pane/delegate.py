@@ -192,8 +192,21 @@ class StyledItemDelegate(QStyledItemDelegate):
             if end >= textLength:
                 end = textLength
 
-            rule = self._rules.findRule(item.name)
-            self.highlightKeyword(doc, rule.charFormat, item.begin, end)
+
+            ruleName, groupNumStr = item.name.split(".")
+            rule = self._rules.findRule(ruleName)
+            groupNum = int(groupNumStr)
+
+            #
+            # groupNum = 0 stands for whole match
+            # groupNum > 0 stands for group match
+            #
+
+            charFormat = rule.match
+            if groupNum != 0:
+                charFormat = rule.groups[groupNum]
+
+            self.highlightKeyword(doc, charFormat, item.begin, end)
 
     def highlightAllText(self, doc: QTextDocument, charFormat: QTextCharFormat):
         cursor = QTextCursor(doc)

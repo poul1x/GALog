@@ -1,9 +1,0 @@
-version: 0.1.0
-rules:
-  - name: MacAddress
-    pattern: '([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})'
-    style:
-      colors:
-        background:
-          value: black
-          alpha: 0.1

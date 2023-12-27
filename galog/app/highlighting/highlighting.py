@@ -1,3 +1,4 @@
+from collections import defaultdict
 from dataclasses import dataclass
 from re import Pattern
 from typing import Dict, List, Optional
@@ -6,20 +7,21 @@ import yaml
 from PyQt5.QtGui import QColor, QFont, QTextCharFormat
 
 from .errors import RuleAlreadyExistsError, RuleNotFoundError
-from .model import HRuleConfigEntry, HRulesConfig, LogMessageColors, StyleEntry
-
-
-class HighlightingMode:
-    Match = "match"
-    Groups = "groups"
+from .model import (
+    HighlightingRulesetModel,
+    HighlightingRuleModel,
+    TextColorModel,
+    TextHighlightingModel,
+    RegexGroupsHighlightingModel,
+)
 
 
 @dataclass
 class HighlightingRule:
     pattern: Pattern
-    charFormat: QTextCharFormat
+    match: Optional[QTextCharFormat]
+    groups: Optional[Dict[int, QTextCharFormat]]
     priority: int
-    groups: Optional[List[int]]
 
 
 class HighlightingRules:
@@ -28,7 +30,7 @@ class HighlightingRules:
     def __init__(self) -> None:
         self._rules = dict()
 
-    def _loadColors(self, colors: LogMessageColors):
+    def _loadColors(self, colors: TextColorModel):
         charFormat = QTextCharFormat()
 
         if colors.foreground:
@@ -66,38 +68,50 @@ class HighlightingRules:
             elif item == "strikeout":
                 charFormat.setFontStrikeOut(True)
             else:
+                assert item in fontWeights
                 charFormat.setFontWeight(fontWeights[item])
 
         return charFormat
 
-    def _loadStyle(self, style: StyleEntry):
+    def _loadTextHighlighting(self, hl: TextHighlightingModel):
         charFormat = QTextCharFormat()
-        if style.colors:
-            charFormat.merge(self._loadColors(style.colors))
-        if style.formatting:
-            charFormat.merge(self._loadFormatting(style.formatting))
+        if hl.colors:
+            charFormat.merge(self._loadColors(hl.colors))
+        if hl.formatting:
+            charFormat.merge(self._loadFormatting(hl.formatting))
 
         return charFormat
 
-    def _loadRule(self, rule: HRuleConfigEntry):
+    def _loadTextHighlightingForGroups(
+        self, rulesetForGroups: List[RegexGroupsHighlightingModel]
+    ):
+        charFormatDict = defaultdict(QTextCharFormat)
+        for groupsRule in rulesetForGroups:
+            charFormat = self._loadTextHighlighting(groupsRule.highlighting)
+            for groupNum in groupsRule.numbers:
+                charFormatDict[groupNum].merge(charFormat)
+
+        return dict(charFormatDict)
+
+    def _loadRule(self, rule: HighlightingRuleModel):
         name = rule.name
         if name in self._rules:
             msg = f"Rule '{name}' already exists"
             raise RuleAlreadyExistsError(msg)
 
-        charFormat = self._loadStyle(rule.style)
-        self._rules[name] = HighlightingRule(
-            rule.pattern, charFormat, rule.priority, rule.groups
-        )
+        assert not (rule.highlighting is None and rule.groups is None)
+        match = self._loadTextHighlighting(rule.highlighting) if rule.highlighting else None  # fmt: skip
+        groups = self._loadTextHighlightingForGroups(rule.groups) if rule.groups else None  # fmt: skip
+        self._rules[name] = HighlightingRule(rule.pattern, match, groups, rule.priority)
 
-    def addRuleSet(self, filepath: str):
+    def addRuleset(self, filepath: str):
         try:
             with open(filepath, "r", encoding="utf-8") as f:
                 data = yaml.safe_load(f)
 
-            config = HRulesConfig.model_validate(data)
-            for ruleEntry in config.rules:
-                self._loadRule(ruleEntry)
+            config = HighlightingRulesetModel.model_validate(data)
+            for rule in config.rules:
+                self._loadRule(rule)
 
         except Exception as e:
             print("Failed to load rules from %s" % filepath)

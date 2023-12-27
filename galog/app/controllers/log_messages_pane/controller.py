@@ -166,7 +166,13 @@ class LogMessagesPaneController:
     def _lazyHighlighting(self, index: QModelIndex):
         items = []
         for name, rule in self._highlightingRules.items():
-            item = SearchItem(name, rule.pattern, rule.priority, rule.groups)
+            groups = set()
+            if rule.match:
+                groups.add(0)
+            if rule.groups:
+                groups.update(rule.groups.keys())
+
+            item = SearchItem(name, rule.pattern, rule.priority, groups)
             items.append(item)
 
         task = SearchItemTask(index.data(), items)
