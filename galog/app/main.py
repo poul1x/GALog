@@ -23,7 +23,11 @@ from galog.app.controllers.kill_app import KillAppController
 from galog.app.controllers.log_messages_pane.controller import LogMessagesPaneController
 from galog.app.controllers.run_app.controller import RunAppController
 from galog.app.highlighting import HighlightingRules
-from galog.app.util.messagebox import showErrorMsgBox, showNotImpMsgBox, showQuitMsgBox
+from galog.app.util.message_box import (
+    showErrorMsgBox,
+    showNotImpMsgBox,
+    showPromptMsgBox,
+)
 from galog.app.util.paths import fontFiles, highlightingFiles, iconFile, styleSheetFiles
 from galog.app.util.style import CustomStyle
 
@@ -102,7 +106,11 @@ class MainWindow(QMainWindow):
         self.logMessagesPaneController.setHighlightingRules(rules)
 
     def closeEvent(self, event: QEvent):
-        if showQuitMsgBox():
+        if showPromptMsgBox(
+            title="Close window",
+            caption="Do you really want to quit?",
+            body="If you close the window, current progress will be lost",
+        ):
             self.logMessagesPaneController.stopCapture()
             event.accept()
         else:
@@ -163,6 +171,14 @@ class MainWindow(QMainWindow):
 
             self.logMessagesPaneController.startCapture(device, package)
             self.setCaptureSpecificActionsEnabled(True)
+
+    def clearCaptureOutput(self):
+        if showPromptMsgBox(
+            title="Clear capture output",
+            caption="Clear capture output?",
+            body="All captured log messages will be erased",
+        ):
+            self.logMessagesPaneController.clearLogMessages()
 
     def stopCapture(self):
         dialog = StopCaptureDialog()
@@ -233,6 +249,15 @@ class MainWindow(QMainWindow):
         action.triggered.connect(lambda: self.stopCapture())
         action.setEnabled(False)
         action.setData(True)
+        return action
+
+    def clearCaptureOutputAction(self):
+        action = QAction("&Clear", self)
+        action.setShortcut("Ctrl+X")
+        action.setStatusTip("Clear capture output")
+        action.triggered.connect(lambda: self.clearCaptureOutput())
+        action.setEnabled(True)
+        action.setData(False)
         return action
 
     def openLogFileAction(self):
@@ -347,6 +372,7 @@ class MainWindow(QMainWindow):
         captureMenu.addAction(self.startCaptureAction())
         captureMenu.addAction(self.restartCaptureAction())
         captureMenu.addAction(self.stopCaptureAction())
+        captureMenu.addAction(self.clearCaptureOutputAction())
         captureMenu.addAction(self.openLogFileAction())
         captureMenu.addAction(self.saveLogFileAction())
         captureMenu.addAction(self.messageFilterAction())
@@ -377,6 +403,7 @@ class MainWindow(QMainWindow):
 
         self.setupMenuBar()
         self.statusBar().show()
+
 
 def runApp():
     app = QApplication(sys.argv)

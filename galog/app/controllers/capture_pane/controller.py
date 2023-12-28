@@ -9,7 +9,7 @@ from galog.app.apk_info import APK
 from galog.app.components.capture_pane import RunAppAction
 from galog.app.components.dialogs import LoadingDialog
 from galog.app.device import AdbClient
-from galog.app.util.messagebox import showErrorMsgBox
+from galog.app.util.message_box import showErrorMsgBox
 from galog.app.util.signals import blockSignals
 
 from ...components.capture_pane import CapturePane

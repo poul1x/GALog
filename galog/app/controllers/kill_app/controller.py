@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import *
 
 from galog.app.components.dialogs import LoadingDialog
 from galog.app.device import AdbClient
-from galog.app.util.messagebox import showErrorMsgBox
+from galog.app.util.message_box import showErrorMsgBox
 
 from .app_killer import AppKiller
 

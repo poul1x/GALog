@@ -17,7 +17,7 @@ from galog.app.controllers.message_view_pane.controller import (
 )
 from galog.app.device.device import AdbClient
 from galog.app.highlighting import HighlightingRules
-from galog.app.util.messagebox import showErrorMsgBox
+from galog.app.util.message_box import showErrorMsgBox
 
 from .blinking_row import RowBlinkingController
 from .log_reader import (
@@ -188,7 +188,7 @@ class LogMessagesPaneController:
 
     def _appStarted(self, packageName: str):
         if self._liveReload:
-            self._clearLogMessages()
+            self.clearLogMessages()
             self.disableMessageFilter()
 
         msg = f"App '{packageName}' started"
@@ -228,7 +228,7 @@ class LogMessagesPaneController:
     def startCapture(self, device: str, package: str):
         self._pane.tableView.setStyleSheet("background: white;")
 
-        self._clearLogMessages()
+        self.clearLogMessages()
         self._logReader = AndroidAppLogReader(self._client, device, package)
         self._logReader.signals.failed.connect(self._logReaderFailed)
         self._logReader.signals.initialized.connect(self._logReaderInitialized)
@@ -277,7 +277,7 @@ class LogMessagesPaneController:
     def messageFilterEnabled(self):
         return self._pane.filterModel.filteringEnabled()
 
-    def _clearLogMessages(self):
+    def clearLogMessages(self):
         cnt = self._pane.dataModel.rowCount()
         self._pane.dataModel.removeRows(0, cnt)
 
