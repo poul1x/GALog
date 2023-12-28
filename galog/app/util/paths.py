@@ -2,7 +2,7 @@ import os
 import sys
 
 SELF_FILE_PATH = "."
-if sys.argv[0].endswith(".exe"):
+if not sys.argv[0].endswith(".py"):
     SELF_FILE_PATH = os.path.dirname(sys.argv[0])
 
 
