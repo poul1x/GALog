@@ -1,6 +1,10 @@
 from PyQt5.QtGui import QColor
 
 
+def rowSelectedColor():
+    return QColor("#EBF8FF")
+
+
 def logLevelColor(logLevel: str):
     if logLevel == "F":
         return QColor("#ffa8ae")

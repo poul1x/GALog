@@ -24,7 +24,7 @@ from PyQt5.QtWidgets import *
 
 from galog.app.controllers.log_messages_pane.search import SearchResult
 from galog.app.highlighting import HighlightingRules
-from galog.app.util.colors import logLevelColor
+from galog.app.util.colors import logLevelColor, rowSelectedColor
 from galog.app.util.painter import painterSaveRestore
 
 from .data_model import Columns
@@ -115,10 +115,10 @@ class StyledItemDelegate(QStyledItemDelegate):
             if option.state & QStyle.State_Selected:
                 color = logLevelColor(logLevel)
             else:
-                color = QColor("white")
+                color = rowSelectedColor()
         else:
             if option.state & QStyle.State_Selected:
-                color = QColor("white")
+                color = rowSelectedColor()
             else:
                 color = logLevelColor(logLevel)
 
