@@ -35,7 +35,7 @@ def appStrings() -> AppStrings:
     return _APP_STRINGS
 
 
-def init(lang: str):
+def appStringsInit(lang: str):
     global _APP_STRINGS
 
     filepath = stringsFile(lang)

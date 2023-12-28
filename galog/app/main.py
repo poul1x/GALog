@@ -27,7 +27,7 @@ from galog.app.util.messagebox import showErrorMsgBox, showNotImpMsgBox, showQui
 from galog.app.util.paths import fontFiles, highlightingFiles, iconFile, styleSheetFiles
 from galog.app.util.style import CustomStyle
 
-from . import app_strings
+from .strings import appStringsInit
 from .components.log_messages_pane import LogMessagesPane
 
 ADB_HOST = "127.0.0.1"
@@ -72,7 +72,7 @@ class MainWindow(QMainWindow):
         QThreadPool.globalInstance().start(execAdbServer)
 
     def loadAppStrings(self):
-        app_strings.init("en")
+        appStringsInit("en")
 
     def loadFontsFromTar(self, fontDB: QFontDatabase, tar: tarfile.TarFile):
         for member in tar.getmembers():

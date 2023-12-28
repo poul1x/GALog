@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 
 from ppadb import ClearError, InstallError  # noqa
 
-from galog.app.app_strings import appStrings
+from galog.app.strings import appStrings
 
 
 class DeviceError(Exception, metaclass=ABCMeta):
