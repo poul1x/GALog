@@ -2,14 +2,22 @@ from typing import Optional
 from PyQt5 import QtCore
 
 from PyQt5.QtCore import QRect, Qt, QSize
-from PyQt5.QtGui import QColor, QFont, QPainter, QFontMetrics
-from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QTableView, QWidget, QProxyStyle, QStyle
+from PyQt5.QtGui import QColor, QFont, QPainter, QFontMetrics, QFocusEvent
+from PyQt5.QtWidgets import (
+    QAbstractItemView,
+    QHeaderView,
+    QTableView,
+    QWidget,
+    QProxyStyle,
+    QStyle,
+)
 
 from galog.app.util.painter import painterSaveRestore
 
 from .delegate import StyledItemDelegate
 from .filter_model import FilterModel
 from .data_model import Columns, DataModel
+
 
 class VerticalHeader(QHeaderView):
     def __init__(self, parent: Optional[QWidget] = None):
@@ -43,6 +51,7 @@ class VerticalHeader(QHeaderView):
         rowNum = self.model().rowCount()
         return QSize(fm.width(str(rowNum)) + 5, 0)
 
+
 class TableView(QTableView):
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
@@ -52,6 +61,13 @@ class TableView(QTableView):
     def initCustomDelegate(self):
         self.delegate = StyledItemDelegate(self)
         self.setItemDelegate(self.delegate)
+
+    def focusInEvent(self, event: QFocusEvent):
+        # Automatically select first row on focus with TAB key
+        super().focusInEvent(event)
+        if self.filterModel.rowCount() > 0:
+            if not self.selectedIndexes():
+                self.selectRow(0)
 
     def initUserInterface(self):
         self.dataModel = DataModel()
@@ -73,7 +89,7 @@ class TableView(QTableView):
 
         font = self.delegate.font()
         height = QFontMetrics(font).height()
-        height += 5 # vertical padding
+        height += 5  # vertical padding
 
         vHeader = VerticalHeader(self)
         self.setVerticalHeader(vHeader)
