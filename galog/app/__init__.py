@@ -1,4 +1,4 @@
-from .app import runApp
+from .main import runApp
 
 __all__ = [
     "runApp",

@@ -1,3 +1,4 @@
+import sys
 import shutil
 import subprocess
 import tarfile
@@ -7,6 +8,8 @@ from typing import List, Optional
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QApplication
+
 
 from galog.app.components.capture_pane import CapturePane, RunAppAction
 from galog.app.components.dialogs.stop_capture_dialog import (
@@ -24,8 +27,8 @@ from galog.app.util.messagebox import showErrorMsgBox, showNotImpMsgBox, showQui
 from galog.app.util.paths import fontFiles, highlightingFiles, iconFile, styleSheetFiles
 from galog.app.util.style import CustomStyle
 
-from .. import app_strings
-from .log_messages_pane import LogMessagesPane
+from . import app_strings
+from .components.log_messages_pane import LogMessagesPane
 
 ADB_HOST = "127.0.0.1"
 ADB_PORT = 5037
@@ -374,3 +377,9 @@ class MainWindow(QMainWindow):
 
         self.setupMenuBar()
         self.statusBar().show()
+
+def runApp():
+    app = QApplication(sys.argv)
+    mainWindow = MainWindow()
+    mainWindow.show()
+    sys.exit(app.exec())
