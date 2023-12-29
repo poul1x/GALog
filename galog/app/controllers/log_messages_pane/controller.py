@@ -308,3 +308,13 @@ class LogMessagesPaneController:
         # self._pane.tableView.resizeRowToContents(
         #     self._pane.dataModel.rowCount() - 1
         # )
+
+    def _refreshVisibleIndexes(self):
+        viewportRect = self._pane.tableView.viewport().rect()
+        topLeft = self._pane.tableView.indexAt(viewportRect.topLeft())
+        bottomRight = self._pane.tableView.indexAt(viewportRect.bottomRight())
+        self._pane.filterModel.dataChanged.emit(topLeft, bottomRight)
+
+    def setHighlightingEnabled(self, enabled: bool):
+        self._pane.tableView.delegate.setHighlightingEnabled(enabled)
+        self._refreshVisibleIndexes()

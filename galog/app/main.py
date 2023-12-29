@@ -201,6 +201,9 @@ class MainWindow(QMainWindow):
     def toggleLiveReload(self, checkBox: QCheckBox):
         self.logMessagesPaneController.setLiveReloadEnabled(checkBox.isChecked())
 
+    def toggleHighlighting(self, checkBox: QCheckBox):
+        self.logMessagesPaneController.setHighlightingEnabled(checkBox.isChecked())
+
     def toggleShowLineNumbers(self, checkBox: QCheckBox):
         self.logMessagesPaneController.setShowLineNumbers(checkBox.isChecked())
 
@@ -302,6 +305,18 @@ class MainWindow(QMainWindow):
         action.setData(False)
         return action
 
+    def toggleHighlightingAction(self):
+        action = QWidgetAction(self)
+        checkBox = QCheckBox("Text highlighting")
+        checkBox.stateChanged.connect(lambda: self.toggleHighlighting(checkBox))
+        checkBox.setChecked(True)
+
+        action.setDefaultWidget(checkBox)
+        action.setStatusTip("Enable/disable text highlighting in log messages pane")
+        action.setEnabled(True)
+        action.setData(False)
+        return action
+
     def showLineNumbersAction(self):
         action = QWidgetAction(self)
         checkBox = QCheckBox("Show line numbers")
@@ -377,6 +392,7 @@ class MainWindow(QMainWindow):
         captureMenu.addAction(self.saveLogFileAction())
         captureMenu.addAction(self.messageFilterAction())
         captureMenu.addAction(self.liveReloadAction())
+        captureMenu.addAction(self.toggleHighlightingAction())
         captureMenu.addAction(self.showLineNumbersAction())
 
         # This will be implemented in the next release

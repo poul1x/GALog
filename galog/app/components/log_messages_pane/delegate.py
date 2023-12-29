@@ -44,10 +44,12 @@ class HighlightingData:
 
 class StyledItemDelegate(QStyledItemDelegate):
     lazyHighlighting = pyqtSignal(QModelIndex)
+    _highlightingEnabled: bool
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._rules = None
+        self._highlightingEnabled = True
         self._initFont()
 
     def setFont(self, font: QFont):
@@ -59,6 +61,9 @@ class StyledItemDelegate(QStyledItemDelegate):
     def setHighlightingRules(self, rules: HighlightingRules):
         self._rules = rules
 
+    def setHighlightingEnabled(self, enabled: bool):
+        self._highlightingEnabled = enabled
+
     def _initFont(self):
         self._font = QFont()
         self._font.setFamily("Roboto Mono")
@@ -68,17 +73,17 @@ class StyledItemDelegate(QStyledItemDelegate):
         if index.column() != Columns.logMessage:
             return
 
-        data: HighlightingData = index.data(Qt.UserRole)
-        if data.state == LazyHighlightingState.running:
+        if not self._highlightingEnabled:
             return
 
+        data: HighlightingData = index.data(Qt.UserRole)
         if data.state == LazyHighlightingState.done:
             self.highlightKeywords(doc, data.items)
-            return
-
-        # State is LazyHighlightingState.pending:
-        data.state = LazyHighlightingState.running
-        self.lazyHighlighting.emit(index)
+        elif data.state == LazyHighlightingState.pending:
+            data.state = LazyHighlightingState.running
+            self.lazyHighlighting.emit(index)
+        else:  # data.state == LazyHighlightingState.running:
+            pass
 
     def _selectedRowHighlightCellText(
         self,
@@ -189,9 +194,8 @@ class StyledItemDelegate(QStyledItemDelegate):
                 continue
 
             end = item.end
-            if end >= textLength:
-                end = textLength
-
+            if end > textLength:
+                end = textLength - 1
 
             ruleName, groupNumStr = item.name.split(".")
             rule = self._rules.findRule(ruleName)
