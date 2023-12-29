@@ -307,10 +307,6 @@ class LogMessagesPaneController:
             itemLogMessage,
         )
 
-        # self._pane.tableView.resizeRowToContents(
-        #     self._pane.dataModel.rowCount() - 1
-        # )
-
     def _refreshVisibleIndexes(self):
         viewportRect = self._pane.tableView.viewport().rect()
         topLeft = self._pane.tableView.indexAt(viewportRect.topLeft())
@@ -320,3 +316,14 @@ class LogMessagesPaneController:
     def setHighlightingEnabled(self, enabled: bool):
         self._pane.tableView.delegate.setHighlightingEnabled(enabled)
         self._refreshVisibleIndexes()
+
+    def logMessagesAsText(self):
+        result = []
+        model = self._pane.dataModel
+        for i in range(model.rowCount()):
+            tagName = model.item(i, Columns.tagName).text()
+            logLevel = model.item(i, Columns.logLevel).text()
+            logMessage = model.item(i, Columns.logMessage).text()
+            result.append(f"{logLevel}/{tagName}: {logMessage}")
+
+        return "\n".join(result)

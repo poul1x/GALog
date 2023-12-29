@@ -22,6 +22,7 @@ from galog.app.controllers.install_app import InstallAppController
 from galog.app.controllers.kill_app import KillAppController
 from galog.app.controllers.log_messages_pane.controller import LogMessagesPaneController
 from galog.app.controllers.run_app.controller import RunAppController
+from galog.app.controllers.save_log_file.controller import SaveLogFileController
 from galog.app.highlighting import HighlightingRules
 from galog.app.util.message_box import (
     showErrorMsgBox,
@@ -180,6 +181,11 @@ class MainWindow(QMainWindow):
         ):
             self.logMessagesPaneController.clearLogMessages()
 
+    def saveLogFile(self):
+        text = self.logMessagesPaneController.logMessagesAsText()
+        controller = SaveLogFileController(text)
+        controller.promptSaveFile()
+
     def stopCapture(self):
         dialog = StopCaptureDialog()
         result = dialog.exec_()
@@ -227,15 +233,6 @@ class MainWindow(QMainWindow):
         action.setData(False)
         return action
 
-    def restartCaptureAction(self):
-        action = QAction("&Restart", self)
-        action.setShortcut("Ctrl+R")
-        action.setStatusTip("Restart log capture (with app restart)")
-        action.triggered.connect(lambda: showNotImpMsgBox())
-        action.setEnabled(False)
-        action.setData(True)
-        return action
-
     def messageFilterAction(self):
         action = QAction("&Find", self)
         action.setShortcut("Ctrl+F")
@@ -276,9 +273,9 @@ class MainWindow(QMainWindow):
         action = QAction("&Save", self)
         action.setShortcut("Ctrl+S")
         action.setStatusTip("Save log capture to file")
-        action.triggered.connect(lambda: showNotImpMsgBox())
-        action.setEnabled(False)
-        action.setData(True)
+        action.triggered.connect(lambda: self.saveLogFile())
+        action.setEnabled(True)
+        action.setData(False)
         return action
 
     def getCheckBoxRectWidth(self, checkBox: QCheckBox):
@@ -385,7 +382,6 @@ class MainWindow(QMainWindow):
         menuBar = self.menuBar()
         captureMenu = menuBar.addMenu("📱 &Capture")
         captureMenu.addAction(self.startCaptureAction())
-        captureMenu.addAction(self.restartCaptureAction())
         captureMenu.addAction(self.stopCaptureAction())
         captureMenu.addAction(self.clearCaptureOutputAction())
         captureMenu.addAction(self.openLogFileAction())
