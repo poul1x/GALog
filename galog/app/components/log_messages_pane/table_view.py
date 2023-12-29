@@ -62,13 +62,6 @@ class TableView(QTableView):
         self.delegate = StyledItemDelegate(self)
         self.setItemDelegate(self.delegate)
 
-    def focusInEvent(self, event: QFocusEvent):
-        # Automatically select first row on focus with TAB key
-        super().focusInEvent(event)
-        if self.filterModel.rowCount() > 0:
-            if not self.selectedIndexes():
-                self.selectRow(0)
-
     def initUserInterface(self):
         self.dataModel = DataModel()
         self.filterModel = FilterModel()

@@ -2,7 +2,7 @@ from typing import Optional
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QKeyEvent
-from PyQt5.QtWidgets import QLineEdit, QProxyStyle, QStyle, QWidget
+from PyQt5.QtWidgets import QLineEdit, QProxyStyle, QStyle, QWidget, QApplication
 from galog.app.util.hotkeys import HotkeyHelper
 
 from galog.app.util.paths import iconFile
@@ -24,7 +24,9 @@ class SearchInput(QLineEdit):
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
         if helper.isArrowPressed():
-            self.focusNextPrevChild(True)
+            self.focusNextChild()
+            nextChild = QApplication.focusWidget()
+            QApplication.postEvent(nextChild, QKeyEvent(event))
         else:
             super().keyPressEvent(event)
 

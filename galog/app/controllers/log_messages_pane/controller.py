@@ -252,6 +252,8 @@ class LogMessagesPaneController:
     def _applyMessageFilter(self):
         text = self._pane.searchPane.input.text()
         self._pane.filterModel.setFilterFixedString(text)
+        if self._pane.filterModel.rowCount() > 0:
+            self._pane.tableView.selectRow(0)
 
     def _resetMessageFilter(self):
         self._pane.searchPane.input.setText("")
