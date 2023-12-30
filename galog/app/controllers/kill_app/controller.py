@@ -10,8 +10,8 @@ from .app_killer import AppKiller
 
 
 class KillAppController:
-    def __init__(self, adbHost: str, adbPort: int):
-        self._client = AdbClient(adbHost, adbPort)
+    def __init__(self):
+        self._client = AdbClient()
 
     def appKillerSucceeded(self):
         self._loadingDialog.close()

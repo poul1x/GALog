@@ -10,8 +10,8 @@ from .app_runner import AppRunner
 
 
 class RunAppController:
-    def __init__(self, adbHost: str, adbPort: int):
-        self._client = AdbClient(adbHost, adbPort)
+    def __init__(self):
+        self._client = AdbClient()
         self._appDebug = False
 
     def setAppDebug(self, debug: bool):

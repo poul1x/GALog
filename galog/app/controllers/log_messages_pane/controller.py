@@ -28,10 +28,17 @@ from .log_reader import (
 )
 from .search import SearchItem, SearchItemTask, SearchResult
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from galog.app.main import MainWindow
+else:
+    MainWindow = object
 
 class LogMessagesPaneController:
-    def __init__(self, adbHost: str, adbPort: int):
-        self._client = AdbClient(adbHost, adbPort)
+    def __init__(self, mainWindow: MainWindow):
+        self._client = AdbClient()
+        self._mainWindow = mainWindow
         self._rowBlinkingController = None
         self._viewPaneController = None
         self._highlightingRules = None
@@ -179,16 +186,15 @@ class LogMessagesPaneController:
         task.signals.finished.connect(lambda results: self._searchDone(index, results))
         QThreadPool.globalInstance().start(task)
 
+    def addLogLine(self, line: LogLine):
+        self._addLogLine(line.level, line.tag, line.msg)
+
     def _lineRead(self, parsedLine: LogLine):
-        self._addLogLine(
-            parsedLine.level,
-            parsedLine.tag,
-            parsedLine.msg,
-        )
+        self.addLogLine(parsedLine)
 
     def _appStarted(self, packageName: str):
         if self._liveReload:
-            self.clearLogMessages()
+            self.clearLogLines()
             self.disableMessageFilter()
 
         msg = f"App '{packageName}' started"
@@ -223,12 +229,14 @@ class LogMessagesPaneController:
             self._loadingDialog.close()
             self._loadingDialog = None
 
+        self._mainWindow.setCaptureSpecificActionsEnabled(False)
         showErrorMsgBox(msgBrief, msgVerbose)
+
 
     def startCapture(self, device: str, package: str):
         self._pane.tableView.setStyleSheet("background: white;")
 
-        self.clearLogMessages()
+        self.clearLogLines()
         self._logReader = AndroidAppLogReader(self._client, device, package)
         self._logReader.signals.failed.connect(self._logReaderFailed)
         self._logReader.signals.initialized.connect(self._logReaderInitialized)
@@ -247,7 +255,9 @@ class LogMessagesPaneController:
     def stopCapture(self):
         if self._logReader:
             self._logReader.stop()
-            self._logReader = None
+
+    def isCaptureRunning(self):
+        return self._logReader.isRunning()
 
     def _applyMessageFilter(self):
         text = self._pane.searchPane.input.text()
@@ -279,7 +289,7 @@ class LogMessagesPaneController:
     def messageFilterEnabled(self):
         return self._pane.filterModel.filteringEnabled()
 
-    def clearLogMessages(self):
+    def clearLogLines(self):
         cnt = self._pane.dataModel.rowCount()
         self._pane.dataModel.removeRows(0, cnt)
 
@@ -327,3 +337,7 @@ class LogMessagesPaneController:
             result.append(f"{logLevel}/{tagName}: {logMessage}")
 
         return "\n".join(result)
+
+    def addLogLines(self, lines: List[LogLine]):
+        for line in lines:
+            self.addLogLine(line)

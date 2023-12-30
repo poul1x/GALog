@@ -21,6 +21,7 @@ from galog.app.controllers.capture_pane import CapturePaneController
 from galog.app.controllers.install_app import InstallAppController
 from galog.app.controllers.kill_app import KillAppController
 from galog.app.controllers.log_messages_pane.controller import LogMessagesPaneController
+from galog.app.controllers.open_log_file.controller import OpenLogFileController
 from galog.app.controllers.run_app.controller import RunAppController
 from galog.app.controllers.save_log_file.controller import SaveLogFileController
 from galog.app.highlighting import HighlightingRules
@@ -35,10 +36,6 @@ from galog.app.util.style import CustomStyle
 from .strings import appStringsInit
 from .components.log_messages_pane import LogMessagesPane
 
-ADB_HOST = "127.0.0.1"
-ADB_PORT = 5037
-
-
 class MainWindow(QMainWindow):
     _viewWindows: List[LogMessageViewPane]
     _liveReload: bool
@@ -50,8 +47,8 @@ class MainWindow(QMainWindow):
         self.startAdbServer()
         self._searchPane = None
         self._liveReload = True
-        self.capturePaneController = CapturePaneController(ADB_HOST, ADB_PORT)
-        self.logMessagesPaneController = LogMessagesPaneController(ADB_HOST, ADB_PORT)
+        self.capturePaneController = CapturePaneController()
+        self.logMessagesPaneController = LogMessagesPaneController(self)
         self.loadAppStrings()
         self.loadStyleSheet()
         self.loadFonts()
@@ -117,6 +114,15 @@ class MainWindow(QMainWindow):
         else:
             event.ignore()
 
+    def findActionByName(self, name: str):
+        result = None
+        for action in self.actions():
+            if action.objectName() == name:
+                result = action
+                break
+
+        return result
+
     def setCaptureSpecificActionsEnabled(self, enabled: bool):
         menuBar = self.menuBar()
         for fileMenu in menuBar.findChildren(QMenu):
@@ -165,7 +171,7 @@ class MainWindow(QMainWindow):
             action = self.capturePaneController.selectedAction()
 
             if action != RunAppAction.DoNotStartApp:
-                controller = RunAppController(ADB_HOST, ADB_PORT)
+                controller = RunAppController()
                 # controller.setAppDebug(action == RunAppAction.StartAppDebug)
                 controller.setAppDebug(False)
                 controller.runApp(device, package)
@@ -179,12 +185,27 @@ class MainWindow(QMainWindow):
             caption="Clear capture output?",
             body="All captured log messages will be erased",
         ):
-            self.logMessagesPaneController.clearLogMessages()
+            self.logMessagesPaneController.clearLogLines()
 
     def saveLogFile(self):
         text = self.logMessagesPaneController.logMessagesAsText()
         controller = SaveLogFileController(text)
         controller.promptSaveFile()
+
+    def openLogFile(self):
+        if self.logMessagesPaneController.isCaptureRunning():
+            msgBrief = "Capture is running"
+            msgVerbose = "Unable to open log file while capture is running. Please, stop the running capture first"  # fmt: skip
+            showErrorMsgBox(msgBrief, msgVerbose)
+            return
+
+        self.logMessagesPaneController.disableMessageFilter()
+        self.logMessagesPaneController.clearLogLines()
+
+        controller = OpenLogFileController()
+        lines = controller.promptOpenFile()
+        if lines:
+            self.logMessagesPaneController.addLogLines(lines)
 
     def stopCapture(self):
         dialog = StopCaptureDialog()
@@ -195,7 +216,7 @@ class MainWindow(QMainWindow):
         if result == StopCaptureDialogResult.AcceptedKillApp:
             device = self.logMessagesPaneController.device
             package = self.logMessagesPaneController.package
-            controller = KillAppController(ADB_HOST, ADB_PORT)
+            controller = KillAppController()
             controller.killApp(device, package)
 
         self.logMessagesPaneController.stopCapture()
@@ -221,7 +242,7 @@ class MainWindow(QMainWindow):
             showErrorMsgBox(msgBrief, msgVerbose)
             return
 
-        controller = InstallAppController(ADB_HOST, ADB_PORT)
+        controller = InstallAppController()
         controller.promptInstallApp(device)
 
     def startCaptureAction(self):
@@ -229,6 +250,7 @@ class MainWindow(QMainWindow):
         action.setShortcut("Ctrl+N")
         action.setStatusTip("Start new log capture")
         action.triggered.connect(lambda: self.startCapture())
+        action.setObjectName("capture.new")
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -247,6 +269,7 @@ class MainWindow(QMainWindow):
         action.setShortcut("Ctrl+Q")
         action.setStatusTip("Stop capture")
         action.triggered.connect(lambda: self.stopCapture())
+        action.setObjectName("capture.stop")
         action.setEnabled(False)
         action.setData(True)
         return action
@@ -256,6 +279,7 @@ class MainWindow(QMainWindow):
         action.setShortcut("Ctrl+X")
         action.setStatusTip("Clear capture output")
         action.triggered.connect(lambda: self.clearCaptureOutput())
+        action.setObjectName("capture.clear")
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -264,7 +288,7 @@ class MainWindow(QMainWindow):
         action = QAction("&Open", self)
         action.setShortcut("Ctrl+O")
         action.setStatusTip("Open log capture from file")
-        action.triggered.connect(lambda: showNotImpMsgBox())
+        action.triggered.connect(lambda: self.openLogFile())
         action.setEnabled(True)
         action.setData(False)
         return action

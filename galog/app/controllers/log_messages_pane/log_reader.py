@@ -168,7 +168,10 @@ class LogcatReaderThread(QThread):
             with suppress(BlockingIOError):
                 data = conn.read(RECV_CHUNK_SIZE)
                 if not data:
-                    raise AdbConnectionError()
+                    msgBrief = "Connection error"
+                    msgVerbose = "Failed to read data"
+                    self.failed.emit(msgBrief, msgVerbose)
+                    break
 
                 reader.addDataChunk(data)
                 for line in reader.readParsedLines():
@@ -279,3 +282,6 @@ class AndroidAppLogReader:
         if self._readerThread.isRunning():
             self._readerThread.stop()
             self._readerThread.wait()
+
+    def isRunning(self):
+        return self._readerThread.isRunning()

@@ -20,8 +20,8 @@ from .package_loader import PackageLoader
 class CapturePaneController:
     _pane: Optional[CapturePane]
 
-    def __init__(self, adbHost: str, adbPort: int) -> None:
-        self._client = AdbClient(adbHost, adbPort)
+    def __init__(self) -> None:
+        self._client = AdbClient()
         self._lastSelectedDevice = None
         self._lastSelectedPackage = None
         self._lastSelectedAction = RunAppAction.StartApp
@@ -129,6 +129,7 @@ class CapturePaneController:
     def _packageReloadFailed(self, msgBrief: str, msgVerbose: str):
         self._loadingDialog.close()
         self._setPackagesEmpty()
+        self._lastSelectedPackage = None
         showErrorMsgBox(msgBrief, msgVerbose)
 
     def _packageLoaderSucceeded(self, packageList: List[str], selectedPackage: str):
@@ -155,6 +156,8 @@ class CapturePaneController:
 
     def _deviceLoaderFailed(self, msgBrief: str, msgVerbose: str):
         self._loadingDialog.close()
+        self._lastSelectedDevice = None
+        self._lastSelectedPackage = None
         showErrorMsgBox(msgBrief, msgVerbose)
 
     def _fromApkButtonClicked(self):
