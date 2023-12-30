@@ -188,8 +188,8 @@ class MainWindow(QMainWindow):
             self.logMessagesPaneController.clearLogLines()
 
     def saveLogFile(self):
-        text = self.logMessagesPaneController.logMessagesAsText()
-        controller = SaveLogFileController(text)
+        logLines = self.logMessagesPaneController.logLines()
+        controller = SaveLogFileController(logLines)
         controller.promptSaveFile()
 
     def openLogFile(self):

@@ -1,22 +1,25 @@
-from typing import Optional
+from typing import List, Optional
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-class TextFileWriterSignals(QObject):
+from galog.app.controllers.log_messages_pane.log_reader import LogLine
+
+
+class LogFileWriterSignals(QObject):
     succeeded = pyqtSignal()
     failed = pyqtSignal(str, str, str)
 
 
-class TextFileWriter(QRunnable):
+class LogFileWriter(QRunnable):
     _msDelay: Optional[int]
 
-    def __init__(self, filePath: str, content: str):
+    def __init__(self, filePath: str, logLines: List[LogLine]):
         super().__init__()
-        self.signals = TextFileWriterSignals()
+        self.signals = LogFileWriterSignals()
         self._filePath = filePath
-        self._content = content
+        self._logLines = logLines
         self._msDelay = None
 
     def setStartDelay(self, ms: int):
@@ -26,17 +29,24 @@ class TextFileWriter(QRunnable):
         if self._msDelay:
             QThread.msleep(self._msDelay)
 
-    def _writeTextFile(self):
+    def _logLinesAsText(self):
+        result = []
+        for line in self._logLines:
+            result.append(f"{line.level}/{line.tag}: {line.msg}")
+
+        return "\n".join(result)
+
+    def _writeLogFile(self):
         try:
             with open(self._filePath, "w") as f:
-                f.write(self._content)
+                f.write(self._logLinesAsText())
 
         except Exception:
             msgBrief = "Failed to save file"
             msgVerbose = "Please, view logs to get more info"
-            self.signals.failed.emit(msgBrief, msgVerbose)
+            self.signals.failed.emit(msgBrief, msgVerbose, None)
 
     def run(self):
         self._delayIfNeeded()
-        self._writeTextFile()
+        self._writeLogFile()
         self.signals.succeeded.emit()

@@ -1,7 +1,7 @@
 from typing import List
 
 from PyQt5.QtCore import QModelIndex, Qt, QThread, QThreadPool
-from PyQt5.QtGui import QStandardItem
+from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QTableView
 
 from galog.app.components.dialogs import LoadingDialog
@@ -34,6 +34,7 @@ if TYPE_CHECKING:
     from galog.app.main import MainWindow
 else:
     MainWindow = object
+
 
 class LogMessagesPaneController:
     def __init__(self, mainWindow: MainWindow):
@@ -232,7 +233,6 @@ class LogMessagesPaneController:
         self._mainWindow.setCaptureSpecificActionsEnabled(False)
         showErrorMsgBox(msgBrief, msgVerbose)
 
-
     def startCapture(self, device: str, package: str):
         self._pane.tableView.setStyleSheet("background: white;")
 
@@ -327,16 +327,18 @@ class LogMessagesPaneController:
         self._pane.tableView.delegate.setHighlightingEnabled(enabled)
         self._refreshVisibleIndexes()
 
-    def logMessagesAsText(self):
-        result = []
+    def logLines(self):
         model = self._pane.dataModel
-        for i in range(model.rowCount()):
-            tagName = model.item(i, Columns.tagName).text()
-            logLevel = model.item(i, Columns.logLevel).text()
-            logMessage = model.item(i, Columns.logMessage).text()
-            result.append(f"{logLevel}/{tagName}: {logMessage}")
 
-        return "\n".join(result)
+        def logLine(i: int):
+            return LogLine(
+                level=model.item(i, Columns.logLevel).text(),
+                msg=model.item(i, Columns.logMessage).text(),
+                tag=model.item(i, Columns.tagName).text(),
+                pid=-1,
+            )
+
+        return [logLine(i) for i in range(model.rowCount())]
 
     def addLogLines(self, lines: List[LogLine]):
         for line in lines:
