@@ -255,9 +255,10 @@ class LogMessagesPaneController:
     def stopCapture(self):
         if self._logReader:
             self._logReader.stop()
+            self._logReader = None
 
     def isCaptureRunning(self):
-        return self._logReader.isRunning()
+        return self._logReader and self._logReader.isRunning()
 
     def _applyMessageFilter(self):
         text = self._pane.searchPane.input.text()

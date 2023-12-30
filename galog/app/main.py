@@ -161,6 +161,12 @@ class MainWindow(QMainWindow):
                         defaultWidget.setStyleSheet("width: 0px;")
 
     def startCapture(self):
+        if self.logMessagesPaneController.isCaptureRunning():
+            msgBrief = "Capture is running"
+            msgVerbose = "Unable to start capture while another capture is running. Please, stop the running capture first"  # fmt: skip
+            showErrorMsgBox(msgBrief, msgVerbose)
+            return
+
         capturePane = CapturePane(self)
         self.capturePaneController.takeControl(capturePane)
         self.capturePaneController.startCaptureDialog()
