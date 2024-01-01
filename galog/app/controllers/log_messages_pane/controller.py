@@ -233,10 +233,10 @@ class LogMessagesPaneController:
         self._mainWindow.setCaptureSpecificActionsEnabled(False)
         showErrorMsgBox(msgBrief, msgVerbose)
 
-    def startCapture(self, device: str, package: str):
+    def makeWhiteBackground(self):
         self._pane.tableView.setStyleSheet("background: white;")
 
-        self.clearLogLines()
+    def startCapture(self, device: str, package: str):
         self._logReader = AndroidAppLogReader(self._client, device, package)
         self._logReader.signals.failed.connect(self._logReaderFailed)
         self._logReader.signals.initialized.connect(self._logReaderInitialized)

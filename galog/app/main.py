@@ -182,6 +182,10 @@ class MainWindow(QMainWindow):
                 controller.setAppDebug(False)
                 controller.runApp(device, package)
 
+
+            self.logMessagesPaneController.makeWhiteBackground()
+            self.logMessagesPaneController.disableMessageFilter()
+            self.logMessagesPaneController.clearLogLines()
             self.logMessagesPaneController.startCapture(device, package)
             self.setCaptureSpecificActionsEnabled(True)
 
@@ -191,6 +195,8 @@ class MainWindow(QMainWindow):
             caption="Clear capture output?",
             body="All captured log messages will be erased",
         ):
+            self.logMessagesPaneController.makeWhiteBackground()
+            self.logMessagesPaneController.disableMessageFilter()
             self.logMessagesPaneController.clearLogLines()
 
     def saveLogFile(self):
@@ -205,13 +211,15 @@ class MainWindow(QMainWindow):
             showErrorMsgBox(msgBrief, msgVerbose)
             return
 
-        self.logMessagesPaneController.disableMessageFilter()
-        self.logMessagesPaneController.clearLogLines()
-
         controller = OpenLogFileController()
         lines = controller.promptOpenFile()
-        if lines:
-            self.logMessagesPaneController.addLogLines(lines)
+        if not lines:
+            return
+
+        self.logMessagesPaneController.makeWhiteBackground()
+        self.logMessagesPaneController.disableMessageFilter()
+        self.logMessagesPaneController.clearLogLines()
+        self.logMessagesPaneController.addLogLines(lines)
 
     def stopCapture(self):
         dialog = StopCaptureDialog()
