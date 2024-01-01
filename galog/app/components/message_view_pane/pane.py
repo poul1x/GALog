@@ -67,9 +67,7 @@ class LogMessageViewPane(QDialog):
 
         self.logMsgTextBrowser = QTextBrowser()
         self.logMsgTextBrowser.setOpenExternalLinks(True)
-        self.logMsgTextBrowser.setOpenLinks(True)
         self.logMsgTextBrowser.setReadOnly(True)
-        self.logMsgTextBrowser.setFocusPolicy(Qt.NoFocus)
 
         vBoxLayout = QVBoxLayout()
         vBoxLayout.addLayout(hBoxLayout)
