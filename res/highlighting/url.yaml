@@ -7,7 +7,3 @@ rules:
       formatting:
         - underline
         - semibold
-      colors:
-        foreground:
-          value: black
-          alpha: 0.1

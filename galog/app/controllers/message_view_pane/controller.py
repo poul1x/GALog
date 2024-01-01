@@ -72,7 +72,7 @@ class LogMessageViewPaneController:
         return cursor
 
     def highlightKeyword(self, keyword: SearchResult, charFormat: QTextCharFormat):
-        if keyword.name == "genericUrl":
+        if keyword.name == "GenericUrl.0":
             charFormat.setAnchor(True)
             text = self._pane.logMsgTextBrowser.document().toPlainText()
             addr = text[keyword.begin : keyword.end]
