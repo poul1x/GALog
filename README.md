@@ -1,6 +1,8 @@
-# GALog - Graphical Android Log [\[Win\]](#windows) [\[Linux\]](#linux--mac) [\[Mac\]](#linux--mac) [\[Docs\]](#documentation)
+# GALog - Graphical Android Log
 
 ![](/assets/galog.png)
+
+##  [\[Win\]](#windows) [\[Linux\]](#linux--mac) [\[Mac\]](#linux--mac) [\[Docs\]](#documentation)
 
 **GALog** is a GUI program designed to retrieve and display Android log output for a specific app using the ADB server API.
 
