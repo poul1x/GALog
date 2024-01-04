@@ -1,63 +1,83 @@
-# GALog - Graphical Android Log
+# GALog - Graphical Android Log [\[Win\]](#windows) [\[Linux\]](#linux--mac) [\[Mac\]](#linux--mac) [\[Docs\]](#documentation)
 
 ![](/assets/galog.png)
 
 **GALog** is a GUI program designed to retrieve and display Android log output for a specific app using the ADB server API.
 
-<u>Features</u>:
+<ins>Features</ins>:
 - Nice-looking GUI
-- Log output highlighting: additional formatting is applied to enhance log readability.
+- Log output highlighting: additional formatting is applied to enhance log readability (very WIP).
 - Live reloading: log output is automatically reloaded upon app restart.
 - Ability to save log output to a file and read it later.
 - Message filtering based on content.
 
-## Local development
+## Documentation
 
-### Install and run
+Documentation can be found [there](link)
 
-Using python 3.7+
+## Installation
 
-```cmd
-py -3 -m venv venv
-./venv/bin/activate.ps
-pip install -r requirements-dev.txt
+### Windows
 
-py -3 main.py
+> [!NOTE]  
+> Prebuilt executables are available for windows 10 x64 bit on the [releases](https://github.com/poul1x/galog/releases) page.
+
+Clone repository and install dependencies:
+
+```powershell
+git clone https://github.com/poul1x/galog.git
+cd galog
+python3 -m venv venv
+.\venv\Scripts\activate.ps1
+pip install -r requirements-prod.txt
 ```
 
-TODO
+Run galog as a python module:
 
-### Code documentation
+```powershell
+python3 -m galog
+```
 
-TODO
+Optionally, build and run an executable file:
 
-### Running tests
+```powershell
+pyinstaller --name galog --onefile galog/__main__.py
+Copy-Item -Path .\res -Destination .\dist\galog -Recurse
+.\dist\galog\galog.exe
+```
 
-TODO
+### Linux & Mac
 
-### Spell checking
-
-TODO
-
-### Build
+Clone repository and install dependencies:
 
 ```bash
-pyinstaller --onefile "galog\__main__.py"
-# Copy logging.yaml
+git clone https://github.com/poul1x/galog.git
+cd galog
+python3 -m venv venv
+source ./venv/bin/activate
+pip install -r requirements-prod.txt
 ```
 
-### Fonts
+Run galog as a python module:
 
-Roboto Mono
-
-```
-https://github.com/googlefonts/RobotoMono/tree/main/fonts/ttf
+```bash
+python3 -m galog
 ```
 
-### VSCode extensions
+Optionally, build and run an executable file:
 
-- `ms-python.python`
-- `ms-python.vscode-pylance`
-- `streetsidesoftware.code-spell-checker`
-- `streetsidesoftware.code-spell-checker-russian`
-- `seanwu.vscode-qt-for-python`
+```bash
+pyinstaller --name galog --onefile galog/__main__.py
+cp -r ./res -Destination ./dist/galog
+./dist/galog/galog
+```
+
+## OS support
+
+**Windows**: Main development system. Fast feedback and bug fixes.
+
+**Linux**: Running in vmware. Slow feedback and bug fixes. 
+
+**Mac**: Running in vmware (slow!!!). Slowest feedback and bug fixes. Has UI bugs which won't be fixed in the near future
+
+
