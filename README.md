@@ -1,6 +1,15 @@
-# galog
+# GALog - Graphical Android Log
 
-GALog = Graphical Android Log
+![](/assets/galog.png)
+
+**GALog** is a GUI program designed to retrieve and display Android log output for a specific app using the ADB server API.
+
+<u>Features</u>:
+- Nice-looking GUI
+- Log output highlighting: additional formatting is applied to enhance log readability.
+- Live reloading: log output is automatically reloaded upon app restart.
+- Ability to save log output to a file and read it later.
+- Message filtering based on content.
 
 ## Local development
 
