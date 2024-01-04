@@ -1,13 +1,13 @@
 QMenuBar {
 	background-color: #ffffff;
 	min-height: 30px;
-	font-family: Arial, sans-serif;
+	font-family: Arial;
 	font-size: 20px;
 }
 
 QMenuBar::item {
 	background-color: #ffffff;
-	font-family: Arial, sans-serif;
+	font-family: Arial;
 	min-height: 30px;
 	font-size: 20px;
 	padding: 5px;
@@ -72,7 +72,7 @@ QMenu QCheckBox::indicator:checked:hover {
 QStatusBar {
     background-color: #464646;
 	color: #ffffff;
-	font-family: Arial, sans-serif;
+	font-family: Arial;
 	font-size: 20px;
 	padding-top: 5px;
 	padding-bottom: 5px;

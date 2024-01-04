@@ -10,7 +10,7 @@
 	border: 2px solid black;
 	border-radius: 0px;
 
-	font-family: Arial, sans-serif;
+	font-family: Arial;
 	font-size: 19px;
 }
 
@@ -35,14 +35,14 @@
 }
 
 #CapturePaneHeader QLabel {
-	font-family: Arial, sans-serif;
+	font-family: Arial;
 	font-size: 19px;
 	font-weight: bold;
 }
 
 #CapturePaneHeader QPushButton {
-	font-family: Arial, sans-serif;
-	font-family: Arial, sans-serif;
+	font-family: Arial;
+	font-family: Arial;
 	font-size: 20px;
 	background: #ffffff;
 	border: 1px solid #464646;
@@ -59,7 +59,7 @@
 /* -------------------------- */
 
 #CapturePaneBody QListView{
-	font-family: Arial, sans-serif;
+	font-family: Arial;
 	font-size: 20px;
 	border: none;
 }
@@ -76,7 +76,7 @@
 }
 
 #CapturePaneBody QLineEdit {
-	font-family: Arial, sans-serif;
+	font-family: Arial;
     font-size: 20px;
 	background: #eeeeee;
 	padding-top: 5px;
@@ -92,7 +92,7 @@
 }
 
 #CapturePaneFooter QPushButton {
-	font-family: Arial, sans-serif;
+	font-family: Arial;
 	font-size: 20px;
 	background: #ffffff;
 	border: none;

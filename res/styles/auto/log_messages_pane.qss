@@ -2,7 +2,7 @@
     background-color: #464646;
     color: #f5f5f5;
     border:none;
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     font-weight: bold;
     font-size: 20px;
     padding: 5px;
@@ -26,7 +26,7 @@
 
 #LogMessagesSearchPane QLineEdit {
     border: none;
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     font-size: 20px;
     padding: 2px;
     margin-left: 5px;
@@ -35,7 +35,7 @@
 
 #LogMessagesSearchPane QPushButton {
     border: none;
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     font-size: 20px;
     margin-left: 5px;
     margin-right: 5px;

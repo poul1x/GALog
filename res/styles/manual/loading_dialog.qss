@@ -10,7 +10,7 @@
 }
 
 #LoadingDialog QLabel {
-	font-family: Arial, sans-serif;
+	font-family: Arial;
 	font-size: 20px;
 	font-weight: bold;
 	color: #464646;
