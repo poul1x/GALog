@@ -2,7 +2,7 @@ version: 0.1.0
 rules:
   - name: DotSeparatedWords
     pattern: '\w+(\.[a-zA-Z0-9\(\)$]+){2,}'
-    priority: 500
+    priority: 501
     highlighting:
       formatting:
         - underline

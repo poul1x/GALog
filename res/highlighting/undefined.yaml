@@ -1,7 +1,7 @@
 version: 0.1.0
 rules:
   - name: UndefinedOrNullSmall
-    pattern: '\bundefined|null\b'
+    pattern: '\bundefined|null|nullptr\b'
     priority: 600
     highlighting:
       formatting:

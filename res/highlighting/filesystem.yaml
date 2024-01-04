@@ -2,16 +2,44 @@ version: 0.1.0
 rules:
   - name: LinuxFilePath
     # Linux file name allows almost all available characters
-    # Use ',', ';', '*', ':' and '\s' as separators to stop highlighting
-    pattern: '((~\/)|(\/)|(\.\/)|(\.\.\/))[^\s,;*:]*'
+    # Use '/', ',', ';', ':', '*' and '\s' as separators to stop highlighting
+    pattern: '(([^\s/,;:*]+/)+[^\s/,;:*]*)|((/[^\s/,;:*]+)+/?)'
     priority: 600
     highlighting:
       formatting:
         - underline
         - italic
-  - name: WellKnownFileExtensions
-    pattern: '(?i)\b\S+\.(3GP|7Z|APK|APP|ASP|ASPX|AVI|BAK|BAT|BMP|CFG|COM|CSS|CSV|DAT|DB|DLL|DOC|DOCX|EPS|EXE|FLV|GIF|HTM|HTML|JPG|JS|JSP|JAR|M3U|M4A|MDB|MID|MOV|MP4|MPA|MPG|MSG|PDF|PHP|PNG|PPT|PPTX|PSD|RAR|RSS|RTF|SQL|SWF|SYS|SO|TAR|TEX|TIF|TIFF|TMP|TXT|VCD|VOB|WAV|WMA|WMV|WEBP|XLS|XLSX|XML|ZIP|ZIPX)'
-    priority: 600
+  - name: WellKnownFileExtensions.Compression
+    pattern: '(?i)[^\s/]+\.(7Z|ZIP|ZIPX|TAR|GZ|XZ)\b'
+    priority: 599
+    highlighting:
+      formatting:
+        - underline
+        - italic
+  - name: WellKnownFileExtensions.AndroidAppInternals
+    pattern: '(?i)[^\s/]+\.(APK|AAB|DEX|JAR|SO|DB|SQLITE|SQL|C|CPP|JAVA|KT)\b'
+    priority: 599
+    highlighting:
+      formatting:
+        - underline
+        - italic
+  - name: WellKnownFileExtensions.SerializationFormats
+    pattern: '(?i)[^\s/]+\.(JSON|YAML|XML|TOML|CSV)\b'
+    priority: 599
+    highlighting:
+      formatting:
+        - underline
+        - italic
+  - name: WellKnownFileExtensions.MediaFiles
+    pattern: '(?i)[^\s/]+\.(AVI|BMP|GIF|JPG|MOV|MP4|PDF|PNG|SWF|TIF|TIFF|WEBP)\b'
+    priority: 599
+    highlighting:
+      formatting:
+        - underline
+        - italic
+  - name: WellKnownFileExtensions.Other
+    pattern: '(?i)[^\s/]+\.(APP|CFG|CONF|TMP|TXT)\b'
+    priority: 599
     highlighting:
       formatting:
         - underline

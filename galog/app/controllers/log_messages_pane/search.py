@@ -58,7 +58,7 @@ class SearchItemTask(QRunnable):
                 if groupNum not in item.groups:
                     continue
 
-                name = f"{item.name}.{groupNum}"
+                name = f"{item.name}#{groupNum}"
                 priority = item.priority + groupNum
                 start, end = match.start(groupNum), match.end(groupNum)
                 yield SearchResult(name, priority, start, end)

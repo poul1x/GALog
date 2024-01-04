@@ -188,7 +188,7 @@ class StyledItemDelegate(QStyledItemDelegate):
             if end > textLength:
                 end = textLength - 1
 
-            ruleName, groupNumStr = item.name.split(".")
+            ruleName, groupNumStr = item.name.split("#")
             rule = self._rules.findRule(ruleName)
             groupNum = int(groupNumStr)
 

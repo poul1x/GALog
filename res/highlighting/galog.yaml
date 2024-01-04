@@ -1,0 +1,75 @@
+version: 0.1.0
+rules:
+  - name: GalogMessage.AppStarted
+    pattern: >-
+      ^App ('.+') started$
+    priority: 1000
+    groups:
+      - numbers: [1]
+        highlighting:
+          formatting:
+            - medium
+          colors:
+            background:
+              value: black
+              alpha: 0.05
+  - name: GalogMessage.AppRunning
+    pattern: >-
+      ^App ('.+') is running. (PID)\(s\): (\d+)$
+    priority: 1000
+    groups:
+      - numbers: [1]
+        highlighting:
+          formatting:
+            - medium
+          colors:
+            background:
+              value: black
+              alpha: 0.05
+      - numbers: [2]
+        highlighting:
+          formatting:
+            - normal
+      - numbers: [3]
+        highlighting:
+          formatting:
+            - italic
+  - name: GalogMessage.ProcessStarted
+    pattern: >-
+      ^Process <(PID)=(\d+)> started for .*$
+    priority: 1000
+    groups:
+      - numbers: [1]
+        highlighting:
+          formatting:
+            - normal
+      - numbers: [2]
+        highlighting:
+          formatting:
+            - italic
+  - name: GalogMessage.ProcessEnded
+    pattern: >-
+      ^Process <(PID)=(\d+)> ended$
+    priority: 1000
+    groups:
+      - numbers: [1]
+        highlighting:
+          formatting:
+            - normal
+      - numbers: [2]
+        highlighting:
+          formatting:
+            - italic
+  - name: GalogMessage.AppEnded
+    pattern: >-
+      ^App ('.+') ended$
+    priority: 1000
+    groups:
+      - numbers: [1]
+        highlighting:
+          formatting:
+            - medium
+          colors:
+            background:
+              value: black
+              alpha: 0.05

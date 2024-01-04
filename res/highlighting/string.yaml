@@ -5,7 +5,7 @@ rules:
     priority: 800
     highlighting:
       formatting:
-        - medium
+        - normal
       colors:
         background:
           value: black
@@ -15,14 +15,14 @@ rules:
     priority: 800
     highlighting:
       formatting:
-        - medium
+        - normal
       colors:
         background:
           value: black
           alpha: 0.05
   - name: UppercaseWord
-    pattern: '\b[A-Z_]{5,}\b'
-    priority: 800
+    pattern: '\b[A-Z_]{2,}\b'
+    priority: 500
     highlighting:
       formatting:
         - bold

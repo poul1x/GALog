@@ -2,7 +2,7 @@ version: 0.1.0
 rules:
   - name: PackageName
     pattern: '[a-z0-9]+(\.[a-z0-9]+){2,}'
-    priority: 500
+    priority: 502
     highlighting:
       formatting:
         - italic

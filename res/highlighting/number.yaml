@@ -1,7 +1,7 @@
 version: 0.1.0
 rules:
   - name: DecimalNumber
-    pattern: '\b-?\d+(?:\.\d+)?\b'
+    pattern: '\b-?\d+(\.\d+)?([a-zA-Z]+)?\b'
     priority: 500
     highlighting:
       formatting:

@@ -27,6 +27,7 @@ def validate_at_least_one_key_set(fields: dict):
 
 
 NonEmptyStr = Annotated[str, StringConstraints(min_length=1)]
+RuleName = Annotated[str, StringConstraints(pattern=r"^[^#]+$")]
 ColorHexRgb = Annotated[str, StringConstraints(pattern=r"#[0-9a-fA-F]{6}")]
 VersionString = Annotated[str, StringConstraints(pattern=r"\d+\.\d+\.\d+")]
 GroupNumberList = Annotated[List[PositiveInt], AfterValidator(validate_non_empty_list)]
@@ -118,7 +119,7 @@ class RegexGroupsHighlightingModel(BaseModel):
 
 
 class HighlightingRuleModel(BaseModel):
-    name: NonEmptyStr
+    name: RuleName
     pattern: Pattern
     priority: NonNegativeInt = 500
     highlighting: Optional[TextHighlightingModel] = None

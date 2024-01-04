@@ -1,0 +1,22 @@
+version: 0.1.0
+rules:
+    #
+    # Restore original formatting for <key>=<value> log lines
+    # Which could be broken by one of highlighting rules
+    # Example input: Configuring clns-7 for other apk /data/app/<...>==/base.apk. target_sdk_version=34, uses_libraries=ALL, library_path=<...>
+    #
+  - name: FalsePositiveRestore.ValueOf
+    pattern: '[|;,\s]+\w+\s*=\s*'
+    priority: 700
+    highlighting:
+      formatting:
+        - normal
+    #
+    # Restore original formatting for articles misunderstood as uppercase words
+    #
+  - name: FalsePositiveRestore.UppercaseWord
+    pattern: '\b(A|AN|THE)\b'
+    priority: 801
+    highlighting:
+      formatting:
+        - normal
