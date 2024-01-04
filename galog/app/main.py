@@ -103,6 +103,10 @@ class MainWindow(QMainWindow):
 
         self.logMessagesPaneController.setHighlightingRules(rules)
 
+    def cancelThreadPoolTasks(self):
+        QThreadPool.globalInstance().clear()
+        QThreadPool.globalInstance().waitForDone()
+
     def closeEvent(self, event: QEvent):
         if showPromptMsgBox(
             title="Close window",
@@ -110,6 +114,7 @@ class MainWindow(QMainWindow):
             body="If you close the window, current progress will be lost",
         ):
             self.logMessagesPaneController.stopCapture()
+            self.cancelThreadPoolTasks()
             event.accept()
         else:
             event.ignore()
