@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import (
 )
 
 from galog.app.util.painter import painterSaveRestore
+from galog.app.util.table_view import TableView as BaseTableView
 
 from .delegate import StyledItemDelegate
 from .filter_model import FilterModel
@@ -52,7 +53,7 @@ class VerticalHeader(QHeaderView):
         return QSize(fm.width(str(rowNum)) + 5, 0)
 
 
-class TableView(QTableView):
+class TableView(BaseTableView):
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
         self.initCustomDelegate()

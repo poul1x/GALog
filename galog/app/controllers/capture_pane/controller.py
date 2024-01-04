@@ -51,7 +51,7 @@ class CapturePaneController:
         self._pane.deviceDropDown.currentTextChanged.connect(self._deviceChanged)
         self._pane.fromApkButton.clicked.connect(self._fromApkButtonClicked)
         self._pane.packagesList.doubleClicked.connect(self._packageSelected)
-        self._pane.packagesList.activated.connect(self._packageSelected)
+        self._pane.packagesList.rowActivated.connect(self._packageSelected)
         self._pane.searchInput.activate.connect(self._packageMayBeSelected)
         self._pane.searchInput.textChanged.connect(self._searchQueryChanged)
         self._pane.selectButton.clicked.connect(self._selectButtonClicked)

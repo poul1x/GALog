@@ -15,6 +15,9 @@ class HotkeyHelper:
     def isEscapePressed(self):
         return self._event.key() == Qt.Key_Escape
 
+    def isSpacePressed(self):
+        return self._event.key() == Qt.Key_Space
+
     def isArrowPressed(self):
         return self._event.key() in [Qt.Key_Up, Qt.Key_Down, Qt.Key_Right, Qt.Key_Left]
 

@@ -63,7 +63,7 @@ class LogMessagesPaneController:
         self._highlightingRules = rules
 
     def takeControl(self, pane: LogMessagesPane):
-        pane.tableView.activated.connect(self._rowActivated)
+        pane.tableView.rowActivated.connect(self._rowActivated)
         pane.tableView.delegate.setHighlightingRules(self._highlightingRules)
         pane.tableView.delegate.lazyHighlighting.connect(self._lazyHighlighting)
         pane.dataModel.rowsAboutToBeInserted.connect(self._beforeRowInserted)

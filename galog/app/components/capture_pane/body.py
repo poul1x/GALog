@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QListView, QVBoxLayout, QWidget
 
 from galog.app.components.reusable.search_input import SearchInput
 from galog.app.util.hotkeys import HotkeyHelper
+from galog.app.util.list_view import ListView
 
 
 class SearchInputCanActivate(SearchInput):
@@ -36,7 +37,7 @@ class CapturePaneBody(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        self.packagesList = QListView(self)
+        self.packagesList = ListView(self)
         self.packagesList.setEditTriggers(QListView.NoEditTriggers)
 
         self.dataModel = QStandardItemModel(self)
