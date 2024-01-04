@@ -1,0 +1,31 @@
+name: Pull request accepted
+on:
+  pull_request:
+    branches: [main]
+    types: [closed]
+permissions:
+  contents: write
+jobs:
+  bump_version:
+    if: ${{ github.event.pull_request.merged }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR title
+        uses: deepakputhraya/action-pr-title@master
+        with:
+          regex: '(MAJOR|MINOR|PATCH): .+'
+      - name: Clone repository
+        uses: actions/checkout@v4
+      - name: Set up git
+        run: |
+           git config --global user.name "${{ vars.BOT_NAME }}"
+           git config --global user.email "${{ vars.BOT_EMAIL }}"
+      - name: Bump Version
+        run: |
+          pip3 install bump2version
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          VERSION_PART=$(echo $PR_TITLE | awk '{print tolower(substr($1, 1, length($1)-1))}')
+          bump2version $VERSION_PART
+      - name: Push changes
+        run: |
+          git push --follow-tags

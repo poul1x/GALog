@@ -1,0 +1,62 @@
+name: Release
+on:
+  push:
+    tags: ['[0-9]+\.[0-9]+\.[0-9]+']
+permissions:
+  contents: write
+jobs:
+  windows_release:
+    runs-on: windows-latest
+    steps:
+      - name: Setup UPX
+        uses: crazy-max/ghaction-upx@v3
+        with:
+          install-only: true
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build App
+        run: |
+          python3 -m venv venv
+          .\venv\Scripts\activate.ps1
+          pip install -r requirements-prod.txt
+          pyinstaller --name galog --windowed --exclude-module .\galog\tests --onedir .\galog\__main__.py
+          Copy-Item -Path LICENSE.txt, README.md -Destination .\dist\galog
+          Copy-Item -Path .\res -Destination .\dist\galog -Recurse
+      - name: Remove unused files
+        run: |
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\_bz2.pyd
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\_ctypes.pyd
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\_decimal.pyd
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\_hashlib.pyd
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\libcrypto-1_1.dll
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\libffi-7.dll
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\libssl-1_1.dll
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\_queue.pyd
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\_ssl.pyd
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\unicodedata.pyd
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\_uuid.pyd
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\PyQt5\Qt5\bin\d3dcompiler*.dll
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\PyQt5\Qt5\bin\libEGL.dll
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\PyQt5\Qt5\bin\libGLES*.dll
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\PyQt5\Qt5\bin\opengl32sw.dll
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\PyQt5\Qt5\bin\Qt5DBus.dll
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\PyQt5\Qt5\bin\Qt5Network.dll
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\PyQt5\Qt5\bin\Qt5Network.dll
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\PyQt5\Qt5\bin\Qt5Qml.dll
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\PyQt5\Qt5\bin\Qt5QmlModels.dll
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\PyQt5\Qt5\bin\Qt5Quick.dll
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\PyQt5\Qt5\bin\Qt5WebSockets.dll
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\PyQt5\Qt5\plugins\platforms\* -Exclude qwindows.dll
+          Remove-Item -ErrorAction SilentlyContinue -Path .\dist\galog\PyQt5\Qt5\plugins\imageformats\* -Exclude qjpeg.dll, qsvg.dll, qico.dll
+          Remove-Item -ErrorAction SilentlyContinue -Recurse -Path .\dist\galog\PyQt5\Qt5\translations
+      - name: Create release
+        run: |
+          $ARCHIVE_NAME="galog-$env:GITHUB_REF_NAME-win10-x64.zip"
+          Compress-Archive -Path .\dist\galog\* -DestinationPath $ARCHIVE_NAME
+          gh release create $env:GITHUB_REF_NAME $ARCHIVE_NAME
+        env:
+          GH_TOKEN: ${{ github.token }}
