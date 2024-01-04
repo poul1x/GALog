@@ -1,7 +1,7 @@
-from typing import List
+from typing import TYPE_CHECKING, List
 
 from PyQt5.QtCore import QModelIndex, Qt, QThread, QThreadPool
-from PyQt5.QtGui import QStandardItem, QStandardItemModel
+from PyQt5.QtGui import QStandardItem
 from PyQt5.QtWidgets import QTableView
 
 from galog.app.components.dialogs import LoadingDialog
@@ -27,8 +27,6 @@ from .log_reader import (
     ProcessStartedEvent,
 )
 from .search import SearchItem, SearchItemTask, SearchResult
-
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from galog.app.main import MainWindow

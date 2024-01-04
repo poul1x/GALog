@@ -2,9 +2,9 @@ from typing import Optional
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QKeyEvent
-from PyQt5.QtWidgets import QLineEdit, QProxyStyle, QStyle, QWidget, QApplication
-from galog.app.util.hotkeys import HotkeyHelper
+from PyQt5.QtWidgets import QApplication, QLineEdit, QProxyStyle, QStyle, QWidget
 
+from galog.app.util.hotkeys import HotkeyHelper
 from galog.app.util.paths import iconFile
 
 

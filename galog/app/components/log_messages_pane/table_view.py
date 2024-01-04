@@ -1,23 +1,15 @@
 from typing import Optional
-from PyQt5 import QtCore
 
-from PyQt5.QtCore import QRect, Qt, QSize
-from PyQt5.QtGui import QColor, QFont, QPainter, QFontMetrics, QFocusEvent
-from PyQt5.QtWidgets import (
-    QAbstractItemView,
-    QHeaderView,
-    QTableView,
-    QWidget,
-    QProxyStyle,
-    QStyle,
-)
+from PyQt5.QtCore import QRect, QSize, Qt
+from PyQt5.QtGui import QColor, QFont, QFontMetrics, QPainter
+from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QTableView, QWidget
 
 from galog.app.util.painter import painterSaveRestore
 from galog.app.util.table_view import TableView as BaseTableView
 
+from .data_model import Columns, DataModel
 from .delegate import StyledItemDelegate
 from .filter_model import FilterModel
-from .data_model import Columns, DataModel
 
 
 class VerticalHeader(QHeaderView):

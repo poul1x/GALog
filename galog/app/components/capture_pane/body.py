@@ -1,5 +1,3 @@
-from enum import Enum, auto
-
 from PyQt5.QtCore import QSortFilterProxyModel, Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent, QStandardItemModel
 from PyQt5.QtWidgets import QListView, QVBoxLayout, QWidget

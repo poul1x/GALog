@@ -1,9 +1,8 @@
-from typing import Optional
+import re
 
-from PyQt5.QtCore import pyqtSignal, QThread, QObject, QRunnable
+from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
 
 from galog.app.controllers.log_messages_pane.log_reader import LogLine
-import re
 
 REGEX_VTAG = r"^([A-Z])/(.+?): (.*)$"
 

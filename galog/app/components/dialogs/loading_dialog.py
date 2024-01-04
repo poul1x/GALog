@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QProgressBar
+from PyQt5.QtWidgets import QDialog, QLabel, QProgressBar, QVBoxLayout
 
 from galog.app.util.paths import styleSheetFile
 from galog.app.util.style import CustomStyle

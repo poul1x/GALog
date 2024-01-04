@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from re import Pattern
-from typing import Dict, List, Optional, Set
+from typing import List, Set
 
-from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
+from PyQt5.QtCore import QObject, QRunnable, pyqtSignal
 
 
 @dataclass
@@ -44,7 +44,6 @@ class SearchItemTask(QRunnable):
         self.signals.finished.emit(sorted(result, key=key))
 
     def _search(self, item: SearchItem):
-
         #
         # We need to find all matches (if needed), including group matches (if needed),
         # and convert them to SearchResult structures, giving lower priority

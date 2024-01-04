@@ -1,8 +1,15 @@
 from copy import deepcopy
 from typing import List, Optional
 
-from PyQt5.QtCore import QTimer, Qt
-from PyQt5.QtGui import QGuiApplication, QStandardItemModel, QTextCharFormat, QTextCursor, QFont, QColor
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import (
+    QColor,
+    QFont,
+    QGuiApplication,
+    QStandardItemModel,
+    QTextCharFormat,
+    QTextCursor,
+)
 
 from galog.app.components.log_messages_pane.data_model import Columns
 from galog.app.components.log_messages_pane.delegate import HighlightingData

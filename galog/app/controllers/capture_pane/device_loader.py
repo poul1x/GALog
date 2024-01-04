@@ -1,7 +1,8 @@
 from contextlib import suppress
 from typing import List, Optional
 
-from PyQt5.QtCore import QRunnable, pyqtSignal, QObject, QThread
+from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
+
 from galog.app.device import AdbClient, devicesRestricted
 from galog.app.device.errors import DeviceError
 

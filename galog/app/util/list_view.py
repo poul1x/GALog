@@ -1,7 +1,9 @@
 from typing import Optional
+
+from PyQt5.QtCore import QModelIndex, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QListView, QWidget
-from PyQt5.QtCore import pyqtSignal, QModelIndex
+
 from .hotkeys import HotkeyHelper
 
 

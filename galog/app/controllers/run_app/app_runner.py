@@ -1,6 +1,7 @@
 from typing import Optional
 
-from PyQt5.QtCore import pyqtSignal, QThread, QObject,QRunnable
+from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
+
 from galog.app.device import AdbClient, deviceRestricted
 from galog.app.device.errors import DeviceError
 

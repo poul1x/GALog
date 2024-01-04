@@ -1,18 +1,9 @@
-from copy import copy
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import List
 
-from PyQt5.QtCore import (
-    QModelIndex,
-    QSortFilterProxyModel,
-    Qt,
-    pyqtSignal,
-    QSize,
-    QRectF,
-)
+from PyQt5.QtCore import QModelIndex, QRectF, QSortFilterProxyModel, Qt, pyqtSignal
 from PyQt5.QtGui import (
-    QColor,
     QFont,
     QFontMetrics,
     QPainter,
@@ -20,7 +11,7 @@ from PyQt5.QtGui import (
     QTextCursor,
     QTextDocument,
 )
-from PyQt5.QtWidgets import QStyle, QStyleOptionViewItem, QStyledItemDelegate
+from PyQt5.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem
 
 from galog.app.controllers.log_messages_pane.search import SearchResult
 from galog.app.highlighting import HighlightingRules

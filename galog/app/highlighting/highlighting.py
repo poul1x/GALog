@@ -8,11 +8,11 @@ from PyQt5.QtGui import QColor, QFont, QTextCharFormat
 
 from .errors import RuleAlreadyExistsError, RuleNotFoundError
 from .model import (
-    HighlightingRulesetModel,
     HighlightingRuleModel,
+    HighlightingRulesetModel,
+    RegexGroupsHighlightingModel,
     TextColorModel,
     TextHighlightingModel,
-    RegexGroupsHighlightingModel,
 )
 
 

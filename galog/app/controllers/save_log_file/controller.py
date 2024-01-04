@@ -1,20 +1,16 @@
 from typing import List, Optional
-from zipfile import BadZipFile
 
 from PyQt5.QtCore import QThreadPool
 from PyQt5.QtWidgets import QFileDialog
 
-from galog.app.apk_info import APK
 from galog.app.components.dialogs import LoadingDialog
 from galog.app.controllers.log_messages_pane.log_reader import LogLine
-from galog.app.device import AdbClient
-from galog.app.util.message_box import showErrorMsgBox, showInfoMsgBox
+from galog.app.util.message_box import showErrorMsgBox
 
 from .log_file_writer import LogFileWriter
 
 
 class SaveLogFileController:
-
     def __init__(self, logLines: List[LogLine]) -> None:
         self._logLines = logLines
 

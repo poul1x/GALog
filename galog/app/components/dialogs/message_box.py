@@ -1,10 +1,11 @@
+import platform
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QMessageBox, QWidget
 
 from galog.app.util.paths import iconFile, styleSheetFile
 from galog.app.util.style import CustomStyle
-import platform
 
 
 class MessageBox(QMessageBox):

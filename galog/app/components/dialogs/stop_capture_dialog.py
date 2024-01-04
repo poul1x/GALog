@@ -1,6 +1,7 @@
 from enum import Enum, auto
 
 from PyQt5.QtWidgets import QCheckBox
+
 from .message_box import MessageBox
 
 

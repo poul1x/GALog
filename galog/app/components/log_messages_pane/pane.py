@@ -1,14 +1,12 @@
 from typing import Optional
 
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent, QFont, QFontMetrics
-from PyQt5.QtWidgets import QHBoxLayout, QHeaderView, QPushButton, QVBoxLayout, QWidget
+from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QVBoxLayout, QWidget
 
 from galog.app.components.reusable.search_input.widget import SearchInput
 from galog.app.util.hotkeys import HotkeyHelper
 
-from .data_model import Columns, DataModel
-from .filter_model import FilterModel
 from .table_view import TableView
 
 

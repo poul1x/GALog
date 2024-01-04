@@ -2,12 +2,12 @@ from re import Pattern
 from typing import List, Optional, Union
 
 from pydantic import (
+    AfterValidator,
     BaseModel,
     NonNegativeFloat,
     NonNegativeInt,
     PositiveInt,
     model_validator,
-    AfterValidator,
 )
 from pydantic.types import Annotated, StringConstraints
 from typing_extensions import Literal

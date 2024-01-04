@@ -1,14 +1,22 @@
-import sys
 import shutil
 import subprocess
+import sys
 import tarfile
 from contextlib import suppress
-from typing import List, Optional
+from typing import List
 
-from PyQt5.QtCore import QThreadPool, QEvent
+from PyQt5.QtCore import QEvent, QThreadPool
 from PyQt5.QtGui import QFontDatabase, QIcon
-from PyQt5.QtWidgets import QApplication, QMenu,QWidgetAction, QAction, QCheckBox, QStyle, QStyleOptionButton, QMainWindow
-
+from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QCheckBox,
+    QMainWindow,
+    QMenu,
+    QStyle,
+    QStyleOptionButton,
+    QWidgetAction,
+)
 
 from galog.app.components.capture_pane import CapturePane, RunAppAction
 from galog.app.components.dialogs.stop_capture_dialog import (
@@ -32,8 +40,9 @@ from galog.app.util.message_box import (
 from galog.app.util.paths import fontFiles, highlightingFiles, iconFile, styleSheetFiles
 from galog.app.util.style import CustomStyle
 
-from .strings import appStringsInit
 from .components.log_messages_pane import LogMessagesPane
+from .strings import appStringsInit
+
 
 class MainWindow(QMainWindow):
     _viewWindows: List[LogMessageViewPane]
@@ -185,7 +194,6 @@ class MainWindow(QMainWindow):
                 # controller.setAppDebug(action == RunAppAction.StartAppDebug)
                 controller.setAppDebug(False)
                 controller.runApp(device, package)
-
 
             self.logMessagesPaneController.makeWhiteBackground()
             self.logMessagesPaneController.disableMessageFilter()
