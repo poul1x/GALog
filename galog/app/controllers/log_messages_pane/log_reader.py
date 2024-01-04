@@ -5,7 +5,7 @@ import time
 from typing import Optional, Tuple
 
 from ppadb.connection import Connection
-from PyQt5.QtCore import *
+from PyQt5.QtCore import pyqtSignal, QThreadPool, QThread, QObject
 
 from galog.app.device import AdbClient, deviceRestricted
 from galog.app.device.device import AdbDevice

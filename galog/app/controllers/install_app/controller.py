@@ -1,9 +1,8 @@
 from typing import Optional
 from zipfile import BadZipFile
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import QThreadPool
+from PyQt5.QtWidgets import QFileDialog
 
 from galog.app.apk_info import APK
 from galog.app.components.dialogs import LoadingDialog

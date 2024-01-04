@@ -1,8 +1,6 @@
 from typing import Optional
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import pyqtSignal, QThread, QObject, QRunnable
 
 from galog.app.controllers.log_messages_pane.log_reader import LogLine
 import re

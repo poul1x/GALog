@@ -5,10 +5,9 @@ import tarfile
 from contextlib import suppress
 from typing import List, Optional
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import QThreadPool, QEvent
+from PyQt5.QtGui import QFontDatabase, QIcon
+from PyQt5.QtWidgets import QApplication, QMenu,QWidgetAction, QAction, QCheckBox, QStyle, QStyleOptionButton, QMainWindow
 
 
 from galog.app.components.capture_pane import CapturePane, RunAppAction

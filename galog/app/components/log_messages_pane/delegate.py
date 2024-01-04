@@ -20,7 +20,7 @@ from PyQt5.QtGui import (
     QTextCursor,
     QTextDocument,
 )
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QStyle, QStyleOptionViewItem, QStyledItemDelegate
 
 from galog.app.controllers.log_messages_pane.search import SearchResult
 from galog.app.highlighting import HighlightingRules

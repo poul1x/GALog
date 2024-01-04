@@ -1,6 +1,4 @@
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import QThreadPool
 
 from galog.app.components.dialogs import LoadingDialog
 from galog.app.device import AdbClient

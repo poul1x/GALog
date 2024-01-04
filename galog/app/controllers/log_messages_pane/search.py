@@ -2,10 +2,7 @@ from dataclasses import dataclass
 from re import Pattern
 from typing import Dict, List, Optional, Set
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-
+from PyQt5.QtCore import QRunnable, pyqtSignal, QObject
 
 
 @dataclass
