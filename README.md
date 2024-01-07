@@ -20,12 +20,12 @@
 > [!NOTE]
 > Prebuilt executables are available for Windows 10 (x64 bit) on the [releases](https://github.com/poul1x/galog/releases) page.
 
-Clone repository and install dependencies:
+Clone repository and install dependencies with powershell commands:
 
 ```powershell
 git clone https://github.com/poul1x/galog.git
 cd galog
-python3 -m venv venv
+py -3 -m venv venv
 .\venv\Scripts\activate.ps1
 pip install -r requirements-prod.txt
 ```
@@ -33,15 +33,15 @@ pip install -r requirements-prod.txt
 Run galog as a python module:
 
 ```powershell
-python3 -m galog
+python -m galog
 ```
 
 Optionally, you can build and run an executable file:
 
 ```powershell
 pyinstaller --name galog --onefile galog/__main__.py
-Copy-Item -Path .\res -Destination .\dist\galog -Recurse
-.\dist\galog\galog.exe
+Copy-Item -Path .\res -Destination .\dist -Recurse
+.\dist\galog.exe
 ```
 
 ### Linux & Mac
@@ -59,15 +59,15 @@ pip install -r requirements-prod.txt
 Run galog as a python module:
 
 ```bash
-python3 -m galog
+python -m galog
 ```
 
 Optionally, you can build and run an executable file:
 
 ```bash
 pyinstaller --name galog --onefile galog/__main__.py
-cp -r ./res -Destination ./dist/galog
-./dist/galog/galog
+cp -r ./res -Destination ./dist
+./dist/galog
 ```
 
 ## Documentation
