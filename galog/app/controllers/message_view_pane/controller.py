@@ -40,7 +40,7 @@ class LogMessageViewPaneController:
     def _highlightingData(self, row: int) -> HighlightingData:
         return self._dataModel.item(row, Columns.logMessage).data(Qt.UserRole)
 
-    def showContentFor(self, row: int):
+    def showContentFor(self, row: int, highlightingEnabled: bool):
         tagName = self._dataModel.item(row, Columns.tagName).text()
         logLevel = self._dataModel.item(row, Columns.logLevel).text()
         logMessage = self._dataModel.item(row, Columns.logMessage).text()
@@ -50,7 +50,8 @@ class LogMessageViewPaneController:
         self.setLogLevel(logLevel)
         self.setLogMessage(logMessage)
         self.setStyleSheetAuto(logLevel)
-        self.applyHighlighting(self._hRules, hData.items)
+        if highlightingEnabled:
+            self.applyHighlighting(hData.items)
         self._pane.exec_()
 
     def copyButtonClickedEnd(self, oldText: str):
@@ -127,10 +128,10 @@ class LogMessageViewPaneController:
         styleSheet = styleSheet.replace("$color_darker$", colorDarker)
         self._pane.setStyleSheet(styleSheet)
 
-    def applyHighlighting(self, ruleset: HighlightingRules, items: List[SearchResult]):
+    def applyHighlighting(self, items: List[SearchResult]):
         for item in items:
             ruleName, groupNumStr = item.name.split("#")
-            rule = ruleset.findRule(ruleName)
+            rule = self._hRules.findRule(ruleName)
             groupNum = int(groupNumStr)
 
             charFormat = rule.match

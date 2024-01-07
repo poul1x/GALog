@@ -55,6 +55,9 @@ class StyledItemDelegate(QStyledItemDelegate):
     def setHighlightingEnabled(self, enabled: bool):
         self._highlightingEnabled = enabled
 
+    def highlightingEnabled(self):
+        return self._highlightingEnabled
+
     def _initFont(self):
         self._font = QFont()
         self._font.setFamily("Roboto Mono")

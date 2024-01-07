@@ -143,7 +143,8 @@ class LogMessagesPaneController:
     def _showContentFor(self, index: QModelIndex):
         viewPane = LogMessageViewPane(self._pane)
         self._viewPaneController.takeControl(viewPane)
-        self._viewPaneController.showContentFor(index.row())
+        highlightingEnabled = self._pane.tableView.delegate.highlightingEnabled()
+        self._viewPaneController.showContentFor(index.row(), highlightingEnabled)
 
     def _rowActivated(self, index: QModelIndex):
         if self._pane.filterModel.filteringEnabled():
