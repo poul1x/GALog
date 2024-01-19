@@ -63,7 +63,7 @@ class TableView(BaseTableView):
 
         self.setCornerButtonEnabled(False)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.setSelectionMode(QTableView.SingleSelection)
+        self.setSelectionMode(QTableView.ExtendedSelection)
         self.setTabKeyNavigation(False)
         self.setShowGrid(False)
 

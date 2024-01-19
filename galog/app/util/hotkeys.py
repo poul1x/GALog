@@ -21,6 +21,9 @@ class HotkeyHelper:
     def isArrowPressed(self):
         return self._event.key() in [Qt.Key_Up, Qt.Key_Down, Qt.Key_Right, Qt.Key_Left]
 
+    def isCtrlCPressed(self):
+        return self._event.key() == Qt.Key_C and self.isCtrlPressed()
+
     def isCtrlDPressed(self):
         return self._event.key() == Qt.Key_D and self.isCtrlPressed()
 

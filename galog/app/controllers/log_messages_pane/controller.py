@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, List
 
 from PyQt5.QtCore import QModelIndex, Qt, QThread, QThreadPool
-from PyQt5.QtGui import QStandardItem
+from PyQt5.QtGui import QStandardItem, QStandardItemModel, QGuiApplication
 from PyQt5.QtWidgets import QTableView
 
 from galog.app.components.dialogs import LoadingDialog
@@ -69,6 +69,7 @@ class LogMessagesPaneController:
         pane.searchPane.input.returnPressed.connect(self._applyMessageFilter)
         pane.searchPane.button.clicked.connect(self._applyMessageFilter)
         pane.toggleMessageFilter.connect(self._toggleMessageFilter)
+        pane.copyRowsToClipboard.connect(self._copyRowsToClipboard)
         self._pane = pane
         self._scrolling = True
         self._backToFilter = None
@@ -271,6 +272,7 @@ class LogMessagesPaneController:
 
     def enableMessageFilter(self, reset: bool = True):
         self._showLineNumbers()
+        self._pane.tableView.setSelectionMode(QTableView.SingleSelection)
         self._pane.filterModel.setFilteringEnabled(True)
         self._pane.searchPane.input.setFocusPolicy(Qt.TabFocus)
         self._pane.searchPane.input.setFocus()
@@ -281,6 +283,7 @@ class LogMessagesPaneController:
 
     def disableMessageFilter(self):
         self._hideLineNumbers()
+        self._pane.tableView.setSelectionMode(QTableView.ExtendedSelection)
         self._pane.filterModel.setFilteringEnabled(False)
         self._pane.tableView.reset()
         self._pane.searchPane.input.setFocusPolicy(Qt.NoFocus)
@@ -327,19 +330,32 @@ class LogMessagesPaneController:
         self._pane.tableView.delegate.setHighlightingEnabled(enabled)
         self._refreshVisibleIndexes()
 
+    def _logLine(self, model: QStandardItemModel, row: int):
+        return LogLine(
+            level=model.item(row, Columns.logLevel).text(),
+            msg=model.item(row, Columns.logMessage).text(),
+            tag=model.item(row, Columns.tagName).text(),
+            pid=-1,
+        )
+
     def logLines(self):
         model = self._pane.dataModel
-
-        def logLine(i: int):
-            return LogLine(
-                level=model.item(i, Columns.logLevel).text(),
-                msg=model.item(i, Columns.logMessage).text(),
-                tag=model.item(i, Columns.tagName).text(),
-                pid=-1,
-            )
-
-        return [logLine(i) for i in range(model.rowCount())]
+        return [self._logLine(model, i) for i in range(model.rowCount())]
 
     def addLogLines(self, lines: List[LogLine]):
         for line in lines:
             self.addLogLine(line)
+
+    def _copyRowsToClipboard(self):
+        indexes = self._pane.tableView.selectedIndexes()
+        if not indexes:
+            return
+
+        lines = []
+        model = self._pane.dataModel
+        for row in set([index.row() for index in indexes]):
+            line = self._logLine(model, row)
+            lines.append(f"{line.level}/{line.tag}: {line.msg}")
+
+        clip = QGuiApplication.clipboard()
+        clip.setText("\n".join(lines))
