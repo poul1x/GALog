@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, List
 
 from PyQt5.QtCore import QModelIndex, Qt, QThread, QThreadPool
-from PyQt5.QtGui import QStandardItem, QStandardItemModel, QGuiApplication
+from PyQt5.QtGui import QGuiApplication, QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QTableView
 
 from galog.app.components.dialogs import LoadingDialog
