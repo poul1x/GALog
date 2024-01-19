@@ -1,0 +1,51 @@
+version: 0.1.0
+rules:
+  - name: SmaliFunctionDeclaration
+    # Accessing hidden method Landroid/view/View;->computeFitSystemWindows(Landroid/graphics/Rect;Landroid/graphics/Rect;)Z (unsupported, reflection, allowed)
+    pattern: '(L.+)(;->)(.+)(\()([^(]*)(\))(I|J|F|D|Z|S|B|C|V|L\S+)'
+    priority: 601
+    groups:
+      - numbers: [1]
+        highlighting:
+          formatting:
+            - italic
+      - numbers: [2]
+        highlighting:
+          formatting:
+            - normal
+            - semibold
+      - numbers: [3]
+        highlighting:
+          formatting:
+            - normal
+            - underline
+      - numbers: [4,6]
+        highlighting:
+          formatting:
+            - normal
+      - numbers: [5]
+        highlighting:
+          formatting:
+            - italic
+      - numbers: [7]
+        highlighting:
+          formatting:
+            - italic
+  - name: UniversalFunctionDeclaration
+    # some.example.Class.methodName(int param1, String param2, ...)
+    pattern: '([a-zA-Z0-9_.:$<>]+)(\()(.*)(\))'
+    priority: 600
+    groups:
+      - numbers: [1]
+        highlighting:
+          formatting:
+            - normal
+            - underline
+      - numbers: [2, 4]
+        highlighting:
+          formatting:
+            - normal
+      - numbers: [3]
+        highlighting:
+          formatting:
+            - italic

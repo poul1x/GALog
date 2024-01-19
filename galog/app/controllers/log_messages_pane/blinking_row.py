@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
+from PyQt5.QtCore import QObject, QRunnable, Qt, QThread, QThreadPool, pyqtSignal
 
 from galog.app.components.log_messages_pane import LogMessagesPane
 from galog.app.components.log_messages_pane.data_model import Columns

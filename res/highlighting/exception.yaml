@@ -1,0 +1,125 @@
+version: 0.1.0
+rules:
+  - name: FatalExceptionMain
+    pattern: 'FATAL EXCEPTION: main'
+    priority: 800
+    highlighting:
+      formatting:
+        - bold
+  - name: ExceptionProcess
+    pattern: 'Process:\s+(.+), PID: (\d+)'
+    priority: 800
+    groups:
+      - numbers: [1, 2]
+        highlighting:
+          formatting:
+            - underline
+            - semibold
+    highlighting:
+      colors:
+        background:
+          value: black
+          alpha: 0.1
+  - name: ExceptionWithMessage
+    # java.net.SocketTimeoutException: Read timed out
+    pattern: '^(.+Exception): (.+)$'
+    priority: 799
+    groups:
+      - numbers: [1]
+        highlighting:
+          formatting:
+            - bold
+            - underline
+      - numbers: [2]
+        highlighting:
+          formatting:
+            - normal
+
+  - name: StacktraceLine
+    # at com.android.okhttp.internal.huc.DelegatingHttpsURLConnection.connect(DelegatingHttpsURLConnection.java:90)
+    pattern: '(at) (.+)(\()(.+)(\))'
+    priority: 800
+    groups:
+      - numbers: [1]
+        highlighting:
+          formatting:
+            - italic
+      - numbers: [2]
+        highlighting:
+          formatting:
+            - normal
+            - underline
+      - numbers: [3, 5]
+        highlighting:
+          formatting:
+            - normal
+      - numbers: [4]
+        highlighting:
+          formatting:
+            - italic
+  - name: NativeStacktraceLine.variant1
+    # native: #00 pc 00085c9c  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+28) (BuildId: ddfcb9d4fd7d4d5ecb9d226c1e8e24dd)
+    # native: #01 pc 004b0dd4  /apex/com.android.art/lib64/libart.so (art::Thread::DumpStack const+388) (BuildId: 735f12f804f88d62a2cb437261076ff7)
+    # native: #10 pc 000296cc  /data/data/ru.example.myapp/cache/gTgaMddAwdp7833.so (???) (BuildId: 52d00c800764cddad5cf9bdf714a188ade4a7113)
+    # native: #22 pc 00100edc  /apex/com.android.art/javalib/core-oj.jar (java.lang.Runtime.nativeLoad)
+    # native: #00 pc 0000000000411f14  /apex/com.android.runtime/lib64/libart.so (art::DumpNativeStack(std::__1::basic_ostream<char, std::__1::char_traits<char>>&, int, BacktraceMap*, char const*, art::ArtMethod*, void*, bool)+140)
+    pattern: '(native): (#\d+) pc ([0-9a-fA-F]+)\s+(\S+) (\()(.+)(\))'
+    priority: 800
+    groups:
+      - numbers: [1]
+        highlighting:
+          formatting:
+            - italic
+      - numbers: [2]
+        highlighting:
+          formatting:
+            - italic
+            - semibold
+      - numbers: [3]
+        highlighting:
+          formatting:
+            - italic
+      - numbers: [4]
+        highlighting:
+          formatting:
+            - italic
+            - underline
+      - numbers: [5,7]
+        highlighting:
+          formatting:
+            - normal
+      - numbers: [6]
+        highlighting:
+          formatting:
+            - italic
+  - name: NativeStacktraceLine.variant2
+    # native: #37 pc 00001268  [anon:dalvik-classes5.dex extracted in memory from /data/app/~~9UahijttdWY8UqyQiJ7BwQ==/ru.example.app-58_xcPK2lxCUZDLDn9DWGw==/base.apk!classes5.dex] (ru.example.app..DgfUllQesljxW.<init>)
+    # native: #42 pc 0000000000005ec2  [anon:dalvik-classes31.dex extracted in memory from /data/app/com.mwegener.cabernetco-ffzE7pkXCQ6UtMxsA-RnvQ==/base.apk!classes31.dex] (com.swmansion.reanimated.NodesManager.handleEvent+66)
+    pattern: '(native): (#\d+) pc ([0-9a-fA-F]+)\s+(\[.+\]) (\()(.+)(\))'
+    priority: 800
+    groups:
+      - numbers: [1]
+        highlighting:
+          formatting:
+            - italic
+      - numbers: [2]
+        highlighting:
+          formatting:
+            - italic
+            - semibold
+      - numbers: [3]
+        highlighting:
+          formatting:
+            - italic
+      - numbers: [4]
+        highlighting:
+          formatting:
+            - normal
+      - numbers: [5, 7]
+        highlighting:
+          formatting:
+            - normal
+      - numbers: [6]
+        highlighting:
+          formatting:
+            - italic
