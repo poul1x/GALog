@@ -17,6 +17,7 @@ class SearchItem:
 class SearchResult:
     name: str
     priority: int
+    groupNum: int
     begin: int
     end: int
 
@@ -58,7 +59,14 @@ class SearchItemTask(QRunnable):
                 if groupNum not in item.groups:
                     continue
 
-                name = f"{item.name}#{groupNum}"
-                priority = item.priority + groupNum
-                start, end = match.start(groupNum), match.end(groupNum)
-                yield SearchResult(name, priority, start, end)
+                start, end = match.span(groupNum)
+                if start == -1 or end == -1:
+                    continue
+
+                yield SearchResult(
+                    item.name,
+                    item.priority + groupNum,
+                    groupNum,
+                    start,
+                    end,
+                )

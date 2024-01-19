@@ -130,9 +130,8 @@ class LogMessageViewPaneController:
 
     def applyHighlighting(self, items: List[SearchResult]):
         for item in items:
-            ruleName, groupNumStr = item.name.split("#")
-            rule = self._hRules.findRule(ruleName)
-            groupNum = int(groupNumStr)
+            rule = self._hRules.findRule(item.name)
+            groupNum = item.groupNum
 
             charFormat = rule.match
             if groupNum != 0:
