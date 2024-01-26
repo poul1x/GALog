@@ -12,11 +12,11 @@ rules:
     priority: 800
     highlighting:
       formatting:
-        - normal
-      colors:
-        background:
-          value: black
-          alpha: 0.05
+        - semibold
+      # colors:
+      #   background:
+      #     value: black
+      #     alpha: 0.05
     # Couldn't make a copy of "qwerty"
     # "hello world"
     # Fill "x" with y
@@ -30,11 +30,7 @@ rules:
     priority: 800
     highlighting:
       formatting:
-        - normal
-      colors:
-        background:
-          value: black
-          alpha: 0.05
+        - semibold
   - name: UppercaseWord
     pattern: >-
       \b[A-Z_]{2,}\b
