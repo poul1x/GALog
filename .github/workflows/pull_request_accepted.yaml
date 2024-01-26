@@ -13,7 +13,7 @@ jobs:
       - name: Check PR title
         uses: deepakputhraya/action-pr-title@master
         with:
-          regex: '(MAJOR|MINOR|PATCH): .+'
+          regex: '^(MAJOR|MINOR|PATCH): [^&|;$><\\\(\)#]+$'
       - name: Clone repository
         uses: actions/checkout@v4
         with:
@@ -23,9 +23,10 @@ jobs:
            git config --global user.name "${{ vars.BOT_NAME }}"
            git config --global user.email "${{ vars.BOT_EMAIL }}"
       - name: Bump Version
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           pip3 install bump2version
-          PR_TITLE="${{ github.event.pull_request.title }}"
           VERSION_PART=$(echo $PR_TITLE | awk '{print tolower(substr($1, 1, length($1)-1))}')
           bump2version $VERSION_PART
       - name: Push changes

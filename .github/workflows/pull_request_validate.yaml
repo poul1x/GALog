@@ -12,4 +12,4 @@ jobs:
       - name: Check PR title
         uses: deepakputhraya/action-pr-title@master
         with:
-          regex: '(MAJOR|MINOR|PATCH): .+'
+          regex: '^(MAJOR|MINOR|PATCH): [^&|;$><\\\(\)#]+$'
