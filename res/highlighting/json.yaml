@@ -1,7 +1,22 @@
 version: 0.1.0
 rules:
-  - name: JsonKey
-    pattern: '(")(.*)(")\s*(:)'
+  - name: OneLinerJsonKey
+    pattern: >-
+      [,{]+(\")((?:\\\"|[^\"])*)(\")\s*(:)
+    priority: 900
+    groups:
+      - numbers: [1,3]
+        highlighting:
+          formatting:
+            - thin
+            - italic
+      - numbers: [2, 4]
+        highlighting:
+          formatting:
+            - italic
+  - name: MultilineJsonKey
+    pattern: >-
+      ^ *(\")((?:\\\"|[^\"])*)(\")\s*(:)
     priority: 900
     groups:
       - numbers: [1,3]
