@@ -2,7 +2,7 @@ version: 0.1.0
 rules:
   - name: DotSeparatedWords
     pattern: >-
-      \w+(\.\w+)+
+      [\w$\-]+(\.[\w$\-]+)+
     priority: 501
     highlighting:
       formatting:
