@@ -6,35 +6,18 @@ rules:
     highlighting:
       formatting:
         - bold
-  - name: ExceptionProcess
-    pattern: 'Process:\s+(.+), PID: (\d+)'
-    priority: 800
-    groups:
-      - numbers: [1, 2]
-        highlighting:
-          formatting:
-            - underline
-            - semibold
-    highlighting:
-      colors:
-        background:
-          value: black
-          alpha: 0.1
   - name: ExceptionWithMessage
     # java.net.SocketTimeoutException: Read timed out
-    pattern: '^(.+Exception): (.+)$'
+    # <-- HTTP FAILED: java.net.UnknownHostException: Unable to
+    # Error received: id: [NetworkLayerException]
+    # NetworkLayerException(exception=java.net.UnknownHostException: Unable to resolve host
+    pattern: >-
+      ([a-zA-Z0-9._$]+Exception)
     priority: 799
-    groups:
-      - numbers: [1]
-        highlighting:
-          formatting:
-            - bold
-            - underline
-      - numbers: [2]
-        highlighting:
-          formatting:
-            - normal
-
+    highlighting:
+      formatting:
+        - bold
+        - underline
   - name: StacktraceLine
     # at com.android.okhttp.internal.huc.DelegatingHttpsURLConnection.connect(DelegatingHttpsURLConnection.java:90)
     pattern: '(at) (.+)(\()(.+)(\))'

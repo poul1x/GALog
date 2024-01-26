@@ -1,19 +1,22 @@
 version: 0.1.0
 rules:
   - name: DecimalNumber
-    pattern: '\b-?\d+(\.\d+)?([a-zA-Z]+)?\b'
+    pattern: >-
+      \b-?\d+(\.\d+)?([a-zA-Z]+)?\b
     priority: 500
     highlighting:
       formatting:
         - italic
   - name: HexadecimalNumber
-    pattern: '0x[0-9a-fA-F]+'
+    pattern: >-
+      0x[0-9a-fA-F]+
     priority: 501
     highlighting:
       formatting:
         - medium
   - name: HashSymbolWithDigits
-    pattern: '#\d+'
+    pattern: >-
+      #\d+
     priority: 501
     highlighting:
       formatting:

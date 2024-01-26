@@ -1,14 +1,16 @@
 version: 0.1.0
 rules:
   - name: UndefinedOrNullSmall
-    pattern: '\b(undefined|null|nullptr)\b'
+    pattern: >-
+      \b(undefined|null|nullptr)\b
     priority: 600
     highlighting:
       formatting:
         - italic
         - medium
   - name: UndefinedOrNullBig
-    pattern: '\b(UNDEFINED|NULL)\b'
+    pattern: >-
+      \b(UNDEFINED|NULL)\b
     priority: 600
     highlighting:
       formatting:

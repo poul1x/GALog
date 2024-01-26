@@ -1,8 +1,9 @@
 version: 0.1.0
 rules:
-  - name: SmaliFunctionDeclaration
-    # Accessing hidden method Landroid/view/View;->computeFitSystemWindows(Landroid/graphics/Rect;Landroid/graphics/Rect;)Z (unsupported, reflection, allowed)
-    pattern: '(L.+)(;->)(.+)(\()([^(]*)(\))(I|J|F|D|Z|S|B|C|V|L\S+)'
+  - name: SmaliFieldDeclaration
+    # Accessing hidden field Ljava/util/Collections$SynchronizedCollection;->mutex:Ljava/lang/Object; (max-target-o, reflection, denied)
+    pattern: >-
+      (L.+;)(->)(.+):(I|J|F|D|Z|S|B|C|V|L\S+)
     priority: 601
     groups:
       - numbers: [1]
@@ -18,7 +19,30 @@ rules:
         highlighting:
           formatting:
             - normal
-            - underline
+      - numbers: [4]
+        highlighting:
+          formatting:
+            - normal
+            - italic
+  - name: SmaliFunctionDeclaration
+    # Accessing hidden method Landroid/view/View;->computeFitSystemWindows(Landroid/graphics/Rect;Landroid/graphics/Rect;)Z (unsupported, reflection, allowed)
+    pattern: >-
+      (L.+;)(->)(.+)(\()([^(]*)(\))(I|J|F|D|Z|S|B|C|V|L\S+)
+    priority: 601
+    groups:
+      - numbers: [1]
+        highlighting:
+          formatting:
+            - italic
+      - numbers: [2]
+        highlighting:
+          formatting:
+            - normal
+            - semibold
+      - numbers: [3]
+        highlighting:
+          formatting:
+            - normal
       - numbers: [4,6]
         highlighting:
           formatting:
@@ -31,9 +55,31 @@ rules:
         highlighting:
           formatting:
             - italic
+  - name: SmaliClassMethod
+    # Method Landroid/webkit/TracingController;.stop is abstract
+    pattern: >-
+      (L.+);(\.)(\S+)
+    priority: 601
+    highlighting:
+      formatting:
+        - italic
+        - underline
+  - name: SmaliComplexType
+    # Method Landroid/webkit/TracingController;.stop is abstract
+    pattern: >-
+      (L.+);
+    priority: 500
+    groups:
+      - numbers: [1]
+        highlighting:
+          formatting:
+            - italic
+            - underline
   - name: UniversalFunctionDeclaration
     # some.example.Class.methodName(int param1, String param2, ...)
-    pattern: '([a-zA-Z0-9_.:$<>]+)(\()(.*)(\))'
+    # Verification of android.os.Bundle com.passport.internal.provider.InternalProvider.b(java.lang.String, java.lang.String, android.os.Bundle) took 257.416ms (2540.63 bytecodes/s) (14080B approximate peak alloc)
+    pattern: >-
+      (?<!\w)([a-zA-Z0-9_.:$<>]+)(\()(.*?)(\))
     priority: 600
     groups:
       - numbers: [1]
