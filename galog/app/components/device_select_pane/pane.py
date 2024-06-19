@@ -1,50 +1,34 @@
 from typing import Optional
 
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent, QStandardItem
-from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QVBoxLayout, QWidget, QDialog, QApplication, QComboBox
+from PyQt5.QtGui import QKeyEvent, QStandardItem, QIcon
+from PyQt5.QtWidgets import (
+    QHBoxLayout,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+    QDialog,
+    QApplication,
+    QComboBox,
+)
 from galog.app.components.capture_pane.body import SearchInputCanActivate
 
 from galog.app.components.reusable.search_input.widget import SearchInput
 from galog.app.util.hotkeys import HotkeyHelper
 
-from .table_view import TableView
+from galog.app.util.paths import iconFile
 
-from .header import DeviceSelectPaneHeader
-from .footer import DeviceSelectPaneFooter
+from .adb_server_address import AdbServerAddress
+from .device_table import DeviceTable
+from .button_bar import ButtonBar
 
 
 class DeviceSelectPane(QDialog):
-    toggleMessageFilter = pyqtSignal()
-    copyRowsToClipboard = pyqtSignal()
-
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.setObjectName("DeviceSelectPane")
         self.setAttribute(Qt.WA_StyledBackground)
         self.initUserInterface()
-        self.dataModel.append(
-            QStandardItem("RF8T213A4YW"),
-            QStandardItem("Google Pixel 4a (sunfish)"),
-            QStandardItem("Android 12 (API Level: 23-31)"),
-            QStandardItem("arm-v64"),
-        )
-
-        self.dataModel.append(
-            QStandardItem("nm87weerty4"),
-            QStandardItem("Samsung SM-M127F (m12nsxx)"),
-            QStandardItem("Android 12 (API Level: ?-?)"),
-            QStandardItem("arm-v64"),
-        )
-
-        self.dataModel.append(
-            QStandardItem("ert45tgf"),
-            QStandardItem("Error: failed to get XXXX"),
-            QStandardItem(""),
-            QStandardItem(""),
-        )
-
-        self.tableView.setSpan(2, 1, 1, self.dataModel.columnCount())
         self.setGeometryAuto()
 
     # def keyPressEvent(self, event: QKeyEvent):
@@ -57,31 +41,33 @@ class DeviceSelectPane(QDialog):
     #         super().keyPressEvent(event)
 
     def initUserInterface(self):
-        self.tableView = TableView(self)
-        self.dataModel = self.tableView.dataModel
-        self.filterModel = self.tableView.filterModel
 
+        hBoxLayoutTop = QHBoxLayout()
+        alignLeft = Qt.AlignLeft | Qt.AlignVCenter
+        alignRight = Qt.AlignRight | Qt.AlignVCenter
 
+        self.adbServerAddress = AdbServerAddress(self)
+        hBoxLayoutTop.addWidget(self.adbServerAddress, alignment=alignLeft)
 
-        layout = QVBoxLayout()
-        layout.addWidget(DeviceSelectPaneHeader(self))
-        layout.addWidget(self.tableView)
+        self.reloadButton = QPushButton(self)
+        self.reloadButton.setIcon(QIcon(iconFile("reload")))
+        self.reloadButton.setText("Reload devices")
+        hBoxLayoutTop.addWidget(self.reloadButton, alignment=alignRight)
 
-        layout2 = QHBoxLayout()
+        ############################################################
+        # Layout Main
+        ############################################################
 
-        # layout.addWidget(self.tableView, 1)
-        self.searchInput = SearchInputCanActivate(self)
-        self.searchInput.setPlaceholderText("Search device by serial")
-        layout2.addWidget(self.searchInput, 1)
+        vBoxLayoutMain = QVBoxLayout()
+        vBoxLayoutMain.addLayout(hBoxLayoutTop)
 
-        self.searchTypeDropdown = QComboBox(self)
-        self.searchTypeDropdown.addItem("Serial")
-        self.searchTypeDropdown.addItem("Name")
-        layout2.addWidget(self.searchTypeDropdown)
+        self.deviceTable = DeviceTable(self)
+        vBoxLayoutMain.addWidget(self.deviceTable)
 
-        layout.addLayout(layout2)
-        layout.addWidget(DeviceSelectPaneFooter(self))
-        self.setLayout(layout)
+        buttonBar = ButtonBar(self)
+        vBoxLayoutMain.addWidget(buttonBar)
+
+        self.setLayout(vBoxLayoutMain)
 
         # self.searchPane.button.setFocusPolicy(Qt.NoFocus)
         # self.searchPane.input.setFocusPolicy(Qt.NoFocus)

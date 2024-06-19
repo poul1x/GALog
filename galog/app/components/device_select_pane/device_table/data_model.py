@@ -25,7 +25,7 @@ class DataModel(QStandardItemModel):
         labels = ["Device Serial", "Device name", "Build info", "CPU ABI"]
         self.setHorizontalHeaderLabels(labels)
 
-    def append(
+    def addDevice(
         self,
         itemDeviceSerial: QStandardItem,
         itemDeviceName: QStandardItem,

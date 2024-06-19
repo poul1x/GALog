@@ -3,17 +3,10 @@ from enum import Enum, auto
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QSizePolicy, QWidget
 
-
-class RunAppAction(int, Enum):
-    StartApp = auto()
-    StartAppDebug = auto()
-    DoNotStartApp = auto()
-
-
-class DeviceSelectPaneFooter(QWidget):
+class ButtonBar(QWidget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.setObjectName("DeviceSelectPaneFooter")
+        self.setObjectName("ButtonBar")
         self.setAttribute(Qt.WA_StyledBackground)
         self.initUserInterface()
 
