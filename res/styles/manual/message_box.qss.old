@@ -1,0 +1,69 @@
+QMessageBox {
+    background-color: #ffffff;
+}
+
+QMessageBox > QLabel{
+	min-width: 300px;
+}
+
+QMessageBox > QCheckBox {
+	font-family: Arial;
+	font-style: italic;
+	font-size: 20px;
+}
+
+QMessageBox > QCheckBox::indicator {
+	width: 22px;
+	height: 22px;
+}
+
+#qt_msgbox_label {
+	font-family: Arial;
+	font-size: 20px;
+	font-weight: bold;
+	color: #464646;
+    margin-top: 5px;
+}
+
+#qt_msgbox_informativelabel {
+	font-family: Arial;
+	font-size: 20px;
+	color: #464646;
+    margin: 5px;
+}
+
+#qt_msgbox_buttonbox {
+	background: #464646;
+}
+
+#qt_msgbox_buttonbox > QPushButton {
+	font-family: Arial;
+	font-size: 22px;
+	color: #000000;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 30px;
+    padding-right: 30px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+	margin-right: 10px;
+	background: #c8dcff;
+    border: none;
+}
+
+#qt_msgbox_buttonbox[os=windows] > QPushButton {
+    margin-top: 0px;
+}
+
+#qt_msgbox_buttonbox > QPushButton:disabled {
+	color: #464646
+}
+
+#qt_msgbox_buttonbox > QPushButton:focus {
+	background: #a0c3ff;
+}
+
+#qt_msgbox_buttonbox > QPushButton:hover {
+	background: #739fff;
+	color: white;
+}
