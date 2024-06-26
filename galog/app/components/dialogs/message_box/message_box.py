@@ -1,29 +1,21 @@
 from typing import Optional
 
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QApplication,
-    QWidget,
-    QHBoxLayout,
-    QDialog,
-    QPushButton,
-    QLabel,
     QCheckBox,
+    QDialog,
+    QLabel,
     QVBoxLayout,
+    QWidget,
 )
 
-from galog.app.util.paths import iconFile, styleSheetFile
+from galog.app.util.paths import styleSheetFile
 from galog.app.util.style import CustomStyle
 
-from galog.app.util.paths import STYLESHEET_DIR, iconFile, styleSheetFile
-
-from enum import Enum, auto
-
-from galog.app.util.style import CustomStyle
-from .content_area import MessageBoxContentArea
 from .button_bar import MessageBoxButtonBar
-
+from .content_area import MessageBoxContentArea
 
 
 class MessageBox(QDialog):
@@ -72,7 +64,6 @@ class MessageBox(QDialog):
             layout.insertWidget(index, checkBox)
 
         self._checkBox = checkBox
-
 
     def _onButtonClicked(self, buttonId: int):
         self._clickedButtonId = buttonId

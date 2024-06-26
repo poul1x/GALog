@@ -1,8 +1,8 @@
 from typing import Optional
 
-from galog.app.components.dialogs import MessageBox
 from PyQt5.QtGui import QIcon
 
+from galog.app.components.dialogs import MessageBox
 from galog.app.util.paths import iconFile
 
 
@@ -45,9 +45,7 @@ def showPromptMsgBox(title: str, caption: str, body: str):
 def showNotImpMsgBox():
     messageBox = MessageBox()
     messageBox.setHeaderText("Feature not implemented")
-    messageBox.setBodyText(
-        "The feature will be finished soon. Please, be patient"
-    )
+    messageBox.setBodyText("The feature will be finished soon. Please, be patient")
     messageBox.setIcon(QIcon(iconFile("msgbox-info")))
     messageBox.addButton("Ok")
     messageBox.setWindowTitle("Not implemented")

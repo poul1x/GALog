@@ -1,28 +1,11 @@
-
-
 from typing import Optional
 
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import (
-    QApplication,
-    QWidget,
-    QHBoxLayout,
-    QDialog,
-    QPushButton,
-    QLabel,
-    QCheckBox,
-    QVBoxLayout,
-)
+from PyQt5.QtWidgets import QHBoxLayout, QLabel, QWidget
 
-from galog.app.util.paths import iconFile, styleSheetFile
-from galog.app.util.style import CustomStyle
+from galog.app.util.paths import iconFile
 
-from galog.app.util.paths import STYLESHEET_DIR, iconFile, styleSheetFile
-
-from enum import Enum, auto
-
-from galog.app.util.style import CustomStyle
 
 class MessageBoxContentArea(QWidget):
     def __init__(self, parent: Optional[QWidget] = None) -> None:
