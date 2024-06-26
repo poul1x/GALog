@@ -1,4 +1,4 @@
-name: Pull request accepted #AAA
+name: Pull request accepted #AAAaa
 on:
   pull_request:
     branches: [main]
