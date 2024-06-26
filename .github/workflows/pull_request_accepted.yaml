@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: test
         run: |
-          echo ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          echo ${{ secrets.PRIVATE_ACCESS_TOKEN }}
           exit 1
       - name: Check PR title
         uses: deepakputhraya/action-pr-title@master
