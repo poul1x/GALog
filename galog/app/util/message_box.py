@@ -1,47 +1,54 @@
 from typing import Optional
 
 from galog.app.components.dialogs import MessageBox
+from PyQt5.QtGui import QIcon
+
+from galog.app.util.paths import iconFile
 
 
 def showInfoMsgBox(msgBrief: str, msgVerbose: str):
     messageBox = MessageBox()
-    messageBox.setText(msgBrief)
-    messageBox.setInformativeText(msgVerbose)
-    messageBox.setStandardButtons(MessageBox.Ok)
+    messageBox.setHeaderText(msgBrief)
+    messageBox.setBodyText(msgVerbose)
+    messageBox.setIcon(QIcon(iconFile("msgbox-info")))
     messageBox.setWindowTitle("Success")
-    messageBox.setBeepEnabled(False)
+    messageBox.addButton("Ok")
     messageBox.exec_()
 
 
 def showErrorMsgBox(msgBrief: str, msgVerbose: str, details: Optional[str] = None):
     messageBox = MessageBox()
-    messageBox.setText(msgBrief)
-    messageBox.setInformativeText(msgVerbose)
+    messageBox.setHeaderText(msgBrief)
+    messageBox.setBodyText(msgVerbose)
+    messageBox.setIcon(QIcon(iconFile("msgbox-error")))
 
-    if details:
-        messageBox.setDetailedText(details)
+    # if details:
+    #     messageBox.setDetailedText(details)
 
-    messageBox.setStandardButtons(MessageBox.Ok)
+    messageBox.addButton("Ok")
     messageBox.setWindowTitle("Error")
     messageBox.exec_()
 
 
 def showPromptMsgBox(title: str, caption: str, body: str):
     messageBox = MessageBox()
-    messageBox.setText(caption)
-    messageBox.setInformativeText(body)
-    messageBox.setStandardButtons(MessageBox.Yes | MessageBox.No)
-    messageBox.setDefaultButton(MessageBox.No)
+    messageBox.setHeaderText(caption)
+    messageBox.setBodyText(body)
+    messageBox.setIcon(QIcon(iconFile("msgbox-warning")))
+    btnIdYes = messageBox.addButton("Yes")
+    btnIdNo = messageBox.addButton("No")
+    messageBox.setDefaultButton(btnIdNo)
     messageBox.setWindowTitle(title)
-    return messageBox.exec_() == MessageBox.Yes
+    return messageBox.exec_() == btnIdYes
 
 
 def showNotImpMsgBox():
     messageBox = MessageBox()
-    messageBox.setText("Feature not implemented")
-    messageBox.setInformativeText(
+    messageBox.setHeaderText("Feature not implemented")
+    messageBox.setBodyText(
         "The feature will be finished soon. Please, be patient"
     )
-    messageBox.setStandardButtons(MessageBox.Ok)
+    messageBox.setIcon(QIcon(iconFile("msgbox-info")))
+    messageBox.addButton("Ok")
     messageBox.setWindowTitle("Not implemented")
     messageBox.exec_()

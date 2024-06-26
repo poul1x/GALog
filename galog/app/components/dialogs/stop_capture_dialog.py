@@ -14,19 +14,20 @@ class StopCaptureDialogResult(int, Enum):
 class StopCaptureDialog(MessageBox):
     def __init__(self):
         super().__init__()
-        self.setText("Stop capture")
+        self.setHeaderText("Stop capture")
         self.setWindowTitle("Stop capture")
-        self.setInformativeText("All captured log messages will remain there")
-        self.setStandardButtons(MessageBox.Yes | MessageBox.No)
-        self.setDefaultButton(MessageBox.Yes)
+        self.setBodyText("All captured log messages will remain there")
+        self.btnIdYes = self.addButton("Yes")
+        self.btnIdNo = self.addButton("No")
+        self.setDefaultButton(self.btnIdYes)
 
         checkBox = QCheckBox("Kill app process", self)
         checkBox.setChecked(True)
         self.setCheckBox(checkBox)
 
     def exec_(self) -> int:
-        result = super().exec_()
-        if result == MessageBox.Yes:
+        btnId = super().exec_()
+        if btnId == self.btnIdYes:
             if self.checkBox().isChecked():
                 return StopCaptureDialogResult.AcceptedKillApp
             else:
