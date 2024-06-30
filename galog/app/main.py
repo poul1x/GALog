@@ -24,6 +24,7 @@ from galog.app.components.dialogs.stop_capture_dialog import (
     StopCaptureDialogResult,
 )
 from galog.app.components.message_view_pane import LogMessageViewPane
+from galog.app.components.tag_filter.pane import TagFilterPane
 from galog.app.controllers.capture_pane import CapturePaneController
 from galog.app.controllers.install_app import InstallAppController
 from galog.app.controllers.kill_app import KillAppController
@@ -64,6 +65,8 @@ class MainWindow(QMainWindow):
         self.initUserInterface()
         self.initLeftPaddingForEachMenu()
         self.increaseHoverAreaForCheckableActions()
+        filterPane = TagFilterPane(self)
+        filterPane.exec()
 
     def startAdbServer(self):
         adb = shutil.which("adb")
