@@ -4,6 +4,10 @@ from PyQt5.QtWidgets import *
 from galog.app.util.list_view import ListView
 from galog.app.util.paths import iconFile
 
+from .filter_type_switch import FilterTypeSwitch
+from .control_button_bar import ControlButtonBar
+from .bottom_button_bar import BottomButtonBar
+from .filtered_tags_list import FilteredTagsList
 
 class TagFilterPane(QDialog):
     def _defaultFlags(self):
@@ -30,60 +34,25 @@ class TagFilterPane(QDialog):
         self.setGeometry(x, y, width, height)
 
     def initUserInterface(self):
+        filterTypeSwitch = FilterTypeSwitch(self)
+        controlButtonBar = ControlButtonBar(self)
+        filteredTagsList = FilteredTagsList(self)
+        bottomButtonBar = BottomButtonBar(self)
+
         hBoxLayout = QHBoxLayout()
-        filterTypeLabel = QLabel("Filter type")
-        filterTypeSelector = QComboBox(self)
-        filterTypeSelector.addItem("Include")
-        filterTypeSelector.addItem("Exclude")
-        hBoxLayout.addWidget(filterTypeLabel)
-        hBoxLayout.addWidget(filterTypeSelector)
+        hBoxLayout.setContentsMargins(0,10,0,10)
+        hBoxLayout.setSpacing(0)
+        hBoxLayout.addWidget(filteredTagsList, stretch=1)
+        hBoxLayout.addWidget(controlButtonBar)
 
         vBoxLayout = QVBoxLayout()
-        self.addTagButton = QPushButton("Add", self)
-        self.removeTagButton = QPushButton("Remove", self)
-        self.removeAllTagsButton = QPushButton("Remove all", self)
-        self.saveToFileButton = QPushButton("Save to file",self)
-        self.loadFromFileButton = QPushButton("Load from file", self)
-        vBoxLayout.addWidget(self.removeTagButton)
-        vBoxLayout.addWidget(self.removeAllTagsButton)
-        vBoxLayout.addWidget(self.saveToFileButton)
-        vBoxLayout.addWidget(self.loadFromFileButton)
+        vBoxLayout.setContentsMargins(0,0,0,0)
+        vBoxLayout.setSpacing(0)
+        vBoxLayout.addWidget(filterTypeSwitch)
+        vBoxLayout.addLayout(hBoxLayout, stretch=1)
+        vBoxLayout.addWidget(bottomButtonBar)
 
-
-        hBoxLayout4 = QHBoxLayout()
-        self.tagNameInput = QLineEdit(self)
-        self.tagNameInput.setPlaceholderText("Enter tag to add")
-        hBoxLayout4.addWidget(self.tagNameInput)
-        hBoxLayout4.addWidget(self.addTagButton)
-
-
-        vBoxLayout2  = QVBoxLayout()
-        self.tagListView = ListView(self)
-        self.tagListView.setEditTriggers(QListView.NoEditTriggers)
-
-        self.dataModel = QStandardItemModel(self)
-        self.tagListView.setModel(self.dataModel)
-        vBoxLayout2.addWidget(self.tagNameInput)
-        vBoxLayout2.addWidget(self.tagListView)
-
-        hBoxLayout2 = QHBoxLayout()
-        hBoxLayout2.addLayout(vBoxLayout2)
-        hBoxLayout2.addLayout(vBoxLayout)
-
-
-        hBoxLayout3 = QHBoxLayout()
-        buttonSave = QPushButton("Save", self)
-        buttonCancel = QPushButton("Cancel", self)
-        hBoxLayout3.setAlignment(Qt.AlignRight)
-        hBoxLayout3.addWidget(buttonSave)
-        hBoxLayout3.addWidget(buttonCancel)
-
-        vBoxLayout3 = QVBoxLayout()
-        vBoxLayout3.addLayout(hBoxLayout)
-        vBoxLayout3.addLayout(hBoxLayout4)
-        vBoxLayout3.addLayout(hBoxLayout2)
-        vBoxLayout3.addLayout(hBoxLayout3)
-        self.setLayout(vBoxLayout3)
+        self.setLayout(vBoxLayout)
 
 
 
