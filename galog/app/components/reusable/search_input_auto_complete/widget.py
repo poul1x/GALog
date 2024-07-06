@@ -1,28 +1,24 @@
 from typing import List, Optional
 
-from PyQt5.QtCore import Qt, QStringListModel
+from PyQt5.QtCore import Qt, QStringListModel, pyqtSignal
 from PyQt5.QtGui import QIcon, QKeyEvent
-from PyQt5.QtWidgets import QApplication, QLineEdit, QProxyStyle, QStyle, QWidget, QCompleter
+from PyQt5.QtWidgets import (
+    QWidget,
+    QCompleter,
+)
 from ..search_input import SearchInput
 from .delegate import CompleterDelegate
 
-from galog.app.util.hotkeys import HotkeyHelper
-from galog.app.util.paths import iconFile
 
-class SearchInputStyleAddon(QProxyStyle):
-    def standardIcon(self, standardIcon, option=None, widget=None):
-        if standardIcon == QStyle.SP_LineEditClearButton:
-            return QIcon(iconFile("clear"))
-        return super().standardIcon(standardIcon, option, widget)
+class SearchInputAutoComplete(SearchInput):
+    completionAccepted = pyqtSignal(str)
 
-
-class SearchInputAutoComplete(QLineEdit):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
-        self.initUserInterface2()
         self._completing = False
 
-    def initUserInterface2(self):
+    def initUserInterface(self):
+        super().initUserInterface()
         self._dataModel = QStringListModel(self)
         self._completer = QCompleter()
         self._completer.setModel(self._dataModel)
@@ -35,17 +31,16 @@ class SearchInputAutoComplete(QLineEdit):
         self._completer.popup().setItemDelegate(delegate)
         self.textChanged.connect(self.handleTextChanged)
 
-        self.setPlaceholderText("Search")
-        self.addAction(QIcon(iconFile("search")), QLineEdit.LeadingPosition)
-        self.setStyle(SearchInputStyleAddon(self.style()))
-        self.setClearButtonEnabled(True)
-
+        self._completer.popup().setStyleSheet(
+            r"border: 1px solid black; border-left: 2px solid black; border-right: 2px solid black; background: #ececec"
+        )
+        self._completer.popup().window().setWindowFlag(Qt.NoDropShadowWindowHint, True)
 
     def handleTextChanged(self, text: str):
         if not self._completing:
             found = False
             prefix = text.rpartition(",")[-1]
-            if len(prefix) > 1:
+            if len(prefix) > 0:
                 self._completer.setCompletionPrefix(prefix)
                 if self._completer.currentRow() >= 0:
                     found = True
@@ -54,11 +49,12 @@ class SearchInputAutoComplete(QLineEdit):
             else:
                 self._completer.popup().hide()
 
-    def handleCompletion(self, text):
+    def handleCompletion(self, text: str):
         if not self._completing:
             self._completing = True
             prefix = self._completer.completionPrefix()
-            self.setText(self.text()[: -len(prefix)] + text)
+            finalText = self.text()[: -len(prefix)] + text
+            self.completionAccepted.emit(finalText)
             self._completing = False
 
     def setCompletionStrings(self, strings: List[str]):

@@ -42,7 +42,7 @@ class FilteredTagsList(QWidget):
         vBoxLayout.addWidget(self.tagListView)
         self.setLayout(vBoxLayout)
         tags = ["System", "galog", "qweerwrt", "qwasds", "Cpature Reciever", "OkHTTP"]
-        # self.addManyTags(tags)
+        self.addManyTags(tags * 3)
         self.tagNameInput.setCompletionStrings(tags)
 
 
