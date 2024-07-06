@@ -46,22 +46,23 @@
 
 /* ---------------------------------------- */
 
-#TagFilterPane #FilteredTagsList {
-	/* background: #eeeeee; */
-}
-
-#TagFilterPane #FilteredTagsList > QLineEdit {
-	margin: 0px;
+#TagFilterPane > #TagNameInput {
+	margin-left: 10px;
+	margin-right: 10px;
 	border: 2px solid #464646;
 	border-bottom: none;
 	font-family: Arial;
 	font-size: 20px;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-top: 2px;
+    padding-bottom: 4px;
     padding-left: 4px;
-    padding-right: 4px;
+    padding-right: 0px;
 }
 
+#TagFilterPane #FilteredTagsList {
+	margin-left: 10px;
+	margin-right: 10px;
+}
 
 #TagFilterPane #FilteredTagsList > QListView {
 	font-family: Arial;
@@ -86,7 +87,8 @@
 /* ---------------------------------------- */
 
 #TagFilterPane > #ControlButtonBar {
-	/* background: #85c0ff; */
+	margin-left: 10px;
+	margin-right: 10px;
 }
 
 #TagFilterPane > #ControlButtonBar > QPushButton {

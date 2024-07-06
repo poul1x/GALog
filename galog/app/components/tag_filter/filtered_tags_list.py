@@ -29,8 +29,6 @@ class FilteredTagsList(QWidget):
         vBoxLayout.setContentsMargins(10, 0, 10, 0)
         vBoxLayout.setSpacing(0)
 
-        self.tagNameInput = SearchInputAutoComplete(self)
-        self.tagNameInput.setPlaceholderText("Enter tag to add")
 
         self.tagListView = ListView(self)
         self.tagListView.setEditTriggers(QListView.NoEditTriggers)
@@ -38,12 +36,10 @@ class FilteredTagsList(QWidget):
 
         self.dataModel = QStandardItemModel(self)
         self.tagListView.setModel(self.dataModel)
-        vBoxLayout.addWidget(self.tagNameInput)
         vBoxLayout.addWidget(self.tagListView)
         self.setLayout(vBoxLayout)
         tags = ["System", "galog", "qweerwrt", "qwasds", "Cpature Reciever", "OkHTTP"]
         self.addManyTags(tags * 3)
-        self.tagNameInput.setCompletionStrings(tags)
 
 
     def _selectedRows(self):

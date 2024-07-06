@@ -15,6 +15,7 @@ class SearchInputAutoComplete(SearchInput):
 
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
+        self.removeBuiltinActions()
         self._completing = False
 
     def initUserInterface(self):
@@ -35,6 +36,10 @@ class SearchInputAutoComplete(SearchInput):
             r"border: 1px solid black; border-left: 2px solid black; border-right: 2px solid black; background: #ececec"
         )
         self._completer.popup().window().setWindowFlag(Qt.NoDropShadowWindowHint, True)
+
+    def removeBuiltinActions(self):
+        for action in self.actions():
+            self.removeAction(action)
 
     def handleTextChanged(self, text: str):
         if not self._completing:
