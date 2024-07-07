@@ -1,5 +1,5 @@
-from .controller import RunAppController
+from .controller import TagFilterPaneController
 
 __all__ = [
-    "RunAppController",
+    "TagFilterPaneController",
 ]

@@ -12,7 +12,9 @@ from PyQt5.QtWidgets import (
     QStyleOptionViewItem,
     QStyle,
 )
-from galog.app.components.reusable.search_input_auto_complete import SearchInputAutoComplete
+from galog.app.components.reusable.search_input_auto_complete import (
+    SearchInputAutoComplete,
+)
 from galog.app.util.list_view import ListView
 
 
@@ -29,7 +31,6 @@ class FilteredTagsList(QWidget):
         vBoxLayout.setContentsMargins(10, 0, 10, 0)
         vBoxLayout.setSpacing(0)
 
-
         self.tagListView = ListView(self)
         self.tagListView.setEditTriggers(QListView.NoEditTriggers)
         self.tagListView.setSelectionMode(QAbstractItemView.ExtendedSelection)
@@ -38,9 +39,6 @@ class FilteredTagsList(QWidget):
         self.tagListView.setModel(self.dataModel)
         vBoxLayout.addWidget(self.tagListView)
         self.setLayout(vBoxLayout)
-        tags = ["System", "galog", "qweerwrt", "qwasds", "Cpature Reciever", "OkHTTP"]
-        self.addManyTags(tags * 3)
-
 
     def _selectedRows(self):
         selectionModel = self.tagListView.selectionModel()
@@ -53,12 +51,15 @@ class FilteredTagsList(QWidget):
         for tag in tags:
             self.dataModel.appendRow(QStandardItem(tag))
 
-    def hasSelectedTags(self):
-        return bool(self._selectedRows())
+    def hasTags(self):
+        return self.dataModel.rowCount() > 0
 
     def removeSelectedTags(self):
-        for row in self._selectedRows():
+        selectedRows = self._selectedRows()
+        for row in selectedRows:
             self.dataModel.removeRow(row)
+
+        return selectedRows
 
     def removeAllTags(self):
         self.dataModel.clear()

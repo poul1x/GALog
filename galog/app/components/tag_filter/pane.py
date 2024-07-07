@@ -11,6 +11,10 @@ from .filtered_tags_list import FilteredTagsList
 from .tag_name_input import TagNameInput
 
 class TagFilterPane(QDialog):
+
+    Accepted = 1
+    Rejected = 0
+
     def _defaultFlags(self):
         return (
             Qt.Window
@@ -18,6 +22,7 @@ class TagFilterPane(QDialog):
             | Qt.WindowMaximizeButtonHint
             | Qt.WindowCloseButtonHint
         )
+
 
     def __init__(self, parent: QWidget):
         super().__init__(parent, self._defaultFlags())
@@ -60,3 +65,12 @@ class TagFilterPane(QDialog):
         vBoxLayoutMain.addLayout(hBoxLayout, stretch=1)
         vBoxLayoutMain.addWidget(self.bottomButtonBar)
         self.setLayout(vBoxLayoutMain)
+
+    def exec_(self) -> int:
+        result = super().exec_()
+        if result == QDialog.Accepted:
+            return TagFilterPane.Accepted
+        else:
+            return TagFilterPane.Rejected
+
+    exec = exec_

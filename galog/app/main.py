@@ -32,6 +32,7 @@ from galog.app.controllers.log_messages_pane.controller import LogMessagesPaneCo
 from galog.app.controllers.open_log_file.controller import OpenLogFileController
 from galog.app.controllers.run_app.controller import RunAppController
 from galog.app.controllers.save_log_file.controller import SaveLogFileController
+from galog.app.controllers.tag_filter.controller import TagFilterPaneController
 from galog.app.highlighting import HighlightingRules
 from galog.app.util.message_box import (
     showErrorMsgBox,
@@ -58,6 +59,7 @@ class MainWindow(QMainWindow):
         self._liveReload = True
         self.capturePaneController = CapturePaneController()
         self.logMessagesPaneController = LogMessagesPaneController(self)
+        self.tagFilterPaneController = TagFilterPaneController(self)
         self.loadAppStrings()
         self.loadStyleSheet()
         self.loadFonts()
@@ -65,8 +67,6 @@ class MainWindow(QMainWindow):
         self.initUserInterface()
         self.initLeftPaddingForEachMenu()
         self.increaseHoverAreaForCheckableActions()
-        filterPane = TagFilterPane(self)
-        filterPane.exec()
 
     def startAdbServer(self):
         adb = shutil.which("adb")
@@ -176,6 +176,9 @@ class MainWindow(QMainWindow):
                         defaultWidget.setText(defaultWidget.text() + " " * 64)
                         defaultWidget.setStyleSheet("width: 0px;")
 
+    def openTagFilter(self):
+        self.tagFilterPaneController.exec_()
+
     def startCapture(self):
         if self.logMessagesPaneController.isCaptureRunning():
             msgBrief = "Capture is running"
@@ -273,6 +276,16 @@ class MainWindow(QMainWindow):
 
         controller = InstallAppController()
         controller.promptInstallApp(device)
+
+    def openTagFilterAction(self):
+        action = QAction("&Tag filter", self)
+        action.setShortcut("Ctrl+Shift+F")
+        action.setStatusTip("Open tag filter")
+        action.triggered.connect(lambda: self.openTagFilter())
+        # action.setObjectName("capture.new")
+        action.setEnabled(True)
+        action.setData(True)
+        return action
 
     def startCaptureAction(self):
         action = QAction("&New", self)
@@ -443,6 +456,7 @@ class MainWindow(QMainWindow):
         captureMenu.addAction(self.liveReloadAction())
         captureMenu.addAction(self.toggleHighlightingAction())
         captureMenu.addAction(self.showLineNumbersAction())
+        captureMenu.addAction(self.openTagFilterAction())
 
         # This will be implemented in the next release
         # adbMenu = menuBar.addMenu("🐞 &ADB")

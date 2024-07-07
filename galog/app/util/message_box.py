@@ -29,6 +29,14 @@ def showErrorMsgBox(msgBrief: str, msgVerbose: str, details: Optional[str] = Non
     messageBox.setWindowTitle("Error")
     messageBox.exec_()
 
+def showErrorMsgBox2(msgVerbose: str):
+    messageBox = MessageBox()
+    messageBox.setBodyText(msgVerbose)
+    messageBox.setIcon(QIcon(iconFile("msgbox-error")))
+    messageBox.addButton("Ok")
+    messageBox.setWindowTitle("Error")
+    messageBox.exec_()
+
 
 def showPromptMsgBox(title: str, caption: str, body: str):
     messageBox = MessageBox()
