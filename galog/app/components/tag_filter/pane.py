@@ -43,6 +43,7 @@ class TagFilterPane(QDialog):
         self.filterTypeSwitch = FilterTypeSwitch(self)
         self.controlButtonBar = ControlButtonBar(self)
         self.tagNameInput = TagNameInput(self)
+        self.tagNameInput.setCompletionStrings(["mama", "papa"])
         self.filteredTagsList = FilteredTagsList(self)
         self.bottomButtonBar = BottomButtonBar(self)
 

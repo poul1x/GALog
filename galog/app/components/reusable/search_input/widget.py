@@ -2,18 +2,17 @@ from typing import Optional
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QKeyEvent
-from PyQt5.QtWidgets import QApplication, QLineEdit, QProxyStyle, QStyle, QWidget
+from PyQt5.QtWidgets import (
+    QApplication,
+    QLineEdit,
+    QProxyStyle,
+    QStyle,
+    QWidget,
+    QToolButton,
+)
 
 from galog.app.util.hotkeys import HotkeyHelper
 from galog.app.util.paths import iconFile
-
-
-class SearchInputStyleAddon(QProxyStyle):
-    def standardIcon(self, standardIcon, option=None, widget=None):
-        if standardIcon == QStyle.SP_LineEditClearButton:
-            return QIcon(iconFile("clear"))
-        return super().standardIcon(standardIcon, option, widget)
-
 
 class SearchInput(QLineEdit):
     def __init__(self, parent: Optional[QWidget] = None):
@@ -33,5 +32,6 @@ class SearchInput(QLineEdit):
     def initUserInterface(self):
         self.setPlaceholderText("Search")
         self.addAction(QIcon(iconFile("search")), QLineEdit.LeadingPosition)
-        self.setStyle(SearchInputStyleAddon(self.style()))
+        self.findChild(QToolButton).setIcon(QIcon(iconFile("close")))
         self.setClearButtonEnabled(True)
+

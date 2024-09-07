@@ -6,9 +6,9 @@ from PyQt5.QtWidgets import (
     QWidget,
     QCompleter,
 )
+
 from ..search_input import SearchInput
 from .delegate import CompleterDelegate
-
 
 class SearchInputAutoComplete(SearchInput):
     completionAccepted = pyqtSignal(str)
@@ -17,6 +17,7 @@ class SearchInputAutoComplete(SearchInput):
         super().__init__(parent)
         self.removeBuiltinActions()
         self._completing = False
+        self.initUserInterface()
 
     def initUserInterface(self):
         super().initUserInterface()
@@ -31,10 +32,6 @@ class SearchInputAutoComplete(SearchInput):
         delegate = CompleterDelegate(self)
         self._completer.popup().setItemDelegate(delegate)
         self.textChanged.connect(self.handleTextChanged)
-
-        self._completer.popup().setStyleSheet(
-            r"border: 1px solid black; border-left: 2px solid black; border-right: 2px solid black; background: #ececec"
-        )
         self._completer.popup().window().setWindowFlag(Qt.NoDropShadowWindowHint, True)
 
     def removeBuiltinActions(self):
