@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (
     QStyledItemDelegate,
     QStyleOptionViewItem,
     QStyle,
+    QSizePolicy, QFrame
 )
 from galog.app.components.reusable.search_input_auto_complete import (
     SearchInputAutoComplete,
@@ -28,7 +29,7 @@ class FilteredTagsList(QWidget):
     def initUserInterface(self):
         vBoxLayout = QVBoxLayout()
         vBoxLayout.setAlignment(Qt.AlignTop)
-        vBoxLayout.setContentsMargins(10, 0, 10, 0)
+        vBoxLayout.setContentsMargins(0, 0, 0, 0)
         vBoxLayout.setSpacing(0)
 
         self.tagListView = ListView(self)

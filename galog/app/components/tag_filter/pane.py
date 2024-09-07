@@ -48,7 +48,7 @@ class TagFilterPane(QDialog):
         self.bottomButtonBar = BottomButtonBar(self)
 
         vBoxLayout = QVBoxLayout()
-        vBoxLayout.setContentsMargins(0,0,0,0)
+        vBoxLayout.setContentsMargins(10,0,10,0)
         vBoxLayout.setSpacing(0)
         vBoxLayout.addWidget(self.tagNameInput)
         vBoxLayout.addWidget(self.filteredTagsList)

@@ -29,7 +29,7 @@ class CompleterDelegate(QStyledItemDelegate):
             option.backgroundBrush = QColor("#464646")
             option.palette.setBrush(QPalette.Text, QColor("#ffffff"))
         else:
-            option.backgroundBrush = QColor("#eeeeee")
+            option.backgroundBrush = QColor("#ffffff")
             option.palette.setBrush(QPalette.Text, QColor("#000000"))
 
         # If option.state is MouseOver or Selected

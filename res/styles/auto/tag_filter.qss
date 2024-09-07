@@ -2,11 +2,7 @@
 	background: #ffffff;
 }
 
-#TagFilterPane #FilterTypeSwitch {
-	/* background: #ffffff */
-}
-
-#TagFilterPane #FilterTypeSwitch > QWidget {
+#TagFilterPane > #FilterTypeSwitch > QWidget {
 	font-family: Arial;
 	font-size: 19px;
 }
@@ -47,49 +43,31 @@
 /* ---------------------------------------- */
 
 #TagFilterPane > #TagNameInput {
-	margin-left: 10px;
-	margin-right: 10px;
 	border: 2px solid #464646;
 	border-bottom: none;
 	font-family: Arial;
 	font-size: 20px;
     padding-top: 2px;
     padding-bottom: 4px;
-    padding-left: 4px;
-    padding-right: 0px;
 }
 
-#TagFilterPane #FilteredTagsList {
-	margin-left: 10px;
-	margin-right: 10px;
-}
-
-#TagFilterPane #FilteredTagsList > QListView {
+#TagFilterPane > #FilteredTagsList > QListView {
 	font-family: Arial;
 	font-size: 20px;
 	border: 2px solid #464646;
-    /* padding-top: 5px;
-    padding-bottom: 5px; */
-    /* padding-left: 4px;
-    padding-right: 4px; */
 }
 
-#TagFilterPane #FilteredTagsList > QListView::item:hover
+#TagFilterPane > #FilteredTagsList > QListView::item:hover
 {
 	background-color: #f3f3f3;
 }
 
-#TagFilterPane #FilteredTagsList > QListView::item:selected
+#TagFilterPane > #FilteredTagsList > QListView::item:selected
 {
 	background-color: #464646;
 	color: #ffffff;
 }
 /* ---------------------------------------- */
-
-#TagFilterPane > #ControlButtonBar {
-	margin-left: 10px;
-	margin-right: 10px;
-}
 
 #TagFilterPane > #ControlButtonBar > QPushButton {
 	font-family: Arial;
@@ -114,7 +92,7 @@
 
 /* ---------------------------------------- */
 
-#TagFilterPane #BottomButtonBar {
+#TagFilterPane > #BottomButtonBar {
 	background: #464646;
 }
 
@@ -146,3 +124,5 @@
 	background: #739fff;
 	color: white;
 }
+
+/* ---------------------------------------- */

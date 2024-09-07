@@ -32,6 +32,7 @@ class SearchInput(QLineEdit):
     def initUserInterface(self):
         self.setPlaceholderText("Search")
         self.addAction(QIcon(iconFile("search")), QLineEdit.LeadingPosition)
-        self.findChild(QToolButton).setIcon(QIcon(iconFile("close")))
+
         self.setClearButtonEnabled(True)
+        self.findChildren(QToolButton)[1].setIcon(QIcon(iconFile("close")))
 

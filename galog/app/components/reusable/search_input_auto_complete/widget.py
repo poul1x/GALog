@@ -10,14 +10,13 @@ from PyQt5.QtWidgets import (
 from ..search_input import SearchInput
 from .delegate import CompleterDelegate
 
+
 class SearchInputAutoComplete(SearchInput):
     completionAccepted = pyqtSignal(str)
 
     def __init__(self, parent: Optional[QWidget] = None):
-        super().__init__(parent)
-        self.removeBuiltinActions()
         self._completing = False
-        self.initUserInterface()
+        super().__init__(parent)
 
     def initUserInterface(self):
         super().initUserInterface()
@@ -29,14 +28,13 @@ class SearchInputAutoComplete(SearchInput):
         self._completer.setWidget(self)
         self._completer.activated.connect(self.handleCompletion)
 
+        s = r"border: 1px solid black; border-left: 2px solid black; border-right: 2px solid black;"
+        self._completer.popup().window().setWindowFlag(Qt.NoDropShadowWindowHint, True)
+        self._completer.popup().setStyleSheet(s)
+
         delegate = CompleterDelegate(self)
         self._completer.popup().setItemDelegate(delegate)
         self.textChanged.connect(self.handleTextChanged)
-        self._completer.popup().window().setWindowFlag(Qt.NoDropShadowWindowHint, True)
-
-    def removeBuiltinActions(self):
-        for action in self.actions():
-            self.removeAction(action)
 
     def handleTextChanged(self, text: str):
         if not self._completing:
