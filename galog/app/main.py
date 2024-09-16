@@ -24,7 +24,7 @@ from galog.app.components.dialogs.stop_capture_dialog import (
     StopCaptureDialogResult,
 )
 from galog.app.components.message_view_pane import LogMessageViewPane
-from galog.app.components.tag_filter.pane import TagFilterPane
+from galog.app.components.tag_filter_pane.pane import TagFilterPane
 from galog.app.controllers.capture_pane import CapturePaneController
 from galog.app.controllers.install_app import InstallAppController
 from galog.app.controllers.kill_app import KillAppController
@@ -32,7 +32,7 @@ from galog.app.controllers.log_messages_pane.controller import LogMessagesPaneCo
 from galog.app.controllers.open_log_file.controller import OpenLogFileController
 from galog.app.controllers.run_app.controller import RunAppController
 from galog.app.controllers.save_log_file.controller import SaveLogFileController
-from galog.app.controllers.tag_filter.controller import TagFilterPaneController
+from galog.app.controllers.tag_filter_pane.controller import TagFilterPaneController
 from galog.app.highlighting import HighlightingRules
 from galog.app.util.message_box import (
     showErrorMsgBox,

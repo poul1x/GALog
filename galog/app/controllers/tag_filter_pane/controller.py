@@ -13,7 +13,7 @@ from galog.app.components.log_messages_pane.delegate import (
 )
 from galog.app.components.log_messages_pane.pane import LogMessagesPane
 from galog.app.components.message_view_pane import LogMessageViewPane
-from galog.app.components.tag_filter import TagFilterType, TagFilterPane
+from galog.app.components.tag_filter_pane import TagFilterType, TagFilterPane
 from galog.app.controllers.message_view_pane.controller import (
     LogMessageViewPaneController,
 )
