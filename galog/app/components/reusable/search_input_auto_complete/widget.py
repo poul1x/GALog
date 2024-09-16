@@ -34,28 +34,32 @@ class SearchInputAutoComplete(SearchInput):
 
         delegate = CompleterDelegate(self)
         self._completer.popup().setItemDelegate(delegate)
-        self.textChanged.connect(self.handleTextChanged)
+        self.textEdited.connect(self.handleTextEdited)
 
-    def handleTextChanged(self, text: str):
-        if not self._completing:
-            found = False
-            prefix = text.rpartition(",")[-1]
-            if len(prefix) > 0:
-                self._completer.setCompletionPrefix(prefix)
-                if self._completer.currentRow() >= 0:
-                    found = True
-            if found:
-                self._completer.complete()
-            else:
-                self._completer.popup().hide()
+    def handleTextEdited(self, text: str):
+        if self._completing:
+            return
+
+        found = False
+        if len(text) > 0:
+            self._completer.setCompletionPrefix(text)
+            if self._completer.currentRow() >= 0:
+                found = True
+
+        if found:
+            self._completer.complete()
+        else:
+            self._completer.popup().hide()
 
     def handleCompletion(self, text: str):
-        if not self._completing:
-            self._completing = True
-            prefix = self._completer.completionPrefix()
-            finalText = self.text()[: -len(prefix)] + text
-            self.completionAccepted.emit(finalText)
-            self._completing = False
+        if self._completing:
+            return
+
+        self._completing = True
+        prefix = self._completer.completionPrefix()
+        finalText = self.text()[: -len(prefix)] + text
+        self.completionAccepted.emit(finalText)
+        self._completing = False
 
     def setCompletionStrings(self, strings: List[str]):
         self._dataModel.setStringList(strings)
