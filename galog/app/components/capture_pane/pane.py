@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QVBoxLayout, QWidget
 
 from galog.app.util.hotkeys import HotkeyHelper
 
@@ -20,6 +20,7 @@ class CapturePane(QDialog):
         self.initUserInterface()
         self.setGeometryAuto()
         self.initFocusPolicy()
+        self.center()
 
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
@@ -39,6 +40,19 @@ class CapturePane(QDialog):
         x = (screen.width() - width) // 2
         y = (screen.height() - height) // 2
         self.setGeometry(x, y, width, height)
+
+    def center(self):
+        mainWindow = None
+        for widget in QApplication.topLevelWidgets():
+            if isinstance(widget, QMainWindow):
+                mainWindow = widget
+                break
+
+        assert mainWindow is not None
+        mwGeometry = mainWindow.geometry()
+        geometry = self.frameGeometry()
+        geometry.moveCenter(mwGeometry.center())
+        self.move(geometry.topLeft())
 
     def initUserInterface(self):
         self.setWindowTitle("New capture")

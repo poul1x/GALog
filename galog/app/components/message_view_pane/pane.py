@@ -2,6 +2,7 @@ from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QApplication,
+    QMainWindow,
     QDialog,
     QHBoxLayout,
     QLabel,
@@ -29,6 +30,19 @@ class LogMessageViewPane(QDialog):
         self.setObjectName("LogMessageViewPane")
         self.setWindowTitle("View log message")
         self.initUserInterface()
+
+    def center(self):
+        mainWindow = None
+        for widget in QApplication.topLevelWidgets():
+            if isinstance(widget, QMainWindow):
+                mainWindow = widget
+                break
+
+        assert mainWindow is not None
+        mwGeometry = mainWindow.geometry()
+        geometry = self.frameGeometry()
+        geometry.moveCenter(mwGeometry.center())
+        self.move(geometry.topLeft())
 
     def initUserInterface(self):
         self.logLevelLabel = QLabel()
@@ -80,3 +94,4 @@ class LogMessageViewPane(QDialog):
         x = (screen.width() - width) // 2
         y = (screen.height() - height) // 2
         self.setGeometry(x, y, width, height)
+        self.center()
