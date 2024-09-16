@@ -54,9 +54,13 @@ class TagFilterPaneController:
         self._pane.tagNameInput.completionAccepted.connect(self._handleAddTagCompleted)
         self._pane.tagNameInput.textChanged.connect(self._handleInputStateChanged)
 
+        self._pane.filteredTagsList.selectionChanged.connect(
+            self._handleFilteredTagsSelection
+        )
 
         self._updateAddButtonState()
-        self._updateRemoveButtonsState()
+        self._updateRemoveTagButtonState()
+        self._updateRemoveAllTagsButtonState()
 
         with self._execute() as result:
             if result == TagFilterPane.Accepted:
@@ -77,14 +81,14 @@ class TagFilterPaneController:
     def tagListExclude(self):
         return self._tagsExclude
 
-    def _addTag(self, tag: str):
+    def _addTagInternal(self, tag: str):
         if tag in self._tagsTmp:
             msg = "Tag already exists in this filter"
             showErrorMsgBox2(msg)
             return
 
         self._pane.filteredTagsList.addTag(tag)
-        self._pane.tagNameInput.setText("")
+        self._pane.tagNameInput.clear()
         self._tagsTmp.append(tag)
 
     def _handleInputStateChanged(self):
@@ -92,27 +96,35 @@ class TagFilterPaneController:
 
     def _handleAddTag(self):
         tag = self._pane.tagNameInput.text()
-        self._addTag(tag)
+        self._addTagInternal(tag)
 
     def _handleAddTagCompleted(self, tag: str):
-        self._addTag(tag)
+        self._addTagInternal(tag)
 
     def _updateAddButtonState(self):
         hasInput = len(self._pane.tagNameInput.text()) > 0
         self._pane.controlButtonBar.addTagButton.setEnabled(hasInput)
 
-    def _updateRemoveButtonsState(self):
+    def _updateRemoveTagButtonState(self):
+        enabled = self._pane.filteredTagsList.hasSelectedTags()
+        self._pane.controlButtonBar.removeTagButton.setEnabled(enabled)
+
+    def _updateRemoveAllTagsButtonState(self):
         enabled = self._pane.filteredTagsList.hasTags()
         self._pane.controlButtonBar.removeAllTagsButton.setEnabled(enabled)
+
+    def _handleFilteredTagsSelection(self):
+        enabled = self._pane.filteredTagsList.hasSelectedTags()
         self._pane.controlButtonBar.removeTagButton.setEnabled(enabled)
 
     def _handleRemoveSelectedTags(self):
         tags = self._pane.filteredTagsList.removeSelectedTags()
         self._tagsTmp = list(filter(lambda t: t not in tags, self._tagsTmp))
-        self._updateRemoveButtonsState()
-
+        self._updateRemoveAllTagsButtonState()
+        self._updateRemoveTagButtonState()
 
     def _handleRemoveAllTags(self):
         self._pane.filteredTagsList.removeAllTags()
-        self._updateRemoveButtonsState()
+        self._updateRemoveAllTagsButtonState()
+        self._updateRemoveTagButtonState()
         self._tagsTmp = []

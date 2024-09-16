@@ -1,5 +1,5 @@
 from typing import List
-from PyQt5.QtCore import Qt, QModelIndex
+from PyQt5.QtCore import Qt, QModelIndex, pyqtSignal
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor, QPalette, QFont
 from PyQt5.QtWidgets import (
     QWidget,
@@ -11,7 +11,8 @@ from PyQt5.QtWidgets import (
     QStyledItemDelegate,
     QStyleOptionViewItem,
     QStyle,
-    QSizePolicy, QFrame
+    QSizePolicy,
+    QFrame,
 )
 from galog.app.components.reusable.search_input_auto_complete import (
     SearchInputAutoComplete,
@@ -20,6 +21,8 @@ from galog.app.util.list_view import ListView
 
 
 class FilteredTagsList(QWidget):
+    selectionChanged = pyqtSignal()
+
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.setObjectName(self.__class__.__name__)
@@ -41,9 +44,20 @@ class FilteredTagsList(QWidget):
         vBoxLayout.addWidget(self.tagListView)
         self.setLayout(vBoxLayout)
 
+        self.tagListView.selectionModel().selectionChanged.connect(
+            self._onSelectionChanged
+        )
+
+    def _onSelectionChanged(self, *unused):
+        self.selectionChanged.emit()
+
     def _selectedRows(self):
+        def key(index: QModelIndex):
+            return index.row()
+
         selectionModel = self.tagListView.selectionModel()
-        return [index.row() for index in selectionModel.selectedRows()]
+        selectedRows = sorted(selectionModel.selectedRows(), key=key, reverse=True)
+        return [(index.row(), index.data()) for index in selectedRows]
 
     def addTag(self, tag: str):
         self.dataModel.appendRow(QStandardItem(tag))
@@ -55,12 +69,16 @@ class FilteredTagsList(QWidget):
     def hasTags(self):
         return self.dataModel.rowCount() > 0
 
-    def removeSelectedTags(self):
-        selectedRows = self._selectedRows()
-        for row in selectedRows:
-            self.dataModel.removeRow(row)
+    def hasSelectedTags(self):
+        return bool(self.tagListView.selectionModel().selectedRows())
 
-        return selectedRows
+    def removeSelectedTags(self):
+        result = []
+        for row, tag in self._selectedRows():
+            self.dataModel.removeRow(row)
+            result.append(tag)
+
+        return result
 
     def removeAllTags(self):
         self.dataModel.clear()
