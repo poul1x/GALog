@@ -71,6 +71,12 @@ class LogMessagesPaneController:
         pane.searchPane.button.clicked.connect(self._applyMessageFilter)
         pane.toggleMessageFilter.connect(self._toggleMessageFilter)
         pane.copyRowsToClipboard.connect(self._copyRowsToClipboard)
+
+        pane.cmViewMessage.connect(self._rowActivated)
+        pane.cmGoToOrigin.connect(self._goToOrigin)
+        pane.cmGoBack.connect(self._goBack)
+        pane.tableView.rowGoToOrigin.connect(self._rowGoToOrigin)
+
         self._pane = pane
         self._scrolling = True
         self._backToFilter = None
@@ -132,6 +138,22 @@ class LogMessagesPaneController:
         self._pane.tableView.setFocus()
         self._rowBlinkingController.startBlinking(index.row())
 
+    def _goBack(self):
+        filterModel = self._pane.filterModel
+        if filterModel.filteringEnabled() or filterModel.tagFilteringEnabled():
+            return
+
+        if self._backToFilter is not None:
+            self._jumpBack()
+
+    def _goToOrigin(self, index: QModelIndex):
+        filterModel = self._pane.filterModel
+        if filterModel.filteringEnabled() or filterModel.tagFilteringEnabled():
+            self._jumpToRow(index)
+
+    def _rowGoToOrigin(self):
+        self._goToOrigin(self._pane.tableView.currentIndex())
+
     def _jumpToRow(self, index: QModelIndex):
         self._backToFilter = index.row()
         dataModelIndex = self._pane.filterModel.mapToSource(index)
@@ -149,8 +171,10 @@ class LogMessagesPaneController:
         self._viewPaneController.showContentFor(index.row(), highlightingEnabled)
 
     def _rowActivated(self, index: QModelIndex):
-        if self._pane.filterModel.filteringEnabled():
-            self._jumpToRow(index)
+        filterModel = self._pane.filterModel
+        if filterModel.filteringEnabled() or filterModel.tagFilteringEnabled():
+            realIndex = filterModel.mapToSource(index)
+            self._showContentFor(realIndex)
         else:
             self._showContentFor(index)
 

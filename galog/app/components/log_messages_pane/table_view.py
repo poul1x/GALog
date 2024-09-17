@@ -1,8 +1,9 @@
 from typing import Optional
 
-from PyQt5.QtCore import QRect, QSize, Qt
-from PyQt5.QtGui import QColor, QFont, QFontMetrics, QPainter
+from PyQt5.QtCore import QRect, QSize, Qt, pyqtSignal
+from PyQt5.QtGui import QColor, QFont, QFontMetrics, QPainter, QKeyEvent
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QTableView, QWidget
+from galog.app.util.hotkeys import HotkeyHelper
 
 from galog.app.util.painter import painterSaveRestore
 from galog.app.util.table_view import TableView as BaseTableView
@@ -46,10 +47,20 @@ class VerticalHeader(QHeaderView):
 
 
 class TableView(BaseTableView):
+
+    rowGoToOrigin = pyqtSignal()
+
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
         self.initCustomDelegate()
         self.initUserInterface()
+
+    def keyPressEvent(self, event: QKeyEvent):
+        helper = HotkeyHelper(event)
+        if helper.isCtrlEnterPressed():
+            self.rowGoToOrigin.emit()
+        else:
+            super().keyPressEvent(event)
 
     def initCustomDelegate(self):
         self.delegate = StyledItemDelegate(self)
