@@ -2,14 +2,15 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QComboBox
 from enum import Enum, auto
 
-class TagFilterType(int, Enum):
-    Include = 0
-    Exclude = auto()
+class TagFilteringMode(int, Enum):
+    Disabled = 0
+    ShowMatching = auto()
+    HideMatching = auto()
 
 
 class FilterTypeSwitch(QWidget):
 
-    filterTypeChanged = pyqtSignal(TagFilterType)
+    filterTypeChanged = pyqtSignal(TagFilteringMode)
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)
@@ -20,20 +21,23 @@ class FilterTypeSwitch(QWidget):
     def initUserInterface(self):
         hBoxLayout = QHBoxLayout()
         hBoxLayout.setContentsMargins(0,0,0,0)
-        # hBoxLayout.setSpacing(0)
-        filterTypeLabel = QLabel("Filter type:")
+        filterTypeLabel = QLabel("Filtering mode:")
         self.filterTypeSwitch = QComboBox(self)
-        self.filterTypeSwitch.addItem("Include")
-        self.filterTypeSwitch.addItem("Exclude")
+        self.filterTypeSwitch.addItem("Disabled")
+        self.filterTypeSwitch.addItem("Show matching")
+        self.filterTypeSwitch.addItem("Hide matching")
         self.filterTypeSwitch.currentIndexChanged.connect(self._handleCurrentIndexChanged)
-        self.filterTypeSwitch.setCurrentIndex(TagFilterType.Exclude.value)
+        self.filterTypeSwitch.setCurrentIndex(TagFilteringMode.Disabled.value)
         hBoxLayout.addWidget(filterTypeLabel)
         hBoxLayout.addWidget(self.filterTypeSwitch)
         hBoxLayout.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.setLayout(hBoxLayout)
 
     def _handleCurrentIndexChanged(self, index: int):
-        self.filterTypeChanged.emit(TagFilterType(index))
+        self.filterTypeChanged.emit(TagFilteringMode(index))
 
-    def filterType(self):
-        return TagFilterType(self.filterTypeSwitch.currentIndex())
+    def filteringMode(self):
+        return TagFilteringMode(self.filterTypeSwitch.currentIndex())
+
+    def setFilteringMode(self, mode: TagFilteringMode):
+        self.filterTypeSwitch.setCurrentIndex(mode.value)

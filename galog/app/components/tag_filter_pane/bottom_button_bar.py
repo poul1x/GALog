@@ -11,10 +11,10 @@ class BottomButtonBar(QWidget):
 
     def initUserInterface(self):
         hBoxLayout = QHBoxLayout()
-        buttonSave = QPushButton("Save", self)
-        buttonCancel = QPushButton("Cancel", self)
+        self.buttonSave = QPushButton("Save", self)
+        self.buttonCancel = QPushButton("Cancel", self)
         hBoxLayout.setContentsMargins(0,0,0,0)
         hBoxLayout.setAlignment(Qt.AlignRight)
-        hBoxLayout.addWidget(buttonSave)
-        hBoxLayout.addWidget(buttonCancel)
+        hBoxLayout.addWidget(self.buttonSave)
+        hBoxLayout.addWidget(self.buttonCancel)
         self.setLayout(hBoxLayout)

@@ -15,6 +15,7 @@ from galog.app.components.message_view_pane import LogMessageViewPane
 from galog.app.controllers.message_view_pane.controller import (
     LogMessageViewPaneController,
 )
+from galog.app.controllers.tag_filter_pane import TagFilteringConfig
 from galog.app.device.device import AdbClient
 from galog.app.highlighting import HighlightingRules
 from galog.app.util.message_box import showErrorMsgBox
@@ -269,6 +270,9 @@ class LogMessagesPaneController:
     def _resetMessageFilter(self):
         self._pane.searchPane.input.setText("")
         self._pane.filterModel.setFilterFixedString("")
+
+    def setFilteringConfig(self, config: TagFilteringConfig):
+        pass
 
     def enableMessageFilter(self, reset: bool = True):
         self._showLineNumbers()

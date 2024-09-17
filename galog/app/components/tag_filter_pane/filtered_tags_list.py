@@ -57,7 +57,18 @@ class FilteredTagsList(QWidget):
 
         selectionModel = self.tagListView.selectionModel()
         selectedRows = sorted(selectionModel.selectedRows(), key=key, reverse=True)
-        return [(index.row(), index.data()) for index in selectedRows]
+        return [index.row() for index in selectedRows]
+
+    def toStringList(self) -> List[str]:
+        result = []
+        for index in range(self.dataModel.rowCount()):
+            item = self.dataModel.item(index)
+            result.append(item.data())
+
+        return result
+
+    def hasTag(self, tag: str):
+        return bool(self.dataModel.findItems(tag))
 
     def addTag(self, tag: str):
         self.dataModel.appendRow(QStandardItem(tag))
@@ -66,6 +77,10 @@ class FilteredTagsList(QWidget):
         for tag in tags:
             self.dataModel.appendRow(QStandardItem(tag))
 
+    def setTags(self, tags: List[str]):
+        self.removeAllTags()
+        self.addManyTags(tags)
+
     def hasTags(self):
         return self.dataModel.rowCount() > 0
 
@@ -73,12 +88,8 @@ class FilteredTagsList(QWidget):
         return bool(self.tagListView.selectionModel().selectedRows())
 
     def removeSelectedTags(self):
-        result = []
-        for row, tag in self._selectedRows():
+        for row in self._selectedRows():
             self.dataModel.removeRow(row)
-            result.append(tag)
-
-        return result
 
     def removeAllTags(self):
         self.dataModel.clear()

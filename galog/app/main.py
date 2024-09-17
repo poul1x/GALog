@@ -177,7 +177,10 @@ class MainWindow(QMainWindow):
                         defaultWidget.setStyleSheet("width: 0px;")
 
     def openTagFilter(self):
-        self.tagFilterPaneController.exec_()
+        result = self.tagFilterPaneController.exec_()
+        if result == TagFilterPane.Accepted:
+            config = self.tagFilterPaneController.filteringConfig()
+            self.logMessagesPaneController.setFilteringConfig(config)
 
     def startCapture(self):
         if self.logMessagesPaneController.isCaptureRunning():
