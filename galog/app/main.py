@@ -32,7 +32,11 @@ from galog.app.controllers.log_messages_pane.controller import LogMessagesPaneCo
 from galog.app.controllers.open_log_file.controller import OpenLogFileController
 from galog.app.controllers.run_app.controller import RunAppController
 from galog.app.controllers.save_log_file.controller import SaveLogFileController
-from galog.app.controllers.tag_filter_pane.controller import TagFilterPaneController
+from galog.app.controllers.tag_filter_pane.controller import (
+    TagFilterPaneController,
+    TagFilteringConfig,
+    TagFilteringMode,
+)
 from galog.app.highlighting import HighlightingRules
 from galog.app.util.message_box import (
     showErrorMsgBox,
@@ -178,9 +182,20 @@ class MainWindow(QMainWindow):
 
     def openTagFilter(self):
         result = self.tagFilterPaneController.exec_()
-        if result == TagFilterPane.Accepted:
-            config = self.tagFilterPaneController.filteringConfig()
-            self.logMessagesPaneController.setFilteringConfig(config)
+        if result == TagFilterPane.Rejected:
+            return
+
+        config = self.tagFilterPaneController.filteringConfig()
+        if config.mode == TagFilteringMode.ShowMatching:
+            self.logMessagesPaneController.setTagFilteringFn(
+                lambda tag: tag in config.tags
+            )
+        elif config.mode == TagFilteringMode.HideMatching:
+            self.logMessagesPaneController.setTagFilteringFn(
+                lambda tag: tag not in config.tags
+            )
+        else:  # config.mode == TagFilteringMode.Disabled:
+            self.logMessagesPaneController.unsetTagFilteringFn()
 
     def startCapture(self):
         if self.logMessagesPaneController.isCaptureRunning():

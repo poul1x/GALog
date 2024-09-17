@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Callable, List
 
 from PyQt5.QtCore import QModelIndex, Qt, QThread, QThreadPool
 from PyQt5.QtGui import QGuiApplication, QStandardItem, QStandardItemModel
@@ -271,8 +271,11 @@ class LogMessagesPaneController:
         self._pane.searchPane.input.setText("")
         self._pane.filterModel.setFilterFixedString("")
 
-    def setFilteringConfig(self, config: TagFilteringConfig):
-        pass
+    def setTagFilteringFn(self, fn: Callable[[str], bool]):
+        self._pane.filterModel.setTagFilteringFn(fn)
+
+    def unsetTagFilteringFn(self):
+        self._pane.filterModel.clearTagFilteringItems()
 
     def enableMessageFilter(self, reset: bool = True):
         self._showLineNumbers()

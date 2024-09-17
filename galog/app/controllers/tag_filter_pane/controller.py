@@ -53,6 +53,12 @@ class TagFilterPaneController:
         self._pane.controlButtonBar.removeAllTagsButton.clicked.connect(
             self._handleRemoveAllTags
         )
+        self._pane.controlButtonBar.saveToFileButton.clicked.connect(
+            self._handleSaveTagsToFile
+        )
+        self._pane.controlButtonBar.loadFromFileButton.clicked.connect(
+            self._handleLoadTagsFromFile
+        )
         self._pane.tagNameInput.completionAccepted.connect(
             self._handleAddTagCompleted,
         )
@@ -65,7 +71,7 @@ class TagFilterPaneController:
         self._pane.bottomButtonBar.buttonSave.clicked.connect(
             self._handleButtonSaveClicked,
         )
-        self._pane.bottomButtonBar.buttonSave.clicked.connect(
+        self._pane.bottomButtonBar.buttonCancel.clicked.connect(
             lambda: self._pane.reject()
         )
 
@@ -108,8 +114,9 @@ class TagFilterPaneController:
             showErrorMsgBox2(msg)
             return
 
-        self._pane.filteredTagsList.addTag(tag)
         self._pane.tagNameInput.clear()
+        self._pane.filteredTagsList.addTag(tag)
+        self._updateControlButtonBarState()
 
     def _handleInputStateChanged(self):
         self._updateAddButtonState()

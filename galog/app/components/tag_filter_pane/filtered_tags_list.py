@@ -63,7 +63,7 @@ class FilteredTagsList(QWidget):
         result = []
         for index in range(self.dataModel.rowCount()):
             item = self.dataModel.item(index)
-            result.append(item.data())
+            result.append(item.text())
 
         return result
 
