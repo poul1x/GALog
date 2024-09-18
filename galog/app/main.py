@@ -181,7 +181,8 @@ class MainWindow(QMainWindow):
                         defaultWidget.setStyleSheet("width: 0px;")
 
     def openTagFilter(self):
-        result = self.tagFilterPaneController.exec_()
+        tagList = self.logMessagesPaneController.uniqueTagNames()
+        result = self.tagFilterPaneController.exec_(tagList)
         if result == TagFilterPane.Rejected:
             return
 

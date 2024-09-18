@@ -42,8 +42,9 @@ class TagFilterPaneController:
         self._config = TagFilteringConfig(mode=TagFilteringMode.Disabled, tags=[])
         self._pane = None
 
-    def exec_(self):
+    def exec_(self, tagList: List[str] = []):
         self._pane = TagFilterPane(self._mainWindow)
+        self._pane.tagNameInput.setCompletionStrings(tagList)
         self._pane.controlButtonBar.addTagButton.clicked.connect(
             self._handleAddTag,
         )

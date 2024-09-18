@@ -391,3 +391,12 @@ class LogMessagesPaneController:
 
         clip = QGuiApplication.clipboard()
         clip.setText("\n".join(lines))
+
+    def uniqueTagNames(self) -> List[str]:
+        result = set()
+        dataModel = self._pane.dataModel
+        for i in range(dataModel.rowCount()):
+            item = dataModel.item(i, Column.tagName.value)
+            result.add(item.text())
+
+        return list(result)
