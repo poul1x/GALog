@@ -1,22 +1,9 @@
 from typing import List
-from PyQt5.QtCore import Qt, QModelIndex, pyqtSignal
-from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor, QPalette, QFont
-from PyQt5.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
-    QLineEdit,
-    QListView,
-    QAbstractItemView,
-    QCompleter,
-    QStyledItemDelegate,
-    QStyleOptionViewItem,
-    QStyle,
-    QSizePolicy,
-    QFrame,
-)
-from galog.app.components.reusable.search_input_auto_complete import (
-    SearchInputAutoComplete,
-)
+
+from PyQt5.QtCore import QModelIndex, Qt, pyqtSignal
+from PyQt5.QtGui import QStandardItem, QStandardItemModel
+from PyQt5.QtWidgets import QAbstractItemView, QListView, QVBoxLayout, QWidget
+
 from galog.app.util.list_view import ListView
 
 

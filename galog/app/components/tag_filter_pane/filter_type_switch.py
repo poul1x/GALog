@@ -1,6 +1,8 @@
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel, QComboBox
 from enum import Enum, auto
+
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QLabel, QWidget
+
 
 class TagFilteringMode(int, Enum):
     Disabled = 0
@@ -9,7 +11,6 @@ class TagFilteringMode(int, Enum):
 
 
 class FilterTypeSwitch(QWidget):
-
     filterTypeChanged = pyqtSignal(TagFilteringMode)
 
     def __init__(self, parent: QWidget):
@@ -20,13 +21,15 @@ class FilterTypeSwitch(QWidget):
 
     def initUserInterface(self):
         hBoxLayout = QHBoxLayout()
-        hBoxLayout.setContentsMargins(0,0,0,0)
+        hBoxLayout.setContentsMargins(0, 0, 0, 0)
         filterTypeLabel = QLabel("Filtering mode:")
         self.filterTypeSwitch = QComboBox(self)
         self.filterTypeSwitch.addItem("Disabled")
         self.filterTypeSwitch.addItem("Show matching")
         self.filterTypeSwitch.addItem("Hide matching")
-        self.filterTypeSwitch.currentIndexChanged.connect(self._handleCurrentIndexChanged)
+        self.filterTypeSwitch.currentIndexChanged.connect(
+            self._handleCurrentIndexChanged
+        )
         self.filterTypeSwitch.setCurrentIndex(TagFilteringMode.Disabled.value)
         hBoxLayout.addWidget(filterTypeLabel)
         hBoxLayout.addWidget(self.filterTypeSwitch)

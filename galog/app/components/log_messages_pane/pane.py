@@ -1,18 +1,20 @@
 from typing import Optional
 
-from PyQt5.QtCore import Qt, pyqtSignal, QModelIndex
+from PyQt5.QtCore import QModelIndex, QPoint, Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import (
+    QAction,
+    QHBoxLayout,
+    QMenu,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 from galog.app.components.reusable.search_input.widget import SearchInput
 from galog.app.util.hotkeys import HotkeyHelper
 
 from .table_view import TableView
-
-from PyQt5.QtWidgets import QApplication, QMainWindow, QListView, QMenu, QAction, QVBoxLayout, QWidget
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtCore import Qt, QPoint
-
 
 
 class SearchPane(QWidget):
@@ -72,7 +74,7 @@ class LogMessagesPane(QWidget):
         actionView = QAction("View", self)
         actionOrigin = QAction("Go to origin", self)
         actionBack = QAction("Go back", self)
-        actionView.triggered.connect(lambda: self.cmViewMessage.emit(index) )
+        actionView.triggered.connect(lambda: self.cmViewMessage.emit(index))
         actionOrigin.triggered.connect(lambda: self.cmGoToOrigin.emit(index))
         actionBack.triggered.connect(lambda: self.cmGoBack.emit())
 

@@ -1,8 +1,9 @@
-from PyQt5.QtCore import Qt, QModelIndex
 from PyQt5.QtWidgets import QWidget
+
 from galog.app.components.reusable.search_input_auto_complete import (
     SearchInputAutoComplete,
 )
+
 
 class TagNameInput(SearchInputAutoComplete):
     def __init__(self, parent: QWidget):

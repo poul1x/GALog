@@ -33,9 +33,8 @@ from galog.app.controllers.open_log_file.controller import OpenLogFileController
 from galog.app.controllers.run_app.controller import RunAppController
 from galog.app.controllers.save_log_file.controller import SaveLogFileController
 from galog.app.controllers.tag_filter_pane.controller import (
-    TagFilterPaneController,
-    TagFilteringConfig,
     TagFilteringMode,
+    TagFilterPaneController,
 )
 from galog.app.highlighting import HighlightingRules
 from galog.app.util.message_box import (

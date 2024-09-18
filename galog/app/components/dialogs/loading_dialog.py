@@ -1,13 +1,15 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QLabel, QProgressBar, QVBoxLayout
+from PyQt5.QtWidgets import (
+    QApplication,
+    QDialog,
+    QLabel,
+    QMainWindow,
+    QProgressBar,
+    QVBoxLayout,
+)
 
 from galog.app.util.paths import styleSheetFile
 from galog.app.util.style import CustomStyle
-
-from PyQt5.QtWidgets import (
-    QApplication,
-    QMainWindow,
-)
 
 
 class LoadingDialog(QDialog):

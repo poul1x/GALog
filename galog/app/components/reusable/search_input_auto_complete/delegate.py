@@ -1,12 +1,13 @@
 from typing import Optional
-from PyQt5.QtCore import Qt, QModelIndex
-from PyQt5.QtGui import QColor, QPainter, QPalette, QFont
+
+from PyQt5.QtCore import QModelIndex
+from PyQt5.QtGui import QColor, QFont, QPainter, QPalette
 from PyQt5.QtWidgets import (
-    QStyledItemDelegate,
-    QWidget,
-    QStyleOptionViewItem,
-    QStyle,
     QApplication,
+    QStyle,
+    QStyledItemDelegate,
+    QStyleOptionViewItem,
+    QWidget,
 )
 
 

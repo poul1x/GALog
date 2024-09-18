@@ -1,6 +1,5 @@
-import re
-
 from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
+
 
 class TagFileReaderSignals(QObject):
     succeeded = pyqtSignal(list)

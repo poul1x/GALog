@@ -1,5 +1,7 @@
-from typing import Callable, List
+from typing import Callable
+
 from PyQt5.QtCore import QModelIndex, QSortFilterProxyModel, Qt
+
 
 class RegExpFilterModel(QSortFilterProxyModel):
     def __init__(self, parent=None):

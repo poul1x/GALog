@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QPushButton, QVBoxLayout
+from PyQt5.QtWidgets import QPushButton, QVBoxLayout, QWidget
+
 
 class ControlButtonBar(QWidget):
-
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.setObjectName(self.__class__.__name__)
@@ -11,11 +11,11 @@ class ControlButtonBar(QWidget):
 
     def initUserInterface(self):
         vBoxLayout = QVBoxLayout()
-        vBoxLayout.setContentsMargins(10,0,10,0)
+        vBoxLayout.setContentsMargins(10, 0, 10, 0)
         self.addTagButton = QPushButton("Add", self)
         self.removeTagButton = QPushButton("Remove", self)
         self.removeAllTagsButton = QPushButton("Remove all", self)
-        self.saveToFileButton = QPushButton("Save to file",self)
+        self.saveToFileButton = QPushButton("Save to file", self)
         self.loadFromFileButton = QPushButton("Load from file", self)
         vBoxLayout.addWidget(self.addTagButton)
         vBoxLayout.addWidget(self.removeTagButton)

@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QVBoxLayout, QWidget
 
 from galog.app.util.hotkeys import HotkeyHelper
 

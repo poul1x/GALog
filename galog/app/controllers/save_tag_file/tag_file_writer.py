@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
 
+
 class TagFileWriterSignals(QObject):
     succeeded = pyqtSignal()
     failed = pyqtSignal(str, str, str)

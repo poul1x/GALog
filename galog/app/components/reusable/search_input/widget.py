@@ -2,17 +2,11 @@ from typing import Optional
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QKeyEvent
-from PyQt5.QtWidgets import (
-    QApplication,
-    QLineEdit,
-    QProxyStyle,
-    QStyle,
-    QWidget,
-    QToolButton,
-)
+from PyQt5.QtWidgets import QApplication, QLineEdit, QToolButton, QWidget
 
 from galog.app.util.hotkeys import HotkeyHelper
 from galog.app.util.paths import iconFile
+
 
 class SearchInput(QLineEdit):
     def __init__(self, parent: Optional[QWidget] = None):
@@ -35,4 +29,3 @@ class SearchInput(QLineEdit):
 
         self.setClearButtonEnabled(True)
         self.findChildren(QToolButton)[1].setIcon(QIcon(iconFile("close")))
-

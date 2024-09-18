@@ -1,28 +1,10 @@
-from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, List
 
-from PyQt5.QtCore import QModelIndex, Qt, QThread, QThreadPool
-from PyQt5.QtGui import QGuiApplication, QStandardItem, QStandardItemModel
-from PyQt5.QtWidgets import QTableView
-
-from galog.app.components.dialogs import LoadingDialog
-from galog.app.components.log_messages_pane.data_model import Column
-from galog.app.components.log_messages_pane.delegate import (
-    HighlightingData,
-    LazyHighlightingState,
-)
-from galog.app.components.log_messages_pane.pane import LogMessagesPane
-from galog.app.components.message_view_pane import LogMessageViewPane
 from galog.app.components.tag_filter_pane import TagFilteringMode, TagFilterPane
-from galog.app.controllers.message_view_pane.controller import (
-    LogMessageViewPaneController,
-)
 from galog.app.controllers.open_tag_file import OpenTagFileController
 from galog.app.controllers.save_tag_file import SaveTagFileController
-from galog.app.device.device import AdbClient
-from galog.app.highlighting import HighlightingRules
-from galog.app.util.message_box import showErrorMsgBox, showErrorMsgBox2
+from galog.app.util.message_box import showErrorMsgBox2
 
 if TYPE_CHECKING:
     from galog.app.main import MainWindow

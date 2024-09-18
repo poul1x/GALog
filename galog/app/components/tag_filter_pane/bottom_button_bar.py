@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QPushButton, QHBoxLayout
+from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QWidget
 
 
 class BottomButtonBar(QWidget):
@@ -13,7 +13,7 @@ class BottomButtonBar(QWidget):
         hBoxLayout = QHBoxLayout()
         self.buttonSave = QPushButton("Save", self)
         self.buttonCancel = QPushButton("Cancel", self)
-        hBoxLayout.setContentsMargins(0,0,0,0)
+        hBoxLayout.setContentsMargins(0, 0, 0, 0)
         hBoxLayout.setAlignment(Qt.AlignRight)
         hBoxLayout.addWidget(self.buttonSave)
         hBoxLayout.addWidget(self.buttonCancel)

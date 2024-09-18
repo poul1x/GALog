@@ -1,11 +1,7 @@
 from typing import List, Optional
 
-from PyQt5.QtCore import Qt, QStringListModel, pyqtSignal
-from PyQt5.QtGui import QIcon, QKeyEvent
-from PyQt5.QtWidgets import (
-    QWidget,
-    QCompleter,
-)
+from PyQt5.QtCore import QStringListModel, Qt, pyqtSignal
+from PyQt5.QtWidgets import QCompleter, QWidget
 
 from ..search_input import SearchInput
 from .delegate import CompleterDelegate

@@ -29,6 +29,7 @@ def showErrorMsgBox(msgBrief: str, msgVerbose: str, details: Optional[str] = Non
     messageBox.setWindowTitle("Error")
     messageBox.exec_()
 
+
 def showErrorMsgBox2(msgVerbose: str):
     messageBox = MessageBox()
     messageBox.setBodyText(msgVerbose)

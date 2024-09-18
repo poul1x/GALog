@@ -1,17 +1,15 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from galog.app.util.list_view import ListView
-from galog.app.util.paths import iconFile
 
-from .filter_type_switch import FilterTypeSwitch
-from .control_button_bar import ControlButtonBar
 from .bottom_button_bar import BottomButtonBar
+from .control_button_bar import ControlButtonBar
+from .filter_type_switch import FilterTypeSwitch
 from .filtered_tags_list import FilteredTagsList
 from .tag_name_input import TagNameInput
 
-class TagFilterPane(QDialog):
 
+class TagFilterPane(QDialog):
     Accepted = 1
     Rejected = 0
 
@@ -22,7 +20,6 @@ class TagFilterPane(QDialog):
             | Qt.WindowMaximizeButtonHint
             | Qt.WindowCloseButtonHint
         )
-
 
     def __init__(self, parent: QWidget):
         super().__init__(parent, self._defaultFlags())
@@ -47,19 +44,19 @@ class TagFilterPane(QDialog):
         self.bottomButtonBar = BottomButtonBar(self)
 
         vBoxLayout = QVBoxLayout()
-        vBoxLayout.setContentsMargins(10,0,10,0)
+        vBoxLayout.setContentsMargins(10, 0, 10, 0)
         vBoxLayout.setSpacing(0)
         vBoxLayout.addWidget(self.tagNameInput)
         vBoxLayout.addWidget(self.filteredTagsList)
 
         hBoxLayout = QHBoxLayout()
-        hBoxLayout.setContentsMargins(0,10,0,10)
+        hBoxLayout.setContentsMargins(0, 10, 0, 10)
         hBoxLayout.setSpacing(0)
         hBoxLayout.addLayout(vBoxLayout, stretch=1)
         hBoxLayout.addWidget(self.controlButtonBar)
 
         vBoxLayoutMain = QVBoxLayout()
-        vBoxLayoutMain.setContentsMargins(0,0,0,0)
+        vBoxLayoutMain.setContentsMargins(0, 0, 0, 0)
         vBoxLayoutMain.setSpacing(0)
         vBoxLayoutMain.addWidget(self.filterTypeSwitch)
         vBoxLayoutMain.addLayout(hBoxLayout, stretch=1)
