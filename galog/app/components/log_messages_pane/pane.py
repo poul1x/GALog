@@ -87,7 +87,8 @@ class LogMessagesPane(QWidget):
         self.tableView.customContextMenuRequested.connect(self.showContextMenu)
 
         self.dataModel = self.tableView.dataModel
-        self.filterModel = self.tableView.filterModel
+        self.regExpFilterModel = self.tableView.regExpFilterModel
+        self.fnFilterModel = self.tableView.fnFilterModel
 
         layout = QVBoxLayout()
         self.searchPane = SearchPane(self)

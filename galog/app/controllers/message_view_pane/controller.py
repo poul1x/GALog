@@ -11,7 +11,7 @@ from PyQt5.QtGui import (
     QTextCursor,
 )
 
-from galog.app.components.log_messages_pane.data_model import Columns
+from galog.app.components.log_messages_pane.data_model import Column
 from galog.app.components.log_messages_pane.delegate import HighlightingData
 from galog.app.components.message_view_pane import LogMessageViewPane
 from galog.app.controllers.log_messages_pane.search import SearchResult
@@ -38,12 +38,12 @@ class LogMessageViewPaneController:
         self._pane = viewPane
 
     def _highlightingData(self, row: int) -> HighlightingData:
-        return self._dataModel.item(row, Columns.logMessage).data(Qt.UserRole)
+        return self._dataModel.item(row, Column.logMessage).data(Qt.UserRole)
 
     def showContentFor(self, row: int, highlightingEnabled: bool):
-        tagName = self._dataModel.item(row, Columns.tagName).text()
-        logLevel = self._dataModel.item(row, Columns.logLevel).text()
-        logMessage = self._dataModel.item(row, Columns.logMessage).text()
+        tagName = self._dataModel.item(row, Column.tagName).text()
+        logLevel = self._dataModel.item(row, Column.logLevel).text()
+        logMessage = self._dataModel.item(row, Column.logMessage).text()
         hData = self._highlightingData(row)
 
         self.setTag(tagName)

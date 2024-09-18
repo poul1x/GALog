@@ -7,7 +7,7 @@ from PyQt5.QtGui import QGuiApplication, QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QTableView
 
 from galog.app.components.dialogs import LoadingDialog
-from galog.app.components.log_messages_pane.data_model import Columns
+from galog.app.components.log_messages_pane.data_model import Column
 from galog.app.components.log_messages_pane.delegate import (
     HighlightingData,
     LazyHighlightingState,

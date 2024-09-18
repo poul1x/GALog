@@ -8,9 +8,9 @@ from galog.app.util.hotkeys import HotkeyHelper
 from galog.app.util.painter import painterSaveRestore
 from galog.app.util.table_view import TableView as BaseTableView
 
-from .data_model import Columns, DataModel
+from .data_model import Column, DataModel
 from .delegate import StyledItemDelegate
-from .filter_model import FilterModel
+from .filter_model import RegExpFilterModel, FnFilterModel
 
 
 class VerticalHeader(QHeaderView):
@@ -68,9 +68,15 @@ class TableView(BaseTableView):
 
     def initUserInterface(self):
         self.dataModel = DataModel()
-        self.filterModel = FilterModel()
-        self.filterModel.setSourceModel(self.dataModel)
-        self.setModel(self.filterModel)
+        self.regExpFilterModel = RegExpFilterModel()
+        self.regExpFilterModel.setFilteringColumn(Column.logMessage.value)
+
+        self.fnFilterModel = FnFilterModel()
+        self.fnFilterModel.setFilteringColumn(Column.tagName.value)
+
+        self.fnFilterModel.setSourceModel(self.dataModel)
+        self.regExpFilterModel.setSourceModel(self.fnFilterModel)
+        self.setModel(self.regExpFilterModel)
 
         self.setCornerButtonEnabled(False)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -79,10 +85,10 @@ class TableView(BaseTableView):
         self.setShowGrid(False)
 
         hHeader = self.horizontalHeader()
-        hHeader.setSectionResizeMode(Columns.logMessage, QHeaderView.Stretch)
+        hHeader.setSectionResizeMode(Column.logMessage, QHeaderView.Stretch)
         hHeader.setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        self.setColumnWidth(Columns.logLevel, 10)
-        self.setColumnWidth(Columns.tagName, 200)
+        self.setColumnWidth(Column.logLevel, 10)
+        self.setColumnWidth(Column.tagName, 200)
 
         font = self.delegate.font()
         height = QFontMetrics(font).height()

@@ -5,7 +5,7 @@ from PyQt5.QtGui import QGuiApplication, QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QTableView
 
 from galog.app.components.dialogs import LoadingDialog
-from galog.app.components.log_messages_pane.data_model import Columns
+from galog.app.components.log_messages_pane.data_model import Column
 from galog.app.components.log_messages_pane.delegate import (
     HighlightingData,
     LazyHighlightingState,
@@ -15,7 +15,6 @@ from galog.app.components.message_view_pane import LogMessageViewPane
 from galog.app.controllers.message_view_pane.controller import (
     LogMessageViewPaneController,
 )
-from galog.app.controllers.tag_filter_pane import TagFilteringConfig
 from galog.app.device.device import AdbClient
 from galog.app.highlighting import HighlightingRules
 from galog.app.util.message_box import showErrorMsgBox
@@ -46,7 +45,7 @@ class LogMessagesPaneController:
         self._liveReload = True
         self._lineNumbersVisible = False
         self._scrolling = True
-        self._backToFilter = None
+        self._jumpBackRow = None
 
     @property
     def device(self):
@@ -79,7 +78,7 @@ class LogMessagesPaneController:
 
         self._pane = pane
         self._scrolling = True
-        self._backToFilter = None
+        self._jumpBackRow = None
 
         assert self._highlightingRules is not None
         self._viewPaneController = LogMessageViewPaneController(
@@ -92,7 +91,7 @@ class LogMessagesPaneController:
         if self.messageFilterEnabled():
             self.disableMessageFilter()
         else:
-            if self._backToFilter is not None:
+            if self._jumpBackRow is not None:
                 self._jumpBack()
 
     def setLiveReloadEnabled(self, enabled: bool):
@@ -120,7 +119,7 @@ class LogMessagesPaneController:
     def _blinkRow(self):
         model = self._pane.tableView.model()
         for _ in range(10):
-            for column in Columns:
+            for column in Column:
                 index = model.index(0, column)
                 color1 = model.data(index, Qt.TextColorRole)
                 color2 = model.data(index, Qt.BackgroundRole)
@@ -130,8 +129,8 @@ class LogMessagesPaneController:
 
     def _jumpBack(self):
         self.enableMessageFilter(reset=False)
-        index = self._pane.filterModel.index(self._backToFilter, 0)
-        self._backToFilter = None
+        index = self._pane.regExpFilterModel.index(self._jumpBackRow, 0)
+        self._jumpBackRow = None
         self._pane.tableView.selectRow(index.row())
         flags = QTableView.PositionAtCenter | QTableView.PositionAtTop
         self._pane.tableView.scrollTo(index, flags)
@@ -139,26 +138,26 @@ class LogMessagesPaneController:
         self._rowBlinkingController.startBlinking(index.row())
 
     def _goBack(self):
-        filterModel = self._pane.filterModel
-        if filterModel.filteringEnabled() or filterModel.tagFilteringEnabled():
+        filterModel = self._pane.regExpFilterModel
+        if filterModel.filteringEnabled():
             return
 
-        if self._backToFilter is not None:
+        if self._jumpBackRow is not None:
             self._jumpBack()
 
     def _goToOrigin(self, index: QModelIndex):
-        filterModel = self._pane.filterModel
-        if filterModel.filteringEnabled() or filterModel.tagFilteringEnabled():
+        filterModel = self._pane.regExpFilterModel
+        if filterModel.filteringEnabled():
             self._jumpToRow(index)
 
     def _rowGoToOrigin(self):
         self._goToOrigin(self._pane.tableView.currentIndex())
 
     def _jumpToRow(self, index: QModelIndex):
-        self._backToFilter = index.row()
-        dataModelIndex = self._pane.filterModel.mapToSource(index)
+        self._jumpBackRow = index.row()
+        sourceIndex = self._pane.regExpFilterModel.mapToSource(index)
         self.disableMessageFilter()
-        index = self._pane.filterModel.index(dataModelIndex.row(), 0)
+        index = self._pane.regExpFilterModel.index(sourceIndex.row(), 0)
         self._pane.tableView.selectRow(index.row())
         flags = QTableView.PositionAtCenter | QTableView.PositionAtTop
         self._pane.tableView.scrollTo(index, flags)
@@ -171,12 +170,14 @@ class LogMessagesPaneController:
         self._viewPaneController.showContentFor(index.row(), highlightingEnabled)
 
     def _rowActivated(self, index: QModelIndex):
-        filterModel = self._pane.filterModel
-        if filterModel.filteringEnabled() or filterModel.tagFilteringEnabled():
-            realIndex = filterModel.mapToSource(index)
-            self._showContentFor(realIndex)
-        else:
-            self._showContentFor(index)
+        regExpFilterModel = self._pane.regExpFilterModel
+        fnFilterModel = self._pane.fnFilterModel
+
+        sourceIndex = fnFilterModel.mapToSource(
+            regExpFilterModel.mapToSource(index),
+        )
+
+        self._showContentFor(sourceIndex)
 
     def _beforeRowInserted(self):
         vbar = self._pane.tableView.verticalScrollBar()
@@ -287,24 +288,24 @@ class LogMessagesPaneController:
 
     def _applyMessageFilter(self):
         text = self._pane.searchPane.input.text()
-        self._pane.filterModel.setFilterFixedString(text)
-        if self._pane.filterModel.rowCount() > 0:
+        self._pane.regExpFilterModel.setFilterFixedString(text)
+        if self._pane.regExpFilterModel.rowCount() > 0:
             self._pane.tableView.selectRow(0)
 
     def _resetMessageFilter(self):
         self._pane.searchPane.input.setText("")
-        self._pane.filterModel.setFilterFixedString("")
+        self._pane.regExpFilterModel.setFilterFixedString("")
 
     def setTagFilteringFn(self, fn: Callable[[str], bool]):
-        self._pane.filterModel.setTagFilteringFn(fn)
+        self._pane.fnFilterModel.setFilteringFn(fn)
 
     def unsetTagFilteringFn(self):
-        self._pane.filterModel.clearTagFilteringItems()
+        self._pane.fnFilterModel.setFilteringEnabled(False)
 
     def enableMessageFilter(self, reset: bool = True):
         self._showLineNumbers()
         self._pane.tableView.setSelectionMode(QTableView.SingleSelection)
-        self._pane.filterModel.setFilteringEnabled(True)
+        self._pane.regExpFilterModel.setFilteringEnabled(True)
         self._pane.searchPane.input.setFocusPolicy(Qt.TabFocus)
         self._pane.searchPane.input.setFocus()
         self._pane.searchPane.show()
@@ -315,13 +316,13 @@ class LogMessagesPaneController:
     def disableMessageFilter(self):
         self._hideLineNumbers()
         self._pane.tableView.setSelectionMode(QTableView.ExtendedSelection)
-        self._pane.filterModel.setFilteringEnabled(False)
+        self._pane.regExpFilterModel.setFilteringEnabled(False)
         self._pane.tableView.reset()
         self._pane.searchPane.input.setFocusPolicy(Qt.NoFocus)
         self._pane.searchPane.hide()
 
     def messageFilterEnabled(self):
-        return self._pane.filterModel.filteringEnabled()
+        return self._pane.regExpFilterModel.filteringEnabled()
 
     def clearLogLines(self):
         cnt = self._pane.dataModel.rowCount()
@@ -355,7 +356,7 @@ class LogMessagesPaneController:
         viewportRect = self._pane.tableView.viewport().rect()
         topLeft = self._pane.tableView.indexAt(viewportRect.topLeft())
         bottomRight = self._pane.tableView.indexAt(viewportRect.bottomRight())
-        self._pane.filterModel.dataChanged.emit(topLeft, bottomRight)
+        self._pane.regExpFilterModel.dataChanged.emit(topLeft, bottomRight)
 
     def setHighlightingEnabled(self, enabled: bool):
         self._pane.tableView.delegate.setHighlightingEnabled(enabled)
@@ -363,9 +364,9 @@ class LogMessagesPaneController:
 
     def _logLine(self, model: QStandardItemModel, row: int):
         return LogLine(
-            level=model.item(row, Columns.logLevel).text(),
-            msg=model.item(row, Columns.logMessage).text(),
-            tag=model.item(row, Columns.tagName).text(),
+            level=model.item(row, Column.logLevel).text(),
+            msg=model.item(row, Column.logMessage).text(),
+            tag=model.item(row, Column.tagName).text(),
             pid=-1,
         )
 
