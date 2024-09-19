@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QObject, QRunnable, Qt, QThread, QThreadPool, pyqtSignal
 
 from galog.app.components.log_messages_pane import LogMessagesPane
-from galog.app.components.log_messages_pane.data_model import Columns
+from galog.app.components.log_messages_pane.data_model import Column
 
 
 class RowBlinkingSignals(QObject):
@@ -49,12 +49,12 @@ class RowBlinkingController:
         self._pane.tableView.setFocus()
 
     def _invertColors(self, row: int):
-        model = self._pane.filterModel
-        index = model.index(row, Columns.logLevel)
+        model = self._pane.regExpFilterModel
+        index = model.index(row, Column.logLevel)
         inverted = model.data(index, Qt.UserRole)
         model.setData(index, not inverted, Qt.UserRole)
 
-        for column in Columns:
+        for column in Column:
             index = model.index(row, column)
             model.dataChanged.emit(index, index)
 

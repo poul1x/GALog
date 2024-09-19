@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (
     QCheckBox,
     QDialog,
     QLabel,
+    QMainWindow,
     QVBoxLayout,
     QWidget,
 )
@@ -27,6 +28,19 @@ class MessageBox(QDialog):
         y = (screen.height() - height) // 2
         self.setGeometry(x, y, width, height)
 
+    def center(self):
+        mainWindow = None
+        for widget in QApplication.topLevelWidgets():
+            if isinstance(widget, QMainWindow):
+                mainWindow = widget
+                break
+
+        assert mainWindow is not None
+        mwGeometry = mainWindow.geometry()
+        geometry = self.frameGeometry()
+        geometry.moveCenter(mwGeometry.center())
+        self.move(geometry.topLeft())
+
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.setAttribute(Qt.WA_StyledBackground)
@@ -36,6 +50,7 @@ class MessageBox(QDialog):
         self.setGeometryAuto()
         self.loadStyleSheet()
         self.setSizeAuto()
+        self.center()
         self._clickedButtonId = -1
 
     def loadStyleSheet(self):

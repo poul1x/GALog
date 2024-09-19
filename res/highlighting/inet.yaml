@@ -8,19 +8,21 @@ rules:
       formatting:
         - underline
         - semibold
-  - name: IPv4Address
-    pattern: >-
-      (?:[0-9]{1,3}\.){3}[0-9]{1,3}
-    highlighting:
-      colors:
-        background:
-          value: black
-          alpha: 0.1
-  - name: MacAddress
-    pattern: >-
-      ([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})
-    highlighting:
-      colors:
-        background:
-          value: black
-          alpha: 0.1
+  # - name: IPv4Address
+  #   priority: 750
+  #   pattern: >-
+  #     (?:[0-9]{1,3}\.){3}[0-9]{1,3}
+  #   highlighting:
+  #     colors:
+  #       background:
+  #         value: black
+  #         alpha: 0.1
+  # - name: MacAddress
+  #   priority: 750
+  #   pattern: >-
+  #     ([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})
+  #   highlighting:
+  #     colors:
+  #       background:
+  #         value: black
+  #         alpha: 0.1

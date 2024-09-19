@@ -1,0 +1,16 @@
+version: 0.1.0
+rules:
+  - name: UppercaseWord
+    pattern: >-
+      \b[A-Z_]{2,}\b(?!\.)
+    priority: 500
+    highlighting:
+      formatting:
+        - bold
+  - name: FalsePositiveRestore.UppercaseWord
+    pattern: >-
+      \b(A|AN|THE)\b
+    priority: 501
+    highlighting:
+      formatting:
+        - normal

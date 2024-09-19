@@ -24,6 +24,7 @@ from galog.app.components.dialogs.stop_capture_dialog import (
     StopCaptureDialogResult,
 )
 from galog.app.components.message_view_pane import LogMessageViewPane
+from galog.app.components.tag_filter_pane.pane import TagFilterPane
 from galog.app.controllers.capture_pane import CapturePaneController
 from galog.app.controllers.install_app import InstallAppController
 from galog.app.controllers.kill_app import KillAppController
@@ -31,6 +32,10 @@ from galog.app.controllers.log_messages_pane.controller import LogMessagesPaneCo
 from galog.app.controllers.open_log_file.controller import OpenLogFileController
 from galog.app.controllers.run_app.controller import RunAppController
 from galog.app.controllers.save_log_file.controller import SaveLogFileController
+from galog.app.controllers.tag_filter_pane.controller import (
+    TagFilteringMode,
+    TagFilterPaneController,
+)
 from galog.app.highlighting import HighlightingRules
 from galog.app.util.message_box import (
     showErrorMsgBox,
@@ -57,6 +62,7 @@ class MainWindow(QMainWindow):
         self._liveReload = True
         self.capturePaneController = CapturePaneController()
         self.logMessagesPaneController = LogMessagesPaneController(self)
+        self.tagFilterPaneController = TagFilterPaneController(self)
         self.loadAppStrings()
         self.loadStyleSheet()
         self.loadFonts()
@@ -173,6 +179,24 @@ class MainWindow(QMainWindow):
                         defaultWidget.setText(defaultWidget.text() + " " * 64)
                         defaultWidget.setStyleSheet("width: 0px;")
 
+    def openTagFilter(self):
+        tagList = self.logMessagesPaneController.uniqueTagNames()
+        result = self.tagFilterPaneController.exec_(tagList)
+        if result == TagFilterPane.Rejected:
+            return
+
+        config = self.tagFilterPaneController.filteringConfig()
+        if config.mode == TagFilteringMode.ShowMatching:
+            self.logMessagesPaneController.setTagFilteringFn(
+                lambda tag: tag in config.tags
+            )
+        elif config.mode == TagFilteringMode.HideMatching:
+            self.logMessagesPaneController.setTagFilteringFn(
+                lambda tag: tag not in config.tags
+            )
+        else:  # config.mode == TagFilteringMode.Disabled:
+            self.logMessagesPaneController.unsetTagFilteringFn()
+
     def startCapture(self):
         if self.logMessagesPaneController.isCaptureRunning():
             msgBrief = "Capture is running"
@@ -270,6 +294,16 @@ class MainWindow(QMainWindow):
 
         controller = InstallAppController()
         controller.promptInstallApp(device)
+
+    def openTagFilterAction(self):
+        action = QAction("&Tag filter", self)
+        action.setShortcut("Ctrl+Shift+F")
+        action.setStatusTip("Open tag filter")
+        action.triggered.connect(lambda: self.openTagFilter())
+        # action.setObjectName("capture.new")
+        action.setEnabled(True)
+        action.setData(True)
+        return action
 
     def startCaptureAction(self):
         action = QAction("&New", self)
@@ -440,6 +474,7 @@ class MainWindow(QMainWindow):
         captureMenu.addAction(self.liveReloadAction())
         captureMenu.addAction(self.toggleHighlightingAction())
         captureMenu.addAction(self.showLineNumbersAction())
+        captureMenu.addAction(self.openTagFilterAction())
 
         # This will be implemented in the next release
         # adbMenu = menuBar.addMenu("🐞 &ADB")

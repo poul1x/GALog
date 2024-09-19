@@ -18,7 +18,7 @@ from galog.app.highlighting import HighlightingRules
 from galog.app.util.colors import logLevelColor, rowSelectedColor
 from galog.app.util.painter import painterSaveRestore
 
-from .data_model import Columns
+from .data_model import Column
 
 
 class LazyHighlightingState(int, Enum):
@@ -64,7 +64,7 @@ class StyledItemDelegate(QStyledItemDelegate):
         self._font.setPixelSize(20)
 
     def _applyLogMessageHighlighting(self, doc: QTextDocument, index: QModelIndex):
-        if index.column() != Columns.logMessage:
+        if index.column() != Column.logMessage:
             return
 
         if not self._highlightingEnabled:
@@ -85,10 +85,10 @@ class StyledItemDelegate(QStyledItemDelegate):
         option: QStyleOptionViewItem,
         index: QModelIndex,
     ):
-        if index.column() == Columns.logMessage:
+        if index.column() == Column.logMessage:
             return
 
-        if index.column() == Columns.logLevel:
+        if index.column() == Column.logLevel:
             fmt = QTextCharFormat()
             fmt.setFontItalic(True)
             self.highlightAllText(doc, fmt)
@@ -106,7 +106,7 @@ class StyledItemDelegate(QStyledItemDelegate):
         index: QModelIndex,
     ):
         model = index.model()
-        newIndex = model.index(index.row(), Columns.logLevel)
+        newIndex = model.index(index.row(), Column.logLevel)
         inverted = model.data(newIndex, Qt.UserRole)
         logLevel = model.data(newIndex)
 

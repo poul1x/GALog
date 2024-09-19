@@ -1,9 +1,0 @@
-version: 0.1.0
-rules:
-  - name: Boolean
-    pattern: >-
-      \bTRUE|True|true|FALSE|False|false\b
-    priority: 500
-    highlighting:
-      formatting:
-        - italic
