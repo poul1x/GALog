@@ -18,8 +18,8 @@ class HotkeyHelper:
     def isSpacePressed(self):
         return self._event.key() == Qt.Key_Space
 
-    def isArrowPressed(self):
-        return self._event.key() in [Qt.Key_Up, Qt.Key_Down, Qt.Key_Right, Qt.Key_Left]
+    def isArrowUpDownPressed(self):
+        return self._event.key() in [Qt.Key_Up, Qt.Key_Down]
 
     def isCtrlCPressed(self):
         return self._event.key() == Qt.Key_C and self.isCtrlPressed()

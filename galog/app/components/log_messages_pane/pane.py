@@ -28,6 +28,7 @@ class SearchPane(QWidget):
     def initUserInterface(self):
         self.input = SearchInput(self)
         self.input.setPlaceholderText("Search message")
+        self.setFocusProxy(self.input)
 
         self.searchByDropdown = QComboBox(self)
         self.searchByDropdown.addItem("Message")
@@ -108,9 +109,10 @@ class LogMessagesPane(QWidget):
         self.setLayout(layout)
 
         self.searchPane.button.setFocusPolicy(Qt.NoFocus)
-        self.searchPane.input.setFocusPolicy(Qt.NoFocus)
-        self.tableView.setFocusPolicy(Qt.StrongFocus)
-        self.tableView.setFocus()
+        self.searchPane.searchByDropdown.setFocusPolicy(Qt.NoFocus)
+        self.searchPane.input.setFocusPolicy(Qt.StrongFocus)
+        self.searchPane.setFocusPolicy(Qt.StrongFocus)
 
         self.setTabOrder(self.tableView, self.searchPane.input)
         self.setTabOrder(self.searchPane.input, self.tableView)
+        self.tableView.setFocus()

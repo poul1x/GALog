@@ -94,7 +94,7 @@ class LogMessagesPaneController:
     def _handleSearchByValueChanged(self, index: int):
         searchPane = self._pane.searchPane
         text = searchPane.searchByDropdown.itemText(index)
-        searchPane.input.setPlaceholderText(f"Search {text}")
+        searchPane.input.setPlaceholderText(f"Search {text.lower()}")
 
         columnMapping = {
             -1: 2,
@@ -324,7 +324,6 @@ class LogMessagesPaneController:
         self._showLineNumbers()
         self._pane.tableView.setSelectionMode(QTableView.SingleSelection)
         self._pane.regExpFilterModel.setFilteringEnabled(True)
-        self._pane.searchPane.input.setFocusPolicy(Qt.TabFocus)
         self._pane.searchPane.input.setFocus()
         self._pane.searchPane.show()
 
@@ -336,7 +335,6 @@ class LogMessagesPaneController:
         self._pane.tableView.setSelectionMode(QTableView.ExtendedSelection)
         self._pane.regExpFilterModel.setFilteringEnabled(False)
         self._pane.tableView.reset()
-        self._pane.searchPane.input.setFocusPolicy(Qt.NoFocus)
         self._pane.searchPane.hide()
 
     def messageFilterEnabled(self):
