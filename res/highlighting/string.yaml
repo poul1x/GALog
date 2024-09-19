@@ -31,10 +31,3 @@ rules:
     highlighting:
       formatting:
         - semibold
-  - name: UppercaseWord
-    pattern: >-
-      \b[A-Z_]{2,}\b
-    priority: 500
-    highlighting:
-      formatting:
-        - bold

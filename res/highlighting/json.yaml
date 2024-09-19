@@ -10,13 +10,17 @@ rules:
           formatting:
             - thin
             - italic
-      - numbers: [2, 4]
+      - numbers: [2]
         highlighting:
           formatting:
             - italic
+      - numbers: [4]
+        highlighting:
+          formatting:
+            - normal
   - name: MultilineJsonKey
     pattern: >-
-      ^ *(\")((?:\\\"|[^\"])*)(\")\s*(:)
+      ^\s*(\")((?:\\\"|[^\"])*)(\")\s*(:)
     priority: 900
     groups:
       - numbers: [1,3]
