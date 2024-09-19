@@ -96,6 +96,14 @@ class LogMessagesPaneController:
         text = searchPane.searchByDropdown.itemText(index)
         searchPane.input.setPlaceholderText(f"Search {text.lower()}")
 
+        #
+        # Mapping from QComboBox (index) to QTableView (column)
+        # -1: 2 => Invalid index -> Message
+        # 0: 2 => Message (QComboBox) -> Message (QTableView)
+        # 1: 0 => Log level
+        # 2: 1 => Tag
+        #
+
         columnMapping = {
             -1: 2,
             0: 2,

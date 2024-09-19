@@ -7,8 +7,8 @@ class RegExpFilterModel(QSortFilterProxyModel):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.setFilterKeyColumn(0)
         self._enabled = False
-        self._column = 0
 
     def filteringEnabled(self):
         return self._enabled
@@ -17,8 +17,11 @@ class RegExpFilterModel(QSortFilterProxyModel):
         self._enabled = enabled
         self.invalidateFilter()
 
+    def filteringColumn(self):
+        return self.filterKeyColumn()
+
     def setFilteringColumn(self, column: int):
-        self._column = column
+        self.setFilterKeyColumn(column)
         self.invalidateFilter()
 
     def filterAcceptsRow(self, sourceRow: int, sourceParent: QModelIndex):
@@ -30,7 +33,7 @@ class RegExpFilterModel(QSortFilterProxyModel):
             return True
 
         sourceModel = self.sourceModel()
-        indexBody = sourceModel.index(sourceRow, self._column, sourceParent)
+        indexBody = sourceModel.index(sourceRow, self.filteringColumn(), sourceParent)
         return filterRegExp.indexIn(sourceModel.data(indexBody)) != -1
 
 
@@ -38,9 +41,9 @@ class FnFilterModel(QSortFilterProxyModel):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.setFilterKeyColumn(0)
         self._enabled = False
         self._filterFn = None
-        self._column = 0
 
     def filteringEnabled(self):
         return self._enabled
@@ -57,11 +60,11 @@ class FnFilterModel(QSortFilterProxyModel):
         self._enabled = True
         self.invalidateFilter()
 
-    def setFilteringColumn(self):
-        return self._column
+    def filteringColumn(self):
+        return self.filterKeyColumn()
 
     def setFilteringColumn(self, column: int):
-        self._column = column
+        self.setFilterKeyColumn(column)
         self.invalidateFilter()
 
     def filterAcceptsRow(self, sourceRow: int, sourceParent: QModelIndex):
@@ -69,5 +72,5 @@ class FnFilterModel(QSortFilterProxyModel):
             return True
 
         sourceModel = self.sourceModel()
-        index = sourceModel.index(sourceRow, self._column, sourceParent)
+        index = sourceModel.index(sourceRow, self.filteringColumn(), sourceParent)
         return self._filterFn(sourceModel.data(index))
