@@ -3,6 +3,7 @@ from typing import Optional
 from PyQt5.QtCore import QModelIndex, QPoint, Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import (
+    QComboBox,
     QAction,
     QHBoxLayout,
     QMenu,
@@ -28,6 +29,11 @@ class SearchPane(QWidget):
         self.input = SearchInput(self)
         self.input.setPlaceholderText("Search message")
 
+        self.searchByDropdown = QComboBox(self)
+        self.searchByDropdown.addItem("Message")
+        self.searchByDropdown.addItem("Tag")
+        self.searchByDropdown.addItem("Log Level")
+
         self.button = QPushButton(self)
         self.button.setText("Search")
 
@@ -37,6 +43,7 @@ class SearchPane(QWidget):
         layout.setSpacing(0)
 
         layout.addWidget(self.input, 1)
+        layout.addWidget(self.searchByDropdown)
         layout.addWidget(self.button)
 
         self.setLayout(layout)

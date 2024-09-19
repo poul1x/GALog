@@ -33,6 +33,37 @@
     margin-right: 5px;
 }
 
+#LogMessagesSearchPane QComboBox {
+    border: none;
+    font-family: Arial;
+    font-size: 20px;
+    padding: 2px;
+}
+
+#LogMessagesSearchPane QComboBox::drop-down {
+	background-color: white;
+	border: none;
+	padding-left: 0px;
+	padding-right: 5px;
+}
+
+#LogMessagesSearchPane QComboBox::down-arrow {
+    image: url(res/icons/dropdown.svg);
+}
+
+#LogMessagesSearchPane > QComboBox QListView {
+    selection-background-color: #464646;
+    selection-color: white;
+	border: none;
+}
+
+/* Not working */
+/* #LogMessagesSearchPane > QComboBox QListView::item {
+    padding-top: 2px;
+    padding-bottom: 2px;
+} */
+
+
 #LogMessagesSearchPane QPushButton {
     border: none;
     font-family: Arial;

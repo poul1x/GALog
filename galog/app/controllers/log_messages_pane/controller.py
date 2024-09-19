@@ -71,6 +71,10 @@ class LogMessagesPaneController:
         pane.toggleMessageFilter.connect(self._toggleMessageFilter)
         pane.copyRowsToClipboard.connect(self._copyRowsToClipboard)
 
+        pane.searchPane.searchByDropdown.currentIndexChanged.connect(
+            self._handleSearchByValueChanged
+        )
+
         pane.cmViewMessage.connect(self._rowActivated)
         pane.cmGoToOrigin.connect(self._goToOrigin)
         pane.cmGoBack.connect(self._goBack)
@@ -86,6 +90,20 @@ class LogMessagesPaneController:
         )
 
         self._rowBlinkingController = RowBlinkingController(self._pane)
+
+    def _handleSearchByValueChanged(self, index: int):
+        searchPane = self._pane.searchPane
+        text = searchPane.searchByDropdown.itemText(index)
+        searchPane.input.setPlaceholderText(f"Search {text}")
+
+        columnMapping = {
+            -1: 2,
+            0: 2,
+            1: 0,
+            2: 1,
+        }
+
+        self._pane.regExpFilterModel.setFilteringColumn(columnMapping[index])
 
     def _toggleMessageFilter(self):
         if self.messageFilterEnabled():
