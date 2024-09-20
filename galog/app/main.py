@@ -5,7 +5,7 @@ import tarfile
 from contextlib import suppress
 from typing import List
 
-from PySide6.QtCore import QEvent, QThreadPool
+from PySide6.QtCore import QEvent, QThreadPool, Qt
 from PySide6.QtGui import QFontDatabase, QIcon, QAction
 from PySide6.QtWidgets import (
     QApplication,
@@ -494,7 +494,6 @@ class MainWindow(QMainWindow):
 
         self.setupMenuBar()
         self.statusBar().show()
-
 
 def runApp():
     app = QApplication(sys.argv)
