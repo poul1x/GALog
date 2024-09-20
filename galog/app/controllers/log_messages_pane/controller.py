@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Callable, List
+from typing import TYPE_CHECKING, Callable, Dict, List
 
 from PySide6.QtCore import QModelIndex, Qt, QThread, QThreadPool
 from PySide6.QtGui import QGuiApplication, QStandardItem, QStandardItemModel
@@ -33,14 +33,19 @@ if TYPE_CHECKING:
 else:
     MainWindow = object
 
+import functools
 
 class LogMessagesPaneController:
+
+    _highlightingTasks: Dict[int, SearchItemTask]
+
     def __init__(self, mainWindow: MainWindow):
         self._client = AdbClient()
         self._mainWindow = mainWindow
         self._rowBlinkingController = None
         self._viewPaneController = None
         self._highlightingRules = None
+        self._highlightingTasks = {}
         self._logReader = None
         self._liveReload = True
         self._lineNumbersVisible = False
@@ -213,10 +218,11 @@ class LogMessagesPaneController:
         if self._scrolling:
             self._pane.tableView.scrollToBottom()
 
-    def _searchDone(self, index: QModelIndex, results: List[SearchResult]):
+    def _searchDone(self, index: QModelIndex):
+        task = self._highlightingTasks.pop(index.row())
         data = HighlightingData(
             state=LazyHighlightingState.done,
-            items=results,
+            items=task.searchResults(),
         )
 
         model = index.model()
@@ -236,7 +242,8 @@ class LogMessagesPaneController:
             items.append(item)
 
         task = SearchItemTask(index.data(), items)
-        task.signals.finished.connect(lambda results: self._searchDone(index, results))
+        task.finished.connect(lambda: self._searchDone(index))
+        self._highlightingTasks.update({index.row(): task})
         QThreadPool.globalInstance().start(task)
 
     def addLogLine(self, line: LogLine):
@@ -330,7 +337,7 @@ class LogMessagesPaneController:
 
     def enableMessageFilter(self, reset: bool = True):
         self._showLineNumbers()
-        self._pane.tableView.setSelectionMode(QTableView.SingleSelection)
+        self._pane.tableView.setSelectionMode(QTableView.SelectionMode.SingleSelection)
         self._pane.regExpFilterModel.setFilteringEnabled(True)
         self._pane.searchPane.input.setFocus()
         self._pane.searchPane.show()
@@ -340,7 +347,7 @@ class LogMessagesPaneController:
 
     def disableMessageFilter(self):
         self._hideLineNumbers()
-        self._pane.tableView.setSelectionMode(QTableView.ExtendedSelection)
+        self._pane.tableView.setSelectionMode(QTableView.SelectionMode.ExtendedSelection)
         self._pane.regExpFilterModel.setFilteringEnabled(False)
         self._pane.tableView.reset()
         self._pane.searchPane.hide()
@@ -353,7 +360,7 @@ class LogMessagesPaneController:
         self._pane.dataModel.removeRows(0, cnt)
 
     def _addLogLine(self, logLevel: str, tagName: str, logMessage: str):
-        flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
+        flags = Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled
         itemLogLevel = QStandardItem(logLevel)
         itemLogLevel.setData(False, Qt.ItemDataRole.UserRole)  # is row color inverted
         itemLogLevel.setFlags(flags)

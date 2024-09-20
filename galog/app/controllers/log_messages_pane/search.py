@@ -23,26 +23,42 @@ class SearchResult:
 
 
 class SearchItemTaskSignals(QObject):
-    finished = Signal(list)
+    finished = Signal()
 
 
 class SearchItemTask(QRunnable):
+
+    _signals: SearchItemTaskSignals
+    _searchItems: List[SearchItem]
+    _results: List[SearchResult]
+    _text: str
+
     def __init__(self, text: str, searchItems: List[SearchItem]):
         super().__init__()
-        self.signals = SearchItemTaskSignals()
-        self.searchItems = searchItems
-        self.text = text
+        self.setAutoDelete(False)
+        self._signals = SearchItemTaskSignals()
+        self._searchItems = searchItems
+        self._text = text
+        self._results = []
+
+    @property
+    def finished(self):
+        return self._signals.finished
+
+    def searchResults(self):
+        return self._results
 
     def run(self):
-        result = []
-        for item in self.searchItems:
+        itemsFound = []
+        for item in self._searchItems:
             for found in self._search(item):
-                result.append(found)
+                itemsFound.append(found)
 
         def key(item: SearchResult):
             return item.priority
 
-        self.signals.finished.emit(sorted(result, key=key))
+        self._results = list(sorted(itemsFound, key=key))
+        self._signals.finished.emit()
 
     def _search(self, item: SearchItem):
         #
@@ -54,7 +70,7 @@ class SearchItemTask(QRunnable):
         # groupNum > 0 stands for group matches
         #
 
-        for match in item.pattern.finditer(self.text):
+        for match in item.pattern.finditer(self._text):
             for groupNum in range(0, len(match.groups()) + 1):
                 if groupNum not in item.groups:
                     continue
