@@ -76,15 +76,6 @@ class TagFilterPaneController:
 
         return switch.filteringMode() != TagFilteringMode.Disabled
 
-    def _approveIfFilteringDisabled(self):
-        switch = self._pane.filterTypeSwitch
-        if switch.filteringMode() == TagFilteringMode.Disabled:
-            title = "Tag filter will be disabled"
-            caption = "Current filtering mode is set to 'disabled'. Continue without tag filtering?"
-            return showPromptMsgBox(title, caption)
-
-        return True
-
     def _applyFilteringConfig(self):
         switch = self._pane.filterTypeSwitch
         tagList = self._pane.filteredTagsList
