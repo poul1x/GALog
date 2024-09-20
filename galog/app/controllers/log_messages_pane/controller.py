@@ -158,7 +158,7 @@ class LogMessagesPaneController:
         index = self._pane.regExpFilterModel.index(self._jumpBackRow, 0)
         self._jumpBackRow = None
         self._pane.tableView.selectRow(index.row())
-        flags = QTableView.PositionAtCenter | QTableView.PositionAtTop
+        flags = QTableView.ScrollHint.PositionAtCenter
         self._pane.tableView.scrollTo(index, flags)
         self._pane.tableView.setFocus()
         self._rowBlinkingController.startBlinking(index.row())
@@ -185,7 +185,7 @@ class LogMessagesPaneController:
         self.disableMessageFilter()
         index = self._pane.regExpFilterModel.index(sourceIndex.row(), 0)
         self._pane.tableView.selectRow(index.row())
-        flags = QTableView.ScrollHint.PositionAtCenter | QTableView.ScrollHint.PositionAtTop
+        flags = QTableView.ScrollHint.PositionAtCenter
         self._pane.tableView.scrollTo(index, flags)
         self._rowBlinkingController.startBlinking(index.row())
 

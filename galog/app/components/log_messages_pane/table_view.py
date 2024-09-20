@@ -17,7 +17,7 @@ class VerticalHeader(QHeaderView):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(Qt.Orientation.Vertical, parent)
         self._font = QFont()
-        self._font.setPixelSize(14)
+        self._font.setPixelSize(20)
         self._font.setFamily("Arial")
         self._font.setWeight(QFont.Weight.Bold)
 

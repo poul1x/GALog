@@ -28,13 +28,13 @@ class RegExpFilterModel(QSortFilterProxyModel):
         if not self._enabled:
             return True
 
-        filterRegExp = self.filterRegExp()
-        if filterRegExp.isEmpty():
+        filterRegExp = self.filterRegularExpression()
+        if not filterRegExp.pattern():
             return True
 
         sourceModel = self.sourceModel()
-        indexBody = sourceModel.index(sourceRow, self.filteringColumn(), sourceParent)
-        return filterRegExp.indexIn(sourceModel.data(indexBody)) != -1
+        index = sourceModel.index(sourceRow, self.filteringColumn(), sourceParent)
+        return filterRegExp.match(sourceModel.data(index)).hasMatch()
 
 
 class FnFilterModel(QSortFilterProxyModel):

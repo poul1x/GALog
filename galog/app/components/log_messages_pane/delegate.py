@@ -61,7 +61,7 @@ class StyledItemDelegate(QStyledItemDelegate):
     def _initFont(self):
         self._font = QFont()
         self._font.setFamily("Roboto Mono")
-        self._font.setPixelSize(14)
+        self._font.setPixelSize(20)
 
     def _applyLogMessageHighlighting(self, doc: QTextDocument, index: QModelIndex):
         if index.column() != Column.logMessage:
