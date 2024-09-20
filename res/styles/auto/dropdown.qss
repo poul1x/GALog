@@ -1,0 +1,34 @@
+QComboBox {
+	border: 2px solid black;
+	border-radius: 0px;
+
+	font-family: Arial;
+	font-size: 20px;
+}
+
+QComboBox::drop-down {
+	background-color: white;
+	border:none;
+	padding-left: 0px;
+	padding-right: 5px;
+}
+
+QComboBox::down-arrow {
+    image: url(res/icons/dropdown.svg);
+}
+
+QComboBox QAbstractItemView {
+	font-family: Arial;
+	font-size: 20px;
+}
+
+QComboBox QAbstractItemView::item{
+    color: #000000;
+    background-color: #ffffff;
+	padding: 1px;
+}
+
+QComboBox QAbstractItemView::item:hover{
+	color: #ffffff;
+	background-color: #464646;
+}

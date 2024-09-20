@@ -6,37 +6,10 @@
 	background: #eeeeee;
 }
 
-#CapturePaneHeader QComboBox {
-	border: 2px solid black;
-	border-radius: 0px;
-
-	font-family: Arial;
-	font-size: 19px;
-}
-
-#CapturePaneHeader QComboBox::drop-down {
-	background-color: white;
-	border:none;
-	padding-left: 0px;
-	padding-right: 5px;
-}
-
-#CapturePaneHeader QComboBox::down-arrow {
-    image: url(res/icons/dropdown.svg);
-}
-
-#CapturePaneHeader QComboBox QAbstractItemView
-{
-    color: #000000;
-    background-color: #ffffff;
-
-	selection-color: #ffffff;
-    selection-background-color: #464646;
-}
 
 #CapturePaneHeader QLabel {
 	font-family: Arial;
-	font-size: 19px;
+	font-size: 20px;
 	font-weight: bold;
 }
 
