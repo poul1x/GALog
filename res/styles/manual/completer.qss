@@ -1,0 +1,27 @@
+QAbstractItemView {
+     border: 1px solid black;
+     border-left: 2px solid black;
+     border-right: 2px solid black;
+}
+
+QScrollBar {
+     border-left: 1px solid #cbcbcb;
+     border-right: 1px solid #cbcbcb;
+     background: white;
+     width: 20px;
+}
+
+QScrollBar::handle {
+     background: #8a8a8a;
+     min-height: 50px;
+     border: 1px solid #ffffff;
+     border-radius: 8px;
+}
+
+QScrollBar::sub-line, QScrollBar::add-line {
+    border: none;
+    background: none;
+    color: none;
+    width: 0px;
+    height: 0px;
+}
