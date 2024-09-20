@@ -297,7 +297,7 @@ class MainWindow(QMainWindow):
         action.triggered.connect(lambda: self.openTagFilter())
         # action.setObjectName("capture.new")
         action.setEnabled(True)
-        action.setData(True)
+        action.setData(False)
         return action
 
     def startCaptureAction(self):
