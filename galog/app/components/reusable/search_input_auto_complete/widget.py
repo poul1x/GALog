@@ -3,6 +3,8 @@ from typing import List, Optional
 from PyQt5.QtCore import QStringListModel, Qt, pyqtSignal
 from PyQt5.QtWidgets import QCompleter, QWidget
 
+from galog.app.util.paths import styleSheetFile
+
 from ..search_input import SearchInput
 from .delegate import CompleterDelegate
 
@@ -24,9 +26,12 @@ class SearchInputAutoComplete(SearchInput):
         self._completer.setWidget(self)
         self._completer.activated.connect(self.handleCompletion)
 
-        s = r"border: 1px solid black; border-left: 2px solid black; border-right: 2px solid black;"
+        with open(styleSheetFile("completer")) as f:
+            styleSheet = f.read()
+
+        # s = r"border: 1px solid black; border-left: 2px solid black; border-right: 2px solid black;"
         self._completer.popup().window().setWindowFlag(Qt.NoDropShadowWindowHint, True)
-        self._completer.popup().setStyleSheet(s)
+        self._completer.popup().setStyleSheet(styleSheet)
 
         delegate = CompleterDelegate(self)
         self._completer.popup().setItemDelegate(delegate)

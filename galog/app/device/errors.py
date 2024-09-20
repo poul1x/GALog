@@ -2,13 +2,10 @@ from abc import ABCMeta, abstractmethod
 
 from ppadb import ClearError, InstallError  # noqa
 
-from galog.app.strings import appStrings
-
 
 class DeviceError(Exception, metaclass=ABCMeta):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
-        self._strings = appStrings()
 
     @property
     @abstractmethod
@@ -35,41 +32,41 @@ class DeviceError(Exception, metaclass=ABCMeta):
 class AdbConnectionError(DeviceError):
     @property
     def msgBrief(self):
-        return self._strings.deviceErrors.connectionError.msgBrief
+        return "Connection failure"
 
     @property
     def msgVerbose(self):
-        return self._strings.deviceErrors.connectionError.msgVerbose
+        return "Failed to connect to the adb server. Is adb server running?"
 
 
 class NoDevicesFound(DeviceError):
     @property
     def msgBrief(self):
-        return self._strings.deviceErrors.noDevicesFound.msgBrief
+        return "No connected devices"
 
     @property
     def msgVerbose(self):
-        return self._strings.deviceErrors.noDevicesFound.msgVerbose
+        return "No connected devices found. Please, connect your device to the PC via USB cable"
 
 
 class DeviceNotFound(DeviceError):
     @property
     def msgBrief(self):
-        return self._strings.deviceErrors.deviceNotFound.msgBrief
+        return "Device is not available"
 
     @property
     def msgVerbose(self):
-        return self._strings.deviceErrors.deviceNotFound.msgVerbose
+        return "Device is not longer available. Please, reconnect it to the PC"
 
 
 class DeviceStateUnauthorized(DeviceError):
     @property
     def msgBrief(self):
-        return self._strings.deviceErrors.deviceStateUnauthorized.msgBrief
+        return "Device is unauthorized"
 
     @property
     def msgVerbose(self):
-        return self._strings.deviceErrors.deviceStateUnauthorized.msgVerbose
+        return "Please, allow USB debugging on your device after connecting it to PC"
 
 
 class DeviceStateInvalid(DeviceError):
@@ -82,12 +79,12 @@ class DeviceStateInvalid(DeviceError):
 
     @property
     def msgBrief(self):
-        return self._strings.deviceErrors.deviceStateInvalid.msgBrief
+        return "Device error"
 
     @property
     def msgVerbose(self):
         return self._safeFormatting(
-            self._strings.deviceErrors.deviceStateInvalid.msgVerbose,
+            "Unable to work with device in state '{}'",
             self.deviceState,
         )
 
@@ -102,11 +99,11 @@ class DeviceRuntimeError(DeviceError):
 
     @property
     def msgBrief(self):
-        return self._strings.deviceErrors.runtimeError.msgBrief
+        return "Device error"
 
     @property
     def msgVerbose(self):
-        return self._strings.deviceErrors.runtimeError.msgVerbose
+        return "Unhandled error occurred. Please, enable logging for details"
 
     def __str__(self) -> str:
         return f"{self.msgBrief}. Reason - {self.reason}"

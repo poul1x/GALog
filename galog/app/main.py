@@ -46,7 +46,6 @@ from galog.app.util.paths import fontFiles, highlightingFiles, iconFile, styleSh
 from galog.app.util.style import CustomStyle
 
 from .components.log_messages_pane import LogMessagesPane
-from .strings import appStringsInit
 
 
 class MainWindow(QMainWindow):
@@ -63,7 +62,6 @@ class MainWindow(QMainWindow):
         self.capturePaneController = CapturePaneController()
         self.logMessagesPaneController = LogMessagesPaneController(self)
         self.tagFilterPaneController = TagFilterPaneController(self)
-        self.loadAppStrings()
         self.loadStyleSheet()
         self.loadFonts()
         self.initHighlighting()
@@ -86,9 +84,6 @@ class MainWindow(QMainWindow):
                 )
 
         QThreadPool.globalInstance().start(execAdbServer)
-
-    def loadAppStrings(self):
-        appStringsInit("en")
 
     def loadFontsFromTar(self, fontDB: QFontDatabase, tar: tarfile.TarFile):
         for member in tar.getmembers():
@@ -302,7 +297,7 @@ class MainWindow(QMainWindow):
         action.triggered.connect(lambda: self.openTagFilter())
         # action.setObjectName("capture.new")
         action.setEnabled(True)
-        action.setData(True)
+        action.setData(False)
         return action
 
     def startCaptureAction(self):
