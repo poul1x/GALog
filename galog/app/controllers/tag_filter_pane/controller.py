@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, List
 from galog.app.components.tag_filter_pane import TagFilteringMode, TagFilterPane
 from galog.app.controllers.open_tag_file import OpenTagFileController
 from galog.app.controllers.save_tag_file import SaveTagFileController
-from galog.app.util.message_box import showErrorMsgBox2
+from galog.app.util.message_box import showErrorMsgBox2, showPromptMsgBox
 
 if TYPE_CHECKING:
     from galog.app.main import MainWindow
@@ -74,6 +74,17 @@ class TagFilterPaneController:
             tags=tagList.toStringList(),
         )
 
+        return switch.filteringMode() != TagFilteringMode.Disabled
+
+    def _approveIfFilteringDisabled(self):
+        switch = self._pane.filterTypeSwitch
+        if switch.filteringMode() == TagFilteringMode.Disabled:
+            title = "Tag filter will be disabled"
+            caption = "Current filtering mode is set to 'disabled'. Continue without tag filtering?"
+            return showPromptMsgBox(title, caption)
+
+        return True
+
     def _applyFilteringConfig(self):
         switch = self._pane.filterTypeSwitch
         tagList = self._pane.filteredTagsList
@@ -82,7 +93,14 @@ class TagFilterPaneController:
         self._updateControlButtonBarState()
 
     def _handleButtonSaveClicked(self):
-        self._saveFilteringConfig()
+        filteringEnabled = self._saveFilteringConfig()
+        if not filteringEnabled:
+            title = "Warning"
+            caption = "Tag filter will be disabled"
+            body = "Current filtering mode is set to 'disabled'. Continue without tag filtering?"
+            if not showPromptMsgBox(title, caption, body):
+                return
+
         self._pane.accept()
 
     def filteringConfig(self):
