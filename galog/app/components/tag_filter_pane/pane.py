@@ -15,10 +15,10 @@ class TagFilterPane(QDialog):
 
     def _defaultFlags(self):
         return (
-            Qt.Window
-            | Qt.Dialog
-            | Qt.WindowMaximizeButtonHint
-            | Qt.WindowCloseButtonHint
+            Qt.WindowType.Window
+            | Qt.WindowType.Dialog
+            | Qt.WindowType.WindowMaximizeButtonHint
+            | Qt.WindowType.WindowCloseButtonHint
         )
 
     def __init__(self, parent: QWidget):
@@ -65,7 +65,7 @@ class TagFilterPane(QDialog):
 
     def exec(self) -> int:
         result = super().exec()
-        if result == QDialog.Accepted:
+        if result == QDialog.DialogCode.Accepted:
             return TagFilterPane.Accepted
         else:
             return TagFilterPane.Rejected

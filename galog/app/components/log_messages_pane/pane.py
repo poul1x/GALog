@@ -38,7 +38,7 @@ class SearchPane(QWidget):
         self.button.setText("Search")
 
         layout = QHBoxLayout()
-        layout.setAlignment(Qt.AlignVCenter)
+        layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
@@ -92,7 +92,7 @@ class LogMessagesPane(QWidget):
 
     def initUserInterface(self):
         self.tableView = TableView(self)
-        self.tableView.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.tableView.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.tableView.customContextMenuRequested.connect(self.showContextMenu)
 
         self.dataModel = self.tableView.dataModel
@@ -107,10 +107,10 @@ class LogMessagesPane(QWidget):
         layout.setSpacing(0)
         self.setLayout(layout)
 
-        self.searchPane.button.setFocusPolicy(Qt.NoFocus)
-        self.searchPane.searchByDropdown.setFocusPolicy(Qt.NoFocus)
-        self.searchPane.input.setFocusPolicy(Qt.StrongFocus)
-        self.searchPane.setFocusPolicy(Qt.StrongFocus)
+        self.searchPane.button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.searchPane.searchByDropdown.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.searchPane.input.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.searchPane.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
         self.setTabOrder(self.tableView, self.searchPane.input)
         self.setTabOrder(self.searchPane.input, self.tableView)

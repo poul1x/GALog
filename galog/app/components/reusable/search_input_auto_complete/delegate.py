@@ -15,7 +15,7 @@ class CompleterDelegate(QStyledItemDelegate):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self._font = QFont("Arial")
-        self._font.setPixelSize(20)
+        self._font.setPixelSize(14)
 
     def paint(
         self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex
@@ -23,15 +23,15 @@ class CompleterDelegate(QStyledItemDelegate):
         self.initStyleOption(option, index)
 
         option.font = self._font
-        if option.state & QStyle.State_MouseOver:
+        if option.state & QStyle.StateFlag.State_MouseOver:
             option.backgroundBrush = QColor("#464646")
-            option.palette.setBrush(QPalette.Text, QColor("#ffffff"))
-        elif option.state & QStyle.State_Selected:
+            option.palette.setBrush(QPalette.ColorRole.Text, QColor("#ffffff"))
+        elif option.state & QStyle.StateFlag.State_Selected:
             option.backgroundBrush = QColor("#464646")
-            option.palette.setBrush(QPalette.Text, QColor("#ffffff"))
+            option.palette.setBrush(QPalette.ColorRole.Text, QColor("#ffffff"))
         else:
             option.backgroundBrush = QColor("#ffffff")
-            option.palette.setBrush(QPalette.Text, QColor("#000000"))
+            option.palette.setBrush(QPalette.ColorRole.Text, QColor("#000000"))
 
         # If option.state is MouseOver or Selected
         # Brush color is combined with style color (blue)
@@ -40,4 +40,4 @@ class CompleterDelegate(QStyledItemDelegate):
 
         widget: QWidget = option.widget
         style = widget.style() if widget else QApplication.style()
-        style.drawControl(QStyle.CE_ItemViewItem, option, painter, widget)
+        style.drawControl(QStyle.ControlElement.CE_ItemViewItem, option, painter, widget)

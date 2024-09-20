@@ -19,10 +19,10 @@ from galog.app.util.paths import iconFile
 class LogMessageViewPane(QDialog):
     def _defaultFlags(self):
         return (
-            Qt.Window
-            | Qt.Dialog
-            | Qt.WindowMaximizeButtonHint
-            | Qt.WindowCloseButtonHint
+            Qt.WindowType.Window
+            | Qt.WindowType.Dialog
+            | Qt.WindowType.WindowMaximizeButtonHint
+            | Qt.WindowType.WindowCloseButtonHint
         )
 
     def __init__(self, parent: QWidget):
@@ -46,16 +46,16 @@ class LogMessageViewPane(QDialog):
 
     def initUserInterface(self):
         self.logLevelLabel = QLabel()
-        self.logLevelLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.logLevelLabel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.logLevelLabel.setFixedWidth(300)
         self.logLevelLabel.setTextInteractionFlags(
-            Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard
+            Qt.TextInteractionFlag.TextSelectableByMouse | Qt.TextInteractionFlag.TextSelectableByKeyboard
         )
 
         self.tagNameLabel = QLabel()
-        self.tagNameLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.tagNameLabel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.tagNameLabel.setTextInteractionFlags(
-            Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard
+            Qt.TextInteractionFlag.TextSelectableByMouse | Qt.TextInteractionFlag.TextSelectableByKeyboard
         )
 
         self.copyButton = QPushButton()
@@ -63,17 +63,17 @@ class LogMessageViewPane(QDialog):
         self.copyButton.setText("Copy contents")
         self.copyButton.setFixedWidth(220)
 
-        self.copyButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.copyButton.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.copyButton.setIconSize(QSize(32, 32))
 
         hLeftBoxLayout = QHBoxLayout()
         hLeftBoxLayout.addWidget(self.logLevelLabel)
         hLeftBoxLayout.addWidget(self.tagNameLabel)
-        hLeftBoxLayout.setAlignment(Qt.AlignLeft)
+        hLeftBoxLayout.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         hRightBoxLayout = QHBoxLayout()
         hRightBoxLayout.addWidget(self.copyButton)
-        hRightBoxLayout.setAlignment(Qt.AlignRight)
+        hRightBoxLayout.setAlignment(Qt.AlignmentFlag.AlignRight)
 
         hBoxLayout = QHBoxLayout()
         hBoxLayout.addLayout(hLeftBoxLayout, 1)

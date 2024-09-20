@@ -22,5 +22,5 @@ class ControlButtonBar(QWidget):
         vBoxLayout.addWidget(self.removeAllTagsButton)
         vBoxLayout.addWidget(self.saveToFileButton)
         vBoxLayout.addWidget(self.loadFromFileButton)
-        vBoxLayout.setAlignment(Qt.AlignTop)
+        vBoxLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.setLayout(vBoxLayout)

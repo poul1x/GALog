@@ -8,7 +8,7 @@ class MessageBoxButtonBar(QWidget):
     buttonClicked = Signal(int)
 
     def __init__(self, parent: Optional[QWidget] = None) -> None:
-        super().__init__(parent, Qt.WindowSystemMenuHint | Qt.WindowTitleHint)
+        super().__init__(parent, Qt.WindowType.WindowSystemMenuHint | Qt.WindowType.WindowTitleHint)
 
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
         self.setObjectName("MessageBoxButtonBar")
@@ -17,7 +17,7 @@ class MessageBoxButtonBar(QWidget):
 
     def initUserInterface(self):
         hBoxLayout = QHBoxLayout(self)
-        hBoxLayout.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        hBoxLayout.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         hBoxLayout.setContentsMargins(0, 0, 0, 0)
         hBoxLayout.setSpacing(0)
         self.setLayout(hBoxLayout)

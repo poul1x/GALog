@@ -11,7 +11,11 @@ from .header import CapturePaneHeader
 
 class CapturePane(QDialog):
     def _defaultFlags(self):
-        return Qt.Window | Qt.Dialog | Qt.WindowCloseButtonHint
+        return (
+            Qt.WindowType.Window
+            | Qt.WindowType.Dialog
+            | Qt.WindowType.WindowCloseButtonHint
+        )
 
     def __init__(self, parent: QWidget):
         super().__init__(parent, self._defaultFlags())
@@ -73,12 +77,12 @@ class CapturePane(QDialog):
         self.setLayout(layout)
 
     def initFocusPolicy(self):
-        self.reloadButton.setFocusPolicy(Qt.NoFocus)
-        self.deviceDropDown.setFocusPolicy(Qt.NoFocus)
-        self.actionDropDown.setFocusPolicy(Qt.NoFocus)
-        self.selectButton.setFocusPolicy(Qt.NoFocus)
-        self.cancelButton.setFocusPolicy(Qt.NoFocus)
-        self.fromApkButton.setFocusPolicy(Qt.NoFocus)
+        self.reloadButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.deviceDropDown.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.actionDropDown.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.selectButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.cancelButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.fromApkButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self.packagesList.setFocus()
         self.setTabOrder(self.searchInput, self.packagesList)

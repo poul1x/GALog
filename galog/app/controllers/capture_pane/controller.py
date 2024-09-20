@@ -77,7 +77,7 @@ class CapturePaneController:
             self._selectPackagesListRowByIndex(proxyIndex)
 
     def _setAppRunAction(self, action: RunAppAction):
-        i = self._pane.actionDropDown.findData(action, Qt.UserRole)
+        i = self._pane.actionDropDown.findData(action, Qt.ItemDataRole.UserRole)
         assert i != -1, "Current action must be present in RunAppAction"
         self._pane.actionDropDown.setCurrentIndex(i)
 
@@ -85,7 +85,7 @@ class CapturePaneController:
         self._nothingSelected = True
 
     def _packageSelected(self, index: QModelIndex):
-        self._lastSelectedAction = self._pane.actionDropDown.currentData(Qt.UserRole)
+        self._lastSelectedAction = self._pane.actionDropDown.currentData(Qt.ItemDataRole.UserRole)
         self._lastSelectedPackage = index.data()
         self._pane.accept()
 
@@ -162,7 +162,7 @@ class CapturePaneController:
 
     def _fromApkButtonClicked(self):
         openFileDialog = QFileDialog()
-        openFileDialog.setFileMode(QFileDialog.ExistingFile)
+        openFileDialog.setFileMode(QFileDialog.FileMode.ExistingFile)
         openFileDialog.setNameFilter("APK Files (*.apk)")
 
         if not openFileDialog.exec():
@@ -211,7 +211,7 @@ class CapturePaneController:
         item = QStandardItem("¯\_(ツ)_/¯")
         item.setSelectable(False)
         item.setEnabled(False)
-        item.setData(Qt.AlignCenter, Qt.TextAlignmentRole)
+        item.setData(Qt.AlignmentFlag.AlignCenter, Qt.ItemDataRole.TextAlignmentRole)
         self._pane.dataModel.appendRow(item)
 
     def _setPackages(self, packages: List[str]):
@@ -240,11 +240,11 @@ class CapturePaneController:
         selectionModel.clear()
 
         self._pane.packagesList.setCurrentIndex(index)
-        selectionModel.select(index, QItemSelectionModel.Select)
-        self._pane.packagesList.scrollTo(index, QListView.PositionAtCenter)
+        selectionModel.select(index, QItemSelectionModel.SelectionFlag.Select)
+        self._pane.packagesList.scrollTo(index, QListView.ScrollHint.PositionAtCenter)
 
     def _findPackageItemByName(self, packageName: str):
-        items = self._pane.dataModel.findItems(packageName, Qt.MatchExactly)
+        items = self._pane.dataModel.findItems(packageName, Qt.MatchFlag.MatchExactly)
         return items[0] if items else None
 
     def _setSelectedPackage(self, packageName: str):

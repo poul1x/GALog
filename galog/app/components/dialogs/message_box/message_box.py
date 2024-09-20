@@ -98,7 +98,7 @@ class MessageBox(QDialog):
             return
 
         headerTextLabel = QLabel(self)
-        headerTextLabel.setAlignment(Qt.AlignCenter)
+        headerTextLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         headerTextLabel.setObjectName("MessageBoxHeadTextLabel")
         headerTextLabel.setContentsMargins(0, 0, 0, 0)
         headerTextLabel.setWordWrap(True)

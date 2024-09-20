@@ -33,7 +33,7 @@ class FilterTypeSwitch(QWidget):
         self.filterTypeSwitch.setCurrentIndex(TagFilteringMode.Disabled.value)
         hBoxLayout.addWidget(filterTypeLabel)
         hBoxLayout.addWidget(self.filterTypeSwitch)
-        hBoxLayout.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        hBoxLayout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         self.setLayout(hBoxLayout)
 
     def _handleCurrentIndexChanged(self, index: int):

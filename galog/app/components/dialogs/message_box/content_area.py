@@ -18,7 +18,7 @@ class MessageBoxContentArea(QWidget):
         hBoxLayout = QHBoxLayout(self)
 
         self.iconLabel = QLabel(self)
-        self.iconLabel.setAlignment(Qt.AlignCenter)
+        self.iconLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.iconLabel.setObjectName("MessageBoxIconLabel")
         self.iconLabel.setContentsMargins(0, 0, 0, 0)
         self.setIcon(QIcon(iconFile("msgbox-info")))
@@ -26,7 +26,7 @@ class MessageBoxContentArea(QWidget):
         self.mainTextLabel = QLabel(self)
         self.mainTextLabel.setObjectName("MessageBoxMainTextLabel")
         self.mainTextLabel.setWordWrap(True)
-        self.mainTextLabel.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.mainTextLabel.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
         hBoxLayout.addWidget(self.iconLabel)
         hBoxLayout.addWidget(self.mainTextLabel, 1)

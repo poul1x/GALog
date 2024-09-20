@@ -14,7 +14,7 @@ class BottomButtonBar(QWidget):
         self.buttonSave = QPushButton("Save", self)
         self.buttonCancel = QPushButton("Cancel", self)
         hBoxLayout.setContentsMargins(0, 0, 0, 0)
-        hBoxLayout.setAlignment(Qt.AlignRight)
+        hBoxLayout.setAlignment(Qt.AlignmentFlag.AlignRight)
         hBoxLayout.addWidget(self.buttonSave)
         hBoxLayout.addWidget(self.buttonCancel)
         self.setLayout(hBoxLayout)

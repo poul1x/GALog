@@ -147,10 +147,10 @@ class LogMessagesPaneController:
         for _ in range(10):
             for column in Column:
                 index = model.index(0, column)
-                color1 = model.data(index, Qt.TextColorRole)
-                color2 = model.data(index, Qt.BackgroundRole)
-                model.setData(index, color1, Qt.BackgroundRole)
-                model.setData(index, color2, Qt.TextColorRole)
+                color1 = model.data(index, Qt.ItemDataRole.ForegroundRole)
+                color2 = model.data(index, Qt.ItemDataRole.BackgroundRole)
+                model.setData(index, color1, Qt.ItemDataRole.BackgroundRole)
+                model.setData(index, color2, Qt.ItemDataRole.ForegroundRole)
             QThread.msleep(500)
 
     def _jumpBack(self):
@@ -185,7 +185,7 @@ class LogMessagesPaneController:
         self.disableMessageFilter()
         index = self._pane.regExpFilterModel.index(sourceIndex.row(), 0)
         self._pane.tableView.selectRow(index.row())
-        flags = QTableView.PositionAtCenter | QTableView.PositionAtTop
+        flags = QTableView.ScrollHint.PositionAtCenter | QTableView.ScrollHint.PositionAtTop
         self._pane.tableView.scrollTo(index, flags)
         self._rowBlinkingController.startBlinking(index.row())
 
@@ -220,7 +220,7 @@ class LogMessagesPaneController:
         )
 
         model = index.model()
-        model.setData(index, data, Qt.UserRole)
+        model.setData(index, data, Qt.ItemDataRole.UserRole)
         model.dataChanged.emit(index, index)
 
     def _lazyHighlighting(self, index: QModelIndex):
@@ -355,7 +355,7 @@ class LogMessagesPaneController:
     def _addLogLine(self, logLevel: str, tagName: str, logMessage: str):
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
         itemLogLevel = QStandardItem(logLevel)
-        itemLogLevel.setData(False, Qt.UserRole)  # is row color inverted
+        itemLogLevel.setData(False, Qt.ItemDataRole.UserRole)  # is row color inverted
         itemLogLevel.setFlags(flags)
 
         itemTagName = QStandardItem(tagName)
@@ -367,7 +367,7 @@ class LogMessagesPaneController:
         )
 
         itemLogMessage = QStandardItem(logMessage)
-        itemLogMessage.setData(data, Qt.UserRole)
+        itemLogMessage.setData(data, Qt.ItemDataRole.UserRole)
         itemLogMessage.setFlags(flags)
 
         self._pane.dataModel.append(

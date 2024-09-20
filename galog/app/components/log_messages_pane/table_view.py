@@ -15,17 +15,17 @@ from .filter_model import FnFilterModel, RegExpFilterModel
 
 class VerticalHeader(QHeaderView):
     def __init__(self, parent: Optional[QWidget] = None):
-        super().__init__(Qt.Vertical, parent)
+        super().__init__(Qt.Orientation.Vertical, parent)
         self._font = QFont()
-        self._font.setPixelSize(19)
+        self._font.setPixelSize(14)
         self._font.setFamily("Arial")
-        self._font.setWeight(QFont.Bold)
+        self._font.setWeight(QFont.Weight.Bold)
 
     def _selectedRows(self):
         return [index.row() for index in self.selectionModel().selectedRows()]
 
     def paintSection(self, _painter: QPainter, rect: QRect, index: int):
-        align = Qt.AlignCenter
+        align = Qt.AlignmentFlag.AlignCenter
         lightColor = QColor("#FFFFFF")
         darkColor = QColor("#464646")
 
@@ -43,7 +43,7 @@ class VerticalHeader(QHeaderView):
     def sizeHint(self) -> QSize:
         fm = QFontMetrics(self._font)
         rowNum = self.model().rowCount()
-        return QSize(fm.width(str(rowNum)) + 5, 0)
+        return QSize(fm.horizontalAdvance(str(rowNum)) + 5, 0)
 
 
 class TableView(BaseTableView):
@@ -78,14 +78,14 @@ class TableView(BaseTableView):
         self.setModel(self.regExpFilterModel)
 
         self.setCornerButtonEnabled(False)
-        self.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.setSelectionMode(QTableView.ExtendedSelection)
+        self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.setSelectionMode(QTableView.SelectionMode.ExtendedSelection)
         self.setTabKeyNavigation(False)
         self.setShowGrid(False)
 
         hHeader = self.horizontalHeader()
-        hHeader.setSectionResizeMode(Column.logMessage, QHeaderView.Stretch)
-        hHeader.setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        hHeader.setSectionResizeMode(Column.logMessage, QHeaderView.ResizeMode.Stretch)
+        hHeader.setDefaultAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         self.setColumnWidth(Column.logLevel, 10)
         self.setColumnWidth(Column.tagName, 200)
 
@@ -95,7 +95,7 @@ class TableView(BaseTableView):
 
         vHeader = VerticalHeader(self)
         self.setVerticalHeader(vHeader)
-        vHeader.setSectionResizeMode(QHeaderView.Fixed)
+        vHeader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         vHeader.setMinimumSectionSize(height)
         vHeader.setDefaultSectionSize(height)
         vHeader.setVisible(False)

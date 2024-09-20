@@ -360,12 +360,12 @@ class MainWindow(QMainWindow):
         option = QStyleOptionButton()
         option.initFrom(checkBox)
         style = checkBox.style()
-        rect = style.subElementRect(QStyle.SE_CheckBoxIndicator, option, checkBox)
+        rect = style.subElementRect(QStyle.SubElement.SE_CheckBoxIndicator, option, checkBox)
         return rect.width()
 
     def getCheckBoxLabelSpacing(self, checkBox: QCheckBox):
         return checkBox.style().pixelMetric(
-            QStyle.PM_CheckBoxLabelSpacing, None, checkBox
+            QStyle.PixelMetric.PM_CheckBoxLabelSpacing, None, checkBox
         )
 
     def liveReloadAction(self):

@@ -61,7 +61,7 @@ class StyledItemDelegate(QStyledItemDelegate):
     def _initFont(self):
         self._font = QFont()
         self._font.setFamily("Roboto Mono")
-        self._font.setPixelSize(20)
+        self._font.setPixelSize(14)
 
     def _applyLogMessageHighlighting(self, doc: QTextDocument, index: QModelIndex):
         if index.column() != Column.logMessage:
@@ -70,7 +70,7 @@ class StyledItemDelegate(QStyledItemDelegate):
         if not self._highlightingEnabled:
             return
 
-        data: HighlightingData = index.data(Qt.UserRole)
+        data: HighlightingData = index.data(Qt.ItemDataRole.UserRole)
         if data.state == LazyHighlightingState.done:
             self.highlightKeywords(doc, data.items)
         elif data.state == LazyHighlightingState.pending:
@@ -93,9 +93,9 @@ class StyledItemDelegate(QStyledItemDelegate):
             fmt.setFontItalic(True)
             self.highlightAllText(doc, fmt)
 
-        if option.state & QStyle.State_Selected:
+        if option.state & QStyle.StateFlag.State_Selected:
             fmt = QTextCharFormat()
-            fmt.setFontWeight(QFont.DemiBold)
+            fmt.setFontWeight(QFont.Weight.DemiBold)
             fmt.setFontItalic(True)
             self.highlightAllText(doc, fmt)
 
@@ -107,16 +107,16 @@ class StyledItemDelegate(QStyledItemDelegate):
     ):
         model = index.model()
         newIndex = model.index(index.row(), Column.logLevel)
-        inverted = model.data(newIndex, Qt.UserRole)
+        inverted = model.data(newIndex, Qt.ItemDataRole.UserRole)
         logLevel = model.data(newIndex)
 
         if inverted:
-            if option.state & QStyle.State_Selected:
+            if option.state & QStyle.StateFlag.State_Selected:
                 color = logLevelColor(logLevel)
             else:
                 color = rowSelectedColor()
         else:
-            if option.state & QStyle.State_Selected:
+            if option.state & QStyle.StateFlag.State_Selected:
                 color = rowSelectedColor()
             else:
                 color = logLevelColor(logLevel)
@@ -135,12 +135,12 @@ class StyledItemDelegate(QStyledItemDelegate):
 
         fm = QFontMetrics(self._font)
         textRect = option.widget.style().subElementRect(
-            QStyle.SE_ItemViewItemText, option, option.widget
+            QStyle.SubElement.SE_ItemViewItemText, option, option.widget
         )
 
         text = index.data()
         if fm.width(text) > textRect.width():
-            text = fm.elidedText(text, Qt.ElideRight, textRect.width())
+            text = fm.elidedText(text, Qt.TextElideMode.ElideRight, textRect.width())
             doc.setProperty("elided", True)
 
         doc.setPlainText(text)
@@ -202,13 +202,13 @@ class StyledItemDelegate(QStyledItemDelegate):
 
     def highlightAllText(self, doc: QTextDocument, charFormat: QTextCharFormat):
         cursor = QTextCursor(doc)
-        cursor.select(QTextCursor.Document)
+        cursor.select(QTextCursor.SelectionType.Document)
         cursor.setCharFormat(charFormat)
 
     def cursorSelect(self, doc: QTextDocument, begin: int, end: int):
         cursor = QTextCursor(doc)
-        cursor.setPosition(begin, QTextCursor.MoveAnchor)
-        cursor.setPosition(end, QTextCursor.KeepAnchor)
+        cursor.setPosition(begin, QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(end, QTextCursor.MoveMode.KeepAnchor)
         return cursor
 
     def highlightKeyword(

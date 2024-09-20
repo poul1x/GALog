@@ -41,7 +41,7 @@ class InstallAppController:
 
     def promptInstallApp(self, device: str):
         openFileDialog = QFileDialog()
-        openFileDialog.setFileMode(QFileDialog.ExistingFile)
+        openFileDialog.setFileMode(QFileDialog.FileMode.ExistingFile)
         openFileDialog.setNameFilter("APK Files (*.apk)")
 
         if not openFileDialog.exec():

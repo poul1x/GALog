@@ -38,7 +38,7 @@ class LogMessageViewPaneController:
         self._pane = viewPane
 
     def _highlightingData(self, row: int) -> HighlightingData:
-        return self._dataModel.item(row, Column.logMessage).data(Qt.UserRole)
+        return self._dataModel.item(row, Column.logMessage).data(Qt.ItemDataRole.UserRole)
 
     def showContentFor(self, row: int, highlightingEnabled: bool):
         tagName = self._dataModel.item(row, Column.tagName).text()
@@ -69,13 +69,13 @@ class LogMessageViewPaneController:
 
     def highlightAllText(self, charFormat: QTextCharFormat):
         cursor = QTextCursor(self._pane.logMsgTextBrowser.document())
-        cursor.select(QTextCursor.Document)
+        cursor.select(QTextCursor.SelectionType.Document)
         cursor.setCharFormat(charFormat)
 
     def cursorSelect(self, begin: int, end: int):
         cursor = QTextCursor(self._pane.logMsgTextBrowser.document())
-        cursor.setPosition(begin, QTextCursor.MoveAnchor)
-        cursor.setPosition(end, QTextCursor.KeepAnchor)
+        cursor.setPosition(begin, QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(end, QTextCursor.MoveMode.KeepAnchor)
         return cursor
 
     def highlightKeyword(self, keyword: SearchResult, charFormat: QTextCharFormat):
@@ -119,8 +119,8 @@ class LogMessageViewPaneController:
         self._pane.logMsgTextBrowser.setPlainText(msg)
 
     def setStyleSheetAuto(self, logLevel: str):
-        color = logLevelColor(logLevel).name(QColor.HexRgb)
-        colorDarker = logLevelColorDarker(logLevel).name(QColor.HexRgb)
+        color = logLevelColor(logLevel).name(QColor.NameFormat.HexRgb)
+        colorDarker = logLevelColorDarker(logLevel).name(QColor.NameFormat.HexRgb)
 
         assert self.QSS_TEMPLATE is not None
         styleSheet = deepcopy(self.QSS_TEMPLATE)

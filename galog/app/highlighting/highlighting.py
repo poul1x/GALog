@@ -49,12 +49,12 @@ class HighlightingRules:
 
     def _loadFormatting(self, formatting: List[str]):
         fontWeights = {
-            "thin": QFont.Thin,
-            "light": QFont.Light,
-            "normal": QFont.Normal,
-            "medium": QFont.Medium,
-            "semibold": QFont.DemiBold,
-            "bold": QFont.Bold,
+            "thin": QFont.Weight.Thin,
+            "light": QFont.Weight.Light,
+            "normal": QFont.Weight.Normal,
+            "medium": QFont.Weight.Medium,
+            "semibold": QFont.Weight.DemiBold,
+            "bold": QFont.Weight.Bold,
         }
 
         charFormat = QTextCharFormat()

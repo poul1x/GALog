@@ -6,7 +6,7 @@ from PySide6.QtCore import QModelIndex, QSortFilterProxyModel, Qt
 class RegExpFilterModel(QSortFilterProxyModel):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.setFilterCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
         self.setFilterKeyColumn(0)
         self._enabled = False
 
@@ -40,7 +40,7 @@ class RegExpFilterModel(QSortFilterProxyModel):
 class FnFilterModel(QSortFilterProxyModel):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.setFilterCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
         self.setFilterKeyColumn(0)
         self._enabled = False
         self._filterFn = None

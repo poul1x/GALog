@@ -30,7 +30,7 @@ class SearchInputAutoComplete(SearchInput):
             styleSheet = f.read()
 
         # s = r"border: 1px solid black; border-left: 2px solid black; border-right: 2px solid black;"
-        self._completer.popup().window().setWindowFlag(Qt.NoDropShadowWindowHint, True)
+        self._completer.popup().window().setWindowFlag(Qt.WindowType.NoDropShadowWindowHint, True)
         self._completer.popup().setStyleSheet(styleSheet)
 
         delegate = CompleterDelegate(self)

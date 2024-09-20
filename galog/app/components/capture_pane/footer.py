@@ -19,26 +19,36 @@ class CapturePaneFooter(QWidget):
 
     def initUserInterface(self):
         layout = QHBoxLayout()
-        layout.setAlignment(Qt.AlignVCenter)
+        layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         layoutLeft = QHBoxLayout()
-        layoutLeft.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        layoutLeft.setAlignment(
+            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
+        )
         layoutRight = QHBoxLayout()
-        layoutRight.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        layoutRight.setAlignment(
+            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+        )
 
         self.selectButton = QPushButton("Select")
         self.selectButton.setEnabled(False)
         self.selectButton.setProperty("name", "select")
-        self.selectButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.selectButton.setSizePolicy(
+            QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
+        )
         layoutLeft.addWidget(self.selectButton)
 
         self.fromApkButton = QPushButton("From APK")
         self.fromApkButton.setProperty("name", "fromAPK")
-        self.fromApkButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.fromApkButton.setSizePolicy(
+            QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
+        )
         layoutLeft.addWidget(self.fromApkButton)
 
         self.cancelButton = QPushButton("Cancel")
         self.cancelButton.setProperty("name", "cancel")
-        self.cancelButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.cancelButton.setSizePolicy(
+            QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
+        )
         layoutRight.addWidget(self.cancelButton)
 
         layout.addLayout(layoutLeft)

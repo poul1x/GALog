@@ -18,13 +18,13 @@ class FilteredTagsList(QWidget):
 
     def initUserInterface(self):
         vBoxLayout = QVBoxLayout()
-        vBoxLayout.setAlignment(Qt.AlignTop)
+        vBoxLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
         vBoxLayout.setContentsMargins(0, 0, 0, 0)
         vBoxLayout.setSpacing(0)
 
         self.tagListView = ListView(self)
-        self.tagListView.setEditTriggers(QListView.NoEditTriggers)
-        self.tagListView.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.tagListView.setEditTriggers(QListView.EditTrigger.NoEditTriggers)
+        self.tagListView.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
 
         self.dataModel = QStandardItemModel(self)
         self.tagListView.setModel(self.dataModel)

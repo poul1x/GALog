@@ -51,8 +51,8 @@ class RowBlinkingController:
     def _invertColors(self, row: int):
         model = self._pane.regExpFilterModel
         index = model.index(row, Column.logLevel)
-        inverted = model.data(index, Qt.UserRole)
-        model.setData(index, not inverted, Qt.UserRole)
+        inverted = model.data(index, Qt.ItemDataRole.UserRole)
+        model.setData(index, not inverted, Qt.ItemDataRole.UserRole)
 
         for column in Column:
             index = model.index(row, column)

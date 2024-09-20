@@ -23,9 +23,9 @@ class CapturePaneHeader(QWidget):
     def initUserInterface(self):
         layout = QHBoxLayout()
         layoutLeft = QHBoxLayout()
-        layoutLeft.setAlignment(Qt.AlignLeft)
+        layoutLeft.setAlignment(Qt.AlignmentFlag.AlignLeft)
         layoutRight = QHBoxLayout()
-        layoutRight.setAlignment(Qt.AlignRight)
+        layoutRight.setAlignment(Qt.AlignmentFlag.AlignRight)
 
         self.deviceLabel = QLabel(self)
         self.deviceLabel.setText("Device:")
