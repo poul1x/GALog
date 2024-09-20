@@ -1,8 +1,8 @@
 from typing import Optional
 
-from PyQt5.QtCore import QModelIndex, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QListView, QWidget
+from PySide6.QtCore import QModelIndex, Signal
+from PySide6.QtGui import QKeyEvent
+from PySide6.QtWidgets import QListView, QWidget
 
 from .hotkeys import HotkeyHelper
 
@@ -15,7 +15,7 @@ class ListView(QListView):
     # keyboard shortcuts (<Enter>, <Space>) pressed on the selected row.
     #
 
-    rowActivated = pyqtSignal(QModelIndex)
+    rowActivated = Signal(QModelIndex)
 
     def _emitRowActivated(self, index: QModelIndex):
         self.rowActivated.emit(index)

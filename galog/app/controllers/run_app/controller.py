@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QThreadPool
+from PySide6.QtCore import QThreadPool
 
 from galog.app.components.dialogs import LoadingDialog
 from galog.app.device import AdbClient
@@ -32,4 +32,4 @@ class RunAppController:
 
         self._loadingDialog = LoadingDialog()
         self._loadingDialog.setText(f"Starting app...")
-        self._loadingDialog.exec_()
+        self._loadingDialog.exec()

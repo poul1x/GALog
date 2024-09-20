@@ -1,11 +1,11 @@
 from typing import List, Optional
 
-from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
+from PySide6.QtCore import QObject, QRunnable, QThread, Signal
 
 
 class TagFileWriterSignals(QObject):
-    succeeded = pyqtSignal()
-    failed = pyqtSignal(str, str, str)
+    succeeded = Signal()
+    failed = Signal(str, str, str)
 
 
 class TagFileWriter(QRunnable):

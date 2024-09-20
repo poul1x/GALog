@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QProxyStyle, QStyle
+from PySide6.QtWidgets import QProxyStyle, QStyle
 
 
 class CustomStyle(QProxyStyle):

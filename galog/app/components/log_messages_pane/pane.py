@@ -1,10 +1,9 @@
 from typing import Optional
 
-from PyQt5.QtCore import QModelIndex, QPoint, Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import (
+from PySide6.QtCore import QModelIndex, QPoint, Qt, Signal
+from PySide6.QtGui import QKeyEvent, QAction
+from PySide6.QtWidgets import (
     QComboBox,
-    QAction,
     QHBoxLayout,
     QMenu,
     QPushButton,
@@ -52,11 +51,11 @@ class SearchPane(QWidget):
 
 
 class LogMessagesPane(QWidget):
-    toggleMessageFilter = pyqtSignal()
-    copyRowsToClipboard = pyqtSignal()
-    cmViewMessage = pyqtSignal(QModelIndex)
-    cmGoToOrigin = pyqtSignal(QModelIndex)
-    cmGoBack = pyqtSignal()
+    toggleMessageFilter = Signal()
+    copyRowsToClipboard = Signal()
+    cmViewMessage = Signal(QModelIndex)
+    cmGoToOrigin = Signal(QModelIndex)
+    cmGoBack = Signal()
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)
@@ -89,7 +88,7 @@ class LogMessagesPane(QWidget):
         contextMenu.addAction(actionView)
         contextMenu.addAction(actionOrigin)
         contextMenu.addAction(actionBack)
-        contextMenu.exec_(self.tableView.viewport().mapToGlobal(position))
+        contextMenu.exec(self.tableView.viewport().mapToGlobal(position))
 
     def initUserInterface(self):
         self.tableView = TableView(self)

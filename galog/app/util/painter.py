@@ -1,4 +1,4 @@
-from PyQt5.QtGui import QPainter
+from PySide6.QtGui import QPainter
 
 
 class PainterStateContextManager:

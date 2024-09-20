@@ -1,7 +1,7 @@
 from typing import List, Optional
 
-from PyQt5.QtCore import QThreadPool
-from PyQt5.QtWidgets import QFileDialog
+from PySide6.QtCore import QThreadPool
+from PySide6.QtWidgets import QFileDialog
 
 from galog.app.components.dialogs import LoadingDialog
 from galog.app.controllers.log_messages_pane.log_reader import LogLine
@@ -39,5 +39,5 @@ class OpenLogFileController:
 
         self._loadingDialog = LoadingDialog()
         self._loadingDialog.setText("Reading file")
-        self._loadingDialog.exec_()
+        self._loadingDialog.exec()
         return self._result

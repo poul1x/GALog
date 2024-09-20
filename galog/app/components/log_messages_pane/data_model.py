@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
-from PyQt5.QtGui import QStandardItem, QStandardItemModel
+from PySide6.QtGui import QStandardItem, QStandardItemModel
 
 
 class Column(int, Enum):

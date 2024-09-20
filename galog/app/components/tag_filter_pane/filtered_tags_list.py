@@ -1,14 +1,14 @@
 from typing import List
 
-from PyQt5.QtCore import QModelIndex, Qt, pyqtSignal
-from PyQt5.QtGui import QStandardItem, QStandardItemModel
-from PyQt5.QtWidgets import QAbstractItemView, QListView, QVBoxLayout, QWidget
+from PySide6.QtCore import QModelIndex, Qt, Signal
+from PySide6.QtGui import QStandardItem, QStandardItemModel
+from PySide6.QtWidgets import QAbstractItemView, QListView, QVBoxLayout, QWidget
 
 from galog.app.util.list_view import ListView
 
 
 class FilteredTagsList(QWidget):
-    selectionChanged = pyqtSignal()
+    selectionChanged = Signal()
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)

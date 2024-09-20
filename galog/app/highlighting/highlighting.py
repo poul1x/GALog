@@ -4,7 +4,7 @@ from re import Pattern
 from typing import Dict, List, Optional
 
 import yaml
-from PyQt5.QtGui import QColor, QFont, QTextCharFormat
+from PySide6.QtGui import QColor, QFont, QTextCharFormat
 
 from .errors import RuleAlreadyExistsError, RuleNotFoundError
 from .model import (

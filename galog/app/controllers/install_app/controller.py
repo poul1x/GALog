@@ -1,8 +1,8 @@
 from typing import Optional
 from zipfile import BadZipFile
 
-from PyQt5.QtCore import QThreadPool
-from PyQt5.QtWidgets import QFileDialog
+from PySide6.QtCore import QThreadPool
+from PySide6.QtWidgets import QFileDialog
 
 from galog.app.apk_info import APK
 from galog.app.components.dialogs import LoadingDialog
@@ -44,7 +44,7 @@ class InstallAppController:
         openFileDialog.setFileMode(QFileDialog.ExistingFile)
         openFileDialog.setNameFilter("APK Files (*.apk)")
 
-        if not openFileDialog.exec_():
+        if not openFileDialog.exec():
             return
 
         selectedFiles = openFileDialog.selectedFiles()
@@ -76,4 +76,4 @@ class InstallAppController:
 
         self._loadingDialog = LoadingDialog()
         self._loadingDialog.setText("Checking app exists")
-        self._loadingDialog.exec_()
+        self._loadingDialog.exec()

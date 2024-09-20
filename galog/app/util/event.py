@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QMutex, QMutexLocker, QWaitCondition
+from PySide6.QtCore import QMutex, QMutexLocker, QWaitCondition
 
 
 class Event:

@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QThreadPool
+from PySide6.QtCore import QThreadPool
 
 from galog.app.components.dialogs import LoadingDialog
 from galog.app.device import AdbClient
@@ -27,4 +27,4 @@ class KillAppController:
 
         self._loadingDialog = LoadingDialog()
         self._loadingDialog.setText(f"Killing app...")
-        self._loadingDialog.exec_()
+        self._loadingDialog.exec()

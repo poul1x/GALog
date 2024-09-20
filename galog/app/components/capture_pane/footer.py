@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QSizePolicy, QWidget
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QHBoxLayout, QPushButton, QSizePolicy, QWidget
 
 
 class RunAppAction(int, Enum):

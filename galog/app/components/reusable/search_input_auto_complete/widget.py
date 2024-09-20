@@ -1,7 +1,7 @@
 from typing import List, Optional
 
-from PyQt5.QtCore import QStringListModel, Qt, pyqtSignal
-from PyQt5.QtWidgets import QCompleter, QWidget
+from PySide6.QtCore import QStringListModel, Qt, Signal
+from PySide6.QtWidgets import QCompleter, QWidget
 
 from galog.app.util.paths import styleSheetFile
 
@@ -10,7 +10,7 @@ from .delegate import CompleterDelegate
 
 
 class SearchInputAutoComplete(SearchInput):
-    completionAccepted = pyqtSignal(str)
+    completionAccepted = Signal(str)
 
     def __init__(self, parent: Optional[QWidget] = None):
         self._completing = False

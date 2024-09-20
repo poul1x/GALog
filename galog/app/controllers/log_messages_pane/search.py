@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from re import Pattern
 from typing import List, Set
 
-from PyQt5.QtCore import QObject, QRunnable, pyqtSignal
+from PySide6.QtCore import QObject, QRunnable, Signal
 
 
 @dataclass
@@ -23,7 +23,7 @@ class SearchResult:
 
 
 class SearchItemTaskSignals(QObject):
-    finished = pyqtSignal(list)
+    finished = Signal(list)
 
 
 class SearchItemTask(QRunnable):

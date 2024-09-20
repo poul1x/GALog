@@ -1,15 +1,15 @@
 from contextlib import suppress
 from typing import List, Optional
 
-from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
+from PySide6.QtCore import QObject, QRunnable, QThread, Signal
 
 from galog.app.device import AdbClient, deviceRestricted
 from galog.app.device.errors import DeviceError
 
 
 class PackageLoaderSignals(QObject):
-    succeeded = pyqtSignal(list, str)
-    failed = pyqtSignal(str, str)
+    succeeded = Signal(list, str)
+    failed = Signal(str, str)
 
 
 class PackageLoader(QRunnable):

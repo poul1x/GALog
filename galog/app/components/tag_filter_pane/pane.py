@@ -1,6 +1,6 @@
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
 from .bottom_button_bar import BottomButtonBar
 from .control_button_bar import ControlButtonBar
@@ -63,11 +63,9 @@ class TagFilterPane(QDialog):
         vBoxLayoutMain.addWidget(self.bottomButtonBar)
         self.setLayout(vBoxLayoutMain)
 
-    def exec_(self) -> int:
-        result = super().exec_()
+    def exec(self) -> int:
+        result = super().exec()
         if result == QDialog.Accepted:
             return TagFilterPane.Accepted
         else:
             return TagFilterPane.Rejected
-
-    exec = exec_

@@ -1,8 +1,8 @@
 from typing import Optional
 
-from PyQt5.QtCore import QModelIndex
-from PyQt5.QtGui import QColor, QFont, QPainter, QPalette
-from PyQt5.QtWidgets import (
+from PySide6.QtCore import QModelIndex
+from PySide6.QtGui import QColor, QFont, QPainter, QPalette
+from PySide6.QtWidgets import (
     QApplication,
     QStyle,
     QStyledItemDelegate,

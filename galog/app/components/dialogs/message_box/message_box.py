@@ -1,8 +1,8 @@
 from typing import Optional
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import (
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import (
     QApplication,
     QCheckBox,
     QDialog,
@@ -130,9 +130,7 @@ class MessageBox(QDialog):
     def setIcon(self, icon: QIcon):
         self.contentArea.setIcon(icon)
 
-    def exec_(self):
+    def exec(self):
         QApplication.beep()
-        super().exec_()
+        super().exec()
         return self._clickedButtonId
-
-    exec = exec_

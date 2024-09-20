@@ -1,14 +1,14 @@
 from typing import Optional
 
-from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
+from PySide6.QtCore import QObject, QRunnable, QThread, Signal
 
 from galog.app.device import AdbClient, deviceRestricted
 from galog.app.device.errors import DeviceError
 
 
 class AppKillerSignals(QObject):
-    succeeded = pyqtSignal()
-    failed = pyqtSignal(str, str)
+    succeeded = Signal()
+    failed = Signal(str, str)
 
 
 class AppKiller(QRunnable):

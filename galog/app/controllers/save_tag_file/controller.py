@@ -1,7 +1,7 @@
 from typing import List, Optional
 
-from PyQt5.QtCore import QThreadPool
-from PyQt5.QtWidgets import QFileDialog
+from PySide6.QtCore import QThreadPool
+from PySide6.QtWidgets import QFileDialog
 
 from galog.app.components.dialogs import LoadingDialog
 from galog.app.util.message_box import showErrorMsgBox
@@ -35,4 +35,4 @@ class SaveTagFileController:
 
         self._loadingDialog = LoadingDialog()
         self._loadingDialog.setText("Saving file")
-        self._loadingDialog.exec_()
+        self._loadingDialog.exec()

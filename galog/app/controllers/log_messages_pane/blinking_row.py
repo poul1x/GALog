@@ -1,12 +1,12 @@
-from PyQt5.QtCore import QObject, QRunnable, Qt, QThread, QThreadPool, pyqtSignal
+from PySide6.QtCore import QObject, QRunnable, Qt, QThread, QThreadPool, Signal
 
 from galog.app.components.log_messages_pane import LogMessagesPane
 from galog.app.components.log_messages_pane.data_model import Column
 
 
 class RowBlinkingSignals(QObject):
-    finished = pyqtSignal()
-    invertColors = pyqtSignal(int)
+    finished = Signal()
+    invertColors = Signal(int)
 
 
 class RowBlinkingWorker(QRunnable):

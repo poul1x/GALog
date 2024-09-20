@@ -1,6 +1,6 @@
 from typing import Optional
 
-from PyQt5.QtGui import QIcon
+from PySide6.QtGui import QIcon
 
 from galog.app.components.dialogs import MessageBox
 from galog.app.util.paths import iconFile
@@ -13,7 +13,7 @@ def showInfoMsgBox(msgBrief: str, msgVerbose: str):
     messageBox.setIcon(QIcon(iconFile("msgbox-info")))
     messageBox.setWindowTitle("Success")
     messageBox.addButton("Ok")
-    messageBox.exec_()
+    messageBox.exec()
 
 
 def showErrorMsgBox(msgBrief: str, msgVerbose: str, details: Optional[str] = None):
@@ -27,7 +27,7 @@ def showErrorMsgBox(msgBrief: str, msgVerbose: str, details: Optional[str] = Non
 
     messageBox.addButton("Ok")
     messageBox.setWindowTitle("Error")
-    messageBox.exec_()
+    messageBox.exec()
 
 
 def showErrorMsgBox2(msgVerbose: str):
@@ -36,7 +36,7 @@ def showErrorMsgBox2(msgVerbose: str):
     messageBox.setIcon(QIcon(iconFile("msgbox-error")))
     messageBox.addButton("Ok")
     messageBox.setWindowTitle("Error")
-    messageBox.exec_()
+    messageBox.exec()
 
 
 def showPromptMsgBox(title: str, caption: str, body: str):
@@ -48,7 +48,7 @@ def showPromptMsgBox(title: str, caption: str, body: str):
     btnIdNo = messageBox.addButton("No")
     messageBox.setDefaultButton(btnIdNo)
     messageBox.setWindowTitle(title)
-    return messageBox.exec_() == btnIdYes
+    return messageBox.exec() == btnIdYes
 
 
 def showNotImpMsgBox():
@@ -58,4 +58,4 @@ def showNotImpMsgBox():
     messageBox.setIcon(QIcon(iconFile("msgbox-info")))
     messageBox.addButton("Ok")
     messageBox.setWindowTitle("Not implemented")
-    messageBox.exec_()
+    messageBox.exec()

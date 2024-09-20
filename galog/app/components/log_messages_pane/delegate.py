@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import List
 
-from PyQt5.QtCore import QModelIndex, QRectF, QSortFilterProxyModel, Qt, pyqtSignal
-from PyQt5.QtGui import (
+from PySide6.QtCore import QModelIndex, QRectF, QSortFilterProxyModel, Qt, Signal
+from PySide6.QtGui import (
     QFont,
     QFontMetrics,
     QPainter,
@@ -11,7 +11,7 @@ from PyQt5.QtGui import (
     QTextCursor,
     QTextDocument,
 )
-from PyQt5.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem
+from PySide6.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem
 
 from galog.app.controllers.log_messages_pane.search import SearchResult
 from galog.app.highlighting import HighlightingRules
@@ -34,7 +34,7 @@ class HighlightingData:
 
 
 class StyledItemDelegate(QStyledItemDelegate):
-    lazyHighlighting = pyqtSignal(QModelIndex)
+    lazyHighlighting = Signal(QModelIndex)
     _highlightingEnabled: bool
 
     def __init__(self, parent=None):

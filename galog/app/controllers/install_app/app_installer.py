@@ -1,17 +1,17 @@
 from typing import Optional
 
-from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
+from PySide6.QtCore import QObject, QRunnable, QThread, Signal
 
 from galog.app.device import AdbClient, AdbDevice, deviceRestricted
 from galog.app.device.errors import DeviceError, InstallError
 
 
 class AppInstallerSignals(QObject):
-    checkAppExists = pyqtSignal()
-    uninstallingOldApp = pyqtSignal()
-    installingNewApp = pyqtSignal()
-    succeeded = pyqtSignal()
-    failed = pyqtSignal(str, str, str)
+    checkAppExists = Signal()
+    uninstallingOldApp = Signal()
+    installingNewApp = Signal()
+    succeeded = Signal()
+    failed = Signal(str, str, str)
 
 
 class AppInstaller(QRunnable):

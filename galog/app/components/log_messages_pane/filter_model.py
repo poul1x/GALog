@@ -1,6 +1,6 @@
 from typing import Callable
 
-from PyQt5.QtCore import QModelIndex, QSortFilterProxyModel, Qt
+from PySide6.QtCore import QModelIndex, QSortFilterProxyModel, Qt
 
 
 class RegExpFilterModel(QSortFilterProxyModel):

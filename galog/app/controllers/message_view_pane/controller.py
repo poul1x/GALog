@@ -1,8 +1,8 @@
 from copy import deepcopy
 from typing import List, Optional
 
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import (
+from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import (
     QColor,
     QFont,
     QGuiApplication,
@@ -52,7 +52,7 @@ class LogMessageViewPaneController:
         self.setStyleSheetAuto(logLevel)
         if highlightingEnabled:
             self.applyHighlighting(hData.items)
-        self._pane.exec_()
+        self._pane.exec()
 
     def copyButtonClickedEnd(self, oldText: str):
         self._pane.copyButton.setEnabled(True)

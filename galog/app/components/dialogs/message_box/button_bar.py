@@ -1,11 +1,11 @@
 from typing import Optional
 
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QWidget
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtWidgets import QHBoxLayout, QPushButton, QWidget
 
 
 class MessageBoxButtonBar(QWidget):
-    buttonClicked = pyqtSignal(int)
+    buttonClicked = Signal(int)
 
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent, Qt.WindowSystemMenuHint | Qt.WindowTitleHint)

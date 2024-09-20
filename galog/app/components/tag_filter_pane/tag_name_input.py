@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget
 
 from galog.app.components.reusable.search_input_auto_complete import (
     SearchInputAutoComplete,

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Optional, Tuple
 
 from ppadb.connection import Connection
-from PyQt5.QtCore import QObject, QThread, QThreadPool, pyqtSignal
+from PySide6.QtCore import QObject, QThread, QThreadPool, Signal
 
 from galog.app.device import AdbClient, deviceRestricted
 from galog.app.device.device import AdbDevice
@@ -79,10 +79,10 @@ class LogLineReader:
 
 
 class LogcatReaderThread(QThread):
-    failed = pyqtSignal(str, str)
-    lineRead = pyqtSignal(LogLine)
-    processStarted = pyqtSignal(ProcessStartedEvent)
-    processEnded = pyqtSignal(ProcessEndedEvent)
+    failed = Signal(str, str)
+    lineRead = Signal(LogLine)
+    processStarted = Signal(ProcessStartedEvent)
+    processEnded = Signal(ProcessEndedEvent)
 
     def __init__(self, client: AdbClient, device: str) -> None:
         super().__init__()
@@ -193,13 +193,13 @@ class LogcatReaderThread(QThread):
 
 
 class LogReaderSignals(QObject):
-    failed = pyqtSignal(str, str)
-    lineRead = pyqtSignal(LogLine)
-    processStarted = pyqtSignal(ProcessStartedEvent)
-    processEnded = pyqtSignal(ProcessEndedEvent)
-    initialized = pyqtSignal(str, str, list)
-    appStarted = pyqtSignal(str)
-    appEnded = pyqtSignal(str)
+    failed = Signal(str, str)
+    lineRead = Signal(LogLine)
+    processStarted = Signal(ProcessStartedEvent)
+    processEnded = Signal(ProcessEndedEvent)
+    initialized = Signal(str, str, list)
+    appStarted = Signal(str)
+    appEnded = Signal(str)
 
 
 class AndroidAppLogReader:

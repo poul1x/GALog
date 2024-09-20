@@ -1,8 +1,8 @@
 from enum import Enum, auto
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QLabel, QPushButton, QWidget
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QComboBox, QHBoxLayout, QLabel, QPushButton, QWidget
 
 from galog.app.util.paths import iconFile
 

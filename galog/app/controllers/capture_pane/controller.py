@@ -1,9 +1,9 @@
 from typing import List, Optional
 from zipfile import BadZipFile
 
-from PyQt5.QtCore import QItemSelectionModel, QModelIndex, Qt, QThreadPool
-from PyQt5.QtGui import QStandardItem
-from PyQt5.QtWidgets import QFileDialog, QListView
+from PySide6.QtCore import QItemSelectionModel, QModelIndex, Qt, QThreadPool
+from PySide6.QtGui import QStandardItem
+from PySide6.QtWidgets import QFileDialog, QListView
 
 from galog.app.apk_info import APK
 from galog.app.components.capture_pane import RunAppAction
@@ -68,7 +68,7 @@ class CapturePaneController:
 
         self._loadingDialog = LoadingDialog()
         self._loadingDialog.setText("Connecting to ADB server...")
-        self._loadingDialog.exec_()
+        self._loadingDialog.exec()
 
     def _searchQueryChanged(self, query: str):
         self._pane.filterModel.setFilterFixedString(query)
@@ -119,7 +119,7 @@ class CapturePaneController:
 
         self._loadingDialog = LoadingDialog()
         self._loadingDialog.setText("Fetching packages...")
-        self._loadingDialog.exec_()
+        self._loadingDialog.exec()
 
     def _packageReloadSucceeded(self, packageList: List[str], selectedPackage: str):
         self._loadingDialog.close()
@@ -134,11 +134,11 @@ class CapturePaneController:
 
     def _packageLoaderSucceeded(self, packageList: List[str], selectedPackage: str):
         self._packageReloadSucceeded(packageList, selectedPackage)
-        self._pane.exec_()
+        self._pane.exec()
 
     def _packageLoaderFailed(self, deviceName, deviceState):
         self._packageReloadFailed(deviceName, deviceState)
-        self._pane.exec_()
+        self._pane.exec()
 
     def _deviceLoaderSucceeded(self, deviceList: List[str], selectedDevice: str):
         self._setDevices(deviceList)
@@ -165,7 +165,7 @@ class CapturePaneController:
         openFileDialog.setFileMode(QFileDialog.ExistingFile)
         openFileDialog.setNameFilter("APK Files (*.apk)")
 
-        if not openFileDialog.exec_():
+        if not openFileDialog.exec():
             return
 
         selectedFiles = openFileDialog.selectedFiles()

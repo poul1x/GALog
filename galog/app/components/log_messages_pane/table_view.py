@@ -1,8 +1,8 @@
 from typing import Optional
 
-from PyQt5.QtCore import QRect, QSize, Qt, pyqtSignal
-from PyQt5.QtGui import QColor, QFont, QFontMetrics, QKeyEvent, QPainter
-from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QTableView, QWidget
+from PySide6.QtCore import QRect, QSize, Qt, Signal
+from PySide6.QtGui import QColor, QFont, QFontMetrics, QKeyEvent, QPainter
+from PySide6.QtWidgets import QAbstractItemView, QHeaderView, QTableView, QWidget
 
 from galog.app.util.hotkeys import HotkeyHelper
 from galog.app.util.painter import painterSaveRestore
@@ -47,7 +47,7 @@ class VerticalHeader(QHeaderView):
 
 
 class TableView(BaseTableView):
-    rowGoToOrigin = pyqtSignal()
+    rowGoToOrigin = Signal()
 
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)

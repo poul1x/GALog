@@ -1,8 +1,8 @@
 from typing import Optional
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QKeyEvent
-from PyQt5.QtWidgets import QApplication, QLineEdit, QToolButton, QWidget
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon, QKeyEvent
+from PySide6.QtWidgets import QApplication, QLineEdit, QToolButton, QWidget
 
 from galog.app.util.hotkeys import HotkeyHelper
 from galog.app.util.paths import iconFile

@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING, Callable, List
 
-from PyQt5.QtCore import QModelIndex, Qt, QThread, QThreadPool
-from PyQt5.QtGui import QGuiApplication, QStandardItem, QStandardItemModel
-from PyQt5.QtWidgets import QTableView
+from PySide6.QtCore import QModelIndex, Qt, QThread, QThreadPool
+from PySide6.QtGui import QGuiApplication, QStandardItem, QStandardItemModel
+from PySide6.QtWidgets import QTableView
 
 from galog.app.components.dialogs import LoadingDialog
 from galog.app.components.log_messages_pane.data_model import Column
@@ -302,7 +302,7 @@ class LogMessagesPaneController:
 
         self._loadingDialog = LoadingDialog()
         self._loadingDialog.setText(f"Fetching app logs...")
-        self._loadingDialog.exec_()
+        self._loadingDialog.exec()
 
     def stopCapture(self):
         if self._logReader:

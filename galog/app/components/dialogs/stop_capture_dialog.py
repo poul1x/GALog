@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
-from PyQt5.QtWidgets import QCheckBox
+from PySide6.QtWidgets import QCheckBox
 
 from .message_box import MessageBox
 
@@ -25,8 +25,8 @@ class StopCaptureDialog(MessageBox):
         checkBox.setChecked(True)
         self.setCheckBox(checkBox)
 
-    def exec_(self) -> int:
-        btnId = super().exec_()
+    def exec(self) -> int:
+        btnId = super().exec()
         if btnId == self.btnIdYes:
             if self.checkBox().isChecked():
                 return StopCaptureDialogResult.AcceptedKillApp

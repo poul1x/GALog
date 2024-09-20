@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QLabel, QWidget
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtWidgets import QComboBox, QHBoxLayout, QLabel, QWidget
 
 
 class TagFilteringMode(int, Enum):
@@ -11,7 +11,7 @@ class TagFilteringMode(int, Enum):
 
 
 class FilterTypeSwitch(QWidget):
-    filterTypeChanged = pyqtSignal(TagFilteringMode)
+    filterTypeChanged = Signal(TagFilteringMode)
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)

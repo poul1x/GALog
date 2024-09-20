@@ -1,9 +1,9 @@
-from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
+from PySide6.QtCore import QObject, QRunnable, QThread, Signal
 
 
 class TagFileReaderSignals(QObject):
-    succeeded = pyqtSignal(list)
-    failed = pyqtSignal(str, str, str)
+    succeeded = Signal(list)
+    failed = Signal(str, str, str)
 
 
 class TagFileReader(QRunnable):

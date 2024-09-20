@@ -5,10 +5,9 @@ import tarfile
 from contextlib import suppress
 from typing import List
 
-from PyQt5.QtCore import QEvent, QThreadPool
-from PyQt5.QtGui import QFontDatabase, QIcon
-from PyQt5.QtWidgets import (
-    QAction,
+from PySide6.QtCore import QEvent, QThreadPool
+from PySide6.QtGui import QFontDatabase, QIcon, QAction
+from PySide6.QtWidgets import (
     QApplication,
     QCheckBox,
     QMainWindow,
@@ -176,7 +175,7 @@ class MainWindow(QMainWindow):
 
     def openTagFilter(self):
         tagList = self.logMessagesPaneController.uniqueTagNames()
-        result = self.tagFilterPaneController.exec_(tagList)
+        result = self.tagFilterPaneController.exec(tagList)
         if result == TagFilterPane.Rejected:
             return
 
@@ -254,7 +253,7 @@ class MainWindow(QMainWindow):
 
     def stopCapture(self):
         dialog = StopCaptureDialog()
-        result = dialog.exec_()
+        result = dialog.exec()
         if result == StopCaptureDialogResult.Rejected:
             return
 
@@ -480,7 +479,7 @@ class MainWindow(QMainWindow):
         # adbMenu.addAction(self.shutdownDeviceAction())
 
     def initUserInterface(self):
-        screen = QApplication.desktop().screenGeometry()
+        screen = QApplication.primaryScreen().geometry()
         width = int(screen.width() * 0.8)
         height = int(screen.height() * 0.8)
         x = (screen.width() - width) // 2
