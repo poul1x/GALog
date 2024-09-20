@@ -139,7 +139,7 @@ class StyledItemDelegate(QStyledItemDelegate):
         )
 
         text = index.data()
-        if fm.width(text) > textRect.width():
+        if fm.horizontalAdvance(text) > textRect.width():
             text = fm.elidedText(text, Qt.TextElideMode.ElideRight, textRect.width())
             doc.setProperty("elided", True)
 
