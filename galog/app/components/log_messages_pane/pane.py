@@ -21,7 +21,7 @@ class SearchPane(QWidget):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.setObjectName("LogMessagesSearchPane")
-        self.setAttribute(Qt.WA_StyledBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
         self.initUserInterface()
 
     def initUserInterface(self):
@@ -60,7 +60,7 @@ class LogMessagesPane(QWidget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.setObjectName("LogMessagesPane")
-        self.setAttribute(Qt.WA_StyledBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
         self.initUserInterface()
 
     def keyPressEvent(self, event: QKeyEvent):

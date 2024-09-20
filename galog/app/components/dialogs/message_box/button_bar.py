@@ -10,7 +10,7 @@ class MessageBoxButtonBar(QWidget):
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent, Qt.WindowSystemMenuHint | Qt.WindowTitleHint)
 
-        self.setAttribute(Qt.WA_StyledBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
         self.setObjectName("MessageBoxButtonBar")
         self.initUserInterface()
         self._buttonCount = 0

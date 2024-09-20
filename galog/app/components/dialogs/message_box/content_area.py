@@ -10,7 +10,7 @@ from galog.app.util.paths import iconFile
 class MessageBoxContentArea(QWidget):
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
-        self.setAttribute(Qt.WA_StyledBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
         self.setObjectName("MessageBoxContentArea")
         self.initUserInterface()
 

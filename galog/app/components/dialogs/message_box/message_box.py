@@ -21,7 +21,7 @@ from .content_area import MessageBoxContentArea
 
 class MessageBox(QDialog):
     def setGeometryAuto(self):
-        screen = QApplication.desktop().screenGeometry()
+        screen = QApplication.primaryScreen().geometry()
         width = int(screen.width() * 0.3)
         height = int(screen.height() * 0.4)
         x = (screen.width() - width) // 2
@@ -43,7 +43,7 @@ class MessageBox(QDialog):
 
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
-        self.setAttribute(Qt.WA_StyledBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
         self.setObjectName("MessageBox")
         self.setWindowTitle("GALog")
         self.initUserInterface()

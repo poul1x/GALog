@@ -14,7 +14,7 @@ class CapturePaneFooter(QWidget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.setObjectName("CapturePaneFooter")
-        self.setAttribute(Qt.WA_StyledBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
         self.initUserInterface()
 
     def initUserInterface(self):

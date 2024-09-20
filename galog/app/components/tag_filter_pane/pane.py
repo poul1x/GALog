@@ -29,7 +29,7 @@ class TagFilterPane(QDialog):
         self.initGeometry()
 
     def initGeometry(self):
-        screen = QApplication.desktop().screenGeometry()
+        screen = QApplication.primaryScreen().geometry()
         width = min(int(screen.width() * 0.4), 450)
         height = min(int(screen.height() * 0.4), 400)
         x = (screen.width() - width) // 2

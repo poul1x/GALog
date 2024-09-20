@@ -12,7 +12,12 @@
     "pavel",
     "knyazev",
     "seanwu",
-    "ppadb"
+    "ppadb",
+    "msleep",
+    "pids",
+    "hoverable",
+    "ruleset",
+    "galog"
   ],
   // flagWords - list of words to be always considered incorrect
   // This is useful for offensive words and common spelling errors.

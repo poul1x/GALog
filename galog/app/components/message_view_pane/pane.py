@@ -88,7 +88,7 @@ class LogMessageViewPane(QDialog):
         vBoxLayout.addWidget(self.logMsgTextBrowser, 1)
         self.setLayout(vBoxLayout)
 
-        screen = QApplication.desktop().screenGeometry()
+        screen = QApplication.primaryScreen().geometry()
         width = int(screen.width() * 0.5)
         height = int(screen.height() * 0.5)
         x = (screen.width() - width) // 2

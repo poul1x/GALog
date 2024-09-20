@@ -16,7 +16,7 @@ class CapturePane(QDialog):
     def __init__(self, parent: QWidget):
         super().__init__(parent, self._defaultFlags())
         self.setObjectName("CapturePane")
-        self.setAttribute(Qt.WA_StyledBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
         self.initUserInterface()
         self.setGeometryAuto()
         self.initFocusPolicy()
@@ -34,7 +34,7 @@ class CapturePane(QDialog):
             super().keyPressEvent(event)
 
     def setGeometryAuto(self):
-        screen = QApplication.desktop().screenGeometry()
+        screen = QApplication.primaryScreen().geometry()
         width = int(screen.width() * 0.3)
         height = int(screen.height() * 0.4)
         x = (screen.width() - width) // 2

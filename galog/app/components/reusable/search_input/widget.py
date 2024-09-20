@@ -11,7 +11,7 @@ from galog.app.util.paths import iconFile
 class SearchInput(QLineEdit):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
-        self.setAttribute(Qt.WA_StyledBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
         self.initUserInterface()
 
     def keyPressEvent(self, event: QKeyEvent):

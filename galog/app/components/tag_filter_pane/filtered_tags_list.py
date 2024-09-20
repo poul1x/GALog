@@ -13,7 +13,7 @@ class FilteredTagsList(QWidget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.setObjectName(self.__class__.__name__)
-        self.setAttribute(Qt.WA_StyledBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
         self.initUserInterface()
 
     def initUserInterface(self):
