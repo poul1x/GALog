@@ -24,6 +24,7 @@ ipython_config.py
 .env
 .venv
 venv/
+/un.txt
 
 # Logs
 *.log
@@ -39,3 +40,7 @@ venv/
 /*.spec
 /build
 /dist
+
+# nuitka
+/*.build
+/*.dist
