@@ -36,7 +36,7 @@ class LogFileWriter(QRunnable):
 
     def _writeLogFile(self):
         try:
-            with open(self._filePath, "w") as f:
+            with open(self._filePath, "w", encoding="utf-8") as f:
                 f.write(self._logLinesAsText())
 
         except Exception:
