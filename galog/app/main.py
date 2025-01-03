@@ -501,4 +501,5 @@ def runApp():
     app = QApplication(sys.argv)
     mainWindow = MainWindow()
     mainWindow.show()
+    print("GALog initialized")
     sys.exit(app.exec())

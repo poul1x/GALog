@@ -53,7 +53,8 @@ class SearchPane(QWidget):
 
 class LogMessagesPane(QWidget):
     toggleMessageFilter = pyqtSignal()
-    copyRowsToClipboard = pyqtSignal()
+    copyMsgRowsToClipboard = pyqtSignal()
+    copyFullRowsToClipboard = pyqtSignal()
     cmViewMessage = pyqtSignal(QModelIndex)
     cmGoToOrigin = pyqtSignal(QModelIndex)
     cmGoBack = pyqtSignal()
@@ -68,8 +69,10 @@ class LogMessagesPane(QWidget):
         helper = HotkeyHelper(event)
         if helper.isEscapePressed():
             self.toggleMessageFilter.emit()
+        elif helper.isCtrlShiftCPressed():
+            self.copyFullRowsToClipboard.emit()
         elif helper.isCtrlCPressed():
-            self.copyRowsToClipboard.emit()
+            self.copyMsgRowsToClipboard.emit()
         else:
             super().keyPressEvent(event)
 

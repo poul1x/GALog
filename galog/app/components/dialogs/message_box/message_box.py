@@ -89,7 +89,7 @@ class MessageBox(QDialog):
         self.setMaximumWidth(450)
 
     def setHeaderText(self, text: str):
-        index = 0
+        index = 1
         layout: QVBoxLayout = self.layout()
         widget = layout.itemAt(index).widget()
 
@@ -110,10 +110,13 @@ class MessageBox(QDialog):
 
     def initUserInterface(self):
         vBoxLayout = QVBoxLayout(self)
+        self.headEmptySpace = QLabel(self)
+        self.headEmptySpace.setObjectName("MessageBoxHeadEmptySpace")
         self.contentArea = MessageBoxContentArea(self)
         self.buttonBar = MessageBoxButtonBar(self)
         self.buttonBar.buttonClicked.connect(self._onButtonClicked)
 
+        vBoxLayout.addWidget(self.headEmptySpace)
         vBoxLayout.addWidget(self.contentArea, 1)
         vBoxLayout.addWidget(self.buttonBar)
         vBoxLayout.setContentsMargins(0, 0, 0, 0)

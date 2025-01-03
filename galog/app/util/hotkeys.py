@@ -10,7 +10,13 @@ class HotkeyHelper:
         return self._event.key() in [Qt.Key_Enter, Qt.Key_Return]
 
     def isCtrlPressed(self):
-        return self._event.modifiers() == Qt.ControlModifier
+        return bool(self._event.modifiers() & Qt.ControlModifier)
+
+    def isShiftPressed(self):
+        return bool(self._event.modifiers() & Qt.ShiftModifier)
+
+    def isCtrlShiftPressed(self):
+        return self.isCtrlPressed() and self.isShiftPressed()
 
     def isEscapePressed(self):
         return self._event.key() == Qt.Key_Escape
@@ -23,6 +29,9 @@ class HotkeyHelper:
 
     def isCtrlCPressed(self):
         return self._event.key() == Qt.Key_C and self.isCtrlPressed()
+
+    def isCtrlShiftCPressed(self):
+        return self._event.key() == Qt.Key_C and self.isCtrlShiftPressed()
 
     def isCtrlDPressed(self):
         return self._event.key() == Qt.Key_D and self.isCtrlPressed()

@@ -69,7 +69,8 @@ class LogMessagesPaneController:
         pane.searchPane.input.returnPressed.connect(self._applyMessageFilter)
         pane.searchPane.button.clicked.connect(self._applyMessageFilter)
         pane.toggleMessageFilter.connect(self._toggleMessageFilter)
-        pane.copyRowsToClipboard.connect(self._copyRowsToClipboard)
+        pane.copyFullRowsToClipboard.connect(self._copyFullRowsToClipboard)
+        pane.copyMsgRowsToClipboard.connect(self._copyMsgRowsToClipboard)
 
         pane.searchPane.searchByDropdown.currentIndexChanged.connect(
             self._handleSearchByValueChanged
@@ -386,13 +387,16 @@ class LogMessagesPaneController:
         self._pane.tableView.delegate.setHighlightingEnabled(enabled)
         self._refreshVisibleIndexes()
 
-    def _logLine(self, model: QStandardItemModel, row: int):
+    def _logLineFull(self, model: QStandardItemModel, row: int):
         return LogLine(
             level=model.item(row, Column.logLevel).text(),
             msg=model.item(row, Column.logMessage).text(),
             tag=model.item(row, Column.tagName).text(),
             pid=-1,
         )
+
+    def _logLineMsg(self, model: QStandardItemModel, row: int):
+        return model.item(row, Column.logMessage).text()
 
     def logLines(self):
         model = self._pane.dataModel
@@ -402,7 +406,7 @@ class LogMessagesPaneController:
         for line in lines:
             self.addLogLine(line)
 
-    def _copyRowsToClipboard(self):
+    def _copyMsgRowsToClipboard(self):
         indexes = self._pane.tableView.selectedIndexes()
         if not indexes:
             return
@@ -410,7 +414,20 @@ class LogMessagesPaneController:
         lines = []
         model = self._pane.dataModel
         for row in set([index.row() for index in indexes]):
-            line = self._logLine(model, row)
+            lines.append(self._logLineMsg(model, row))
+
+        clip = QGuiApplication.clipboard()
+        clip.setText("\n".join(lines))
+
+    def _copyFullRowsToClipboard(self):
+        indexes = self._pane.tableView.selectedIndexes()
+        if not indexes:
+            return
+
+        lines = []
+        model = self._pane.dataModel
+        for row in set([index.row() for index in indexes]):
+            line = self._logLineFull(model, row)
             lines.append(f"{line.level}/{line.tag}: {line.msg}")
 
         clip = QGuiApplication.clipboard()
