@@ -1,0 +1,33 @@
+version: 0.1.0
+target:
+  exe_path: dist/galog/galog
+  args: []
+  env:
+    - name: 'PYTHONUNBUFFERED'
+      value: '1'
+  out_dir: dist.min
+  run_timeout_sec: 5
+  success_indicator:
+    output: 'GALog initialized'
+minimizers:
+  qt_translation_files_removal:
+    exclude_files: []
+  unused_shared_libraries_removal:
+    exclude_files:
+      - '*/imageformats/libqsvg.so*'
+      - '*/libQt5Svg.so*'
+      - '*/libffi.so.*'
+  external_strip_program:
+    exe_path: strip
+    args: ['--strip-all']
+    exclude_files: []
+    fail_on_error: true
+  external_packer_program:
+    min_file_size_kb: 200
+    exclude_files:
+      - '*/platforms/*.so*'
+      - '*/imageformats/*.so*'
+      - '*/iconengines/*.so*'
+    exe_path: upx
+    args: ['-9', '-q', '-f']
+    fail_on_error: false
