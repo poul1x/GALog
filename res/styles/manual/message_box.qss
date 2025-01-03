@@ -21,11 +21,17 @@
     background-color: #ffffff;
 }
 
+#MessageBoxHeadEmptySpace {
+	background-color: #464646;
+	min-height: 30px;
+}
+
 #MessageBoxHeadTextLabel {
 	font-family: Arial;
 	font-size: 22px;
 	font-weight: bold;
 	color: #464646;
+	padding-top: 10px;
 }
 
 #MessageBoxIconLabel {
@@ -37,15 +43,11 @@
 	font-family: Arial;
 	font-size: 20px;
 	color: #464646;
-    /* margin-top: 10px;
-    margin-bottom: 10px; */
     margin-right: 10px;
-    /* margin-left: 10px; */
 }
 
 #MessageBoxButtonBar {
 	background: #464646;
-	/* max-height: 80px; */
 }
 
 #MessageBoxButtonBar > QPushButton {
