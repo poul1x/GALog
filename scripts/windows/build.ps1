@@ -8,9 +8,14 @@ $GALogVenvDir = ".\venv"
 $DistDir = ".\__dist_release"
 $OutDir = "$DistDir\$GALogName"
 
+Write-Host "Ensure python3.9 installed"
+py -3.9 --version
+if ($LASTEXITCODE -ne 0) {
+    throw "Command 'py -3.9 --version' failed"
+}
+
 if (-not (Test-Path -Path $GALogSrcDir)) {
-    Write-Host "Source code directory not found: $GALogSrcDir"
-	exit 1
+    throw "Source code directory not found: $GALogSrcDir"
 }
 
 if (-not (Test-Path -Path $GALogVenvDir)) {
@@ -39,7 +44,7 @@ pyinstaller `
 	--add-data "res;res" `
 	--distpath $DistDir `
 	--exclude-module .\galog\tests `
-	.\galog\__main__.py
+	"$GALogSrcDir\__main__.py"
 
 if ($LASTEXITCODE -ne 0) {
 	throw "Command 'pyinstaller' failed with exit code $LASTEXITCODE"

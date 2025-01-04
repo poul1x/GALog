@@ -1,11 +1,11 @@
 version: 0.1.0
 target:
-  exe_path: dist/galog/galog
+  exe_path: __dist_min/galog/galog
   args: []
   env:
     - name: 'PYTHONUNBUFFERED'
       value: '1'
-  out_dir: dist.min
+  out_dir: __dist_min/galog.min
   run_timeout_sec: 5
   success_indicator:
     output: 'GALog initialized'
