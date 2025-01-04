@@ -40,3 +40,5 @@ black -q "$GALogSrcDir"
 if ($LASTEXITCODE -ne 0) {
 	throw "Command 'black' failed"
 }
+
+Write-Host "Done"
