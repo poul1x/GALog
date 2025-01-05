@@ -45,7 +45,7 @@ python -m galog
 ### Linux
 
 **Requirements**:
-- [Qt for X11 Requirements](https://doc.qt.io/qt-5/linux-requirements.html). Install the libraries listed in the table to make Qt functional.
+- [Qt for X11 Requirements](https://doc.qt.io/qt-5/linux-requirements.html). Install the libraries listed in the table to make Qt functional. Also read this [issue](https://github.com/poul1x/GALog/issues/1).
 
 **Install & Run**: 
 
