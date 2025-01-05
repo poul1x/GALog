@@ -2,7 +2,7 @@
 
 ![](/assets/galog.gif)
 
-##  [\[Win\]](#windows) [\[Linux\]](#linux--mac) [\[Mac\]](#linux--mac) [\[Docs\]](https://github.com/poul1x/galog/wiki)
+##  [\[Win\]](#windows) [\[Linux\]](#linux) [\[Mac\]](#mac) [\[Docs\]](https://github.com/poul1x/galog/wiki)
 
 **GALog** is a GUI program designed to retrieve and display Android log output for a specific app using the ADB server API.
 
@@ -17,10 +17,16 @@
 
 ### Windows
 
-> [!NOTE]
-> Prebuilt executables are available for Windows 10 (x64 bit) on the [releases](https://github.com/poul1x/galog/releases) page.
+**Requirements**:
+- [Microsoft Visual C++ Redistributable 2015-2022](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#visual-studio-2015-2017-2019-and-2022)
 
-Clone repository and install dependencies with powershell commands:
+**Install & Run**:
+- Download app bundle for Windows 10 from the [releases](https://github.com/poul1x/galog/releases) page
+- Unpack the bundle and run `galog.exe` executable
+
+**Run GALog using Python**:
+
+Clone repository and install the dependencies with powershell commands:
 
 ```powershell
 git clone https://github.com/poul1x/galog.git
@@ -36,17 +42,19 @@ Run galog as a python module:
 python -m galog
 ```
 
-Optionally, you can build and run an executable file:
+### Linux
 
-```powershell
-pyinstaller --name galog --onefile galog/__main__.py
-Copy-Item -Path .\res -Destination .\dist -Recurse
-.\dist\galog.exe
-```
+**Requirements**:
+- [Qt for X11 Requirements](https://doc.qt.io/qt-5/linux-requirements.html). Install the libraries listed in the table to make Qt functional.
 
-### Linux & Mac
+**Install & Run**: 
 
-Clone repository and install dependencies:
+- Download app bundle for Linux from the [releases](https://github.com/poul1x/galog/releases) page
+- Unpack the bundle and run `galog` executable
+
+**Run GALog using Python**:
+
+Clone repository and install the dependencies:
 
 ```bash
 git clone https://github.com/poul1x/galog.git
@@ -62,12 +70,30 @@ Run galog as a python module:
 python -m galog
 ```
 
-Optionally, you can build and run an executable file:
+### Mac
+
+**Requirements**:
+Unknown (Everything works out of the box).
+
+**Install & Run**: 
+Due to macOS design, a ready-to-use app bundle is currently unavailable.
+
+**Run GALog using Python**:
+
+Clone repository and install the dependencies:
 
 ```bash
-pyinstaller --name galog --onefile galog/__main__.py
-cp -r ./res -Destination ./dist
-./dist/galog
+git clone https://github.com/poul1x/galog.git
+cd galog
+python3 -m venv venv
+source ./venv/bin/activate
+pip install -r requirements-prod.txt
+```
+
+Run galog as a python module:
+
+```bash
+python -m galog
 ```
 
 ## Documentation
