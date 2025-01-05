@@ -1,11 +1,13 @@
 version: 0.1.0
 target:
-  exe_path: dist\galog\galog.exe
+  exe_path: __dist_min\galog\galog.exe
   args: []
   env:
     - name: 'PYTHONUNBUFFERED'
       value: '1'
-  out_dir: dist.min
+  env_path_rm:
+    - "*Python*"
+  out_dir: __dist_min\galog.min
   run_timeout_sec: 5
   success_indicator:
     output: 'GALog initialized'
@@ -14,9 +16,11 @@ minimizers:
     exclude_files: []
   unused_shared_libraries_removal:
     exclude_files:
-      - '*\imageformats\*.dll'
+      - '*\styles\qwindowsvistastyle.dll'
+      - '*\imageformats\qsvg.dll'
       - '*\Qt5Svg.dll'
       - '*\_ctypes.pyd'
+      - '*\python3.dll'
   external_strip_program:
     exe_path: strip.exe
     args: ['--strip-all']

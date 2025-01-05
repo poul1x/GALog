@@ -400,7 +400,7 @@ class LogMessagesPaneController:
 
     def logLines(self):
         model = self._pane.dataModel
-        return [self._logLine(model, i) for i in range(model.rowCount())]
+        return [self._logLineFull(model, i) for i in range(model.rowCount())]
 
     def addLogLines(self, lines: List[LogLine]):
         for line in lines:

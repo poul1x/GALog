@@ -3,8 +3,8 @@ from typing import Optional
 from PyQt5.QtCore import QModelIndex, QPoint, Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import (
-    QComboBox,
     QAction,
+    QComboBox,
     QHBoxLayout,
     QMenu,
     QPushButton,
