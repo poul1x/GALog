@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -eu
-
 GALogName="galog"
 GALogSrcDir="./galog"
 GALogVenvDir="./venv"
@@ -28,6 +26,7 @@ fi
 
 echo "Ensure dependecies installed..."
 source "$GALogVenvDir/bin/activate"
+pip install --upgrade pip
 pip install -r requirements-prod.txt
 
 echo "Verify Pyinstaller"

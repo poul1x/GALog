@@ -29,6 +29,7 @@ fi
 
 echo "Ensure dependecies installed..."
 source "$GALogVenvDir/bin/activate"
+pip install --upgrade pip
 pip install -r requirements-prod.txt
 
 echo "Verify Pyinstaller"
