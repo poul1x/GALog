@@ -16,6 +16,7 @@ from galog.app.components.reusable.search_input.widget import SearchInput
 from galog.app.util.hotkeys import HotkeyHelper
 
 from .table_view import TableView
+from .quick_nav import QuickNavigationFrame
 
 
 class SearchPane(QWidget):
@@ -119,3 +120,4 @@ class LogMessagesPane(QWidget):
         self.setTabOrder(self.tableView, self.searchPane.input)
         self.setTabOrder(self.searchPane.input, self.tableView)
         self.tableView.setFocus()
+

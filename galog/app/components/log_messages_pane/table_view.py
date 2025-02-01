@@ -1,7 +1,7 @@
 from typing import Optional
 
 from PyQt5.QtCore import QRect, QSize, Qt, pyqtSignal
-from PyQt5.QtGui import QColor, QFont, QFontMetrics, QKeyEvent, QPainter
+from PyQt5.QtGui import QColor, QFont, QFontMetrics, QKeyEvent, QPainter, QResizeEvent
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QTableView, QWidget
 
 from galog.app.util.hotkeys import HotkeyHelper
@@ -11,6 +11,7 @@ from galog.app.util.table_view import TableView as BaseTableView
 from .data_model import Column, DataModel
 from .delegate import StyledItemDelegate
 from .filter_model import FnFilterModel, RegExpFilterModel
+from .quick_nav import QuickNavigationFrame
 
 
 class VerticalHeader(QHeaderView):
@@ -99,3 +100,18 @@ class TableView(BaseTableView):
         vHeader.setMinimumSectionSize(height)
         vHeader.setDefaultSectionSize(height)
         vHeader.setVisible(False)
+
+        self.quickNavFrame = QuickNavigationFrame(self)
+        self.quickNavFrame.setMarginTop(self.horizontalHeader().height() + 10)
+        self.quickNavFrame.setMarginBottom(10)
+        self.quickNavFrame.setMarginRight(30)
+        self.quickNavFrame.setFixedWidth(120)
+        self.quickNavFrame.updateGeometry()
+        self.quickNavFrame.hideChildren()
+
+        self.quickNavFrame.upArrowButton.clicked.connect(lambda: self.scrollToTop())  # fmt: skip
+        self.quickNavFrame.downArrowButton.clicked.connect(lambda: self.scrollToBottom())  # fmt: skip
+
+    def resizeEvent(self, e: QResizeEvent) -> None:
+        self.quickNavFrame.updateGeometry()
+        return super().resizeEvent(e)
