@@ -3,7 +3,7 @@
 }
 
 #TagFilterPane > #FilterTypeSwitch > QWidget {
-	font-family: Arial;
+	font-family: Roboto;
 	font-size: 19px;
 }
 
@@ -45,14 +45,14 @@
 #TagFilterPane > #TagNameInput {
 	border: 2px solid #464646;
 	border-bottom: none;
-	font-family: Arial;
+	font-family: Roboto;
 	font-size: 20px;
     padding-top: 2px;
     padding-bottom: 4px;
 }
 
 #TagFilterPane > #FilteredTagsList > QListView {
-	font-family: Arial;
+	font-family: Roboto;
 	font-size: 20px;
 	border: 2px solid #464646;
 }
@@ -70,7 +70,7 @@
 /* ---------------------------------------- */
 
 #TagFilterPane > #ControlButtonBar > QPushButton {
-	font-family: Arial;
+	font-family: Roboto;
 	font-size: 20px;
 	color: #000000;
 	background: #ffffff;
@@ -97,7 +97,7 @@
 }
 
 #TagFilterPane > #BottomButtonBar > QPushButton {
-	font-family: Arial;
+	font-family: Roboto;
 	font-size: 22px;
 	color: #000000;
     padding-top: 8px;

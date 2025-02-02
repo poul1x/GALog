@@ -19,7 +19,7 @@ class VerticalHeader(QHeaderView):
         super().__init__(Qt.Vertical, parent)
         self._font = QFont()
         self._font.setPixelSize(19)
-        self._font.setFamily("Arial")
+        self._font.setFamily("Roboto")
         self._font.setWeight(QFont.Bold)
 
     def _selectedRows(self):

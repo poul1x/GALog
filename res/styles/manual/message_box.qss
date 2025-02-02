@@ -27,7 +27,7 @@
 }
 
 #MessageBoxHeadTextLabel {
-	font-family: Arial;
+	font-family: Roboto;
 	font-size: 22px;
 	font-weight: bold;
 	color: #464646;
@@ -40,7 +40,7 @@
 }
 
 #MessageBoxMainTextLabel {
-	font-family: Arial;
+	font-family: Roboto;
 	font-size: 20px;
 	color: #464646;
     margin-right: 10px;
@@ -51,7 +51,7 @@
 }
 
 #MessageBoxButtonBar > QPushButton {
-	font-family: Arial;
+	font-family: Roboto;
 	font-size: 22px;
 	color: #000000;
     padding-top: 8px;
@@ -80,7 +80,7 @@
 }
 
 #MessageBox > QCheckBox {
-	font-family: Arial;
+	font-family: Roboto;
 	font-style: italic;
 	font-size: 20px;
 	margin-left: 10px;
