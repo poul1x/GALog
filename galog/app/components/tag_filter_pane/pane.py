@@ -56,7 +56,7 @@ class TagFilterPane(QDialog):
         hBoxLayout.addWidget(self.controlButtonBar)
 
         vBoxLayoutMain = QVBoxLayout()
-        vBoxLayoutMain.setContentsMargins(0, 0, 0, 0)
+        vBoxLayoutMain.setContentsMargins(0, 10, 0, 0)
         vBoxLayoutMain.setSpacing(0)
         vBoxLayoutMain.addWidget(self.filterTypeSwitch)
         vBoxLayoutMain.addLayout(hBoxLayout, stretch=1)
