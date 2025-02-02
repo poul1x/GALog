@@ -1,6 +1,6 @@
 -r requirements-base.txt
-pyqt5-tools==5.15.9.3.3
-pyqt5-stubs==5.15.6.0
-black==23.3.0
-autoflake==2.1.1
-isort==5.11.5
+pyqt5-tools~=5.0
+pyqt5-stubs~=5.0
+black~=23.0
+autoflake~=2.0
+isort~=5.0

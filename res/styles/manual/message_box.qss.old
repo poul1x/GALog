@@ -7,7 +7,7 @@ QMessageBox > QLabel{
 }
 
 QMessageBox > QCheckBox {
-	font-family: Arial;
+	font-family: Roboto;
 	font-style: italic;
 	font-size: 20px;
 }
@@ -18,7 +18,7 @@ QMessageBox > QCheckBox::indicator {
 }
 
 #qt_msgbox_label {
-	font-family: Arial;
+	font-family: Roboto;
 	font-size: 20px;
 	font-weight: bold;
 	color: #464646;
@@ -26,7 +26,7 @@ QMessageBox > QCheckBox::indicator {
 }
 
 #qt_msgbox_informativelabel {
-	font-family: Arial;
+	font-family: Roboto;
 	font-size: 20px;
 	color: #464646;
     margin: 5px;
@@ -37,7 +37,7 @@ QMessageBox > QCheckBox::indicator {
 }
 
 #qt_msgbox_buttonbox > QPushButton {
-	font-family: Arial;
+	font-family: Roboto;
 	font-size: 22px;
 	color: #000000;
     padding-top: 8px;

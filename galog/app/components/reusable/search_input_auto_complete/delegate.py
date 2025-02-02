@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (
 class CompleterDelegate(QStyledItemDelegate):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
-        self._font = QFont("Arial")
+        self._font = QFont("Roboto")
         self._font.setPixelSize(20)
 
     def paint(

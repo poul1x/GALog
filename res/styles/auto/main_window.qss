@@ -1,13 +1,13 @@
 QMenuBar {
 	background-color: #ffffff;
 	min-height: 30px;
-	font-family: Arial;
+	font-family: Roboto;
 	font-size: 20px;
 }
 
 QMenuBar::item {
 	background-color: #ffffff;
-	font-family: Arial;
+	font-family: Roboto;
 	min-height: 30px;
 	font-size: 20px;
 	padding: 5px;
@@ -29,7 +29,7 @@ QMenu::item {
 	padding-bottom: 2px;
 	/* padding-left: auto; */
 	padding-right: 50px;
-	font-family: Arial;
+	font-family: Roboto;
 	font-size: 20px;
 }
 
@@ -40,7 +40,7 @@ QMenu::item:selected {
 
 QMenu QCheckBox {
 	margin: 0px;
-	font-family: Arial;
+	font-family: Roboto;
 	font-size: 20px;
 	border: none;
 
@@ -72,7 +72,7 @@ QMenu QCheckBox::indicator:checked:hover {
 QStatusBar {
     background-color: #464646;
 	color: #ffffff;
-	font-family: Arial;
+	font-family: Roboto;
 	font-size: 20px;
 	padding-top: 5px;
 	padding-bottom: 5px;

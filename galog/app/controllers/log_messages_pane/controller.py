@@ -335,6 +335,7 @@ class LogMessagesPaneController:
         self._pane.regExpFilterModel.setFilteringEnabled(True)
         self._pane.searchPane.input.setFocus()
         self._pane.searchPane.show()
+        self._pane.tableView.quickNavFrame.updateGeometry()
 
         if reset == True:
             self._resetMessageFilter()
@@ -345,6 +346,9 @@ class LogMessagesPaneController:
         self._pane.regExpFilterModel.setFilteringEnabled(False)
         self._pane.tableView.reset()
         self._pane.searchPane.hide()
+
+        self._pane.layout().activate()  # reclaim the space searchPane occupied
+        self._pane.tableView.quickNavFrame.updateGeometry()
 
     def messageFilterEnabled(self):
         return self._pane.regExpFilterModel.filteringEnabled()
