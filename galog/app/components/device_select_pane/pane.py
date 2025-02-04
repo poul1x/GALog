@@ -11,14 +11,9 @@ from PyQt5.QtWidgets import (
     QApplication,
     QComboBox,
 )
-from galog.app.components.capture_pane.body import SearchInputCanActivate
-
-from galog.app.components.reusable.search_input.widget import SearchInput
-from galog.app.util.hotkeys import HotkeyHelper
-
 from galog.app.util.paths import iconFile
 
-from .adb_server_address import AdbServerAddress
+from .adb_server_settings import AdbServerSettings
 from .device_table import DeviceTable
 from .button_bar import ButtonBar
 
@@ -41,25 +36,30 @@ class DeviceSelectPane(QDialog):
     #         super().keyPressEvent(event)
 
     def initUserInterface(self):
+        # hBoxLayoutTop = QHBoxLayout()
+        # hBoxLayoutTop.setSpacing(0)
 
-        hBoxLayoutTop = QHBoxLayout()
-        alignLeft = Qt.AlignLeft | Qt.AlignVCenter
-        alignRight = Qt.AlignRight | Qt.AlignVCenter
+        # alignLeft = Qt.AlignLeft | Qt.AlignVCenter
+        # alignRight = Qt.AlignRight | Qt.AlignVCenter
 
-        self.adbServerAddress = AdbServerAddress(self)
-        hBoxLayoutTop.addWidget(self.adbServerAddress, alignment=alignLeft)
+        # self.adbServerAddress = AdbServerSettings(self)
+        # hBoxLayoutTop.addWidget(self.adbServerAddress, alignment=alignLeft)
 
-        self.reloadButton = QPushButton(self)
-        self.reloadButton.setIcon(QIcon(iconFile("reload")))
-        self.reloadButton.setText("Reload devices")
-        hBoxLayoutTop.addWidget(self.reloadButton, alignment=alignRight)
+        # self.reloadButton = QPushButton(self)
+        # self.reloadButton.setIcon(QIcon(iconFile("reload")))
+        # self.reloadButton.setText("Reload devices")
+        # self.reloadButton.setProperty("name", "reload")
+        # hBoxLayoutTop.addWidget(self.reloadButton, alignment=alignRight)
 
         ############################################################
         # Layout Main
         ############################################################
 
         vBoxLayoutMain = QVBoxLayout()
-        vBoxLayoutMain.addLayout(hBoxLayoutTop)
+        # vBoxLayoutMain.addLayout(hBoxLayoutTop)
+
+        self.adbServerAddress = AdbServerSettings(self)
+        vBoxLayoutMain.addWidget(self.adbServerAddress)
 
         self.deviceTable = DeviceTable(self)
         vBoxLayoutMain.addWidget(self.deviceTable)
@@ -67,6 +67,8 @@ class DeviceSelectPane(QDialog):
         buttonBar = ButtonBar(self)
         vBoxLayoutMain.addWidget(buttonBar)
 
+        vBoxLayoutMain.setContentsMargins(0, 0, 0, 0)
+        vBoxLayoutMain.setSpacing(0)
         self.setLayout(vBoxLayoutMain)
 
         # self.searchPane.button.setFocusPolicy(Qt.NoFocus)

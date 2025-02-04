@@ -34,7 +34,7 @@ class InstallAppController:
         self._loadingDialog.setText("Checking app exists")
 
     def _dialogInstallingNewApp(self):
-        self._loadingDialog.setText("Instaling new app")
+        self._loadingDialog.setText("Installing new app")
 
     def _dialogUninstallingOldApp(self):
         self._loadingDialog.setText("Checking app exists")

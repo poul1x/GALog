@@ -53,8 +53,8 @@ class AppInstaller(QRunnable):
 
     def _execInstallApp(self):
         with deviceRestricted(self._client, self._deviceName) as device:
-            if self._appExists(device):
-                self._uninstallApp(device)
+            # if self._appExists(device):
+            #     self._uninstallApp(device)
             self._installApp(device)
 
     def run(self):
