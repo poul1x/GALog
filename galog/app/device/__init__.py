@@ -1,8 +1,8 @@
-from .device import AdbClient, AdbDevice, deviceRestricted, devicesRestricted
+from .device import AdbClient, AdbDevice, deviceRestricted, deviceList
 
 __all__ = [
     "AdbClient",
     "AdbDevice",
-    "devicesRestricted",
+    "deviceList",
     "deviceRestricted",
 ]

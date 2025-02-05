@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
 
-from galog.app.device import AdbClient, devicesRestricted
+from galog.app.device import AdbClient, deviceList
 from galog.app.device.errors import DeviceError
 
 
@@ -25,7 +25,7 @@ class DeviceLoader(QRunnable):
         self._msDelay = None
 
     def _getDevices(self):
-        return [dev.serial for dev in devicesRestricted(self._client)]
+        return [dev.serial for dev in deviceList(self._client)]
 
     def _selectDevice(self, devices: List[str]):
         i = 0

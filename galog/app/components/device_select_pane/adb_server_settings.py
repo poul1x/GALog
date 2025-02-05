@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (
 from galog.app.util.paths import iconFile
 
 
-IP_REGEXP = r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
+IP_REGEXP = r"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$"
 PORT_REGEXP = r"^(?![7-9]\d\d\d\d)(?!6[6-9]\d\d\d)(?!65[6-9]\d\d)(?!655[4-9]\d)(?!6553[6-9])(?!0+)\d{1,5}$"
 
 
@@ -55,8 +55,14 @@ class AdbServerSettings(QWidget):
 
         self.setLayout(layout)
 
-    def getIpAddress(self):
+    def ipAddr(self):
         return self.ipAddressInput.text()
 
-    def getPort(self):
+    def port(self):
         return self.portInput.text()
+
+    def setIpAddr(self, addr: str):
+        return self.ipAddressInput.setText(addr)
+
+    def setPort(self, port: str):
+        return self.portInput.setText(port)

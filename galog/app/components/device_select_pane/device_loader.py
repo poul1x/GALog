@@ -1,38 +1,31 @@
 from contextlib import suppress
+from dataclasses import dataclass
 from typing import List, Optional
 
 from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
 
-from galog.app.device import AdbClient, devicesRestricted
+from galog.app.device import AdbClient, deviceList
+from galog.app.device.device import DEVICE_STATE_OK, AdbDevice, deviceList, deviceListWithInfo
 from galog.app.device.errors import DeviceError
 
 
 class DeviceLoaderSignals(QObject):
-    succeeded = pyqtSignal(list, str)
+    succeeded = pyqtSignal(list)
     failed = pyqtSignal(str, str)
 
 
 class DeviceLoader(QRunnable):
     _client: AdbClient
-    _lastSelectedDevice: Optional[str]
     _msDelay: Optional[int]
 
-    def __init__(self, client: AdbClient, lastSelectedDevice: Optional[str] = None):
+    def __init__(self, client: AdbClient):
         super().__init__()
         self.signals = DeviceLoaderSignals()
-        self._lastSelectedDevice = lastSelectedDevice
         self._client = client
         self._msDelay = None
 
     def _getDevices(self):
-        return [dev.serial for dev in devicesRestricted(self._client)]
-
-    def _selectDevice(self, devices: List[str]):
-        i = 0
-        with suppress(ValueError):
-            i = devices.index(self._lastSelectedDevice)
-
-        return devices[i]
+        return deviceListWithInfo(self._client)
 
     def setStartDelay(self, ms: int):
         self._msDelay = ms
@@ -45,8 +38,7 @@ class DeviceLoader(QRunnable):
         try:
             self._delayIfNeeded()
             devices = self._getDevices()
-            device = self._selectDevice(devices)
-            self.signals.succeeded.emit(devices, device)
+            self.signals.succeeded.emit(devices)
 
         except DeviceError as e:
             self.signals.failed.emit(e.msgBrief, e.msgVerbose)

@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import shutil
 import subprocess
 import sys
@@ -48,6 +49,16 @@ from galog.app.util.style import CustomStyle
 
 from .components.log_messages_pane import LogMessagesPane
 
+@dataclass
+class AdbServerSettings:
+    ipAddr: str
+    port: int
+
+@dataclass
+class AppState:
+    adb: AdbServerSettings
+    selectedDeviceSerial: str
+
 
 class MainWindow(QMainWindow):
     _viewWindows: List[LogMessageViewPane]
@@ -69,6 +80,13 @@ class MainWindow(QMainWindow):
         self.initUserInterface()
         self.initLeftPaddingForEachMenu()
         self.increaseHoverAreaForCheckableActions()
+        self.appState = AppState(
+            AdbServerSettings(
+                ipAddr="127.0.0.1",
+                port=5037,
+            ),
+            selectedDeviceSerial=None,
+        )
 
     def startAdbServer(self):
         adb = shutil.which("adb")
@@ -194,9 +212,12 @@ class MainWindow(QMainWindow):
             self.logMessagesPaneController.unsetTagFilteringFn()
 
     def startCapture(self):
-
-        self.deviceSelectPane = DeviceSelectPane(self)
-        self.deviceSelectPane.exec_()
+        self.deviceSelectPane = DeviceSelectPane(self.appState, self)
+        res = self.deviceSelectPane.exec_()
+        print(res)
+        print(self.appState.adb.ipAddr)
+        print(self.appState.adb.port)
+        print(self.appState.selectedDeviceSerial)
         return
 
         if self.logMessagesPaneController.isCaptureRunning():
