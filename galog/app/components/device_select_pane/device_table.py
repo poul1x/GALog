@@ -18,9 +18,7 @@ from PyQt5.QtWidgets import (
     QApplication,
     QStyle,
 )
-from galog.app.components.capture_pane.body import SearchInputCanActivate
-from galog.app.components.log_messages_pane.filter_model import FnFilterModel
-from galog.app.util.qt_helper import selectRowByIndex
+from galog.app.components.reusable import SearchInputCanActivate
 from .data_model import DataModel, FilterModel, Columns
 
 from galog.app.util.table_view import TableView
@@ -77,7 +75,7 @@ class DeviceTable(QWidget):
         self.dataModel.addInvalidDevice(deviceSerial, errorMessage)
 
     def sort(self):
-        self.tableView.sortByColumn(Columns.deviceName, Qt.AscendingOrder)
+        self.tableView.sortByColumn(Columns.displayName, Qt.AscendingOrder)
 
     def clear(self):
         self.dataModel.removeAllDevices()
@@ -85,39 +83,40 @@ class DeviceTable(QWidget):
     def setNoData(self):
         self.dataModel.setEmptyDeviceList()
 
+    def selectRowByIndex(self, index: QModelIndex):
+        assert isinstance(index.model(), FilterModel)
+        self.tableView.setCurrentIndex(index)
+        selectionModel = self.tableView.selectionModel()
+        selectionModel.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
+        self.tableView.scrollTo(index, QTableView.PositionAtCenter)
+
     def selectDeviceBySerial(self, serial: str):
         row = self.dataModel.findDeviceRowBySerial(serial)
         if row == -1:
             return False
 
-
-        selectionModel = self.tableView.selectionModel()
-        index = self.dataModel.index(row, Columns.deviceSerial)
-
+        index = self.dataModel.index(row, Columns.serial)
         proxyIndex = self.filterModel.mapFromSource(index)
-        self.tableView.setCurrentIndex(proxyIndex)
-
-        selectionModel.select(proxyIndex, QItemSelectionModel.Select | QItemSelectionModel.Rows)
-        self.tableView.scrollTo(proxyIndex, QTableView.PositionAtCenter)
-
+        self.selectRowByIndex(proxyIndex)
         return True
 
-    def selectedDeviceSerial(self, index: Optional[QModelIndex] = None):
+    def selectedDevice(self, index: Optional[QModelIndex] = None):
         if not index:
             index = self.tableView.currentIndex()
 
         assert index.isValid(), "Index is invalid"
         realIndex = self.filterModel.mapToSource(index)
 
-        serialIndex = self.dataModel.index(realIndex.row(), Columns.deviceSerial)
-        return serialIndex.data(), serialIndex.data(Qt.UserRole)
+        serialIndex = self.dataModel.index(realIndex.row(), Columns.serial)
+        nameIndex = self.dataModel.index(realIndex.row(), Columns.displayName)
+        return serialIndex.data(), nameIndex.data(), serialIndex.data(Qt.UserRole)
 
     def _applySpans(self):
         rowCount = self.filterModel.rowCount()
         columnCount = self.filterModel.columnCount()
 
         for i in range(rowCount):
-            index = self.filterModel.index(i, Columns.deviceSerial)
+            index = self.filterModel.index(i, Columns.serial)
             if index.data(Qt.UserRole) == True:
                 if self.tableView.columnSpan(i, 1) > 1: # Restore span to 1
                     self.tableView.setSpan(i, 1, 1, 1)
@@ -150,20 +149,20 @@ class DeviceTable(QWidget):
         vHeader = self.tableView.verticalHeader()
         vHeader.setVisible(False)
 
-        font = QFont("Arial")
+        font = QFont("Roboto")
         font.setPixelSize(19)
         self.tableView.setFont(font)
 
         hHeader = self.tableView.horizontalHeader()
-        hHeader.setSectionResizeMode(Columns.deviceSerial, QHeaderView.Interactive)
-        hHeader.setSectionResizeMode(Columns.deviceName, QHeaderView.Interactive)
+        hHeader.setSectionResizeMode(Columns.serial, QHeaderView.Interactive)
+        hHeader.setSectionResizeMode(Columns.displayName, QHeaderView.Interactive)
         hHeader.setSectionResizeMode(Columns.cpuArch, QHeaderView.Interactive)
         hHeader.setSectionResizeMode(Columns.osName, QHeaderView.Interactive)
         hHeader.setSectionResizeMode(Columns.apiLevels, QHeaderView.Stretch)
         hHeader.setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
-        self.tableView.setColumnWidth(Columns.deviceSerial, 160)
-        self.tableView.setColumnWidth(Columns.deviceName, 300)
+        self.tableView.setColumnWidth(Columns.serial, 160)
+        self.tableView.setColumnWidth(Columns.displayName, 300)
 
         ############################################################
         # Layout
@@ -189,4 +188,4 @@ class DeviceTable(QWidget):
         self.filterModel.setFilterFixedString(query)
         if self.filterModel.rowCount() > 0:
             proxyIndex = self.filterModel.index(0, 0)
-            selectRowByIndex(self.tableView, proxyIndex)
+            self.selectRowByIndex(proxyIndex)

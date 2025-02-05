@@ -3,24 +3,9 @@ from PyQt5.QtGui import QKeyEvent, QStandardItemModel
 from PyQt5.QtWidgets import QListView, QVBoxLayout, QWidget
 
 from galog.app.components.reusable.search_input import SearchInput
-from galog.app.util.hotkeys import HotkeyHelper
+from galog.app.components.reusable import SearchInputCanActivate
 from galog.app.util.list_view import ListView
 
-
-class SearchInputCanActivate(SearchInput):
-    #
-    # Use this signal to give an ability to user
-    # to select package directly from search input with <Enter> key press.
-    # Without this feature user has to press <Tab> first, only then press <Enter>
-    #
-    activate = pyqtSignal()
-
-    def keyPressEvent(self, event: QKeyEvent) -> None:
-        helper = HotkeyHelper(event)
-        if helper.isEnterPressed():
-            self.activate.emit()
-
-        return super().keyPressEvent(event)
 
 
 class CapturePaneBody(QWidget):

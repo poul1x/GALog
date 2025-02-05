@@ -6,8 +6,8 @@ from PyQt5.QtCore import Qt, QSortFilterProxyModel, QModelIndex, QObject
 
 
 class Columns(int, Enum):
-    deviceSerial = 0
-    deviceName = auto()
+    serial = 0
+    displayName = auto()
     cpuArch = auto()
     osName = auto()
     apiLevels = auto()
@@ -61,7 +61,7 @@ class DataModel(QStandardItemModel):
             ]
         )
 
-        item = self.item(self.rowCount() - 1, Columns.deviceSerial)
+        item = self.item(self.rowCount() - 1, Columns.serial)
         item.setData(False, Qt.UserRole)
 
     def removeAllDevices(self):
@@ -77,7 +77,7 @@ class DataModel(QStandardItemModel):
         self.appendRow(item)
 
     def findDeviceRowBySerial(self, serial: str):
-        items = self.findItems(serial, Qt.MatchExactly, Columns.deviceSerial)
+        items = self.findItems(serial, Qt.MatchExactly, Columns.serial)
         return items[0].row() if items else -1
 
 
@@ -90,6 +90,6 @@ class FilterModel(QSortFilterProxyModel):
         regex = self.filterRegExp()
         sourceModel = self.sourceModel()
         assert isinstance(sourceModel, DataModel)
-        serial = sourceModel.index(sourceRow, Columns.deviceSerial, sourceParent).data()
-        name = sourceModel.index(sourceRow, Columns.deviceName, sourceParent).data()
+        serial = sourceModel.index(sourceRow, Columns.serial, sourceParent).data()
+        name = sourceModel.index(sourceRow, Columns.displayName, sourceParent).data()
         return regex.indexIn(serial) != -1 or regex.indexIn(name) != -1

@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (
     QApplication,
     QComboBox,
 )
+from galog.app.app_state import LastSelectedDevice
 from galog.app.components.dialogs.loading_dialog import LoadingDialog
 from galog.app.device.device import AdbClient
 from galog.app.util.paths import iconFile
@@ -120,11 +121,11 @@ class DeviceSelectPane(QDialog):
         return super().exec_()
 
     def _deviceSelected(self, index: QModelIndex):
-        print(index.column())
-        deviceSerial, deviceValid = self.deviceTable.selectedDeviceSerial(index)
+        serial, displayName, isValid = self.deviceTable.selectedDevice(index)
 
-        if deviceValid:
-            self._appState.selectedDeviceSerial = deviceSerial
+        if isValid:
+            selectedDevice = LastSelectedDevice(serial, displayName)
+            self._appState.lastSelectedDevice = selectedDevice
             self.accept()
             return
 
@@ -132,7 +133,6 @@ class DeviceSelectPane(QDialog):
             "Device is unavailable",
             "Device can not be selected, because it's unavailable",
         )
-
 
     def _startDeviceLoader(self):
         deviceLoader = DeviceLoader(self.adbClient())
@@ -153,24 +153,27 @@ class DeviceSelectPane(QDialog):
     def _selectButtonClicked(self):
         self._deviceSelected(self.deviceTable.currentIndex())
 
-    def _selectDeviceOrDefault(self, candidate1: Optional[str], candidate2: str):
-        if candidate1 is not None:
-            if self.deviceTable.selectDeviceBySerial(candidate1):
-                return candidate1
-            else:
-                self.deviceTable.selectDeviceBySerial(candidate2)
-                return candidate2
-        else:
-            self.deviceTable.selectDeviceBySerial(candidate2)
-            return candidate2
+    def _selectDefaultDevice(self, deviceList: List[DeviceInfo]):
+
+        #
+        # Select device which was previously used
+        # If device is not present or no device was previously used
+        # Select the first one by default
+        #
+
+        if self._appState.lastSelectedDevice is not None:
+            serial = self._appState.lastSelectedDevice.serial
+            if self.deviceTable.selectDeviceBySerial(serial):
+                return
+
+        assert len(deviceList) > 0
+        serial = deviceList[0].serial
+        self.deviceTable.selectDeviceBySerial(serial)
 
     def _deviceLoaderSucceeded(self, deviceList: List[DeviceInfo]):
         self._loadingDialog.close()
         self._setDevices(deviceList)
-        # self.addTestDevices()
-        self._appState.selectedDeviceSerial = self._selectDeviceOrDefault(
-            self._appState.selectedDeviceSerial, deviceList[0].serial
-        )
+        self._selectDefaultDevice(deviceList)
 
     def _deviceLoaderFailed(self, msgBrief: str, msgVerbose: str):
         self._loadingDialog.close()
@@ -202,7 +205,7 @@ class DeviceSelectPane(QDialog):
 
     def _setDevices(self, devices: List[DeviceInfo]):
         self.buttonBar.selectButton.setEnabled(True)
-        with blockSignals(self.deviceTable): # TODO: why I need this
+        with blockSignals(self.deviceTable):  # TODO: why I need this
             self.deviceTable.clear()
             self._addDevices(devices)
             self.deviceTable.sort()
@@ -210,7 +213,6 @@ class DeviceSelectPane(QDialog):
     def _setDevicesEmpty(self):
         self.buttonBar.selectButton.setEnabled(False)
         self.deviceTable.setNoData()
-
 
     def addTestDevices(self):
         self.deviceTable.addValidDevice(
@@ -233,4 +235,3 @@ class DeviceSelectPane(QDialog):
             "ert45tgf",
             "Device is unavailable (unauthorized)",
         )
-

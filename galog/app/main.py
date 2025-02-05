@@ -4,7 +4,7 @@ import subprocess
 import sys
 import tarfile
 from contextlib import suppress
-from typing import List
+from typing import List, Optional
 
 from PyQt5.QtCore import QEvent, QThreadPool
 from PyQt5.QtGui import QFontDatabase, QIcon
@@ -18,6 +18,7 @@ from PyQt5.QtWidgets import (
     QStyleOptionButton,
     QWidgetAction,
 )
+from galog.app.app_state import AdbServerSettings, AppState
 
 from galog.app.components.capture_pane import CapturePane, RunAppAction
 from galog.app.components.device_select_pane.pane import DeviceSelectPane
@@ -49,15 +50,6 @@ from galog.app.util.style import CustomStyle
 
 from .components.log_messages_pane import LogMessagesPane
 
-@dataclass
-class AdbServerSettings:
-    ipAddr: str
-    port: int
-
-@dataclass
-class AppState:
-    adb: AdbServerSettings
-    selectedDeviceSerial: str
 
 
 class MainWindow(QMainWindow):
@@ -85,7 +77,7 @@ class MainWindow(QMainWindow):
                 ipAddr="127.0.0.1",
                 port=5037,
             ),
-            selectedDeviceSerial=None,
+            lastSelectedDevice=None,
         )
 
     def startAdbServer(self):
@@ -211,15 +203,11 @@ class MainWindow(QMainWindow):
         else:  # config.mode == TagFilteringMode.Disabled:
             self.logMessagesPaneController.unsetTagFilteringFn()
 
-    def startCapture(self):
+    def showDevices(self):
         self.deviceSelectPane = DeviceSelectPane(self.appState, self)
-        res = self.deviceSelectPane.exec_()
-        print(res)
-        print(self.appState.adb.ipAddr)
-        print(self.appState.adb.port)
-        print(self.appState.selectedDeviceSerial)
-        return
+        self.deviceSelectPane.exec_()
 
+    def startCapture(self):
         if self.logMessagesPaneController.isCaptureRunning():
             msgBrief = "Capture is running"
             msgVerbose = "Unable to start capture while another capture is running. Please, stop the running capture first"  # fmt: skip
@@ -333,6 +321,15 @@ class MainWindow(QMainWindow):
         action.setStatusTip("Start new log capture")
         action.triggered.connect(lambda: self.startCapture())
         action.setObjectName("capture.new")
+        action.setEnabled(True)
+        action.setData(False)
+        return action
+
+    def showDevicesAction(self):
+        action = QAction("&Devices", self)
+        action.setShortcut("Ctrl+D")
+        action.setStatusTip("Show devices")
+        action.triggered.connect(lambda: self.showDevices())
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -487,6 +484,7 @@ class MainWindow(QMainWindow):
     def setupMenuBar(self):
         menuBar = self.menuBar()
         captureMenu = menuBar.addMenu("📱 &Capture")
+        captureMenu.addAction(self.showDevicesAction())
         captureMenu.addAction(self.startCaptureAction())
         captureMenu.addAction(self.stopCaptureAction())
         captureMenu.addAction(self.clearCaptureOutputAction())
