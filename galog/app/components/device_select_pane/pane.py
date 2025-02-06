@@ -17,7 +17,7 @@ from galog.app.device.device import AdbClient
 from galog.app.util.hotkeys import HotkeyHelper
 from galog.app.util.paths import iconFile
 
-from .adb_server_settings import AdbServerSettings
+from .adb_server_settings import DevicesLoadOptions
 from .device_table import DeviceTable
 from .button_bar import ButtonBar
 
@@ -56,6 +56,7 @@ class DeviceSelectPane(QDialog):
         self.initController()
         self.initFocusPolicy()
         self.setGeometryAuto()
+        self.center()
 
     def adbClient(self):
         return AdbClient(
@@ -67,20 +68,23 @@ class DeviceSelectPane(QDialog):
         helper = HotkeyHelper(event)
         if helper.isCtrlFPressed():
             self.deviceTable.searchInput.setFocus()
+        elif helper.isCtrlRPressed():
+            self.devicesLoadOptions.reloadButton.clicked.emit()
         else:
             super().keyPressEvent(event)
 
     def initController(self):
-        self.adbServerSettings.reloadButton.clicked.connect(self._reloadButtonClicked)
+        self.devicesLoadOptions.reloadButton.clicked.connect(self._reloadButtonClicked)
         self.deviceTable.searchInput.activate.connect(self._deviceMayBeSelected)
+        self.deviceTable.searchInput.textChanged.connect(self._canUserSelectDevice)
         self.deviceTable.tableView.rowActivated.connect(self._deviceSelected)
         self.buttonBar.selectButton.clicked.connect(self._selectButtonClicked)
         self.buttonBar.cancelButton.clicked.connect(self.reject)
 
     def initFocusPolicy(self):
-        self.adbServerSettings.reloadButton.setFocusPolicy(Qt.NoFocus)
-        self.adbServerSettings.ipAddressInput.setFocusPolicy(Qt.NoFocus)
-        self.adbServerSettings.portInput.setFocusPolicy(Qt.NoFocus)
+        self.devicesLoadOptions.reloadButton.setFocusPolicy(Qt.NoFocus)
+        self.devicesLoadOptions.ipAddressInput.setFocusPolicy(Qt.NoFocus)
+        self.devicesLoadOptions.portInput.setFocusPolicy(Qt.NoFocus)
         self.buttonBar.selectButton.setFocusPolicy(Qt.NoFocus)
         self.buttonBar.cancelButton.setFocusPolicy(Qt.NoFocus)
 
@@ -88,10 +92,15 @@ class DeviceSelectPane(QDialog):
         self.setTabOrder(self.deviceTable.searchInput, self.deviceTable.tableView)
         self.setTabOrder(self.deviceTable.tableView, self.deviceTable.searchInput)
 
+    def _canUserSelectDevice(self):
+        canSelect = self.deviceTable.canSelectDevice()
+        self.buttonBar.selectButton.setEnabled(canSelect)
+        return canSelect
+
     def initUserInterface(self):
         vBoxLayoutMain = QVBoxLayout()
-        self.adbServerSettings = AdbServerSettings(self)
-        vBoxLayoutMain.addWidget(self.adbServerSettings)
+        self.devicesLoadOptions = DevicesLoadOptions(self)
+        vBoxLayoutMain.addWidget(self.devicesLoadOptions)
 
         self.deviceTable = DeviceTable(self)
         vBoxLayoutMain.addWidget(self.deviceTable)
@@ -104,16 +113,22 @@ class DeviceSelectPane(QDialog):
         vBoxLayoutMain.setSpacing(0)
         self.setLayout(vBoxLayoutMain)
 
-        self.adbServerSettings.setIpAddr(self._appState.adb.ipAddr)
-        self.adbServerSettings.setPort(str(self._appState.adb.port))
+        self.devicesLoadOptions.setAdbIpAddr(self._appState.adb.ipAddr)
+        self.devicesLoadOptions.setAdbPort(str(self._appState.adb.port))
 
-        # self.searchPane.button.setFocusPolicy(Qt.NoFocus)
-        # self.searchPane.input.setFocusPolicy(Qt.NoFocus)
-        # self.tableView.setFocusPolicy(Qt.StrongFocus)
-        # self.tableView.setFocus()
+    def parent(self):
+        parent = super().parent()
+        if not parent:
+            parent = QApplication.desktop()
 
-        # self.setTabOrder(self.tableView, self.searchPane.input)
-        # self.setTabOrder(self.searchPane.input, self.tableView)
+        assert isinstance(parent, QWidget)
+        return parent
+
+    def center(self):
+        geometry = self.frameGeometry()
+        parentGeometry = self.parent().geometry()
+        geometry.moveCenter(parentGeometry.center())
+        self.move(geometry.topLeft())
 
     def setGeometryAuto(self):
         screen = QApplication.desktop().screenGeometry()
@@ -123,7 +138,7 @@ class DeviceSelectPane(QDialog):
         y = (screen.height() - height) // 2
         self.setGeometry(x, y, width, height)
 
-    def _showLoadingDialog(self):
+    def _openLoadingDialog(self):
         self._loadingDialog = LoadingDialog()
         self._loadingDialog.setText("Connecting to ADB server...")
         self._loadingDialog.exec_()
@@ -138,6 +153,8 @@ class DeviceSelectPane(QDialog):
         if isValid:
             selectedDevice = LastSelectedDevice(serial, displayName)
             self._appState.lastSelectedDevice = selectedDevice
+            self._appState.adb.ipAddr = self.devicesLoadOptions.adbIpAddr()
+            self._appState.adb.port = self.devicesLoadOptions.adbPort()
             self.accept()
             return
 
@@ -155,11 +172,10 @@ class DeviceSelectPane(QDialog):
 
     def _startDeviceListReload(self):
         self._startDeviceLoader()
-        self._showLoadingDialog()
+        self._openLoadingDialog()
 
     def _reloadButtonClicked(self):
-        self._appState.adb.ipAddr = self.adbServerSettings.ipAddr()
-        self._appState.adb.port = self.adbServerSettings.port()
+        # self.deviceTable.searchInput.clear()
         self._startDeviceListReload()
 
     def _selectButtonClicked(self):
@@ -181,13 +197,18 @@ class DeviceSelectPane(QDialog):
         serial = deviceList[0].serial
         self.deviceTable.selectDeviceBySerial(serial)
 
-    def _deviceLoaderSucceeded(self, deviceList: List[DeviceInfo]):
+    def _closeLoadingDialog(self):
         self._loadingDialog.close()
+
+    def _deviceLoaderSucceeded(self, deviceList: List[DeviceInfo]):
+        self._closeLoadingDialog()
         self._setDevices(deviceList)
-        self._selectDefaultDevice(deviceList)
+
+        if self._canUserSelectDevice():
+            self._selectDefaultDevice(deviceList)
 
     def _deviceLoaderFailed(self, msgBrief: str, msgVerbose: str):
-        self._loadingDialog.close()
+        self._closeLoadingDialog()
         self._setDevicesEmpty()
         showErrorMsgBox(msgBrief, msgVerbose)
 

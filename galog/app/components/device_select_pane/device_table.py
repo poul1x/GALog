@@ -108,6 +108,9 @@ class DeviceTable(QWidget):
         nameIndex = self.dataModel.index(realIndex.row(), Columns.displayName)
         return serialIndex.data(), nameIndex.data(), serialIndex.data(Qt.UserRole)
 
+    def canSelectDevice(self):
+        return self.filterModel.rowCount() > 0
+
     def _applySpans(self):
         rowCount = self.filterModel.rowCount()
         columnCount = self.filterModel.columnCount()

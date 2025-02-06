@@ -18,7 +18,7 @@ IP_REGEXP = r"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$"
 PORT_REGEXP = r"^(?![7-9]\d\d\d\d)(?!6[6-9]\d\d\d)(?!65[6-9]\d\d)(?!655[4-9]\d)(?!6553[6-9])(?!0+)\d{1,5}$"
 
 
-class AdbServerSettings(QWidget):
+class DevicesLoadOptions(QWidget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.setObjectName("AdbServerSettings")
@@ -55,14 +55,14 @@ class AdbServerSettings(QWidget):
 
         self.setLayout(layout)
 
-    def ipAddr(self):
+    def adbIpAddr(self):
         return self.ipAddressInput.text()
 
-    def port(self):
+    def adbPort(self):
         return self.portInput.text()
 
-    def setIpAddr(self, addr: str):
+    def setAdbIpAddr(self, addr: str):
         return self.ipAddressInput.setText(addr)
 
-    def setPort(self, port: str):
+    def setAdbPort(self, port: str):
         return self.portInput.setText(port)
