@@ -48,9 +48,6 @@ class DeviceTable(QWidget):
         self.setAttribute(Qt.WA_StyledBackground)
         self.initUserInterface()
 
-    def currentIndex(self):
-        return self.tableView.currentIndex()
-
     def addValidDevice(
         self,
         deviceSerial: str,

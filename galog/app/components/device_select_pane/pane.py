@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import (
 from galog.app.app_state import LastSelectedDevice
 from galog.app.components.dialogs.loading_dialog import LoadingDialog
 from galog.app.device.device import AdbClient
+from galog.app.util.hotkeys import HotkeyHelper
 from galog.app.util.paths import iconFile
 
 from .adb_server_settings import AdbServerSettings
@@ -53,6 +54,7 @@ class DeviceSelectPane(QDialog):
         self.setAttribute(Qt.WA_StyledBackground)
         self.initUserInterface()
         self.initController()
+        self.initFocusPolicy()
         self.setGeometryAuto()
 
     def adbClient(self):
@@ -61,20 +63,30 @@ class DeviceSelectPane(QDialog):
             int(self._appState.adb.port),
         )
 
-    # def keyPressEvent(self, event: QKeyEvent):
-    #     helper = HotkeyHelper(event)
-    #     if helper.isEscapePressed():
-    #         self.toggleMessageFilter.emit()
-    #     elif helper.isCtrlCPressed():
-    #         self.copyRowsToClipboard.emit()
-    #     else:
-    #         super().keyPressEvent(event)
+    def keyPressEvent(self, event: QKeyEvent):
+        helper = HotkeyHelper(event)
+        if helper.isCtrlFPressed():
+            self.deviceTable.searchInput.setFocus()
+        else:
+            super().keyPressEvent(event)
 
     def initController(self):
         self.adbServerSettings.reloadButton.clicked.connect(self._reloadButtonClicked)
+        self.deviceTable.searchInput.activate.connect(self._deviceMayBeSelected)
         self.deviceTable.tableView.rowActivated.connect(self._deviceSelected)
         self.buttonBar.selectButton.clicked.connect(self._selectButtonClicked)
         self.buttonBar.cancelButton.clicked.connect(self.reject)
+
+    def initFocusPolicy(self):
+        self.adbServerSettings.reloadButton.setFocusPolicy(Qt.NoFocus)
+        self.adbServerSettings.ipAddressInput.setFocusPolicy(Qt.NoFocus)
+        self.adbServerSettings.portInput.setFocusPolicy(Qt.NoFocus)
+        self.buttonBar.selectButton.setFocusPolicy(Qt.NoFocus)
+        self.buttonBar.cancelButton.setFocusPolicy(Qt.NoFocus)
+
+        self.deviceTable.tableView.setFocus()
+        self.setTabOrder(self.deviceTable.searchInput, self.deviceTable.tableView)
+        self.setTabOrder(self.deviceTable.tableView, self.deviceTable.searchInput)
 
     def initUserInterface(self):
         vBoxLayoutMain = QVBoxLayout()
@@ -151,10 +163,9 @@ class DeviceSelectPane(QDialog):
         self._startDeviceListReload()
 
     def _selectButtonClicked(self):
-        self._deviceSelected(self.deviceTable.currentIndex())
+        self._deviceSelected(self.deviceTable.tableView.currentIndex())
 
     def _selectDefaultDevice(self, deviceList: List[DeviceInfo]):
-
         #
         # Select device which was previously used
         # If device is not present or no device was previously used
@@ -180,12 +191,24 @@ class DeviceSelectPane(QDialog):
         self._setDevicesEmpty()
         showErrorMsgBox(msgBrief, msgVerbose)
 
-    def _makeApiLevels(self, device: DeviceInfo):
-        return f"{device.details.sdkVerMin} - {device.details.sdkVerMax}"
+    def _apiLevels(self, device: DeviceInfo):
+        hasMin = device.details.sdkVerMin != "<N/A>"
+        hasMax = device.details.sdkVerMax != "<N/A>"
+
+        if hasMin and hasMax:
+            return f"{device.details.sdkVerMin} - {device.details.sdkVerMax}"
+
+        if not hasMin and not hasMax:
+            return "<N/A>"
+
+        if hasMin:
+            return device.details.sdkVerMin
+        else:
+            return device.details.sdkVerMax
 
     def _addValidDevice(self, device: DeviceInfo):
         self.deviceTable.addValidDevice(
-            apiLevels=self._makeApiLevels(device),
+            apiLevels=self._apiLevels(device),
             deviceName=device.details.displayName,
             cpuArch=device.details.cpuArch,
             osInfo=device.details.osInfo,
@@ -213,6 +236,13 @@ class DeviceSelectPane(QDialog):
     def _setDevicesEmpty(self):
         self.buttonBar.selectButton.setEnabled(False)
         self.deviceTable.setNoData()
+
+    def _deviceMayBeSelected(self):
+        index = self.deviceTable.tableView.currentIndex()
+        if not index.isValid():
+            return
+
+        self._deviceSelected(index)
 
     def addTestDevices(self):
         self.deviceTable.addValidDevice(
