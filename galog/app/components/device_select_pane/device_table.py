@@ -87,6 +87,15 @@ class DeviceTable(QWidget):
         selectionModel.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
         self.tableView.scrollTo(index, QTableView.PositionAtCenter)
 
+    def selectTheOnlyOneDevice(self):
+        if self.filterModel.rowCount() == 1:
+            index = self.filterModel.index(0, Columns.serial)
+            if index.data(Qt.UserRole): # isValid
+                self.selectRowByIndex(index)
+                return True
+
+        return False
+
     def selectDeviceBySerial(self, serial: str):
         row = self.dataModel.findDeviceRowBySerial(serial)
         if row == -1:

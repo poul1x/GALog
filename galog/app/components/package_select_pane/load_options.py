@@ -3,20 +3,16 @@ from enum import Enum, auto
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QLabel, QPushButton, QWidget
+from galog.app.app_state import RunAppAction
 
 from galog.app.util.paths import iconFile
 
 
-class RunAppAction(int, Enum):
-    StartApp = auto()
-    StartAppDebug = auto()
-    DoNotStartApp = auto()
 
-
-class CapturePaneHeader(QWidget):
+class PackagesLoadOptions(QWidget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.setObjectName("CapturePaneHeader")
+        self.setObjectName("PackagesLoadOptions")
         self.setAttribute(Qt.WA_StyledBackground)
         self.initUserInterface()
 
@@ -31,8 +27,8 @@ class CapturePaneHeader(QWidget):
         self.deviceLabel.setText("Device:")
         layoutLeft.addWidget(self.deviceLabel)
 
-        self.deviceDropDown = QComboBox(self)
-        layoutLeft.addWidget(self.deviceDropDown)
+        self.deviceSelectButton = QPushButton(self)
+        layoutLeft.addWidget(self.deviceSelectButton)
 
         self.reloadButton = QPushButton(self)
         self.reloadButton.setIcon(QIcon(iconFile("reload")))
@@ -52,3 +48,17 @@ class CapturePaneHeader(QWidget):
         layout.addLayout(layoutLeft)
         layout.addLayout(layoutRight)
         self.setLayout(layout)
+
+    def deviceName(self):
+        return self.deviceSelectButton.text()
+
+    def setDeviceName(self, deviceName: str):
+        return self.deviceSelectButton.setText(deviceName)
+
+    def runAppAction(self) -> RunAppAction:
+        return self.actionDropDown.currentData()
+
+    def setRunAppAction(self, action: RunAppAction):
+        i = self.actionDropDown.findData(action, Qt.UserRole)
+        assert i != -1, "Current action must be present in RunAppAction"
+        self.actionDropDown.setCurrentIndex(i)

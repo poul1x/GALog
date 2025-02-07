@@ -24,6 +24,7 @@ _PROP_RELEASE = "ro.build.version.release"
 _PROP_CPU_ARCH = "ro.product.cpu.abi"
 _PROP_SDK_MIN = "ro.build.version.min_supported_target_sdk"
 _PROP_SDK_MAX = "ro.build.version.sdk"
+_PROP_CODENAME = "ro.product.device"
 
 
 @dataclass
@@ -46,11 +47,15 @@ class AdbDevice(Device):
     def _device_display_name(self, props: Dict[str, str]):
         try:
             mf = props[_PROP_MANUFACTURER].capitalize()
+            codename = props[_PROP_CODENAME]
             model = props[_PROP_MODEL]
         except KeyError:
             return _NOT_AVAIL
 
-        return f"{mf} {model}"
+        if model.lower().startswith(mf.lower()):
+            return f"{model} ({codename})"
+        else:
+            return f"{mf} {model} ({codename})"
 
     def _device_os_info(self, props: Dict[str, str]):
         try:
@@ -105,9 +110,9 @@ class AdbClient(Client):
 
 
 @contextmanager
-def deviceRestricted(client: AdbClient, deviceName: str):
+def deviceRestricted(client: AdbClient, deviceSerial: str):
     try:
-        device, state = client.device_with_state(deviceName)
+        device, state = client.device_with_state(deviceSerial)
     except (RuntimeError, ConnectionError):
         raise AdbConnectionError()
 

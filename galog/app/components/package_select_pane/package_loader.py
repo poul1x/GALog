@@ -8,25 +8,18 @@ from galog.app.device.errors import DeviceError
 
 
 class PackageLoaderSignals(QObject):
-    succeeded = pyqtSignal(list, str)
+    succeeded = pyqtSignal(list)
     failed = pyqtSignal(str, str)
 
 
 class PackageLoader(QRunnable):
     _client: AdbClient
-    _lastSelectedPackage: str
     _msDelay: Optional[int]
 
-    def __init__(
-        self,
-        client: AdbClient,
-        deviceName: str,
-        lastSelectedPackage: Optional[str] = None,
-    ):
+    def __init__(self, client: AdbClient, deviceSerial: str):
         super().__init__()
         self.signals = PackageLoaderSignals()
-        self._lastSelectedPackage = lastSelectedPackage
-        self._deviceName = deviceName
+        self._deviceSerial = deviceSerial
         self._client = client
         self._msDelay = None
 
@@ -38,24 +31,16 @@ class PackageLoader(QRunnable):
             QThread.msleep(self._msDelay)
 
     def _getPackages(self):
-        with deviceRestricted(self._client, self._deviceName) as device:
+        with deviceRestricted(self._client, self._deviceSerial) as device:
             packages = device.list_packages()
 
         return packages
-
-    def _selectPackage(self, packages: List[str]):
-        i = 0
-        with suppress(ValueError):
-            i = packages.index(self._lastSelectedPackage)
-
-        return packages[i]
 
     def run(self):
         try:
             self._delayIfNeeded()
             packages = self._getPackages()
-            package = self._selectPackage(packages)
-            self.signals.succeeded.emit(packages, package)
+            self.signals.succeeded.emit(packages)
 
         except DeviceError as e:
             self.signals.failed.emit(e.msgBrief, e.msgVerbose)

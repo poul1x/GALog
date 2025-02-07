@@ -29,10 +29,9 @@ from PyQt5.QtGui import QStandardItem
 from PyQt5.QtWidgets import QFileDialog, QListView
 
 from galog.app.apk_info import APK
-from galog.app.components.capture_pane import RunAppAction
 from galog.app.components.dialogs import LoadingDialog
 from galog.app.device import AdbClient
-from galog.app.device.device import AdbDevice, DeviceDetails, DeviceInfo
+from galog.app.device import DeviceInfo
 from galog.app.util.message_box import showErrorMsgBox
 from galog.app.util.signals import blockSignals
 
@@ -49,6 +48,8 @@ else:
 class DeviceSelectPane(QDialog):
     def __init__(self, appState: AppState, parent: Optional[QWidget] = None):
         super().__init__(parent)
+        self._autoSelect = False
+        self._autoSelectDone = False
         self._appState = appState
         self.setObjectName("DeviceSelectPane")
         self.setAttribute(Qt.WA_StyledBackground)
@@ -76,7 +77,7 @@ class DeviceSelectPane(QDialog):
     def initController(self):
         self.devicesLoadOptions.reloadButton.clicked.connect(self._reloadButtonClicked)
         self.deviceTable.searchInput.activate.connect(self._deviceMayBeSelected)
-        self.deviceTable.searchInput.textChanged.connect(self._canUserSelectDevice)
+        self.deviceTable.searchInput.textChanged.connect(self._canSelectDevice)
         self.deviceTable.tableView.rowActivated.connect(self._deviceSelected)
         self.buttonBar.selectButton.clicked.connect(self._selectButtonClicked)
         self.buttonBar.cancelButton.clicked.connect(self.reject)
@@ -88,11 +89,11 @@ class DeviceSelectPane(QDialog):
         self.buttonBar.selectButton.setFocusPolicy(Qt.NoFocus)
         self.buttonBar.cancelButton.setFocusPolicy(Qt.NoFocus)
 
-        self.deviceTable.tableView.setFocus()
+        self.deviceTable.searchInput.setFocus()
         self.setTabOrder(self.deviceTable.searchInput, self.deviceTable.tableView)
         self.setTabOrder(self.deviceTable.tableView, self.deviceTable.searchInput)
 
-    def _canUserSelectDevice(self):
+    def _canSelectDevice(self):
         canSelect = self.deviceTable.canSelectDevice()
         self.buttonBar.selectButton.setEnabled(canSelect)
         return canSelect
@@ -130,6 +131,9 @@ class DeviceSelectPane(QDialog):
         geometry.moveCenter(parentGeometry.center())
         self.move(geometry.topLeft())
 
+    def setDeviceAutoSelect(self, value: bool):
+        self._autoSelect = value
+
     def setGeometryAuto(self):
         screen = QApplication.desktop().screenGeometry()
         width = int(screen.width() * 0.4)
@@ -145,23 +149,26 @@ class DeviceSelectPane(QDialog):
 
     def exec_(self):
         self._startDeviceListReload()
+        if self._autoSelect and self._autoSelectDone:
+            return DeviceSelectPane.Accepted
+
         return super().exec_()
 
-    def _deviceSelected(self, index: QModelIndex):
+    def _deviceSelected(self, index: Optional[QModelIndex] = None):
         serial, displayName, isValid = self.deviceTable.selectedDevice(index)
 
-        if isValid:
-            selectedDevice = LastSelectedDevice(serial, displayName)
-            self._appState.lastSelectedDevice = selectedDevice
-            self._appState.adb.ipAddr = self.devicesLoadOptions.adbIpAddr()
-            self._appState.adb.port = self.devicesLoadOptions.adbPort()
-            self.accept()
+        if not isValid:
+            msgBrief = "Device is unavailable"
+            msgVerbose = "Device can not be selected, because it's unavailable"
+            showErrorMsgBox(msgBrief, msgVerbose)
             return
 
-        showErrorMsgBox(
-            "Device is unavailable",
-            "Device can not be selected, because it's unavailable",
-        )
+        selectedDevice = LastSelectedDevice(serial, displayName)
+        self._appState.lastSelectedDevice = selectedDevice
+        self._appState.adb.ipAddr = self.devicesLoadOptions.adbIpAddr()
+        self._appState.adb.port = self.devicesLoadOptions.adbPort()
+        self.accept()
+
 
     def _startDeviceLoader(self):
         deviceLoader = DeviceLoader(self.adbClient())
@@ -175,11 +182,10 @@ class DeviceSelectPane(QDialog):
         self._openLoadingDialog()
 
     def _reloadButtonClicked(self):
-        # self.deviceTable.searchInput.clear()
         self._startDeviceListReload()
 
     def _selectButtonClicked(self):
-        self._deviceSelected(self.deviceTable.tableView.currentIndex())
+        self._deviceSelected()
 
     def _selectDefaultDevice(self, deviceList: List[DeviceInfo]):
         #
@@ -201,15 +207,21 @@ class DeviceSelectPane(QDialog):
         self._loadingDialog.close()
 
     def _deviceLoaderSucceeded(self, deviceList: List[DeviceInfo]):
-        self._closeLoadingDialog()
         self._setDevices(deviceList)
-
-        if self._canUserSelectDevice():
+        if self._canSelectDevice():
             self._selectDefaultDevice(deviceList)
 
-    def _deviceLoaderFailed(self, msgBrief: str, msgVerbose: str):
+        if self._autoSelect:
+            if self.deviceTable.selectTheOnlyOneDevice():
+                self._autoSelectDone = True
+                self._deviceSelected()
+
         self._closeLoadingDialog()
+
+
+    def _deviceLoaderFailed(self, msgBrief: str, msgVerbose: str):
         self._setDevicesEmpty()
+        self._closeLoadingDialog()
         showErrorMsgBox(msgBrief, msgVerbose)
 
     def _apiLevels(self, device: DeviceInfo):

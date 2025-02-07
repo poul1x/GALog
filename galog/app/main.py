@@ -18,9 +18,9 @@ from PyQt5.QtWidgets import (
     QStyleOptionButton,
     QWidgetAction,
 )
-from galog.app.app_state import AdbServerSettings, AppState
+from galog.app.app_state import AdbServerSettings, AppState, RunAppAction
 
-from galog.app.components.capture_pane import CapturePane, RunAppAction
+from galog.app.components.package_select_pane import PackageSelectPane
 from galog.app.components.device_select_pane.pane import DeviceSelectPane
 from galog.app.components.dialogs.stop_capture_dialog import (
     StopCaptureDialog,
@@ -28,7 +28,6 @@ from galog.app.components.dialogs.stop_capture_dialog import (
 )
 from galog.app.components.message_view_pane import LogMessageViewPane
 from galog.app.components.tag_filter_pane.pane import TagFilterPane
-from galog.app.controllers.capture_pane import CapturePaneController
 from galog.app.controllers.install_app import InstallAppController
 from galog.app.controllers.kill_app import KillAppController
 from galog.app.controllers.log_messages_pane.controller import LogMessagesPaneController
@@ -42,6 +41,7 @@ from galog.app.controllers.tag_filter_pane.controller import (
 from galog.app.highlighting import HighlightingRules
 from galog.app.util.message_box import (
     showErrorMsgBox,
+    showInfoMsgBox,
     showNotImpMsgBox,
     showPromptMsgBox,
 )
@@ -49,7 +49,6 @@ from galog.app.util.paths import fontFiles, highlightingFiles, iconFile, styleSh
 from galog.app.util.style import CustomStyle
 
 from .components.log_messages_pane import LogMessagesPane
-
 
 
 class MainWindow(QMainWindow):
@@ -63,7 +62,6 @@ class MainWindow(QMainWindow):
         self.startAdbServer()
         self._searchPane = None
         self._liveReload = True
-        self.capturePaneController = CapturePaneController()
         self.logMessagesPaneController = LogMessagesPaneController(self)
         self.tagFilterPaneController = TagFilterPaneController(self)
         self.loadStyleSheet()
@@ -78,6 +76,7 @@ class MainWindow(QMainWindow):
                 port=5037,
             ),
             lastSelectedDevice=None,
+            lastSelectedPackage=None,
         )
 
     def startAdbServer(self):
@@ -204,8 +203,8 @@ class MainWindow(QMainWindow):
             self.logMessagesPaneController.unsetTagFilteringFn()
 
     def showDevices(self):
-        self.deviceSelectPane = DeviceSelectPane(self.appState, self)
-        self.deviceSelectPane.exec_()
+        deviceSelectPane = DeviceSelectPane(self.appState, self)
+        deviceSelectPane.exec_()
 
     def startCapture(self):
         if self.logMessagesPaneController.isCaptureRunning():
@@ -214,26 +213,35 @@ class MainWindow(QMainWindow):
             showErrorMsgBox(msgBrief, msgVerbose)
             return
 
-        capturePane = CapturePane(self)
-        self.capturePaneController.takeControl(capturePane)
-        self.capturePaneController.startCaptureDialog()
+        if self.appState.lastSelectedDevice is None:
+            deviceSelectPane = DeviceSelectPane(self.appState, self)
+            deviceSelectPane.setDeviceAutoSelect(True)
+            if deviceSelectPane.exec_() == DeviceSelectPane.Rejected:
+                msgBrief = "Device not selected"
+                msgVerbose = "Device was not selected. Unable to start log capture"  # fmt: skip
+                showInfoMsgBox(msgBrief, msgVerbose)
+                return
 
-        if self.capturePaneController.captureTargetSelected():
-            device = self.capturePaneController.selectedDevice()
-            package = self.capturePaneController.selectedPackage()
-            action = self.capturePaneController.selectedAction()
+        packageSelectPane = PackageSelectPane(self.appState, self)
+        result = packageSelectPane.exec_()
+        if result == 0:
+            return
 
-            if action != RunAppAction.DoNotStartApp:
-                controller = RunAppController()
-                # controller.setAppDebug(action == RunAppAction.StartAppDebug)
-                controller.setAppDebug(False)
-                controller.runApp(device, package)
+        device = self.appState.lastSelectedDevice.serial
+        package = self.appState.lastSelectedPackage.name
+        action = self.appState.lastSelectedPackage.action
 
-            self.logMessagesPaneController.makeWhiteBackground()
-            self.logMessagesPaneController.disableMessageFilter()
-            self.logMessagesPaneController.clearLogLines()
-            self.logMessagesPaneController.startCapture(device, package)
-            self.setCaptureSpecificActionsEnabled(True)
+        if action != RunAppAction.DoNotStartApp:
+            controller = RunAppController()
+            # controller.setAppDebug(action == RunAppAction.StartAppDebug)
+            controller.setAppDebug(False)
+            controller.runApp(device, package)
+
+        self.logMessagesPaneController.makeWhiteBackground()
+        self.logMessagesPaneController.disableMessageFilter()
+        self.logMessagesPaneController.clearLogLines()
+        self.logMessagesPaneController.startCapture(device, package)
+        self.setCaptureSpecificActionsEnabled(True)
 
     def clearCaptureOutput(self):
         if showPromptMsgBox(

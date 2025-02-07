@@ -10,10 +10,10 @@ class RunAppAction(int, Enum):
     DoNotStartApp = auto()
 
 
-class CapturePaneFooter(QWidget):
+class ButtonBar(QWidget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.setObjectName("CapturePaneFooter")
+        self.setObjectName("CapturePaneButtonBar")
         self.setAttribute(Qt.WA_StyledBackground)
         self.initUserInterface()
 
