@@ -228,7 +228,7 @@ class MainWindow(QMainWindow):
 
             # Add small delay to remove
             # LoadingDialog flickering
-            QThread.msleep(400)
+            QThread.msleep(100)
 
         packageSelectPane = PackageSelectPane(self.appState, self)
         result = packageSelectPane.exec_()

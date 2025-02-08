@@ -215,7 +215,8 @@ class PackageSelectPane(QDialog):
             return
 
         if self.packagesList.has(packageName):
-            self.accept()
+            self.packagesList.selectPackageByName(packageName)
+            self._selectButtonClicked()
             return
 
         msgBrief = "Package not installed"
@@ -228,7 +229,9 @@ class PackageSelectPane(QDialog):
         if not action.installApp(deviceSerial, selectedFiles[0]):
             return
 
-        self.accept()
+        self.packagesList.addPackage(packageName)
+        self.packagesList.selectPackageByName(packageName)
+        self._selectButtonClicked()
 
     def _packageSelected(self, index: QModelIndex):
         packageName = self.packagesList.selectedPackage(index)

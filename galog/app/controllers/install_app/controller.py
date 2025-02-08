@@ -23,7 +23,7 @@ class InstallAppController:
 
     def _appInstallerSucceeded(self):
         self._loadingDialog.close()
-        showInfoMsgBox("Success", "App installed successfully")
+        # showInfoMsgBox("Success", "App installed successfully")
         self._success = True
 
     def _appInstallerFailed(
