@@ -4,7 +4,7 @@ from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
 
 from galog.app.controllers.log_messages_pane.log_reader import LogLine
 
-REGEX_VTAG = r"^([A-Z])/(.+?):(.*)$"
+REGEX_VTAG = r"^([A-Z])/(.+?): (.*)$"
 
 
 class LogFileReaderSignals(QObject):
