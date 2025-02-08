@@ -13,7 +13,7 @@ from galog.app.util.hotkeys import HotkeyHelper
 from galog.app.util.message_box import showErrorMsgBox
 from galog.app.util.signals import blockSignals
 
-from .adb_server_settings import DevicesLoadOptions
+from .load_options import DevicesLoadOptions
 from .button_bar import ButtonBar
 from .device_loader import DeviceLoader
 from .device_table import DeviceTable

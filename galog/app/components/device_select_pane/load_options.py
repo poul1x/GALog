@@ -27,6 +27,7 @@ class DevicesLoadOptions(QWidget):
         self.ipAddressInput = QLineEdit(self)
         self.ipAddressInput.setValidator(QRegExpValidator(QRegExp(IP_REGEXP)))
         layout.addWidget(self.ipAddressInput, alignment=alignLeft)
+        self.ipAddressInput.setEnabled(False)
 
         portLabel = QLabel(self)
         portLabel.setText("Port:")
@@ -35,6 +36,7 @@ class DevicesLoadOptions(QWidget):
         self.portInput = QLineEdit(self)
         self.portInput.setValidator(QRegExpValidator(QRegExp(PORT_REGEXP)))
         layout.addWidget(self.portInput, alignment=alignLeft)
+        self.portInput.setEnabled(False)
 
         self.reloadButton = QPushButton(self)
         self.reloadButton.setIcon(QIcon(iconFile("reload")))
