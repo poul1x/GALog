@@ -1,7 +1,9 @@
 from typing import Optional
-from PyQt5.QtWidgets import QFrame, QVBoxLayout, QPushButton, QLabel, QWidget
+
+from PyQt5.QtCore import QEvent, QSize, Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QEvent, Qt, QSize
+from PyQt5.QtWidgets import QFrame, QPushButton, QVBoxLayout, QWidget
+
 from galog.app.util.paths import iconFile
 
 

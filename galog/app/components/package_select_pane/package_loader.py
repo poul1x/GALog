@@ -1,5 +1,4 @@
-from contextlib import suppress
-from typing import List, Optional
+from typing import Optional
 
 from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
 

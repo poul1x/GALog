@@ -18,9 +18,7 @@ class AppInstaller(QRunnable):
     _client: AdbClient
     _msDelay: Optional[int]
 
-    def __init__(
-        self, client: AdbClient, deviceName: str, apkFilePath: str
-    ):
+    def __init__(self, client: AdbClient, deviceName: str, apkFilePath: str):
         super().__init__()
         self.signals = AppInstallerSignals()
         self._deviceName = deviceName

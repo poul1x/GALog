@@ -1,43 +1,22 @@
-from typing import Optional
+from typing import TYPE_CHECKING, List, Optional
 
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent, QStandardItem, QIcon
-from PyQt5.QtWidgets import (
-    QHBoxLayout,
-    QPushButton,
-    QVBoxLayout,
-    QWidget,
-    QDialog,
-    QApplication,
-    QComboBox,
-)
+from PyQt5.QtCore import QModelIndex, Qt, QThreadPool
+from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QWidget
+
 from galog.app.app_state import LastSelectedDevice
+from galog.app.components.dialogs import LoadingDialog
 from galog.app.components.dialogs.loading_dialog import LoadingDialog
+from galog.app.device import AdbClient, DeviceInfo
 from galog.app.device.device import AdbClient
 from galog.app.util.hotkeys import HotkeyHelper
-from galog.app.util.paths import iconFile
-
-from .adb_server_settings import DevicesLoadOptions
-from .device_table import DeviceTable
-from .button_bar import ButtonBar
-
-from typing import List, Optional, Tuple
-from zipfile import BadZipFile
-
-from PyQt5.QtCore import QItemSelectionModel, QModelIndex, Qt, QThreadPool
-from PyQt5.QtGui import QStandardItem
-from PyQt5.QtWidgets import QFileDialog, QListView
-
-from galog.app.apk_info import APK
-from galog.app.components.dialogs import LoadingDialog
-from galog.app.device import AdbClient
-from galog.app.device import DeviceInfo
 from galog.app.util.message_box import showErrorMsgBox
 from galog.app.util.signals import blockSignals
 
+from .adb_server_settings import DevicesLoadOptions
+from .button_bar import ButtonBar
 from .device_loader import DeviceLoader
-
-from typing import TYPE_CHECKING
+from .device_table import DeviceTable
 
 if TYPE_CHECKING:
     from galog.app.main import AppState
@@ -169,7 +148,6 @@ class DeviceSelectPane(QDialog):
         self._appState.adb.port = self.devicesLoadOptions.adbPort()
         self.accept()
 
-
     def _startDeviceLoader(self):
         deviceLoader = DeviceLoader(self.adbClient())
         deviceLoader.setStartDelay(500)
@@ -217,7 +195,6 @@ class DeviceSelectPane(QDialog):
                 self._deviceSelected()
 
         self._closeLoadingDialog()
-
 
     def _deviceLoaderFailed(self, msgBrief: str, msgVerbose: str):
         self._setDevicesEmpty()

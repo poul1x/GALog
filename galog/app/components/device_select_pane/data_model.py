@@ -1,8 +1,8 @@
 from enum import Enum, auto
 from typing import Optional
 
+from PyQt5.QtCore import QModelIndex, QObject, QSortFilterProxyModel, Qt
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
-from PyQt5.QtCore import Qt, QSortFilterProxyModel, QModelIndex, QObject
 
 
 class Columns(int, Enum):
@@ -11,6 +11,7 @@ class Columns(int, Enum):
     cpuArch = auto()
     osName = auto()
     apiLevels = auto()
+
 
 class DataModel(QStandardItemModel):
     def __init__(self, parent):

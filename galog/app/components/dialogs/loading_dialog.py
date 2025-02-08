@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (
     QMainWindow,
     QProgressBar,
     QVBoxLayout,
-    QWidget
+    QWidget,
 )
 
 from galog.app.util.paths import styleSheetFile
@@ -68,7 +68,6 @@ class LoadingDialog(QDialog):
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(container)
         self.setLayout(mainLayout)
-
 
     def setText(self, text: str):
         self.label.setText(text)

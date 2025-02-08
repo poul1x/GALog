@@ -1,12 +1,9 @@
-from enum import Enum, auto
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QLabel, QPushButton, QWidget
+
 from galog.app.app_state import RunAppAction
-
 from galog.app.util.paths import iconFile
-
 
 
 class PackagesLoadOptions(QWidget):

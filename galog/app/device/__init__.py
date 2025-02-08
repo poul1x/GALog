@@ -1,4 +1,11 @@
-from .device import AdbClient, AdbDevice, deviceRestricted, deviceList, DeviceInfo, DeviceDetails
+from .device import (
+    AdbClient,
+    AdbDevice,
+    DeviceDetails,
+    DeviceInfo,
+    deviceList,
+    deviceRestricted,
+)
 
 __all__ = [
     "AdbClient",

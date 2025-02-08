@@ -1,44 +1,24 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QVBoxLayout, QWidget
-from galog.app.app_state import AppState, LastSelectedPackage
-from galog.app.controllers.install_app.controller import InstallAppController
-from ..device_select_pane import DeviceSelectPane
-
-from galog.app.util.hotkeys import HotkeyHelper
-
-from .packages_list import PackagesList
-from .button_bar import ButtonBar
-from .load_options import PackagesLoadOptions
-
-from typing import List, Optional
+from typing import List
 from zipfile import BadZipFile
 
-from PyQt5.QtCore import QItemSelectionModel, QModelIndex, Qt, QThreadPool
-from PyQt5.QtWidgets import QFileDialog, QListView
+from PyQt5.QtCore import QModelIndex, Qt, QThreadPool
+from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QVBoxLayout, QWidget
 
 from galog.app.apk_info import APK
+from galog.app.app_state import AppState, LastSelectedPackage
 from galog.app.components.dialogs import LoadingDialog
+from galog.app.controllers.install_app.controller import InstallAppController
 from galog.app.device import AdbClient
+from galog.app.util.hotkeys import HotkeyHelper
 from galog.app.util.message_box import showErrorMsgBox, showPromptMsgBox
 from galog.app.util.signals import blockSignals
 
+from ..device_select_pane import DeviceSelectPane
+from .button_bar import ButtonBar
+from .load_options import PackagesLoadOptions
 from .package_loader import PackageLoader
-
-from typing import List, Optional
-from zipfile import BadZipFile
-
-from PyQt5.QtCore import QItemSelectionModel, QModelIndex, Qt, QThreadPool
-from PyQt5.QtGui import QStandardItem
-from PyQt5.QtWidgets import QFileDialog, QListView
-
-from galog.app.apk_info import APK
-from galog.app.components.dialogs import LoadingDialog
-from galog.app.device import AdbClient
-from galog.app.util.message_box import showErrorMsgBox
-from galog.app.util.signals import blockSignals
-
-from .package_loader import PackageLoader
+from .packages_list import PackagesList
 
 
 class PackageSelectPane(QDialog):
@@ -276,4 +256,3 @@ class PackageSelectPane(QDialog):
         self.packagesList.searchInput.setFocus()
         self._refreshSelectedDevice()
         self._startPackageListReload()
-

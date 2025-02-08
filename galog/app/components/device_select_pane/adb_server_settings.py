@@ -1,18 +1,8 @@
-from enum import Enum, auto
-
-from PyQt5.QtCore import Qt, QRegExp
-from PyQt5.QtGui import QIcon, QIntValidator, QRegExpValidator
-from PyQt5.QtWidgets import (
-    QComboBox,
-    QHBoxLayout,
-    QLabel,
-    QPushButton,
-    QWidget,
-    QLineEdit,
-)
+from PyQt5.QtCore import QRegExp, Qt
+from PyQt5.QtGui import QIcon, QRegExpValidator
+from PyQt5.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QPushButton, QWidget
 
 from galog.app.util.paths import iconFile
-
 
 IP_REGEXP = r"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$"
 PORT_REGEXP = r"^(?![7-9]\d\d\d\d)(?!6[6-9]\d\d\d)(?!65[6-9]\d\d)(?!655[4-9]\d)(?!6553[6-9])(?!0+)\d{1,5}$"

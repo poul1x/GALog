@@ -1,7 +1,5 @@
 from enum import Enum, auto
 
-from PyQt5.QtWidgets import QCheckBox
-
 from .message_box import MessageBox
 
 
@@ -16,7 +14,9 @@ class RestartCaptureDialog(MessageBox):
         super().__init__()
         self.setHeaderText("Restart capture")
         self.setWindowTitle("Restart capture")
-        self.setBodyText("Restart the capture? The app will be restarted and all captured log messages will be erased")
+        self.setBodyText(
+            "Restart the capture? The app will be restarted and all captured log messages will be erased"
+        )
         self.btnIdYes = self.addButton("Yes")
         self.btnIdNo = self.addButton("No")
         self.setDefaultButton(self.btnIdYes)

@@ -1,39 +1,21 @@
+from enum import Enum, auto
 from typing import Optional
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent, QStandardItem
-from PyQt5.QtCore import (
-    QRect,
-    QSize,
-    Qt,
-    QSortFilterProxyModel,
-    QModelIndex,
-    QItemSelectionModel,
-)
-from PyQt5.QtWidgets import (
-    QHBoxLayout,
-    QPushButton,
-    QVBoxLayout,
-    QWidget,
-    QDialog,
-    QApplication,
-    QStyle,
-)
-from galog.app.components.reusable import SearchInputCanActivate
-from .data_model import DataModel, FilterModel, Columns
 
-from galog.app.util.table_view import TableView
-
-from PyQt5.QtCore import QRect, QSize, Qt, QSortFilterProxyModel
-from PyQt5.QtGui import QColor, QFont, QFontMetrics, QPainter
+from PyQt5.QtCore import QItemSelectionModel, QModelIndex, Qt
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (
     QAbstractItemView,
+    QHBoxLayout,
     QHeaderView,
     QTableView,
+    QVBoxLayout,
     QWidget,
-    QStyledItemDelegate,
 )
 
-from enum import Enum, auto
+from galog.app.components.reusable import SearchInputCanActivate
+from galog.app.util.table_view import TableView
+
+from .data_model import Columns, DataModel, FilterModel
 
 
 class SearchType(int, Enum):
@@ -84,13 +66,15 @@ class DeviceTable(QWidget):
         assert isinstance(index.model(), FilterModel)
         self.tableView.setCurrentIndex(index)
         selectionModel = self.tableView.selectionModel()
-        selectionModel.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
+        selectionModel.select(
+            index, QItemSelectionModel.Select | QItemSelectionModel.Rows
+        )
         self.tableView.scrollTo(index, QTableView.PositionAtCenter)
 
     def selectTheOnlyOneDevice(self):
         if self.filterModel.rowCount() == 1:
             index = self.filterModel.index(0, Columns.serial)
-            if index.data(Qt.UserRole): # isValid
+            if index.data(Qt.UserRole):  # isValid
                 self.selectRowByIndex(index)
                 return True
 
@@ -127,11 +111,10 @@ class DeviceTable(QWidget):
         for i in range(rowCount):
             index = self.filterModel.index(i, Columns.serial)
             if index.data(Qt.UserRole) == True:
-                if self.tableView.columnSpan(i, 1) > 1: # Restore span to 1
+                if self.tableView.columnSpan(i, 1) > 1:  # Restore span to 1
                     self.tableView.setSpan(i, 1, 1, 1)
             else:
-                self.tableView.setSpan(i, 1, 1, columnCount - 1) # Set span to > 1
-
+                self.tableView.setSpan(i, 1, 1, columnCount - 1)  # Set span to > 1
 
     def initUserInterface(self):
         self.dataModel = DataModel(self)
@@ -191,7 +174,6 @@ class DeviceTable(QWidget):
         vBoxLayout.setContentsMargins(0, 0, 0, 0)
         vBoxLayout.setSpacing(0)
         self.setLayout(vBoxLayout)
-
 
     def onSearchContentChanged(self, query: str):
         self.filterModel.setFilterFixedString(query)

@@ -1,10 +1,9 @@
-from typing import List, Optional
-from PyQt5.QtCore import QSortFilterProxyModel, Qt, pyqtSignal, QItemSelectionModel, QModelIndex
-from PyQt5.QtGui import QKeyEvent, QStandardItemModel
-from PyQt5.QtWidgets import QListView, QVBoxLayout, QWidget
-from PyQt5.QtGui import QStandardItem
+from typing import Optional
 
-from galog.app.components.reusable.search_input import SearchInput
+from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QSortFilterProxyModel, Qt
+from PyQt5.QtGui import QStandardItem, QStandardItemModel
+from PyQt5.QtWidgets import QListView, QVBoxLayout, QWidget
+
 from galog.app.components.reusable import SearchInputCanActivate
 from galog.app.util.list_view import ListView
 
@@ -72,7 +71,7 @@ class PackagesList(QWidget):
         if row == -1:
             return False
 
-        index = self.dataModel.index(row , 0)
+        index = self.dataModel.index(row, 0)
         proxyIndex = self.filterModel.mapFromSource(index)
         self.selectRowByIndex(proxyIndex)
         return True

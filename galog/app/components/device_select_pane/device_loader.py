@@ -1,11 +1,9 @@
-from contextlib import suppress
-from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
 
 from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
 
-from galog.app.device import AdbClient, deviceList
-from galog.app.device.device import DEVICE_STATE_OK, AdbDevice, deviceList, deviceListWithInfo
+from galog.app.device import AdbClient
+from galog.app.device.device import deviceListWithInfo
 from galog.app.device.errors import DeviceError
 
 

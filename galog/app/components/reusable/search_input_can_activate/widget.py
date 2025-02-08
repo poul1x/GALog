@@ -2,7 +2,9 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QKeyEvent
 
 from galog.app.util.hotkeys import HotkeyHelper
+
 from ..search_input import SearchInput
+
 
 class SearchInputCanActivate(SearchInput):
     #

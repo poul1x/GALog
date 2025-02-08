@@ -1,12 +1,11 @@
-from dataclasses import dataclass
 import shutil
 import subprocess
 import sys
 import tarfile
 from contextlib import suppress
-from typing import List, Optional
+from typing import List
 
-from PyQt5.QtCore import QEvent, QThreadPool, QThread
+from PyQt5.QtCore import QEvent, QThread, QThreadPool
 from PyQt5.QtGui import QFontDatabase, QIcon
 from PyQt5.QtWidgets import (
     QAction,
@@ -18,19 +17,20 @@ from PyQt5.QtWidgets import (
     QStyleOptionButton,
     QWidgetAction,
 )
-from galog.app.app_state import AdbServerSettings, AppState, RunAppAction
-from galog.app.components.dialogs import RestartCaptureDialog
-from galog.app.components.dialogs import RestartCaptureDialogResult
 
-from galog.app.components.package_select_pane import PackageSelectPane
+from galog.app.app_state import AdbServerSettings, AppState, RunAppAction
 from galog.app.components.device_select_pane.pane import DeviceSelectPane
+from galog.app.components.dialogs import (
+    RestartCaptureDialog,
+    RestartCaptureDialogResult,
+)
 from galog.app.components.dialogs.stop_capture_dialog import (
     StopCaptureDialog,
     StopCaptureDialogResult,
 )
 from galog.app.components.message_view_pane import LogMessageViewPane
+from galog.app.components.package_select_pane import PackageSelectPane
 from galog.app.components.tag_filter_pane.pane import TagFilterPane
-from galog.app.controllers.install_app import InstallAppController
 from galog.app.controllers.kill_app import KillAppController
 from galog.app.controllers.log_messages_pane.controller import LogMessagesPaneController
 from galog.app.controllers.open_log_file.controller import OpenLogFileController
