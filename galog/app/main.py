@@ -19,6 +19,8 @@ from PyQt5.QtWidgets import (
     QWidgetAction,
 )
 from galog.app.app_state import AdbServerSettings, AppState, RunAppAction
+from galog.app.components.dialogs import RestartCaptureDialog
+from galog.app.components.dialogs import RestartCaptureDialogResult
 
 from galog.app.components.package_select_pane import PackageSelectPane
 from galog.app.components.device_select_pane.pane import DeviceSelectPane
@@ -32,12 +34,14 @@ from galog.app.controllers.install_app import InstallAppController
 from galog.app.controllers.kill_app import KillAppController
 from galog.app.controllers.log_messages_pane.controller import LogMessagesPaneController
 from galog.app.controllers.open_log_file.controller import OpenLogFileController
+from galog.app.controllers.restart_app.action import RestartAppAction
 from galog.app.controllers.run_app.controller import RunAppController
 from galog.app.controllers.save_log_file.controller import SaveLogFileController
 from galog.app.controllers.tag_filter_pane.controller import (
     TagFilteringMode,
     TagFilterPaneController,
 )
+from galog.app.device.device import AdbClient
 from galog.app.highlighting import HighlightingRules
 from galog.app.util.message_box import (
     showErrorMsgBox,
@@ -279,6 +283,37 @@ class MainWindow(QMainWindow):
         self.logMessagesPaneController.clearLogLines()
         self.logMessagesPaneController.addLogLines(lines)
 
+    def restartCapture(self):
+        dialog = RestartCaptureDialog()
+        result = dialog.exec_()
+        if result == RestartCaptureDialogResult.Rejected:
+            return
+
+        assert self.appState.lastSelectedDevice is not None
+        device = self.appState.lastSelectedDevice.serial
+        package = self.appState.lastSelectedPackage.name
+        # mode = self.appState.lastSelectedPackage.action
+
+        self.logMessagesPaneController.stopCapture()
+        self.logMessagesPaneController.makeWhiteBackground()
+        self.logMessagesPaneController.disableMessageFilter()
+        self.logMessagesPaneController.clearLogLines()
+
+        action = RestartAppAction(self.adbClient())
+        action.restartApp(device, package)
+
+        controller = RunAppController()
+        # controller.setAppDebug(action == RunAppAction.StartAppDebug)
+        controller.setAppDebug(False)
+        controller.runApp(device, package)
+        self.logMessagesPaneController.startCapture(device, package)
+
+    def adbClient(self):
+        return AdbClient(
+            self.appState.adb.ipAddr,
+            int(self.appState.adb.port),
+        )
+
     def stopCapture(self):
         dialog = StopCaptureDialog()
         result = dialog.exec_()
@@ -306,16 +341,16 @@ class MainWindow(QMainWindow):
     def toggleShowLineNumbers(self, checkBox: QCheckBox):
         self.logMessagesPaneController.setShowLineNumbers(checkBox.isChecked())
 
-    def handleInstallApkAction(self):
-        device = self.capturePaneController.selectedDevice()
-        if device is None:
-            msgBrief = "Operation failed"
-            msgVerbose = "No device selected (Select device in 'Capture->New' [tmp])"
-            showErrorMsgBox(msgBrief, msgVerbose)
-            return
+    # def handleInstallApkAction(self):
+    #     device = self.capturePaneController.selectedDevice()
+    #     if device is None:
+    #         msgBrief = "Operation failed"
+    #         msgVerbose = "No device selected (Select device in 'Capture->New' [tmp])"
+    #         showErrorMsgBox(msgBrief, msgVerbose)
+    #         return
 
-        controller = InstallAppController()
-        controller.promptInstallApp(device)
+    #     controller = InstallAppController()
+    #     controller.promptInstallApp(device)
 
     def openTagFilterAction(self):
         action = QAction("&Tag filter", self)
@@ -335,6 +370,15 @@ class MainWindow(QMainWindow):
         action.setObjectName("capture.new")
         action.setEnabled(True)
         action.setData(False)
+        return action
+
+    def restartCaptureAction(self):
+        action = QAction("&Restart", self)
+        action.setShortcut("Ctrl+R")
+        action.setStatusTip("Restart capture")
+        action.triggered.connect(self.restartCapture)
+        action.setEnabled(False)
+        action.setData(True)
         return action
 
     def showDevicesAction(self):
@@ -442,14 +486,14 @@ class MainWindow(QMainWindow):
         action.setData(False)
         return action
 
-    def installApkAction(self):
-        action = QAction("&Install APK", self)
-        action.setShortcut("Ctrl+I")
-        action.setStatusTip("Install app from APK file")
-        action.triggered.connect(self.handleInstallApkAction)
-        action.setEnabled(True)
-        action.setData(False)
-        return action
+    # def installApkAction(self):
+    #     action = QAction("&Install APK", self)
+    #     action.setShortcut("Ctrl+I")
+    #     action.setStatusTip("Install app from APK file")
+    #     action.triggered.connect(self.handleInstallApkAction)
+    #     action.setEnabled(True)
+    #     action.setData(False)
+    #     return action
 
     def clearAppDataAction(self):
         action = QAction("&Clear app data", self)
@@ -498,6 +542,7 @@ class MainWindow(QMainWindow):
         captureMenu = menuBar.addMenu("📱 &Capture")
         captureMenu.addAction(self.showDevicesAction())
         captureMenu.addAction(self.startCaptureAction())
+        captureMenu.addAction(self.restartCaptureAction())
         captureMenu.addAction(self.stopCaptureAction())
         captureMenu.addAction(self.clearCaptureOutputAction())
         captureMenu.addAction(self.openLogFileAction())
