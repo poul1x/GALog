@@ -144,7 +144,7 @@ class DeviceSelectPane(QDialog):
 
     def _openLoadingDialog(self):
         self._loadingDialog = LoadingDialog()
-        self._loadingDialog.setText("Connecting to ADB server...")
+        self._loadingDialog.setText("Loading device list...")
         self._loadingDialog.exec_()
 
     def exec_(self):

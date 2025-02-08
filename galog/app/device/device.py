@@ -24,7 +24,8 @@ _PROP_RELEASE = "ro.build.version.release"
 _PROP_CPU_ARCH = "ro.product.cpu.abi"
 _PROP_SDK_MIN = "ro.build.version.min_supported_target_sdk"
 _PROP_SDK_MAX = "ro.build.version.sdk"
-_PROP_CODENAME = "ro.product.device"
+_PROP_CODENAME1 = "ro.product.device"
+_PROP_CODENAME2 = "ro.product.name"
 
 
 @dataclass
@@ -47,7 +48,7 @@ class AdbDevice(Device):
     def _device_display_name(self, props: Dict[str, str]):
         try:
             mf = props[_PROP_MANUFACTURER].capitalize()
-            codename = props[_PROP_CODENAME]
+            codename = props[_PROP_CODENAME1] or props[_PROP_CODENAME2]
             model = props[_PROP_MODEL]
         except KeyError:
             return _NOT_AVAIL

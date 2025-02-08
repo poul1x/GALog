@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QVBoxLayout, QWidget
 from galog.app.app_state import AppState, LastSelectedPackage
+from galog.app.controllers.install_app.controller import InstallAppController
 from ..device_select_pane import DeviceSelectPane
 
 from galog.app.util.hotkeys import HotkeyHelper
@@ -19,7 +20,7 @@ from PyQt5.QtWidgets import QFileDialog, QListView
 from galog.app.apk_info import APK
 from galog.app.components.dialogs import LoadingDialog
 from galog.app.device import AdbClient
-from galog.app.util.message_box import showErrorMsgBox
+from galog.app.util.message_box import showErrorMsgBox, showPromptMsgBox
 from galog.app.util.signals import blockSignals
 
 from .package_loader import PackageLoader
@@ -142,6 +143,7 @@ class PackageSelectPane(QDialog):
 
     def _packageLoaderSucceeded(self, deviceList: List[str]):
         self._closeLoadingDialog()
+        self.buttonBar.fromApkButton.setEnabled(True)
         self._setPackages(deviceList)
 
         if self._canSelectPackage():
@@ -232,10 +234,18 @@ class PackageSelectPane(QDialog):
             showErrorMsgBox(msgBrief, msgVerbose)
             return
 
-        if not self.packagesList.has(packageName):
-            msgBrief = "Package not installed"
-            msgVerbose = f"Please, install the package '{packageName}' first"
-            showErrorMsgBox(msgBrief, msgVerbose)
+        if self.packagesList.has(packageName):
+            self.accept()
+            return
+
+        msgBrief = "Package not installed"
+        prompt = f"This app is not present on the device. Do you want to install the APK and continue this action?"
+        if not showPromptMsgBox(msgBrief, msgBrief, prompt):
+            return
+
+        deviceSerial = self._appState.lastSelectedDevice.serial
+        action = InstallAppController(self.adbClient())
+        if not action.installApp(deviceSerial, selectedFiles[0]):
             return
 
         self.accept()

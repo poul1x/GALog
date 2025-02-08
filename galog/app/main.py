@@ -6,7 +6,7 @@ import tarfile
 from contextlib import suppress
 from typing import List, Optional
 
-from PyQt5.QtCore import QEvent, QThreadPool
+from PyQt5.QtCore import QEvent, QThreadPool, QThread
 from PyQt5.QtGui import QFontDatabase, QIcon
 from PyQt5.QtWidgets import (
     QAction,
@@ -221,6 +221,10 @@ class MainWindow(QMainWindow):
                 msgVerbose = "Device was not selected. Unable to start log capture"  # fmt: skip
                 showInfoMsgBox(msgBrief, msgVerbose)
                 return
+
+            # Add small delay to remove
+            # LoadingDialog flickering
+            QThread.msleep(400)
 
         packageSelectPane = PackageSelectPane(self.appState, self)
         result = packageSelectPane.exec_()
