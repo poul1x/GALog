@@ -44,7 +44,7 @@ class LogFileReader(QRunnable):
             result = []
             with open(self._filePath, "r", encoding="utf-8") as f:
                 for rawLogLine in f:
-                    strippedLine = rawLogLine.strip()
+                    strippedLine = rawLogLine.rstrip("\r\n")
                     if not strippedLine:
                         continue
                     line = self._parseLogLine(strippedLine)
