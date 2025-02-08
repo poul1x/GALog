@@ -14,9 +14,10 @@
 	font-size: 20px;
 	font-weight: bold;
 	color: #464646;
+	background: white;
 }
 
-#LoadingDialog {
+#LoadingDialog > #Container {
 	background: #ffffff;
 	border: 2px solid #3b3b3b;
     border-radius: 5px;
