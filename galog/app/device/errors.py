@@ -56,7 +56,7 @@ class DeviceNotFound(DeviceError):
 
     @property
     def msgVerbose(self):
-        return "Device is not longer available. Please, reconnect it to the PC"
+        return "Device is no longer available. Please, reconnect it to the PC"
 
 
 class DeviceStateUnauthorized(DeviceError):

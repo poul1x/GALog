@@ -13,16 +13,18 @@ from .app_installer import AppInstaller
 
 
 class InstallAppController:
-    def __init__(self):
-        self._client = AdbClient()
+    def __init__(self, client: AdbClient):
+        self._client = client
         self._appDebug = False
+        self._success = False
 
     def setAppDebug(self, debug: bool):
         self._appDebug = debug
 
     def _appInstallerSucceeded(self):
         self._loadingDialog.close()
-        showInfoMsgBox("Success", "App installed successfully")
+        # showInfoMsgBox("Success", "App installed successfully")
+        self._success = True
 
     def _appInstallerFailed(
         self, msgBrief: str, msgVerbose: str, details: Optional[str]
@@ -34,7 +36,7 @@ class InstallAppController:
         self._loadingDialog.setText("Checking app exists")
 
     def _dialogInstallingNewApp(self):
-        self._loadingDialog.setText("Instaling new app")
+        self._loadingDialog.setText("Installing new app")
 
     def _dialogUninstallingOldApp(self):
         self._loadingDialog.setText("Checking app exists")
@@ -77,3 +79,16 @@ class InstallAppController:
         self._loadingDialog = LoadingDialog()
         self._loadingDialog.setText("Checking app exists")
         self._loadingDialog.exec_()
+
+    def installApp(self, deviceSerial: str, apkFilePath: str):
+        self._success = False
+        appInstaller = AppInstaller(self._client, deviceSerial, apkFilePath)
+        appInstaller.signals.succeeded.connect(self._appInstallerSucceeded)
+        appInstaller.signals.failed.connect(self._appInstallerFailed)
+        appInstaller.setStageDelay(500)
+        QThreadPool.globalInstance().start(appInstaller)
+
+        self._loadingDialog = LoadingDialog()
+        self._loadingDialog.setText("Installing app...")
+        self._loadingDialog.exec_()
+        return self._success

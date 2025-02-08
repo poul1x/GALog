@@ -18,13 +18,10 @@ class AppInstaller(QRunnable):
     _client: AdbClient
     _msDelay: Optional[int]
 
-    def __init__(
-        self, client: AdbClient, deviceName: str, packageName: str, apkFilePath: str
-    ):
+    def __init__(self, client: AdbClient, deviceName: str, apkFilePath: str):
         super().__init__()
         self.signals = AppInstallerSignals()
         self._deviceName = deviceName
-        self._packageName = packageName
         self._apkFilePath = apkFilePath
         self._client = client
         self._msDelay = None
@@ -36,25 +33,25 @@ class AppInstaller(QRunnable):
         if self._msDelay:
             QThread.msleep(self._msDelay)
 
-    def _appExists(self, device: AdbDevice):
-        self.signals.checkAppExists.emit()
-        self._delayIfNeeded()
-        return device.is_installed(self._packageName)
+    # def _appExists(self, device: AdbDevice):
+    #     self.signals.checkAppExists.emit()
+    #     self._delayIfNeeded()
+    #     return device.is_installed(self._packageName)
 
     def _installApp(self, device: AdbDevice):
         self.signals.installingNewApp.emit()
         self._delayIfNeeded()
         device.install(self._apkFilePath)
 
-    def _uninstallApp(self, device: AdbDevice):
-        self.signals.uninstallingOldApp.emit()
-        self._delayIfNeeded()
-        device.uninstall(self._packageName)
+    # def _uninstallApp(self, device: AdbDevice):
+    #     self.signals.uninstallingOldApp.emit()
+    #     self._delayIfNeeded()
+    #     device.uninstall(self._packageName)
 
     def _execInstallApp(self):
         with deviceRestricted(self._client, self._deviceName) as device:
-            if self._appExists(device):
-                self._uninstallApp(device)
+            # if self._appExists(device):
+            #     self._uninstallApp(device)
             self._installApp(device)
 
     def run(self):

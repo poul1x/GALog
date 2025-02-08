@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (
     QMainWindow,
     QProgressBar,
     QVBoxLayout,
+    QWidget,
 )
 
 from galog.app.util.paths import styleSheetFile
@@ -15,11 +16,15 @@ from galog.app.util.style import CustomStyle
 class LoadingDialog(QDialog):
     def __init__(self):
         super().__init__()
-        self.setStyle(CustomStyle())
         self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setStyle(CustomStyle())
         self.setObjectName("LoadingDialog")
         self.initUserInterface()
         self.loadStyleSheet()
+        self.adjustSize()
+        self.setMinimumWidth(350)
+        self.center()
 
     def loadStyleSheet(self):
         with open(styleSheetFile("loading_dialog")) as f:
@@ -46,10 +51,23 @@ class LoadingDialog(QDialog):
         layout.addWidget(self.label)
         layout.addWidget(self.progressBar)
         self.setLayout(layout)
-        self.adjustSize()
-        self.setMinimumWidth(350)
-        # self.setFixedHeight(180)
-        self.center()
+
+    def initUserInterface(self):
+        container = QWidget(self)
+        container.setObjectName("Container")
+        container.setAttribute(Qt.WA_StyledBackground)
+
+        layout = QVBoxLayout()
+        self.label = QLabel(self)
+        self.progressBar = QProgressBar(self)
+        self.progressBar.setRange(0, 0)
+        layout.addWidget(self.label)
+        layout.addWidget(self.progressBar)
+        container.setLayout(layout)
+
+        mainLayout = QVBoxLayout()
+        mainLayout.addWidget(container)
+        self.setLayout(mainLayout)
 
     def setText(self, text: str):
         self.label.setText(text)
