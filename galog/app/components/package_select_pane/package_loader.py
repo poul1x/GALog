@@ -3,12 +3,12 @@ from typing import Optional
 from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
 
 from galog.app.device import AdbClient, deviceRestricted
-from galog.app.device.errors import DeviceError
+from galog.app.device.errors import DeviceError, DeviceNotFound
 
 
 class PackageLoaderSignals(QObject):
     succeeded = pyqtSignal(list)
-    failed = pyqtSignal(str, str)
+    failed = pyqtSignal(DeviceError)
 
 
 class PackageLoader(QRunnable):
@@ -42,4 +42,4 @@ class PackageLoader(QRunnable):
             self.signals.succeeded.emit(packages)
 
         except DeviceError as e:
-            self.signals.failed.emit(e.msgBrief, e.msgVerbose)
+            self.signals.failed.emit(e)
