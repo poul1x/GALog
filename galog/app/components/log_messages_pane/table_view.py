@@ -109,8 +109,20 @@ class TableView(BaseTableView):
         self.quickNavFrame.updateGeometry()
         self.quickNavFrame.hideChildren()
 
-        self.quickNavFrame.upArrowButton.clicked.connect(lambda: self.scrollToTop())  # fmt: skip
-        self.quickNavFrame.downArrowButton.clicked.connect(lambda: self.scrollToBottom())  # fmt: skip
+        self.quickNavFrame.upArrowButton.clicked.connect(self._upArrowButtonClicked)  # fmt: skip
+        self.quickNavFrame.downArrowButton.clicked.connect(self._downArrowButtonClicked)  # fmt: skip
+
+    def _upArrowButtonClicked(self):
+        rowCount = self.regExpFilterModel.rowCount()
+        if rowCount > 0:
+            self.scrollToTop()
+            self.selectRow(0)
+
+    def _downArrowButtonClicked(self):
+        rowCount = self.regExpFilterModel.rowCount()
+        if rowCount > 0:
+            self.scrollToBottom()
+            self.selectRow(rowCount - 1)
 
     def resizeEvent(self, e: QResizeEvent) -> None:
         self.quickNavFrame.updateGeometry()
