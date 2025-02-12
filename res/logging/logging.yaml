@@ -1,0 +1,81 @@
+version: 1
+disable_existing_loggers: True
+formatters:
+  fmt_no_colors:
+    '()': 'logging.Formatter'
+    format: '%(asctime)s %(levelname)8s [%(name)s] %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+  fmt_colors:
+    '()': 'ext://coloredlogs.ColoredFormatter'
+    format: '%(asctime)s %(levelname)8s [%(name)s] %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+    field_styles:
+      asctime:
+        color: magenta
+      name:
+        color: blue
+        bold: True
+      levelname:
+        color: cyan
+        bold: True
+    level_styles:
+      info:
+        color: blue
+      warning:
+        color: yellow
+      debug:
+        color: green
+      error:
+        color: red
+      critical:
+        color: red
+        bold: True
+handlers:
+  hnd_highlighting_thread:
+    class: logging.handlers.RotatingFileHandler
+    filename: highlighting_thread.log
+    formatter: fmt_no_colors
+    maxBytes: 10000000 # 10Mb
+    backupCount: 3
+    level: NOTSET
+  hnd_highlighting_delegate:
+    class: logging.handlers.RotatingFileHandler
+    filename: highlighting_delegate.log
+    formatter: fmt_no_colors
+    maxBytes: 10000000 # 10Mb
+    backupCount: 3
+    level: NOTSET
+  hnd_root:
+    class: logging.handlers.RotatingFileHandler
+    filename: root.log
+    formatter: fmt_no_colors
+    maxBytes: 100000000 # 100Mb
+    backupCount: 3
+    level: NOTSET
+  hnd_console_no_colors:
+    class: logging.StreamHandler
+    formatter: fmt_no_colors
+    level: NOTSET
+    stream: ext://sys.stdout
+  hnd_console_colors:
+    class: logging.StreamHandler
+    formatter: fmt_colors
+    level: NOTSET
+    stream: ext://sys.stdout
+  none:
+    class: logging.NullHandler
+loggers:
+  '': # root logger
+    handlers: [hnd_console_colors]
+    level: DEBUG
+  main:
+    level: INFO
+    propagate: True
+  highlighting_thread:
+    handlers: [hnd_highlighting_thread]
+    level: INFO
+    propagate: True
+  # highlighting_delegate:
+  #   handlers: [hnd_highlighting_delegate]
+  #   level: DEBUG
+  #   propagate: False

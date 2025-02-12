@@ -3,9 +3,13 @@ import subprocess
 import sys
 import tarfile
 from contextlib import suppress
-from typing import List
+from typing import Dict, List
 
-from PyQt5.QtCore import QEvent, QThread, QThreadPool
+import traceback
+import os
+import shutil
+
+from PyQt5.QtCore import QEvent, QThread, QThreadPool, QStandardPaths
 from PyQt5.QtGui import QFontDatabase, QIcon
 from PyQt5.QtWidgets import (
     QAction,
@@ -43,13 +47,25 @@ from galog.app.controllers.tag_filter_pane.controller import (
 )
 from galog.app.device.device import AdbClient
 from galog.app.highlighting import HighlightingRules
+from galog.app.logging import initLogging
 from galog.app.util.message_box import (
     showErrorMsgBox,
     showInfoMsgBox,
     showNotImpMsgBox,
     showPromptMsgBox,
 )
-from galog.app.util.paths import fontFiles, highlightingFiles, iconFile, styleSheetFiles
+from galog.app.util.paths import (
+    appConfigDir,
+    appLogsDir,
+    appLogsRootDir,
+    fontFiles,
+    highlightingFiles,
+    iconFile,
+    loggingConfigFile,
+    loggingConfigFileInitial,
+    styleSheetFiles,
+    appDataDir,
+)
 from galog.app.util.style import CustomStyle
 
 from .components.log_messages_pane import LogMessagesPane
@@ -579,9 +595,60 @@ class MainWindow(QMainWindow):
         self.statusBar().show()
 
 
+def tryInitLogging():
+    try:
+        initLogging()
+    except:
+        traceback.print_exc()
+        msgBrief = "Logging not available"
+        msgVerbose = "Failed to init logging. Logging will not be available"
+        showErrorMsgBox(msgBrief, msgVerbose)
+
+
+def createAppDataFolders():
+    dataDir = appDataDir()
+    if not os.path.exists(dataDir):
+        os.makedirs(dataDir)
+
+    configDir = appConfigDir()
+    if not os.path.exists(configDir):
+        os.mkdir(configDir)
+
+    logsDir = appLogsDir()
+    if not os.path.exists(logsDir):
+        os.mkdir(logsDir)
+
+
+def createUserAppData():
+    userLoggingConfig = loggingConfigFile()
+    if not os.path.exists(userLoggingConfig):
+        initialLoggingConfig = loggingConfigFileInitial()
+        shutil.copy(initialLoggingConfig, userLoggingConfig)
+
+
+def removeOldLogs():
+    logsDir = appLogsDir()
+    rootDir = appLogsRootDir()
+    for dirPath in os.listdir(rootDir):
+        if dirPath != logsDir:
+            with suppress(Exception):
+                shutil.rmtree(os.path.join(rootDir, dirPath))
+
+
+def preRunApp():
+    createAppDataFolders()
+    createUserAppData()
+    tryInitLogging()
+    removeOldLogs()
+
+
+import logging
+
+
 def runApp():
+    preRunApp()
+    logging.getLogger("highlighting_thread").info("text")
     app = QApplication(sys.argv)
     mainWindow = MainWindow()
     mainWindow.show()
-    print("GALog initialized")
     sys.exit(app.exec())
