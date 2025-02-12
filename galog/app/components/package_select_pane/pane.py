@@ -10,6 +10,7 @@ from galog.app.app_state import AppState, LastSelectedPackage
 from galog.app.components.dialogs import LoadingDialog
 from galog.app.controllers.install_app.controller import InstallAppController
 from galog.app.device import AdbClient
+from galog.app.device.errors import DeviceError, DeviceNotFound
 from galog.app.util.hotkeys import HotkeyHelper
 from galog.app.util.message_box import showErrorMsgBox, showPromptMsgBox
 from galog.app.util.signals import blockSignals
@@ -129,12 +130,21 @@ class PackageSelectPane(QDialog):
         if self._canSelectPackage():
             self._selectDefaultPackage(deviceList)
 
-    def _packageLoaderFailed(self, msgBrief: str, msgVerbose: str):
+    def _packageLoaderFailed(self, err: DeviceError):
         self._closeLoadingDialog()
         self.buttonBar.selectButton.setEnabled(False)
         self.buttonBar.fromApkButton.setEnabled(False)
         self.packagesList.setNoData()
-        showErrorMsgBox(msgBrief, msgVerbose)
+
+        if not isinstance(err, DeviceNotFound):
+            showErrorMsgBox(err.msgBrief, err.msgVerbose)
+            return
+
+        msgBrief = "Device not available"
+        msgVerbose = "Device is no longer available. Would you like to switch to another device?"  # fmt: skip
+        if showPromptMsgBox(msgBrief, msgBrief, msgVerbose):
+            self._selectAnotherDevice(True)
+
 
     def _selectDefaultPackage(self, packages: List[str]):
         #
@@ -250,8 +260,9 @@ class PackageSelectPane(QDialog):
     def _selectButtonClicked(self):
         self._packageSelected(self.packagesList.listView.currentIndex())
 
-    def _selectAnotherDevice(self):
+    def _selectAnotherDevice(self, autoSelect: bool = False):
         deviceSelectPane = DeviceSelectPane(self._appState, self.parent())
+        deviceSelectPane.setDeviceAutoSelect(autoSelect)
         result = deviceSelectPane.exec_()
         if result == 0:
             return
