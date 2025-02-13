@@ -21,14 +21,9 @@ class LoadingDialog(QDialog):
         self.setStyle(CustomStyle())
         self.setObjectName("LoadingDialog")
         self.initUserInterface()
-        self.loadStyleSheet()
         self.adjustSize()
         self.setMinimumWidth(350)
         self.center()
-
-    def loadStyleSheet(self):
-        with open(styleSheetFile("loading_dialog")) as f:
-            self.setStyleSheet(f.read())
 
     def center(self):
         mainWindow = None

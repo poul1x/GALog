@@ -72,19 +72,14 @@ from .components.log_messages_pane import LogMessagesPane
 
 
 class MainWindow(QMainWindow):
-    _viewWindows: List[LogMessageViewPane]
-    _liveReload: bool
-
     def __init__(self) -> None:
         super().__init__()
         self.setObjectName("MainWindow")
         self.setStyle(CustomStyle())
         self.startAdbServer()
         self._searchPane = None
-        self._liveReload = True
         self.logMessagesPaneController = LogMessagesPaneController(self)
         self.tagFilterPaneController = TagFilterPaneController(self)
-        self.loadStyleSheet()
         self.loadFonts()
         self.initHighlighting()
         self.initUserInterface()
@@ -126,14 +121,6 @@ class MainWindow(QMainWindow):
         for archive in fontFiles():
             with tarfile.open(archive, "r") as tar:
                 self.loadFontsFromTar(fontDB, tar)
-
-    def loadStyleSheet(self):
-        styleSheet = ""
-        for filepath in styleSheetFiles():
-            with open(filepath, "r", encoding="utf-8") as f:
-                styleSheet += f.read() + "\n"
-
-        self.setStyleSheet(styleSheet)
 
     def initHighlighting(self):
         rules = HighlightingRules()
@@ -631,8 +618,25 @@ def removeOldLogs():
     rootDir = appLogsRootDir()
     for dirPath in os.listdir(rootDir):
         if dirPath != logsDir:
-            with suppress(Exception):
-                shutil.rmtree(os.path.join(rootDir, dirPath))
+            continue
+        with suppress(Exception):
+            oldLogDir = os.path.join(rootDir, dirPath)
+            shutil.rmtree(oldLogDir)
+
+
+class GALogApp(QApplication):
+    def __init__(self, argv: List[str]) -> None:
+        super().__init__(argv)
+        self.loadStyleSheetFiles()
+
+    def loadStyleSheetFiles(self):
+        styleSheet = ""
+        for filepath in styleSheetFiles():
+            with open(filepath, "r", encoding="utf-8") as f:
+                styleSheet += f.read() + "\n"
+
+        self.setStyleSheet(styleSheet)
+
 
 
 def preRunApp():
@@ -648,7 +652,7 @@ import logging
 def runApp():
     preRunApp()
     logging.getLogger("highlighting_thread").info("text")
-    app = QApplication(sys.argv)
+    app = GALogApp(sys.argv)
     mainWindow = MainWindow()
     mainWindow.show()
     sys.exit(app.exec())

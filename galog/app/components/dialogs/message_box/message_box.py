@@ -48,14 +48,9 @@ class MessageBox(QDialog):
         self.setWindowTitle("GALog")
         self.initUserInterface()
         self.setGeometryAuto()
-        self.loadStyleSheet()
         self.setSizeAuto()
         self.center()
         self._clickedButtonId = -1
-
-    def loadStyleSheet(self):
-        with open(styleSheetFile("message_box")) as f:
-            self.setStyleSheet(f.read())
 
     def checkBox(self):
         return self._checkBox

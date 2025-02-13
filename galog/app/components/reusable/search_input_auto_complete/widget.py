@@ -11,10 +11,18 @@ from .delegate import CompleterDelegate
 
 class SearchInputAutoComplete(SearchInput):
     completionAccepted = pyqtSignal(str)
+    POPUP_STYLESHEET: Optional[str] = None
 
     def __init__(self, parent: Optional[QWidget] = None):
         self._completing = False
+        self._loadStyleSheet()
         super().__init__(parent)
+
+    @staticmethod
+    def _loadStyleSheet():
+        if not SearchInputAutoComplete.POPUP_STYLESHEET:
+            with open(styleSheetFile("completer")) as f:
+                SearchInputAutoComplete.POPUP_STYLESHEET = f.read()
 
     def initUserInterface(self):
         super().initUserInterface()
@@ -26,12 +34,8 @@ class SearchInputAutoComplete(SearchInput):
         self._completer.setWidget(self)
         self._completer.activated.connect(self.handleCompletion)
 
-        with open(styleSheetFile("completer")) as f:
-            styleSheet = f.read()
-
-        # s = r"border: 1px solid black; border-left: 2px solid black; border-right: 2px solid black;"
         self._completer.popup().window().setWindowFlag(Qt.NoDropShadowWindowHint, True)
-        self._completer.popup().setStyleSheet(styleSheet)
+        self._completer.popup().setStyleSheet(SearchInputAutoComplete.POPUP_STYLESHEET)
 
         delegate = CompleterDelegate(self)
         self._completer.popup().setItemDelegate(delegate)
