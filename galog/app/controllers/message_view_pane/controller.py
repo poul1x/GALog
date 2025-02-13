@@ -23,12 +23,15 @@ from galog.app.util.paths import styleSheetFile
 class LogMessageViewPaneController:
     QSS_TEMPLATE: Optional[str] = None
 
-    def __init__(self, dataModel: QStandardItemModel, hRules: HighlightingRules):
+    @staticmethod
+    def _loadStyleSheet():
         if not LogMessageViewPaneController.QSS_TEMPLATE:
             path = styleSheetFile("log_message_view_pane")
             with open(path, "r", encoding="utf-8") as f:
                 LogMessageViewPaneController.QSS_TEMPLATE = f.read()
 
+    def __init__(self, dataModel: QStandardItemModel, hRules: HighlightingRules):
+        self._loadStyleSheet()
         self._dataModel = dataModel
         self._hRules = hRules
         self._pane = None
