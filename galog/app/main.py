@@ -23,38 +23,38 @@ from PyQt5.QtWidgets import (
 )
 
 from galog.app.app_state import AdbServerSettings, AppState, RunAppAction
-from galog.app.components.device_select_pane.pane import DeviceSelectPane
-from galog.app.components.dialogs import (
+from galog.app.ui.device_select_pane.pane import DeviceSelectPane
+from galog.app.ui.dialogs import (
     RestartCaptureDialog,
     RestartCaptureDialogResult,
 )
-from galog.app.components.dialogs.stop_capture_dialog import (
+from galog.app.ui.dialogs.stop_capture_dialog import (
     StopCaptureDialog,
     StopCaptureDialogResult,
 )
-from galog.app.components.message_view_pane import LogMessageViewPane
-from galog.app.components.package_select_pane import PackageSelectPane
-from galog.app.components.tag_filter_pane.pane import TagFilterPane
+from galog.app.ui.message_view_pane import LogMessageViewPane
+from galog.app.ui.package_select_pane import PackageSelectPane
+from galog.app.ui.tag_filter_pane.pane import TagFilterPane
 from galog.app.controllers.kill_app import KillAppController
 from galog.app.controllers.log_messages_pane.controller import LogMessagesPaneController
 from galog.app.controllers.open_log_file.controller import OpenLogFileController
 from galog.app.controllers.restart_app.action import RestartAppAction
 from galog.app.controllers.run_app.controller import RunAppController
 from galog.app.controllers.save_log_file.controller import SaveLogFileController
-from galog.app.controllers.tag_filter_pane.controller import (
+from galog.app.ui.panes.tag_filter_pane.controller import (
     TagFilteringMode,
     TagFilterPaneController,
 )
 from galog.app.device.device import AdbClient
-from galog.app.highlighting import HighlightingRules
+from galog.app.hgl_rules import HglRulesStorage
 from galog.app.logging import initLogging
-from galog.app.util.message_box import (
-    showErrorMsgBox,
-    showInfoMsgBox,
-    showNotImpMsgBox,
-    showPromptMsgBox,
+from galog.app.msgbox import (
+    msgBoxErr,
+    msgBoxInfo,
+    msgBoxNotImp,
+    msgBoxPrompt,
 )
-from galog.app.util.paths import (
+from galog.app.paths import (
     appConfigDir,
     appLogsDir,
     appLogsRootDir,
@@ -66,16 +66,16 @@ from galog.app.util.paths import (
     styleSheetFiles,
     appDataDir,
 )
-from galog.app.util.style import CustomStyle
+from galog.app.ui.base.style import GALogStyle
 
-from .components.log_messages_pane import LogMessagesPane
+from .ui.log_messages_pane import LogMessagesPane
 
 
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setObjectName("MainWindow")
-        self.setStyle(CustomStyle())
+        self.setStyle(GALogStyle())
         self.startAdbServer()
         self._searchPane = None
         self.logMessagesPaneController = LogMessagesPaneController(self)
@@ -123,7 +123,7 @@ class MainWindow(QMainWindow):
                 self.loadFontsFromTar(fontDB, tar)
 
     def initHighlighting(self):
-        rules = HighlightingRules()
+        rules = HglRulesStorage()
         for filepath in highlightingFiles():
             rules.addRuleset(filepath)
 
@@ -134,7 +134,7 @@ class MainWindow(QMainWindow):
         QThreadPool.globalInstance().waitForDone()
 
     def closeEvent(self, event: QEvent):
-        if showPromptMsgBox(
+        if msgBoxPrompt(
             title="Close window",
             caption="Do you really want to quit?",
             body="If you close the window, current progress will be lost",
@@ -217,7 +217,7 @@ class MainWindow(QMainWindow):
         if self.logMessagesPaneController.isCaptureRunning():
             msgBrief = "Capture is running"
             msgVerbose = "Unable to start capture while another capture is running. Please, stop the running capture first"  # fmt: skip
-            showErrorMsgBox(msgBrief, msgVerbose)
+            msgBoxErr(msgBrief, msgVerbose)
             return
 
         if self.appState.lastSelectedDevice is None:
@@ -226,7 +226,7 @@ class MainWindow(QMainWindow):
             if deviceSelectPane.exec_() == DeviceSelectPane.Rejected:
                 msgBrief = "Device not selected"
                 msgVerbose = "Device was not selected. Unable to start log capture"  # fmt: skip
-                showInfoMsgBox(msgBrief, msgVerbose)
+                msgBoxInfo(msgBrief, msgVerbose)
                 return
 
             # Add small delay to remove
@@ -255,7 +255,7 @@ class MainWindow(QMainWindow):
         self.setCaptureSpecificActionsEnabled(True)
 
     def clearCaptureOutput(self):
-        if showPromptMsgBox(
+        if msgBoxPrompt(
             title="Clear capture output",
             caption="Clear capture output?",
             body="All captured log messages will be erased",
@@ -273,7 +273,7 @@ class MainWindow(QMainWindow):
         if self.logMessagesPaneController.isCaptureRunning():
             msgBrief = "Capture is running"
             msgVerbose = "Unable to open log file while capture is running. Please, stop the running capture first"  # fmt: skip
-            showErrorMsgBox(msgBrief, msgVerbose)
+            msgBoxErr(msgBrief, msgVerbose)
             return
 
         controller = OpenLogFileController()
@@ -320,10 +320,10 @@ class MainWindow(QMainWindow):
     def stopCapture(self):
         dialog = StopCaptureDialog()
         result = dialog.exec_()
-        if result == StopCaptureDialogResult.Rejected:
+        if result == StopCaptureDialog.Rejected:
             return
 
-        if result == StopCaptureDialogResult.AcceptedKillApp:
+        if result == StopCaptureDialog.AcceptedKillApp:
             device = self.logMessagesPaneController.device
             package = self.logMessagesPaneController.package
             controller = KillAppController()
@@ -502,7 +502,7 @@ class MainWindow(QMainWindow):
         action = QAction("&Clear app data", self)
         action.setShortcut("Ctrl+P")
         action.setStatusTip("Clear user data associated with the app")
-        action.triggered.connect(lambda: showNotImpMsgBox())
+        action.triggered.connect(lambda: msgBoxNotImp())
         action.setEnabled(False)
         action.setData(True)
         return action
@@ -511,7 +511,7 @@ class MainWindow(QMainWindow):
         action = QAction("&Take screenshot", self)
         action.setShortcut("Ctrl+P")
         action.setStatusTip("Take screenshot")
-        action.triggered.connect(lambda: showNotImpMsgBox())
+        action.triggered.connect(lambda: msgBoxNotImp())
         action.setEnabled(False)
         action.setData(True)
         return action
@@ -519,7 +519,7 @@ class MainWindow(QMainWindow):
     def rootModeAction(self):
         action = QAction("&Root mode", self)
         action.setStatusTip("Enable/disable root mode")
-        action.triggered.connect(lambda: showNotImpMsgBox())
+        action.triggered.connect(lambda: msgBoxNotImp())
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -527,7 +527,7 @@ class MainWindow(QMainWindow):
     def rebootDeviceAction(self):
         action = QAction("&Reboot device", self)
         action.setStatusTip("Reboot device")
-        action.triggered.connect(lambda: showNotImpMsgBox())
+        action.triggered.connect(lambda: msgBoxNotImp())
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -535,7 +535,7 @@ class MainWindow(QMainWindow):
     def shutdownDeviceAction(self):
         action = QAction("&Shutdown device", self)
         action.setStatusTip("Shutdown device")
-        action.triggered.connect(lambda: showNotImpMsgBox())
+        action.triggered.connect(lambda: msgBoxNotImp())
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -589,7 +589,7 @@ def tryInitLogging():
         traceback.print_exc()
         msgBrief = "Logging not available"
         msgVerbose = "Failed to init logging. Logging will not be available"
-        showErrorMsgBox(msgBrief, msgVerbose)
+        msgBoxErr(msgBrief, msgVerbose)
 
 
 def createAppDataFolders():

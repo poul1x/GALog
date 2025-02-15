@@ -1,5 +1,5 @@
 from typing import Any, Dict
-from galog.app.util.paths import (
+from galog.app.paths import (
     loggingConfigFile,
     appLogsDir,
 )
