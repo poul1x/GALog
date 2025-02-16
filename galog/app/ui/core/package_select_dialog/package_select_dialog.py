@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QVBoxLayout, QWi
 
 from galog.app.apk_info import APK
 from galog.app.app_state import AppState, LastSelectedPackage
-from galog.app.ui.dialogs import LoadingDialog
+from galog.app.ui.quick_dialogs import LoadingDialog
 from galog.app.controllers.install_app.controller import InstallAppController
 from galog.app.device import AdbClient
 from galog.app.device.errors import DeviceError, DeviceNotFound
@@ -15,24 +15,24 @@ from galog.app.ui.helpers.hotkeys import HotkeyHelper
 from galog.app.msgbox import msgBoxErr, msgBoxPrompt
 from galog.app.util.signals import blockSignals
 
-from ..device_select_pane import DeviceSelectPane
+from ..device_select_dialog import DeviceSelectDialog
 from .button_bar import ButtonBar
 from .load_options import PackagesLoadOptions
 from .package_loader import PackageLoader
 from .packages_list import PackagesList
 
 
-class PackageSelectPane(QDialog):
+class PackageSelectDialog(QDialog):
     def _defaultFlags(self):
         return Qt.Window | Qt.Dialog | Qt.WindowCloseButtonHint
 
     def __init__(self, appState: AppState, parent: QWidget):
         super().__init__(parent, self._defaultFlags())
         self._appState = appState
-        self.setObjectName("PackageSelectPane")
+        self.setObjectName("PackageSelectDialog")
         self.setAttribute(Qt.WA_StyledBackground)
         self.initUserInterface()
-        self.initController()
+        self.initUserInputHandlers()
         self.initFocusPolicy()
         self.setGeometryAuto()
         self.center()
@@ -74,7 +74,7 @@ class PackageSelectPane(QDialog):
         geometry.moveCenter(parentGeometry.center())
         self.move(geometry.topLeft())
 
-    def initController(self):
+    def initUserInputHandlers(self):
         self.packagesLoadOptions.reloadButton.clicked.connect(self._reloadButtonClicked)
         self.packagesList.listView.rowActivated.connect(self._packageSelected)
         self.packagesList.searchInput.activate.connect(self._packageMayBeSelected)
@@ -261,7 +261,7 @@ class PackageSelectPane(QDialog):
         self._packageSelected(self.packagesList.listView.currentIndex())
 
     def _selectAnotherDevice(self, autoSelect: bool = False):
-        deviceSelectPane = DeviceSelectPane(self._appState, self.parent())
+        deviceSelectPane = DeviceSelectDialog(self._appState, self.parent())
         deviceSelectPane.setDeviceAutoSelect(autoSelect)
         result = deviceSelectPane.exec_()
         if result == 0:

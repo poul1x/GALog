@@ -16,7 +16,7 @@ from galog.app.ui.log_messages_pane.delegate import HighlightingData
 from galog.app.ui.message_view_pane import LogMessageViewPane
 from galog.app.controllers.log_messages_pane.search_task import SearchResult
 from galog.app.hgl_rules import HglRulesStorage
-from galog.app.ui.panes.log_messages_pane.colors import logLevelColor, logLevelColorDarker
+from galog.app.ui.core.log_messages_panel.colors import logLevelColor, logLevelColorDarker
 from galog.app.paths import styleSheetFile
 
 

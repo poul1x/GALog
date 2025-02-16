@@ -23,27 +23,27 @@ from PyQt5.QtWidgets import (
 )
 
 from galog.app.app_state import AdbServerSettings, AppState, RunAppAction
-from galog.app.ui.device_select_pane.pane import DeviceSelectPane
-from galog.app.ui.dialogs import (
+from galog.app.ui.device_select_pane.pane import DeviceSelectDialog
+from galog.app.ui.quick_dialogs import (
     RestartCaptureDialog,
     RestartCaptureDialogResult,
 )
-from galog.app.ui.dialogs.stop_capture_dialog import (
+from galog.app.ui.quick_dialogs.stop_capture_dialog import (
     StopCaptureDialog,
     StopCaptureDialogResult,
 )
 from galog.app.ui.message_view_pane import LogMessageViewPane
-from galog.app.ui.package_select_pane import PackageSelectPane
-from galog.app.ui.tag_filter_pane.pane import TagFilterPane
+from galog.app.ui.package_select_pane import PackageSelectDialog
+from galog.app.ui.tag_filter_pane.pane import TagFilterDialog
 from galog.app.controllers.kill_app import KillAppController
-from galog.app.controllers.log_messages_pane.controller import LogMessagesPaneController
+from galog.app.controllers.log_messages_pane.controller import LogMessagesPanelController
 from galog.app.controllers.open_log_file.controller import OpenLogFileController
 from galog.app.controllers.restart_app.action import RestartAppAction
 from galog.app.controllers.run_app.controller import RunAppController
 from galog.app.controllers.save_log_file.controller import SaveLogFileController
-from galog.app.ui.panes.tag_filter_pane.controller import (
+from galog.app.ui.core.tag_filter_dialog.controller import (
     TagFilteringMode,
-    TagFilterPaneController,
+    TagFilterDialogController,
 )
 from galog.app.device.device import AdbClient
 from galog.app.hgl_rules import HglRulesStorage
@@ -68,7 +68,7 @@ from galog.app.paths import (
 )
 from galog.app.ui.base.style import GALogStyle
 
-from .ui.log_messages_pane import LogMessagesPane
+from .ui.log_messages_pane import LogMessagesPanel
 
 
 class MainWindow(QMainWindow):
@@ -78,8 +78,8 @@ class MainWindow(QMainWindow):
         self.setStyle(GALogStyle())
         self.startAdbServer()
         self._searchPane = None
-        self.logMessagesPaneController = LogMessagesPaneController(self)
-        self.tagFilterPaneController = TagFilterPaneController(self)
+        self.logMessagesPaneController = LogMessagesPanelController(self)
+        self.tagFilterPaneController = TagFilterDialogController(self)
         self.loadFonts()
         self.initHighlighting()
         self.initUserInterface()
@@ -194,7 +194,7 @@ class MainWindow(QMainWindow):
     def openTagFilter(self):
         tagList = self.logMessagesPaneController.uniqueTagNames()
         result = self.tagFilterPaneController.exec_(tagList)
-        if result == TagFilterPane.Rejected:
+        if result == TagFilterDialog.Rejected:
             return
 
         config = self.tagFilterPaneController.filteringConfig()
@@ -210,7 +210,7 @@ class MainWindow(QMainWindow):
             self.logMessagesPaneController.unsetTagFilteringFn()
 
     def showDevices(self):
-        deviceSelectPane = DeviceSelectPane(self.appState, self)
+        deviceSelectPane = DeviceSelectDialog(self.appState, self)
         deviceSelectPane.exec_()
 
     def startCapture(self):
@@ -221,9 +221,9 @@ class MainWindow(QMainWindow):
             return
 
         if self.appState.lastSelectedDevice is None:
-            deviceSelectPane = DeviceSelectPane(self.appState, self)
+            deviceSelectPane = DeviceSelectDialog(self.appState, self)
             deviceSelectPane.setDeviceAutoSelect(True)
-            if deviceSelectPane.exec_() == DeviceSelectPane.Rejected:
+            if deviceSelectPane.exec_() == DeviceSelectDialog.Rejected:
                 msgBrief = "Device not selected"
                 msgVerbose = "Device was not selected. Unable to start log capture"  # fmt: skip
                 msgBoxInfo(msgBrief, msgVerbose)
@@ -233,7 +233,7 @@ class MainWindow(QMainWindow):
             # LoadingDialog flickering
             QThread.msleep(100)
 
-        packageSelectPane = PackageSelectPane(self.appState, self)
+        packageSelectPane = PackageSelectDialog(self.appState, self)
         result = packageSelectPane.exec_()
         if result == 0:
             return
@@ -572,7 +572,7 @@ class MainWindow(QMainWindow):
         y = (screen.height() - height) // 2
         self.setGeometry(x, y, width, height)
 
-        pane = LogMessagesPane(self)
+        pane = LogMessagesPanel(self)
         self.logMessagesPaneController.takeControl(pane)
         self.setCentralWidget(pane)
         self.setWindowTitle("galog")

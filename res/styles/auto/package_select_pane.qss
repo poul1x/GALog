@@ -1,4 +1,4 @@
-#PackageSelectPane {
+#PackageSelectDialog {
 	background: #ffffff;
 }
 

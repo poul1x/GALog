@@ -3,7 +3,7 @@ from typing import List, Optional
 from PyQt5.QtCore import QThreadPool
 from PyQt5.QtWidgets import QFileDialog
 
-from galog.app.ui.dialogs import LoadingDialog
+from galog.app.ui.quick_dialogs import LoadingDialog
 from galog.app.msgbox import msgBoxErr
 
 from .tag_file_reader import TagFileReader
