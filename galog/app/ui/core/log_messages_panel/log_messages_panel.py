@@ -51,7 +51,7 @@ class SearchPane(QWidget):
         self.hide()
 
 
-class LogMessagesPane(QWidget):
+class LogMessagesPanel(QWidget):
     toggleMessageFilter = pyqtSignal()
     copyMsgRowsToClipboard = pyqtSignal()
     copyFullRowsToClipboard = pyqtSignal()
@@ -61,7 +61,7 @@ class LogMessagesPane(QWidget):
 
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.setObjectName("LogMessagesPane")
+        self.setObjectName("LogMessagesPanel")
         self.setAttribute(Qt.WA_StyledBackground)
         self.initUserInterface()
 

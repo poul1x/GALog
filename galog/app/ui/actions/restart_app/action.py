@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QThreadPool
 
-from galog.app.ui.dialogs import LoadingDialog
+from galog.app.ui.quick_dialogs import LoadingDialog
 from galog.app.device import AdbClient
 from galog.app.msgbox import msgBoxErr
 

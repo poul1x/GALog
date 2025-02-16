@@ -4,15 +4,15 @@ from PyQt5.QtCore import QModelIndex, Qt, QThread, QThreadPool
 from PyQt5.QtGui import QGuiApplication, QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QTableView
 
-from galog.app.ui.dialogs import LoadingDialog
+from galog.app.ui.quick_dialogs import LoadingDialog
 from galog.app.ui.log_messages_pane.data_model import Column
 from galog.app.ui.log_messages_pane.delegate import (
     HighlightingData,
     LazyHighlightingState,
 )
-from galog.app.ui.log_messages_pane.pane import LogMessagesPane
+from galog.app.ui.log_messages_pane.pane import LogMessagesPanel
 from galog.app.ui.message_view_pane import LogMessageViewPane
-from galog.app.ui.panes.log_messages_pane.msg_view_dialog.controller import (
+from galog.app.ui.core.log_messages_panel.msg_view_dialog.controller import (
     LogMessageViewPaneController,
 )
 from galog.app.device.device import AdbClient
@@ -34,7 +34,7 @@ else:
     MainWindow = object
 
 
-class LogMessagesPaneController:
+class LogMessagesPanelController:
     def __init__(self, mainWindow: MainWindow):
         self._client = AdbClient()
         self._mainWindow = mainWindow
@@ -60,7 +60,7 @@ class LogMessagesPaneController:
     def setHighlightingRules(self, rules: HglRulesStorage):
         self._highlightingRules = rules
 
-    def takeControl(self, pane: LogMessagesPane):
+    def takeControl(self, pane: LogMessagesPanel):
         pane.tableView.rowActivated.connect(self._rowActivated)
         pane.tableView.delegate.setHighlightingRules(self._highlightingRules)
         pane.tableView.delegate.lazyHighlighting.connect(self._lazyHighlighting)

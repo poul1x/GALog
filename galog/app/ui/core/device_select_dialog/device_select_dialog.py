@@ -5,8 +5,8 @@ from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QWidget
 
 from galog.app.app_state import LastSelectedDevice
-from galog.app.ui.dialogs import LoadingDialog
-from galog.app.ui.dialogs.loading_dialog import LoadingDialog
+from galog.app.ui.quick_dialogs import LoadingDialog
+from galog.app.ui.quick_dialogs.loading_dialog import LoadingDialog
 from galog.app.device import AdbClient, DeviceInfo
 from galog.app.device.device import AdbClient
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
@@ -24,16 +24,16 @@ else:
     AppState = object
 
 
-class DeviceSelectPane(QDialog):
+class DeviceSelectDialog(QDialog):
     def __init__(self, appState: AppState, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self._autoSelect = False
         self._autoSelectDone = False
         self._appState = appState
-        self.setObjectName("DeviceSelectPane")
+        self.setObjectName("DeviceSelectDialog")
         self.setAttribute(Qt.WA_StyledBackground)
         self.initUserInterface()
-        self.initController()
+        self.initUserInputHandlers()
         self.initFocusPolicy()
         self.setGeometryAuto()
         self.center()
@@ -53,7 +53,7 @@ class DeviceSelectPane(QDialog):
         else:
             super().keyPressEvent(event)
 
-    def initController(self):
+    def initUserInputHandlers(self):
         self.devicesLoadOptions.reloadButton.clicked.connect(self._reloadButtonClicked)
         self.deviceTable.searchInput.activate.connect(self._deviceMayBeSelected)
         self.deviceTable.searchInput.textChanged.connect(self._canSelectDevice)
@@ -129,7 +129,7 @@ class DeviceSelectPane(QDialog):
     def exec_(self):
         self._startDeviceListReload()
         if self._autoSelect and self._autoSelectDone:
-            return DeviceSelectPane.Accepted
+            return DeviceSelectDialog.Accepted
 
         return super().exec_()
 

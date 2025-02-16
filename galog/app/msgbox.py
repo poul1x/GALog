@@ -2,7 +2,7 @@ from typing import Optional
 
 from PyQt5.QtGui import QIcon
 
-from galog.app.ui.dialogs import MessageBox
+from galog.app.ui.quick_dialogs import MessageBox
 from galog.app.paths import iconFile
 
 
@@ -39,7 +39,7 @@ def msgBoxErr2(msgVerbose: str):
     messageBox.exec_()
 
 
-def msgBoxPrompt(title: str, caption: str, body: str):
+def msgBoxPrompt(caption: str, body: str):
     messageBox = MessageBox()
     messageBox.setHeaderText(caption)
     messageBox.setBodyText(body)
@@ -47,7 +47,7 @@ def msgBoxPrompt(title: str, caption: str, body: str):
     btnIdYes = messageBox.addButton("Yes")
     btnIdNo = messageBox.addButton("No")
     messageBox.setDefaultButton(btnIdNo)
-    messageBox.setWindowTitle(title)
+    messageBox.setWindowTitle("User action required")
     return messageBox.exec_() == btnIdYes
 
 
