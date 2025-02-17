@@ -55,10 +55,6 @@ class MessageBox(BaseDialog):
         self._clickedButtonId = buttonId
         self.accept()
 
-    def setFixedMaxSize(self, maxWidth: int, maxHeight: int):
-        self.setMaximumWidth(maxWidth)
-        self.setMaximumHeight(maxHeight)
-
     def setHeaderText(self, text: str):
         index = 1
         layout: QVBoxLayout = self.layout()
@@ -93,7 +89,6 @@ class MessageBox(BaseDialog):
         vBoxLayout.setContentsMargins(0, 0, 0, 0)
         vBoxLayout.setSpacing(0)
         self.setLayout(vBoxLayout)
-        self.setStyle(GALogStyle())
 
     def addButton(self, name: str):
         return self.buttonBar.addButton(name)

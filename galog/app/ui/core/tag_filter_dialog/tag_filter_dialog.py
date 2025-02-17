@@ -1,9 +1,21 @@
+import os
+from typing import IO
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QWidget, QApplication, QVBoxLayout, QHBoxLayout
+from PyQt5.QtWidgets import (
+    QDialog,
+    QWidget,
+    QApplication,
+    QVBoxLayout,
+    QHBoxLayout,
+    QFileDialog,
+)
 from galog.app.app_state import AppState, TagFilteringConfig, TagFilteringMode
 
 from galog.app.msgbox import msgBoxErr, msgBoxPrompt
 from galog.app.ui.base.dialog import BaseDialog
+from galog.app.ui.actions.read_file import ReadFileAction
+from galog.app.ui.helpers.file_filter import FileFilter, FileFilterBuilder
+from galog.app.ui.quick_dialogs.loading_dialog import LoadingDialog
 
 from .bottom_button_bar import BottomButtonBar
 from .control_button_bar import ControlButtonBar
@@ -17,13 +29,15 @@ class TagFilterDialog(BaseDialog):
     Rejected = 0
 
     def __init__(self, appState: AppState, parent: QWidget):
-        super().__init__(parent, self._defaultFlags())
+        super().__init__(parent)
         self._appState = appState
         self.setWindowTitle("Tag Filter")
-        self.setRelativeGeometry(0.4, 0.4, 450, 400)
-        self.initUserInterface()
+        self.setRelativeGeometry(0.2, 0.35, 450, 400)
+        self._initUserInterface()
+        self._initUserInputHandlers()
+        self._initFocusPolicy()
 
-    def initUserInterface(self):
+    def _initUserInterface(self):
         self.filterTypeSwitch = FilterTypeSwitch(self)
         self.controlButtonBar = ControlButtonBar(self)
         self.tagNameInput = TagNameInput(self)
@@ -61,7 +75,7 @@ class TagFilterDialog(BaseDialog):
 
     exec = exec_
 
-    def initUserInputHandlers(self):
+    def _initUserInputHandlers(self):
         self.controlButtonBar.addTagButton.clicked.connect(self._btnAddTagClicked)
         self.controlButtonBar.removeTagButton.clicked.connect(self._removeSelectedTags)
         self.controlButtonBar.removeAllTagsButton.clicked.connect(self._removeAllTags)
@@ -73,7 +87,7 @@ class TagFilterDialog(BaseDialog):
         self.bottomButtonBar.buttonSave.clicked.connect(self._btnSaveClicked)
         self.bottomButtonBar.buttonCancel.clicked.connect(self.reject)
 
-    def initFocusPolicy(self):
+    def _initFocusPolicy(self):
         self.controlButtonBar.addTagButton.setFocusPolicy(Qt.NoFocus)
         self.controlButtonBar.removeTagButton.setFocusPolicy(Qt.NoFocus)
         self.controlButtonBar.removeAllTagsButton.setFocusPolicy(Qt.NoFocus)
@@ -166,14 +180,37 @@ class TagFilterDialog(BaseDialog):
 
     def _saveTagsToFile(self):
         tagsList = self.filteredTagsList.toStringList()
-        controller = SaveTagFileController(tagsList)
-        controller.promptSaveFile()
+        # controller = SaveTagFileController(tagsList)
+        # controller.promptSaveFile()
+
+    def _askSaveTagFilePath(self):
+        return QFileDialog.getSaveFileName(
+            caption="Save Tag List File",
+            directory=self._appState.lastUsedDirPath,
+            filter=FileFilterBuilder.textFile(),
+        )[0]
+
+    def _askOpenTagFilePath(self):
+        return QFileDialog.getOpenFileName(
+            caption="Open Tag List File",
+            directory=self._appState.lastUsedDirPath,
+            filter=FileFilterBuilder.textFile(),
+        )[0]
+
+    def _saveLastSelectedDir(self, filePath: str):
+        self._appState.lastUsedDirPath = os.path.dirname(filePath)
 
     def _loadTagsFromFile(self):
-        controller = OpenTagFileController()
-        result = controller.promptOpenFile()
-        if not result:
+        filePath = self._askOpenTagFilePath()
+        if not filePath:
             return
 
-        self.filteredTagsList.setTags(result)
+        self._saveLastSelectedDir(filePath)
+
+        def readTagListFromFile(f: IO[str]):
+            tags = list(filter(lambda s: bool(s), f.read().split()))
+            self.filteredTagsList.setTags(tags)
+
+        action = ReadFileAction(filePath)
+        action.readTextFile(readTagListFromFile)
         self._updateControlButtonBarState()

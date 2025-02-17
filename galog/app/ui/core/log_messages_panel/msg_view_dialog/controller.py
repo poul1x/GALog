@@ -11,10 +11,10 @@ from PyQt5.QtGui import (
     QTextCursor,
 )
 
-from galog.app.ui.log_messages_pane.data_model import Column
-from galog.app.ui.log_messages_pane.delegate import HighlightingData
-from galog.app.ui.message_view_pane import LogMessageViewPane
-from galog.app.controllers.log_messages_pane.search_task import SearchResult
+from ..data_model import Column
+from ..delegate import HighlightingData
+from .msg_view_dialog import LogMessageViewDialog
+from ..search_task import SearchResult
 from galog.app.hgl_rules import HglRulesStorage
 from galog.app.ui.core.log_messages_panel.colors import logLevelColor, logLevelColorDarker
 from galog.app.paths import styleSheetFile
@@ -36,7 +36,7 @@ class LogMessageViewPaneController:
         self._hRules = hRules
         self._pane = None
 
-    def takeControl(self, viewPane: LogMessageViewPane):
+    def takeControl(self, viewPane: LogMessageViewDialog):
         viewPane.copyButton.clicked.connect(self.copyButtonClicked)
         self._pane = viewPane
 

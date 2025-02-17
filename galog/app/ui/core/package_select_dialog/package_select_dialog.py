@@ -8,12 +8,11 @@ from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QVBoxLayout, QWi
 from galog.app.apk_info import APK
 from galog.app.app_state import AppState, LastSelectedPackage
 from galog.app.ui.quick_dialogs import LoadingDialog
-from galog.app.controllers.install_app.controller import InstallAppController
+from galog.app.ui.actions.install_app.controller import InstallAppController
 from galog.app.device import AdbClient
 from galog.app.device.errors import DeviceError, DeviceNotFound
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
 from galog.app.msgbox import msgBoxErr, msgBoxPrompt
-from galog.app.util.signals import blockSignals
 
 from ..device_select_dialog import DeviceSelectDialog
 from .button_bar import ButtonBar
@@ -162,10 +161,9 @@ class PackageSelectDialog(QDialog):
         self.packagesList.selectPackageByName(packages[0])
 
     def _setPackages(self, packages: List[str]):
-        with blockSignals(self.packagesList):  # TODO: why I need this
-            self.packagesList.clear()
-            for package in packages:
-                self.packagesList.addPackage(package)
+        self.packagesList.clear()
+        for package in packages:
+            self.packagesList.addPackage(package)
 
     def _openLoadingDialog(self):
         self._loadingDialog = LoadingDialog()

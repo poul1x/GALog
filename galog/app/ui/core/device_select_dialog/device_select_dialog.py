@@ -11,7 +11,6 @@ from galog.app.device import AdbClient, DeviceInfo
 from galog.app.device.device import AdbClient
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
 from galog.app.msgbox import msgBoxErr
-from galog.app.util.signals import blockSignals
 
 from .load_options import DevicesLoadOptions
 from .button_bar import ButtonBar
@@ -238,10 +237,9 @@ class DeviceSelectDialog(QDialog):
 
     def _setDevices(self, devices: List[DeviceInfo]):
         self.buttonBar.selectButton.setEnabled(True)
-        with blockSignals(self.deviceTable):  # TODO: why I need this
-            self.deviceTable.clear()
-            self._addDevices(devices)
-            self.deviceTable.sort()
+        self.deviceTable.clear()
+        self._addDevices(devices)
+        self.deviceTable.sort()
 
     def _setDevicesEmpty(self):
         self.buttonBar.selectButton.setEnabled(False)

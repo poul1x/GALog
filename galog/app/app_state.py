@@ -52,3 +52,4 @@ class AppState:
     lastSelectedDevice: Optional[LastSelectedDevice]
     lastSelectedPackage: Optional[LastSelectedPackage]
     tagFilteringConfig: TagFilteringConfig
+    lastUsedDirPath: str
