@@ -12,11 +12,11 @@ class SearchInputCanActivate(SearchInput):
     # to select package directly from search input with <Enter> key press.
     # Without this feature user has to press <Tab> first, only then press <Enter>
     #
-    activate = pyqtSignal()
+    activated = pyqtSignal()
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         helper = HotkeyHelper(event)
         if helper.isEnterPressed():
-            self.activate.emit()
+            self.activated.emit()
 
         return super().keyPressEvent(event)

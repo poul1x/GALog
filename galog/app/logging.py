@@ -18,6 +18,16 @@ def updateFileHandlersPaths(config: Dict[str, dict]):
             val["filename"] = os.path.join(logsDir, val["filename"])
 
 
+def updateLoggersPascalCase(config: Dict[str, dict]):
+    def snakeCaseToPascalCase(s: str):
+        return "".join(word.capitalize() for word in s.split("_"))
+
+    config["loggers"] = {
+        snakeCaseToPascalCase(loggerName): loggerCfg
+        for loggerName, loggerCfg in config["loggers"].items()
+    }
+
+
 def initLogging():
     loggingConfig = loggingConfigFile()
     with open(loggingConfig, "r", encoding="utf-8") as f:

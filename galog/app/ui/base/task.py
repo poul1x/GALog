@@ -2,10 +2,15 @@ from abc import abstractmethod
 from PyQt5.QtCore import QRunnable, QThread
 import logging
 
-class BackgroundTask(QRunnable):
+
+class BaseTask(QRunnable):
     def __init__(self):
         super().__init__()
         self._msDelay = -1
+        self.initLogger()
+
+    def initLogger(self):
+        self._logger = logging.getLogger(self.__class__.__name__)
 
     def setStartDelay(self, msDelay: int):
         assert msDelay > 0, "Delay must be greater than 0"
@@ -15,7 +20,7 @@ class BackgroundTask(QRunnable):
         if self._msDelay == -1:
             return
 
-        logging.debug(f"Sleep {self._msDelay}ms")
+        self._logger.debug("Delay for %dms", self._msDelay)
         QThread.msleep(self._msDelay)
 
     @abstractmethod
@@ -24,8 +29,12 @@ class BackgroundTask(QRunnable):
 
     def run(self):
         try:
+            self._logger.debug("Delay if needed")
             self.delayIfNeeded()
+
+            self._logger.debug("Call entrypoint")
             self.entrypoint()
+            self._logger.debug("Call entrypoint - OK")
 
         except:
-            logging.exception("BG Task Entrypoint")
+            self._logger.exception("Unhandled exception in task entrypoint:")

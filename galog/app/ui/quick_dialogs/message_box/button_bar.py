@@ -10,7 +10,7 @@ class MessageBoxButtonBar(BaseWidget):
     buttonClicked = pyqtSignal(int)
 
     def __init__(self, parent: Optional[QWidget] = None) -> None:
-        super().__init__(parent, Qt.WindowSystemMenuHint | Qt.WindowTitleHint)
+        super().__init__(parent)
         self.initUserInterface()
         self._buttonCount = 0
 

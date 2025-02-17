@@ -76,7 +76,7 @@ class PackageSelectDialog(QDialog):
     def initUserInputHandlers(self):
         self.packagesLoadOptions.reloadButton.clicked.connect(self._reloadButtonClicked)
         self.packagesList.listView.rowActivated.connect(self._packageSelected)
-        self.packagesList.searchInput.activate.connect(self._packageMayBeSelected)
+        self.packagesList.searchInput.activated.connect(self._packageMayBeSelected)
         self.packagesList.searchInput.textChanged.connect(self._canSelectPackage)
         self.buttonBar.fromApkButton.clicked.connect(self._fromApkButtonClicked)
         self.buttonBar.selectButton.clicked.connect(self._selectButtonClicked)

@@ -18,23 +18,26 @@ class FilterTypeSwitch(BaseWidget):
     def initUserInterface(self):
         hBoxLayout = QHBoxLayout()
         hBoxLayout.setContentsMargins(0, 0, 0, 0)
-        filterTypeLabel = QLabel("Filtering mode:")
-        self.filterTypeSwitch = QComboBox(self)
-        self.filterTypeSwitch.addItem("Disabled")
-        self.filterTypeSwitch.addItem("Show matching")
-        self.filterTypeSwitch.addItem("Hide matching")
-        self.filterTypeSwitch.currentIndexChanged.connect(self._filterTypeChanged)
-        self.filterTypeSwitch.setCurrentIndex(TagFilteringMode.Disabled.value)
-        hBoxLayout.addWidget(filterTypeLabel)
-        hBoxLayout.addWidget(self.filterTypeSwitch)
         hBoxLayout.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.setLayout(hBoxLayout)
+
+        self.label = QLabel("Filtering mode:")
+        hBoxLayout.addWidget(self.label)
+
+        self.dropdown = QComboBox(self)
+        self.dropdown.addItem("Disabled")
+        self.dropdown.addItem("Show matching")
+        self.dropdown.addItem("Hide matching")
+        self.dropdown.currentIndexChanged.connect(self._filterTypeChanged)
+        self.dropdown.setCurrentIndex(TagFilteringMode.Disabled.value)
+        hBoxLayout.addWidget(self.dropdown)
+
 
     def _filterTypeChanged(self, index: int):
         self.filterTypeChanged.emit(TagFilteringMode(index))
 
     def filteringMode(self):
-        return TagFilteringMode(self.filterTypeSwitch.currentIndex())
+        return TagFilteringMode(self.dropdown.currentIndex())
 
     def setFilteringMode(self, mode: TagFilteringMode):
-        self.filterTypeSwitch.setCurrentIndex(mode.value)
+        self.dropdown.setCurrentIndex(mode.value)

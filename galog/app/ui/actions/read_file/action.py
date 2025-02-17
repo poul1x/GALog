@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from PyQt5.QtCore import QThreadPool, QThread
 from PyQt5.QtWidgets import QFileDialog
-from .user_types import FnReadText, FnReadBinary
+from .task import FnReadText, FnReadBinary
 
 from galog.app.ui.quick_dialogs import LoadingDialog
 from galog.app.msgbox import msgBoxErr
@@ -31,10 +31,7 @@ class ReadFileAction:
     def setDialogText(self, text: str):
         self._loadingDialog.setText(text)
 
-    def setDelay(self, msDelay: int):
-        self._loadingDialog.setDelay(msDelay)
-
-    def readTextFile(self, fnReadText: FnReadText):
+    def readTextData(self, fnReadText: FnReadText):
         readFileTask = ReadTextFileTask(self.filePath, fnReadText)
         readFileTask.signals.succeeded.connect(self._succeeded)
         readFileTask.signals.failed.connect(self._failed)
@@ -43,7 +40,7 @@ class ReadFileAction:
         QThreadPool.globalInstance().start(readFileTask)
         self._loadingDialog.exec_()
 
-    def readFileBinary(self, fnReadBinary: FnReadBinary):
+    def readBinaryData(self, fnReadBinary: FnReadBinary):
         readFileTask = ReadBinaryFileTask(self.filePath, fnReadBinary)
         readFileTask.signals.succeeded.connect(self._succeeded)
         readFileTask.signals.failed.connect(self._failed)

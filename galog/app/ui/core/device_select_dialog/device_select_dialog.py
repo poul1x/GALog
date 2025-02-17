@@ -54,7 +54,7 @@ class DeviceSelectDialog(QDialog):
 
     def initUserInputHandlers(self):
         self.devicesLoadOptions.reloadButton.clicked.connect(self._reloadButtonClicked)
-        self.deviceTable.searchInput.activate.connect(self._deviceMayBeSelected)
+        self.deviceTable.searchInput.activated.connect(self._deviceMayBeSelected)
         self.deviceTable.searchInput.textChanged.connect(self._canSelectDevice)
         self.deviceTable.tableView.rowActivated.connect(self._deviceSelected)
         self.buttonBar.selectButton.clicked.connect(self._selectButtonClicked)

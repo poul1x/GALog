@@ -6,7 +6,8 @@ from .style import GALogStyle
 
 
 class BaseDialog(QDialog):
-    def _defaultFlags(self):
+    @staticmethod
+    def _defaultFlags():
         return (
             Qt.Window
             | Qt.Dialog
@@ -24,6 +25,10 @@ class BaseDialog(QDialog):
     def setFixedMaxSize(self, maxWidth: int, maxHeight: int):
         self.setMaximumWidth(maxWidth)
         self.setMaximumHeight(maxHeight)
+
+    def setFixedMinSize(self, maxWidth: int, maxHeight: int):
+        self.setMinimumWidth(maxWidth)
+        self.setMinimumHeight(maxHeight)
 
     def _parentGeometry(self):
         parent = self.parent()

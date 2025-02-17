@@ -18,8 +18,8 @@ class SearchInput(QLineEdit):
         helper = HotkeyHelper(event)
         if helper.isArrowUpDownPressed():
             self.focusNextChild()
-            nextChild = QApplication.focusWidget()
-            QApplication.postEvent(nextChild, QKeyEvent(event))
+            focusedWidget = QApplication.focusWidget()
+            QApplication.postEvent(focusedWidget, QKeyEvent(event))
         else:
             super().keyPressEvent(event)
 

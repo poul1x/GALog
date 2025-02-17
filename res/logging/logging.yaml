@@ -75,6 +75,9 @@ loggers:
     handlers: [hnd_highlighting_thread]
     level: INFO
     propagate: True
+  base_task:
+    level: INFO
+    propagate: True
   # highlighting_delegate:
   #   handlers: [hnd_highlighting_delegate]
   #   level: DEBUG

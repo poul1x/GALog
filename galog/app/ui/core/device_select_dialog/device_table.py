@@ -66,9 +66,7 @@ class DeviceTable(QWidget):
         assert isinstance(index.model(), FilterModel)
         self.tableView.setCurrentIndex(index)
         selectionModel = self.tableView.selectionModel()
-        selectionModel.select(
-            index, QItemSelectionModel.Select | QItemSelectionModel.Rows
-        )
+        selectionModel.select(index, QItemSelectionModel.Select | QItemSelectionModel.Rows)  # fmt: skip
         self.tableView.scrollTo(index, QTableView.PositionAtCenter)
 
     def selectTheOnlyOneDevice(self):

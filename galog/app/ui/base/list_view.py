@@ -1,7 +1,7 @@
 from typing import Optional
 
-from PyQt5.QtCore import QModelIndex, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtCore import QEvent, QModelIndex, pyqtSignal
+from PyQt5.QtGui import QFocusEvent, QKeyEvent
 from PyQt5.QtWidgets import QListView, QWidget
 
 from ..helpers.hotkeys import HotkeyHelper
@@ -32,3 +32,11 @@ class ListView(QListView):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.doubleClicked.connect(self._emitRowActivated)
+
+    def focusInEvent(self, e: QFocusEvent) -> None:
+        # Do not allow focus if empty
+        if self.model().rowCount() == 0:
+            self.focusNextChild()
+
+
+        return super().focusInEvent(e)

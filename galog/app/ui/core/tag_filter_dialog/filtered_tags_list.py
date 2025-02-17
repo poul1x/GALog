@@ -1,6 +1,6 @@
 from typing import List
 
-from PyQt5.QtCore import QModelIndex, Qt, pyqtSignal
+from PyQt5.QtCore import QModelIndex, Qt, pyqtSignal, QItemSelectionModel
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QAbstractItemView, QListView, QVBoxLayout, QWidget
 
@@ -72,8 +72,27 @@ class FilteredTagsList(BaseWidget):
         return bool(self.listView.selectionModel().selectedRows())
 
     def removeSelectedTags(self):
+        removedRows = []
         for row in self._selectedRows():
             self.dataModel.removeRow(row)
+            removedRows.append(row)
+
+        return removedRows
+
+    def selectRow(self, row: int):
+        if row < 0 or row >= self.dataModel.rowCount():
+            return False
+
+        index = self.dataModel.index(row, 0)
+        self.selectRowByIndex(index)
+        return True
+
+    def selectRowByIndex(self, index: QModelIndex):
+        assert index.isValid(), "Index must be valid"
+        self.listView.setCurrentIndex(index)
+        selectionModel = self.listView.selectionModel()
+        selectionModel.select(index, QItemSelectionModel.Select)
+        self.listView.scrollTo(index, QListView.PositionAtCenter)
 
     def removeAllTags(self):
         self.dataModel.clear()

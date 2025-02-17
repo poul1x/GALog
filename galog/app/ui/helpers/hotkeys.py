@@ -42,5 +42,14 @@ class HotkeyHelper:
     def isCtrlFPressed(self):
         return self._event.key() == Qt.Key_F and self.isCtrlPressed()
 
+    def isCtrlOPressed(self):
+        return self._event.key() == Qt.Key_O and self.isCtrlPressed()
+
+    def isCtrlSPressed(self):
+        return self._event.key() == Qt.Key_S and self.isCtrlPressed()
+
+    def isDelPressed(self):
+        return self._event.key() == Qt.Key_Delete
+
     def isCtrlEnterPressed(self):
         return self.isCtrlPressed() and self.isEnterPressed()

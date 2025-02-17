@@ -1,23 +1,41 @@
+from abc import abstractmethod
+from enum import Enum, auto
 from io import TextIOWrapper
 from typing import IO, Callable, List, Optional
 
 from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
 
-from galog.app.ui.base.bg_task import BackgroundTask
-from .user_types import FileProcessError, FnReadText, FnReadBinary
+from galog.app.ui.base.task import BaseTask
+
+from typing import IO, Callable
+
+FnReadText = Callable[[IO[str]], None]
+FnReadBinary = Callable[[IO[bytes]], None]
+
+class FileProcessError(Exception):
+    pass
+
+class ErrorCode(int, Enum):
+    unknownError = 0
+    permissionError = auto()
+    fileNotFound = auto()
+    contentDecodeError = auto()
+    contentProcessError = auto()
+
 
 class ReadFileTaskSignals(QObject):
     succeeded = pyqtSignal()
     failed = pyqtSignal(str, str)
 
 
-class _ReadFileTask(BackgroundTask):
+class _ReadFileTask(BaseTask):
     def __init__(self):
         super().__init__()
         self.signals = ReadFileTaskSignals()
 
+    @abstractmethod
     def _readFile(self):
-        QThread.sleep(1)
+        pass
 
     def _readFileSafe(self):
         try:
@@ -30,7 +48,7 @@ class _ReadFileTask(BackgroundTask):
 
         except PermissionError:
             msgBrief = "Access Denied"
-            msgVerbose = "Unable to read file due to insufficient permissions"
+            msgVerbose = "Unable to read file due to insufficient permissions or file is being used by another process" # fmt: skip
             self.signals.failed.emit(msgBrief, msgVerbose)
 
         except UnicodeDecodeError:
@@ -46,6 +64,7 @@ class _ReadFileTask(BackgroundTask):
             msgBrief = "Unknown Error"
             msgVerbose = "Failed to read file - unknown"
             self.signals.failed.emit(msgBrief, msgVerbose)
+            raise
 
     def entrypoint(self):
         self._readFileSafe()
@@ -58,6 +77,7 @@ class ReadTextFileTask(_ReadFileTask):
         self._fnReadText = fnReadText
 
     def _readFile(self):
+        self._logger.info("Open '%s', mode='r'", self._filePath)
         with open(self._filePath, "r", encoding="utf-8") as f:
             self._fnReadText(f)
 
@@ -68,5 +88,6 @@ class ReadBinaryFileTask(_ReadFileTask):
         self._fnReadBinary = fnReadBinary
 
     def _readFile(self):
+        self._logger.info("Open '%s', mode='rb'", self._filePath)
         with open(self._filePath, "rb") as f:
             self._fnReadBinary(f)
