@@ -21,6 +21,10 @@ class BaseDialog(QDialog):
         self.setWindowTitle("GALog")
         self.setStyle(GALogStyle())
 
+    def setFixedMaxSize(self, maxWidth: int, maxHeight: int):
+        self.setMaximumWidth(maxWidth)
+        self.setMaximumHeight(maxHeight)
+
     def _parentGeometry(self):
         parent = self.parent()
         if parent is None:
@@ -46,3 +50,9 @@ class BaseDialog(QDialog):
         x = geometry.x() + (geometry.width() - width) // 2
         y = geometry.y() + (geometry.height() - height) // 2
         self.setGeometry(x, y, width, height)
+
+    def moveToCenter(self):
+        geometry = self.geometry()
+        parentGeometry = self._parentGeometry()
+        geometry.moveCenter(parentGeometry.center())
+        self.move(geometry.topLeft())

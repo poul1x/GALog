@@ -5,13 +5,13 @@ from PyQt5.QtGui import QGuiApplication, QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QTableView
 
 from galog.app.ui.quick_dialogs import LoadingDialog
-from galog.app.ui.log_messages_pane.data_model import Column
-from galog.app.ui.log_messages_pane.delegate import (
+from galog.app.ui.core.log_messages_panel.data_model import Column
+from galog.app.ui.core.log_messages_panel.delegate import (
     HighlightingData,
     LazyHighlightingState,
 )
-from galog.app.ui.log_messages_pane.pane import LogMessagesPanel
-from galog.app.ui.message_view_pane import LogMessageViewPane
+from galog.app.ui.core.log_messages_panel import LogMessagesPanel
+from galog.app.ui.core.log_messages_panel.msg_view_dialog import LogMessageViewDialog
 from galog.app.ui.core.log_messages_panel.msg_view_dialog.controller import (
     LogMessageViewPaneController,
 )
@@ -20,7 +20,7 @@ from galog.app.hgl_rules import HglRulesStorage
 from galog.app.msgbox import msgBoxErr
 
 from .blinking_row import RowBlinkingController
-from ...log_reader.log_reader import (
+from galog.app.log_reader import (
     AndroidAppLogReader,
     LogLine,
     ProcessEndedEvent,
@@ -191,7 +191,7 @@ class LogMessagesPanelController:
         self._rowBlinkingController.startBlinking(index.row())
 
     def _showContentFor(self, index: QModelIndex):
-        viewPane = LogMessageViewPane(self._pane)
+        viewPane = LogMessageViewPanel(self._pane)
         self._viewPaneController.takeControl(viewPane)
         highlightingEnabled = self._pane.tableView.delegate.highlightingEnabled()
         self._viewPaneController.showContentFor(index.row(), highlightingEnabled)

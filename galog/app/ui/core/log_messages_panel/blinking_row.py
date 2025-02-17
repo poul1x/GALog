@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QObject, QRunnable, Qt, QThread, QThreadPool, pyqtSignal
 
-from galog.app.ui.log_messages_pane import LogMessagesPanel
-from galog.app.ui.log_messages_pane.data_model import Column
+from .log_messages_panel import LogMessagesPanel
+from .data_model import Column
 
 
 class RowBlinkingSignals(QObject):

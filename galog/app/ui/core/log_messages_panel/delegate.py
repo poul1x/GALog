@@ -13,7 +13,7 @@ from PyQt5.QtGui import (
 )
 from PyQt5.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem
 
-from galog.app.controllers.log_messages_pane.search_task import SearchResult
+from galog.app.ui.core.log_messages_panel.search_task import SearchResult
 from galog.app.hgl_rules import HglRulesStorage
 from galog.app.ui.core.log_messages_panel.colors import logLevelColor, rowSelectedColor
 from galog.app.ui.helpers.painter import painterSaveRestore

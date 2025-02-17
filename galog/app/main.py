@@ -22,29 +22,25 @@ from PyQt5.QtWidgets import (
     QWidgetAction,
 )
 
-from galog.app.app_state import AdbServerSettings, AppState, RunAppAction
-from galog.app.ui.device_select_pane.pane import DeviceSelectDialog
+from galog.app.app_state import AdbServerSettings, AppState, RunAppAction, TagFilteringConfig, TagFilteringMode
+from galog.app.ui.core.device_select_dialog import DeviceSelectDialog
 from galog.app.ui.quick_dialogs import (
     RestartCaptureDialog,
-    RestartCaptureDialogResult,
 )
 from galog.app.ui.quick_dialogs.stop_capture_dialog import (
     StopCaptureDialog,
     StopCaptureDialogResult,
 )
-from galog.app.ui.message_view_pane import LogMessageViewPane
-from galog.app.ui.package_select_pane import PackageSelectDialog
-from galog.app.ui.tag_filter_pane.pane import TagFilterDialog
-from galog.app.controllers.kill_app import KillAppController
-from galog.app.controllers.log_messages_pane.controller import LogMessagesPanelController
-from galog.app.controllers.open_log_file.controller import OpenLogFileController
-from galog.app.controllers.restart_app.action import RestartAppAction
-from galog.app.controllers.run_app.controller import RunAppController
-from galog.app.controllers.save_log_file.controller import SaveLogFileController
-from galog.app.ui.core.tag_filter_dialog.controller import (
-    TagFilteringMode,
-    TagFilterDialogController,
-)
+# from galog.app.ui.core.message_view_dialog import LogMessageViewDialog
+from galog.app.ui.core.package_select_dialog import PackageSelectDialog
+from galog.app.ui.actions.kill_app import KillAppController
+from galog.app.ui.core.log_messages_panel.controller import LogMessagesPanelController
+from galog.app.ui.actions.open_log_file.controller import OpenLogFileController
+from galog.app.ui.actions.restart_app.action import RestartAppAction
+from galog.app.ui.actions.run_app.controller import RunAppController
+from galog.app.ui.actions.save_log_file.controller import SaveLogFileController
+
+from galog.app.ui.core.tag_filter_dialog import TagFilterDialog
 from galog.app.device.device import AdbClient
 from galog.app.hgl_rules import HglRulesStorage
 from galog.app.logging import initLogging
@@ -68,35 +64,44 @@ from galog.app.paths import (
 )
 from galog.app.ui.base.style import GALogStyle
 
-from .ui.log_messages_pane import LogMessagesPanel
-
+from galog.app.ui.core.log_messages_panel import LogMessagesPanel
 
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setObjectName("MainWindow")
         self.setStyle(GALogStyle())
-        self.startAdbServer()
-        self._searchPane = None
         self.logMessagesPaneController = LogMessagesPanelController(self)
-        self.tagFilterPaneController = TagFilterDialogController(self)
         self.loadFonts()
         self.initHighlighting()
         self.initUserInterface()
         self.initLeftPaddingForEachMenu()
         self.increaseHoverAreaForCheckableActions()
+        self.initAppState()
+        self.startAdbServer()
+
+    def initAppState(self):
         self.appState = AppState(
-            AdbServerSettings(
+            adb=AdbServerSettings(
                 ipAddr="127.0.0.1",
                 port=5037,
             ),
             lastSelectedDevice=None,
             lastSelectedPackage=None,
+            tagFilteringConfig=TagFilteringConfig.none(),
+            lastUsedDirPath="",
         )
+
+
+    def isLocalAdbAddr(self):
+        return self.appState.adb.ipAddr.startswith("127")
 
     def startAdbServer(self):
         adb = shutil.which("adb")
         if not adb:
+            return
+
+        if not self.isLocalAdbAddr():
             return
 
         def execAdbServer():
@@ -192,12 +197,12 @@ class MainWindow(QMainWindow):
                         defaultWidget.setStyleSheet("width: 0px;")
 
     def openTagFilter(self):
+        dialog = TagFilterDialog(self.appState, self)
         tagList = self.logMessagesPaneController.uniqueTagNames()
-        result = self.tagFilterPaneController.exec_(tagList)
-        if result == TagFilterDialog.Rejected:
+        if dialog.exec_() == TagFilterDialog.Rejected:
             return
 
-        config = self.tagFilterPaneController.filteringConfig()
+        config = self.appState.tagFilteringConfig
         if config.mode == TagFilteringMode.ShowMatching:
             self.logMessagesPaneController.setTagFilteringFn(
                 lambda tag: tag in config.tags

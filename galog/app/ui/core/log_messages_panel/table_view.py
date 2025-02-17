@@ -10,7 +10,7 @@ from galog.app.ui.base.table_view import TableView as BaseTableView
 
 from .data_model import Column, DataModel
 from .delegate import StyledItemDelegate
-from .filter_model import FnFilterModel, RegExpFilterModel
+from .data_model import FnFilterModel, RegExpFilterModel
 from .quick_nav import QuickNavigationFrame
 
 
