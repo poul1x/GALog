@@ -26,7 +26,7 @@ class LogMessageViewPaneController:
     @staticmethod
     def _loadStyleSheet():
         if not LogMessageViewPaneController.QSS_TEMPLATE:
-            path = styleSheetFile("log_message_view_pane")
+            path = styleSheetFile("log_message_view_dialog")
             with open(path, "r", encoding="utf-8") as f:
                 LogMessageViewPaneController.QSS_TEMPLATE = f.read()
 

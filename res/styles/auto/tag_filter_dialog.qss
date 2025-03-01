@@ -49,6 +49,8 @@
 	font-size: 20px;
     padding-top: 2px;
     padding-bottom: 4px;
+    selection-background-color: #464646;
+    selection-color: white;
 }
 
 #TagFilterDialog > #FilteredTagsList > QListView {

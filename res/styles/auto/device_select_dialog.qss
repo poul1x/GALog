@@ -46,7 +46,7 @@
 #DeviceSelectDialog > #DeviceTable > QTableView > QHeaderView::section:horizontal {
     background-color: #464646;
     color: #f5f5f5;
-    border:none;
+    border: none;
     font-family: Roboto;
     font-weight: bold;
     font-size: 20px;
@@ -58,13 +58,24 @@
 #DeviceSelectDialog > #DeviceTable > QTableView {
 	font-family: Roboto;
 	font-size: 20px;
-	border: none;
     background: white;
+    border: none;
+}
+
+#DeviceSelectDialog > #DeviceTable[empty="false"] > QTableView  {
+    background-image: none;
+}
+
+#DeviceSelectDialog > #DeviceTable[empty="true"] > QTableView {
+    background-image: url("icons/shrug.svg");
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 #DeviceSelectDialog > #DeviceTable > QTableView::item:hover
 {
 	/* background-color: #f3f3f3; */
+	/* Do not hover cells -> just use white (no hover) */
 	background-color: #ffffff;
 }
 

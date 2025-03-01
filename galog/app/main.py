@@ -22,7 +22,13 @@ from PyQt5.QtWidgets import (
     QWidgetAction,
 )
 
-from galog.app.app_state import AdbServerSettings, AppState, RunAppAction, TagFilteringConfig, TagFilteringMode
+from galog.app.app_state import (
+    AdbServerSettings,
+    AppState,
+    RunAppAction,
+    TagFilteringConfig,
+    TagFilteringMode,
+)
 from galog.app.ui.core.device_select_dialog import DeviceSelectDialog
 from galog.app.ui.quick_dialogs import (
     RestartCaptureDialog,
@@ -31,6 +37,7 @@ from galog.app.ui.quick_dialogs.stop_capture_dialog import (
     StopCaptureDialog,
     StopCaptureDialogResult,
 )
+
 # from galog.app.ui.core.message_view_dialog import LogMessageViewDialog
 from galog.app.ui.core.package_select_dialog import PackageSelectDialog
 from galog.app.ui.actions.kill_app import KillAppController
@@ -61,10 +68,12 @@ from galog.app.paths import (
     loggingConfigFileInitial,
     styleSheetFiles,
     appDataDir,
+    fixUrlPaths,
 )
 from galog.app.ui.base.style import GALogStyle
 
 from galog.app.ui.core.log_messages_panel import LogMessagesPanel
+
 
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
@@ -91,7 +100,6 @@ class MainWindow(QMainWindow):
             tagFilteringConfig=TagFilteringConfig.none(),
             lastUsedDirPath="",
         )
-
 
     def isLocalAdbAddr(self):
         return self.appState.adb.ipAddr.startswith("127")
@@ -140,7 +148,6 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event: QEvent):
         if msgBoxPrompt(
-            title="Close window",
             caption="Do you really want to quit?",
             body="If you close the window, current progress will be lost",
         ):
@@ -632,16 +639,17 @@ def removeOldLogs():
 class GALogApp(QApplication):
     def __init__(self, argv: List[str]) -> None:
         super().__init__(argv)
+        self._logger = logging.getLogger(self.__class__.__name__)
         self.loadStyleSheetFiles()
 
     def loadStyleSheetFiles(self):
         styleSheet = ""
-        for filepath in styleSheetFiles():
-            with open(filepath, "r", encoding="utf-8") as f:
+        for filePath in styleSheetFiles():
+            self._logger.info("Load styleSheet from '%s'", filePath)
+            with open(filePath, "r", encoding="utf-8") as f:
                 styleSheet += f.read() + "\n"
 
-        self.setStyleSheet(styleSheet)
-
+        self.setStyleSheet(fixUrlPaths(styleSheet))
 
 
 def preRunApp():
@@ -656,7 +664,6 @@ import logging
 
 def runApp():
     preRunApp()
-    logging.getLogger("highlighting_thread").info("text")
     app = GALogApp(sys.argv)
     mainWindow = MainWindow()
     mainWindow.show()

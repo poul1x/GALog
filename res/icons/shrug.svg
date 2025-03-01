@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" width="400" height="200">
+    <!-- Draw the border -->
+    <!-- <rect x="0" y="0" width="200" height="100" fill="none" stroke="black" stroke-width="2" /> -->
+
+    <!-- Centered text without specifying x and y -->
+    <text font-size="20" fill="#464646" text-anchor="middle" dominant-baseline="middle" transform="translate(100, 50)">
+        ¯\_(ツ)_/¯
+    </text>
+</svg>

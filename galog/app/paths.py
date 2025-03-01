@@ -1,7 +1,9 @@
+import re
 import os
 import sys
 from typing import Callable
 from PyQt5.QtCore import QStandardPaths
+from pathlib import Path
 
 from datetime import datetime
 import random
@@ -17,6 +19,7 @@ def randomDigit():
 def randomChar():
     return random.choice("abcdefghijklmnopqrstuvwxyz")
 
+
 def _generateSessionId():
     return "{}-{}".format(
         datetime.now().replace(microsecond=0).isoformat().replace(":", "-"),
@@ -24,22 +27,25 @@ def _generateSessionId():
     )
 
 
-SELF_FILE_PATH = "."
+_CWD = "."
 if not sys.argv[0].endswith(".py"):
-    SELF_FILE_PATH = os.path.dirname(sys.argv[0])
+    _CWD = os.path.dirname(sys.argv[0])
 
 
 def _appDataRootDir():
     return QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
 
 
+import logging
+
 _APP_NAME = "GALog"
 _APP_SESSION_ID = _generateSessionId()
 _APP_DATA_DIR = os.path.join(_appDataRootDir(), _APP_NAME)
+_LOG = logging.getLogger("Paths")
 
 
-def _selfRelativePath(*args: str):
-    return os.path.join(SELF_FILE_PATH, "res", *args)
+def resDirPath(*args: str):
+    return os.path.join(_CWD, "res", *args)
 
 
 def _appDataRelativePath(*args: str):
@@ -47,15 +53,19 @@ def _appDataRelativePath(*args: str):
 
 
 def styleSheetFile(name: str):
-    return _selfRelativePath("styles", "manual", name + ".qss")
+    return resDirPath("styles", "manual", name + ".qss")
 
 
 def iconFile(name: str):
-    return _selfRelativePath("icons", name + ".svg")
+    return resDirPath("icons", name + ".svg")
+
+
+def imageFile(name: str):
+    return resDirPath("images", name + ".png")
 
 
 def loggingConfigFileInitial():
-    return _selfRelativePath("logging", "logging.yaml")
+    return resDirPath("logging", "logging.yaml")
 
 
 def loggingConfigFile():
@@ -75,21 +85,21 @@ def dirFilesRecursive(path: str, fnFilter: Callable[[str], bool]):
 
 def highlightingFiles():
     return dirFilesRecursive(
-        _selfRelativePath("highlighting"),
+        resDirPath("highlighting"),
         lambda path: path.endswith(".yaml"),
     )
 
 
 def styleSheetFiles():
     return dirFilesRecursive(
-        _selfRelativePath("styles", "auto"),
+        resDirPath("styles", "auto"),
         lambda path: path.endswith(".qss"),
     )
 
 
 def fontFiles():
     return dirFilesRecursive(
-        _selfRelativePath("fonts"),
+        resDirPath("fonts"),
         lambda path: path.endswith(".tar.xz"),
     )
 
@@ -101,8 +111,10 @@ def appName():
 def appDataDir():
     return _APP_DATA_DIR
 
+
 def appLogsRootDir():
     return os.path.join(_APP_DATA_DIR, "logs")
+
 
 def appLogsDir():
     return os.path.join(_APP_DATA_DIR, "logs", _APP_SESSION_ID)
@@ -110,3 +122,34 @@ def appLogsDir():
 
 def appConfigDir():
     return os.path.join(_APP_DATA_DIR, "config")
+
+
+def posixPath(path: str):
+    return Path(path).as_posix()
+
+def _fixUrlPath(match: re.Match):
+    def url(path:str):
+        f'url("{path}")'
+
+    matched = match.group(1)
+    assert isinstance(matched, str)
+
+    try:
+        baseDir, fileName = matched.split("/")
+    except ValueError:
+        _LOG.error("Invalid url '%s'", matched)
+        return url(matched)
+
+    fixedPath = resDirPath(baseDir, fileName)
+    if not os.path.exists(fixedPath):
+        _LOG.error("Path does not exist: '%s'", fixedPath)
+        _LOG.error("Failed to fix url '%s'", matched)
+        return url(matched)
+
+    finalPath = posixPath(fixedPath)
+    _LOG.debug("Fixed url %s -> %s:", matched, finalPath)
+    return url(finalPath)
+
+def fixUrlPaths(styleSheet: str):
+    pattern = re.compile(r"url\(\"([^\"]+)\"\)")
+    return re.sub(pattern, _fixUrlPath, styleSheet)

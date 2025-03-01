@@ -68,15 +68,6 @@ class DataModel(QStandardItemModel):
     def removeAllDevices(self):
         self.removeRows(0, self.rowCount())
 
-    def setEmptyDeviceList(self):
-        self.removeAllDevices()
-
-        item = QStandardItem("¯\_(ツ)_/¯")
-        item.setSelectable(False)
-        item.setEnabled(False)
-        item.setData(Qt.AlignCenter, Qt.TextAlignmentRole)
-        self.appendRow(item)
-
     def findDeviceRowBySerial(self, serial: str):
         items = self.findItems(serial, Qt.MatchExactly, Columns.serial)
         return items[0].row() if items else -1

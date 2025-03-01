@@ -34,4 +34,5 @@ def initLogging():
         config = yaml.safe_load(f.read())
 
     updateFileHandlersPaths(config)
+    updateLoggersPascalCase(config)
     logging.config.dictConfig(config)

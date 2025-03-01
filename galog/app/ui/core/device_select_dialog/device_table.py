@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+from galog.app.ui.base.widget import BaseWidget
 
 from galog.app.ui.reusable import SearchInput
 from galog.app.ui.base.table_view import TableView
@@ -23,12 +24,11 @@ class SearchType(int, Enum):
     Name = auto()
 
 
-class DeviceTable(QWidget):
+class DeviceTable(BaseWidget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.setObjectName("DeviceTable")
-        self.setAttribute(Qt.WA_StyledBackground)
         self.initUserInterface()
+        self.clear()
 
     def addValidDevice(
         self,
@@ -56,11 +56,20 @@ class DeviceTable(QWidget):
     def sort(self):
         self.tableView.sortByColumn(Columns.displayName, Qt.AscendingOrder)
 
+    def refreshStyleSheet(self):
+        # Force  to update the stylesheet
+        # When dynamic property was changed
+        self.setStyleSheet(self.styleSheet())
+
     def clear(self):
         self.dataModel.removeAllDevices()
+        self.setProperty("empty", "false")
+        self.refreshStyleSheet()
 
     def setNoData(self):
-        self.dataModel.setEmptyDeviceList()
+        self.dataModel.removeAllDevices()
+        self.setProperty("empty", "true")
+        self.refreshStyleSheet()
 
     def selectRowByIndex(self, index: QModelIndex):
         assert isinstance(index.model(), FilterModel)
