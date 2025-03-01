@@ -1,6 +1,6 @@
 from typing import Optional
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QIcon, QKeyEvent
 from PyQt5.QtWidgets import QApplication, QLineEdit, QToolButton, QWidget
 
@@ -9,6 +9,10 @@ from galog.app.paths import iconFile
 
 
 class SearchInput(QLineEdit):
+
+    arrowUpPressed = pyqtSignal()
+    arrowDownPressed = pyqtSignal()
+
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.setAttribute(Qt.WA_StyledBackground)
@@ -16,10 +20,10 @@ class SearchInput(QLineEdit):
 
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
-        if helper.isArrowUpDownPressed():
-            self.focusNextChild()
-            focusedWidget = QApplication.focusWidget()
-            QApplication.postEvent(focusedWidget, QKeyEvent(event))
+        if helper.isArrowUpPressed():
+            self.arrowUpPressed.emit()
+        if helper.isArrowDownPressed():
+            self.arrowDownPressed.emit()
         else:
             super().keyPressEvent(event)
 

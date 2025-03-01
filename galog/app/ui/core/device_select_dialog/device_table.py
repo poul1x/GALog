@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from galog.app.ui.reusable import SearchInputCanActivate
+from galog.app.ui.reusable import SearchInput
 from galog.app.ui.base.table_view import TableView
 
 from .data_model import Columns, DataModel, FilterModel
@@ -160,7 +160,7 @@ class DeviceTable(QWidget):
 
         hBoxLayout = QHBoxLayout()
         hBoxLayout.setContentsMargins(0, 0, 0, 0)
-        self.searchInput = SearchInputCanActivate(self)
+        self.searchInput = SearchInput(self)
         self.searchInput.textChanged.connect(self.onSearchContentChanged)
         hBoxLayout.addWidget(self.searchInput, 1)
         self.searchInput.setPlaceholderText("Search device by name or serial")

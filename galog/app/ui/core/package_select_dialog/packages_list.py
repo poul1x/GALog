@@ -4,7 +4,7 @@ from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QSortFilterProxyModel
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QListView, QVBoxLayout, QWidget
 
-from galog.app.ui.reusable import SearchInputCanActivate
+from galog.app.ui.reusable import SearchInput
 from galog.app.ui.base.list_view import ListView
 
 
@@ -31,7 +31,7 @@ class PackagesList(QWidget):
         self.listView.setModel(self.filterModel)
         layout.addWidget(self.listView)
 
-        self.searchInput = SearchInputCanActivate(self)
+        self.searchInput = SearchInput(self)
         self.searchInput.setPlaceholderText("Search package")
         self.searchInput.textChanged.connect(self._onSearchContentChanged)
         layout.addWidget(self.searchInput)

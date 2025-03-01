@@ -5,11 +5,11 @@ from PyQt5.QtWidgets import QCompleter, QWidget
 
 from galog.app.paths import styleSheetFile
 
-from ..search_input_can_activate import SearchInputCanActivate
+from ..search_input import SearchInput
 from .delegate import CompleterDelegate
 
 
-class SearchInputAutoComplete(SearchInputCanActivate):
+class SearchInputAutoComplete(SearchInput):
     completionAccepted = pyqtSignal(str)
     POPUP_STYLESHEET: Optional[str] = None
 

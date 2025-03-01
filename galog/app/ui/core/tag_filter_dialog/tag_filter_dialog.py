@@ -98,9 +98,17 @@ class TagFilterDialog(BaseDialog):
         self.filteredTagsList.selectionChanged.connect(self._tagListSelectionChanged)
         self.tagNameInput.textChanged.connect(self._tagInputStateChanged)
         self.tagNameInput.completionAccepted.connect(self._addTag)
-        self.tagNameInput.activated.connect(self._btnAddTagClicked)
+        self.tagNameInput.returnPressed.connect(self._btnAddTagClicked)
+        self.tagNameInput.arrowUpPressed.connect(self._tryFocusTagsListAndGoUp)
+        self.tagNameInput.arrowDownPressed.connect(self._tryFocusTagsListAndGoDown)
         self.bottomButtonBar.buttonSave.clicked.connect(self._btnSaveClicked)
         self.bottomButtonBar.buttonCancel.clicked.connect(self.reject)
+
+    def _tryFocusTagsListAndGoUp(self):
+        self.filteredTagsList.trySetFocusAndGoUp()
+
+    def _tryFocusTagsListAndGoDown(self):
+        self.filteredTagsList.trySetFocusAndGoDown()
 
     def _initFocusPolicy(self):
         self.filterTypeSwitch.dropdown.setFocusPolicy(Qt.NoFocus)
@@ -142,7 +150,6 @@ class TagFilterDialog(BaseDialog):
                 return
 
         self.accept()
-
 
     def _addTag(self, tag: str):
         if self.filteredTagsList.hasTag(tag):
@@ -193,9 +200,9 @@ class TagFilterDialog(BaseDialog):
         removedRows = self.filteredTagsList.removeSelectedTags()
         assert len(removedRows) > 0
 
-        selectRowNumber = sorted(removedRows)[0]
-        if not self.filteredTagsList.selectRow(selectRowNumber):
-            if not self.filteredTagsList.selectRow(selectRowNumber - 1):
+        rowToSelect = sorted(removedRows)[0]
+        if not self.filteredTagsList.selectTagByRow(rowToSelect):
+            if not self.filteredTagsList.selectTagByRow(rowToSelect - 1):
                 # Empty tag list -> focus on input widget
                 self.tagNameInput.setFocus()
 

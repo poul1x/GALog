@@ -35,14 +35,6 @@ class FilteredTagsList(BaseWidget):
             self.selectionChanged.emit
         )
 
-    def _selectedRows(self):
-        def key(index: QModelIndex):
-            return index.row()
-
-        selectionModel = self.listView.selectionModel()
-        selectedRows = sorted(selectionModel.selectedRows(), key=key, reverse=True)
-        return [index.row() for index in selectedRows]
-
     def toStringList(self) -> List[str]:
         result = []
         for index in range(self.dataModel.rowCount()):
@@ -73,26 +65,20 @@ class FilteredTagsList(BaseWidget):
 
     def removeSelectedTags(self):
         removedRows = []
-        for row in self._selectedRows():
+        for row in self.listView.selectedRows():
             self.dataModel.removeRow(row)
             removedRows.append(row)
 
         return removedRows
 
-    def selectRow(self, row: int):
-        if row < 0 or row >= self.dataModel.rowCount():
-            return False
-
-        index = self.dataModel.index(row, 0)
-        self.selectRowByIndex(index)
-        return True
-
-    def selectRowByIndex(self, index: QModelIndex):
-        assert index.isValid(), "Index must be valid"
-        self.listView.setCurrentIndex(index)
-        selectionModel = self.listView.selectionModel()
-        selectionModel.select(index, QItemSelectionModel.Select)
-        self.listView.scrollTo(index, QListView.PositionAtCenter)
+    def selectTagByRow(self, row: int):
+        return self.listView.selectRow(row)
 
     def removeAllTags(self):
         self.dataModel.clear()
+
+    def trySetFocusAndGoUp(self):
+        return self.listView.trySetFocusAndGoUp()
+
+    def trySetFocusAndGoDown(self):
+        return self.listView.trySetFocusAndGoDown()

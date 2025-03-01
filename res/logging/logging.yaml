@@ -3,11 +3,11 @@ disable_existing_loggers: True
 formatters:
   fmt_no_colors:
     '()': 'logging.Formatter'
-    format: '%(asctime)s %(levelname)8s [%(name)s] %(message)s'
+    format: '%(asctime)s %(levelname)8s %(name)s %(message)s'
     datefmt: '%Y-%m-%d %H:%M:%S'
   fmt_colors:
     '()': 'ext://coloredlogs.ColoredFormatter'
-    format: '%(asctime)s %(levelname)8s [%(name)s] %(message)s'
+    format: '%(asctime)s %(levelname)8s %(name)s %(message)s'
     datefmt: '%Y-%m-%d %H:%M:%S'
     field_styles:
       asctime:
@@ -20,7 +20,7 @@ formatters:
         bold: True
     level_styles:
       info:
-        color: blue
+        color: cyan
       warning:
         color: yellow
       debug:
