@@ -61,3 +61,8 @@ class BaseDialog(QDialog):
         parentGeometry = self._parentGeometry()
         geometry.moveCenter(parentGeometry.center())
         self.move(geometry.topLeft())
+
+    def refreshStyleSheet(self):
+        # Force  to update the stylesheet
+        # When dynamic property was changed
+        self.setStyleSheet(self.styleSheet())

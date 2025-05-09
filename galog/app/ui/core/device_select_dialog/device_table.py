@@ -56,11 +56,6 @@ class DeviceTable(BaseWidget):
     def sort(self):
         self.tableView.sortByColumn(Columns.displayName, Qt.AscendingOrder)
 
-    def refreshStyleSheet(self):
-        # Force  to update the stylesheet
-        # When dynamic property was changed
-        self.setStyleSheet(self.styleSheet())
-
     def clear(self):
         self.dataModel.removeAllDevices()
         self.setProperty("empty", "false")

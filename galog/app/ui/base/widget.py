@@ -10,3 +10,8 @@ class BaseWidget(QWidget):
         self.setObjectName(self.__class__.__name__)
         self.setAttribute(Qt.WA_StyledBackground)
         self.setStyle(GALogStyle())
+
+    def refreshStyleSheet(self):
+        # Force  to update the stylesheet
+        # When dynamic property was changed
+        self.setStyleSheet(self.styleSheet())
