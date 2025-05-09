@@ -82,7 +82,7 @@ loggers:
     level: DEBUG
     propagate: True
   list_view:
-    level: DEBUG
+    level: INFO
     propagate: True
   galog_app:
     level: DEBUG
