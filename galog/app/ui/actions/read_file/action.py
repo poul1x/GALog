@@ -28,6 +28,7 @@ class ReadFileAction:
         self._loadingDialog.close()
         msgBoxErr(msgBrief, msgVerbose)
 
+    # TODO: base class?
     def setDialogText(self, text: str):
         self._loadingDialog.setText(text)
 

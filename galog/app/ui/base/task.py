@@ -36,5 +36,5 @@ class BaseTask(QRunnable):
             self.entrypoint()
             self._logger.debug("Call entrypoint - OK")
 
-        except:
+        except Exception:
             self._logger.exception("Unhandled exception in task entrypoint:")

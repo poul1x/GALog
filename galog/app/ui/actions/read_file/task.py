@@ -89,5 +89,5 @@ class ReadBinaryFileTask(_ReadFileTask):
 
     def _readFile(self):
         self._logger.info("Open '%s', mode='rb'", self._filePath)
-        with open(self._filePath, "rb") as f:
+        with open(self._filePath, "rb") as f: # TODO: open may fail -> use failed signal
             self._fnReadBinary(f)

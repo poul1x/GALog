@@ -44,7 +44,7 @@ from galog.app.ui.actions.kill_app import KillAppController
 from galog.app.ui.core.log_messages_panel.controller import LogMessagesPanelController
 from galog.app.ui.actions.open_log_file.controller import OpenLogFileController
 from galog.app.ui.actions.restart_app.action import RestartAppAction
-from galog.app.ui.actions.run_app.controller import RunAppController
+from galog.app.ui.actions.start_app import StartAppAction
 from galog.app.ui.actions.save_log_file.controller import SaveLogFileController
 
 from galog.app.ui.core.tag_filter_dialog import TagFilterDialog
@@ -255,10 +255,8 @@ class MainWindow(QMainWindow):
         action = self.appState.lastSelectedPackage.action
 
         if action != RunAppAction.DoNotStartApp:
-            controller = RunAppController()
-            # controller.setAppDebug(action == RunAppAction.StartAppDebug)
-            controller.setAppDebug(False)
-            controller.runApp(device, package)
+            _action = StartAppAction(self.adbClient())
+            _action.startApp(device, package)
 
         self.logMessagesPaneController.makeWhiteBackground()
         self.logMessagesPaneController.disableMessageFilter()
