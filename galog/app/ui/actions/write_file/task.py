@@ -15,15 +15,17 @@ FnWriteBinary = Callable[[IO[bytes]], None]
 class FileProcessError(Exception):
     pass
 
+
 class ReadFileTaskSignals(QObject):
     succeeded = pyqtSignal()
     failed = pyqtSignal(str, str)
 
 
 class _WriteFileTask(BaseTask):
-    def __init__(self):
+    def __init__(self, filePath: str):
         super().__init__()
         self.signals = ReadFileTaskSignals()
+        self._filePath = filePath
 
     @abstractmethod
     def _writeFile(self):
@@ -33,25 +35,26 @@ class _WriteFileTask(BaseTask):
         try:
             self._writeFile()
 
-        except PermissionError:
+        except PermissionError as e:
+            self._logger.error("Failed to write '%s'. Reason - %s", self._filePath, str(e))  # fmt: skip
             msgBrief = "Access Denied"
-            msgVerbose = "Unable to write file due to insufficient permissions or file is being used by another process" # fmt: skip
+            msgVerbose = "Unable to write file due to insufficient permissions or file is being used by another process"  # fmt: skip
             self.signals.failed.emit(msgBrief, msgVerbose)
 
         except Exception:
+            self._logger.error("Failed to write '%s'. Reason - Unknown", self._filePath)  # fmt: skip
             msgBrief = "Unknown Error"
             msgVerbose = "Failed to write file - unknown"
             self.signals.failed.emit(msgBrief, msgVerbose)
-            raise
 
     def entrypoint(self):
         self._writeFileSafe()
         self.signals.succeeded.emit()
 
+
 class WriteTextFileTask(_WriteFileTask):
     def __init__(self, filePath: str, fnWriteText: FnWriteText):
-        super().__init__()
-        self._filePath = filePath
+        super().__init__(filePath)
         self._fnWriteText = fnWriteText
 
     def _writeFile(self):
@@ -59,10 +62,10 @@ class WriteTextFileTask(_WriteFileTask):
         with open(self._filePath, "w", encoding="utf-8") as f:
             self._fnWriteText(f)
 
+
 class WriteBinaryFileTask(_WriteFileTask):
     def __init__(self, filePath: str, fnWriteBinary: FnWriteBinary):
-        super().__init__()
-        self._filePath = filePath
+        super().__init__(filePath)
         self._fnWriteBinary = fnWriteBinary
 
     def _writeFile(self):
