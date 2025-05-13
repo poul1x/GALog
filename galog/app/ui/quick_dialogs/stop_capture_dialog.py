@@ -7,14 +7,14 @@ from .message_box import MessageBox
 
 class StopCaptureDialogResult(int, Enum):
     AcceptedDetachApp = 0
-    AcceptedKillApp = auto()
+    AcceptedStopApp = auto()
     Rejected = auto()
 
 
 class StopCaptureDialog(MessageBox):
 
     AcceptedDetachApp = StopCaptureDialogResult.AcceptedDetachApp
-    AcceptedKillApp = StopCaptureDialogResult.AcceptedKillApp
+    AcceptedStopApp = StopCaptureDialogResult.AcceptedStopApp
     Rejected = StopCaptureDialogResult.Rejected
 
     def __init__(self):
@@ -34,7 +34,7 @@ class StopCaptureDialog(MessageBox):
         btnId = super().exec_()
         if btnId == self.btnIdYes:
             if self.checkBox().isChecked():
-                return StopCaptureDialog.AcceptedKillApp
+                return StopCaptureDialog.AcceptedStopApp
             else:
                 return StopCaptureDialog.AcceptedDetachApp
         else:

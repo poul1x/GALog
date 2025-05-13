@@ -29,6 +29,7 @@ from galog.app.app_state import (
     TagFilteringConfig,
     TagFilteringMode,
 )
+from galog.app.ui.actions.stop_app import StopAppAction
 from galog.app.ui.core.device_select_dialog import DeviceSelectDialog
 from galog.app.ui.quick_dialogs import (
     RestartCaptureDialog,
@@ -40,7 +41,6 @@ from galog.app.ui.quick_dialogs.stop_capture_dialog import (
 
 # from galog.app.ui.core.message_view_dialog import LogMessageViewDialog
 from galog.app.ui.core.package_select_dialog import PackageSelectDialog
-from galog.app.ui.actions.kill_app import KillAppController
 from galog.app.ui.core.log_messages_panel.controller import LogMessagesPanelController
 from galog.app.ui.actions.open_log_file.controller import OpenLogFileController
 from galog.app.ui.actions.restart_app.action import RestartAppAction
@@ -321,7 +321,6 @@ class MainWindow(QMainWindow):
 
         self.logMessagesPaneController.startCapture(device, package)
 
-
     def adbClient(self):
         return AdbClient(
             self.appState.adb.ipAddr,
@@ -334,11 +333,13 @@ class MainWindow(QMainWindow):
         if result == StopCaptureDialog.Rejected:
             return
 
-        if result == StopCaptureDialog.AcceptedKillApp:
+        if result == StopCaptureDialog.AcceptedStopApp:
             device = self.logMessagesPaneController.device
             package = self.logMessagesPaneController.package
-            controller = KillAppController()
-            controller.killApp(device, package)
+            action = StopAppAction(self.adbClient())
+            action.stopApp(device, package)
+            # Ignore action.failed(), because we want
+            # to stop the capture anyway
 
         self.logMessagesPaneController.stopCapture()
         self.setCaptureSpecificActionsEnabled(False)
