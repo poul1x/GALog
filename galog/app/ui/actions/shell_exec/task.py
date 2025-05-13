@@ -24,6 +24,7 @@ class ShellExecCommand:
     name: str
     cmdString: str
     verifier: ShellExecVerifier = _DEFAULT_VERIFIER
+    waitTimeMs: int = 0
 
 
 @dataclass
@@ -85,6 +86,8 @@ class ShellExecTask(BaseTask):
                 result = self._execCommand(device, command)
                 if not result.succeeded:
                     raise CommandFailed(result)
+                if command.waitTimeMs > 0:
+                    QThread.msleep(command.waitTimeMs)
 
     def _shellExecErrorString(self, execResult: ShellExecResult):
         return (

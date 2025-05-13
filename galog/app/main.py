@@ -301,7 +301,7 @@ class MainWindow(QMainWindow):
     def restartCapture(self):
         dialog = RestartCaptureDialog()
         result = dialog.exec_()
-        if result == RestartCaptureDialogResult.Rejected:
+        if result == RestartCaptureDialog.Rejected:
             return
 
         assert self.appState.lastSelectedDevice is not None
@@ -316,12 +316,11 @@ class MainWindow(QMainWindow):
 
         action = RestartAppAction(self.adbClient())
         action.restartApp(device, package)
+        if action.failed():
+            return
 
-        controller = RunAppController()
-        # controller.setAppDebug(action == RunAppAction.StartAppDebug)
-        controller.setAppDebug(False)
-        controller.runApp(device, package)
         self.logMessagesPaneController.startCapture(device, package)
+
 
     def adbClient(self):
         return AdbClient(

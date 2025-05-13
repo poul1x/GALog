@@ -15,8 +15,8 @@ from enum import Enum
 class StartAppAction(ShellExecAction):
     def __init__(self, adbClient: AdbClient):
         super().__init__(adbClient)
-        self._setLoadingDialogText("Run application")
+        self._setLoadingDialogText("Start application")
 
     def startApp(self, deviceName: str, packageName: str):
-        command = ShellExecCommand("Run app", f"monkey -p {packageName} 1")
+        command = ShellExecCommand("Start application", f"monkey -p {packageName} 1")
         self.executeCommand(deviceName, command)
