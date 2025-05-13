@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QFileDialog
 from galog.app.app_state import AppState
 from galog.app.device.device import AdbClient
 from galog.app.ui.base.action import BaseAction
-from .task import ShellExecCommand, ShellExecTask
+from .task import ShellExecCommand, ShellExecResult, ShellExecTask
 
 from galog.app.ui.quick_dialogs import LoadingDialog
 from galog.app.msgbox import msgBoxErr

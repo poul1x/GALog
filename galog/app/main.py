@@ -257,6 +257,8 @@ class MainWindow(QMainWindow):
         if action != RunAppAction.DoNotStartApp:
             _action = StartAppAction(self.adbClient())
             _action.startApp(device, package)
+            if _action.failed():
+                return
 
         self.logMessagesPaneController.makeWhiteBackground()
         self.logMessagesPaneController.disableMessageFilter()
