@@ -98,3 +98,9 @@ class PackagesList(QWidget):
 
         assert index.isValid(), "Index is invalid"
         return self.filterModel.mapToSource(index).data()
+
+    def trySetFocusAndGoUp(self):
+        self.listView.trySetFocusAndGoUp()
+
+    def trySetFocusAndGoDown(self):
+        self.listView.trySetFocusAndGoDown()

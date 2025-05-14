@@ -76,11 +76,16 @@ class PackageSelectDialog(QDialog):
     def initUserInputHandlers(self):
         self.packagesLoadOptions.reloadButton.clicked.connect(self._reloadButtonClicked)
         self.packagesList.listView.rowActivated.connect(self._packageSelected)
-        self.packagesList.searchInput.returnPressed.connect(self._packageMayBeSelected)
-        self.packagesList.searchInput.textChanged.connect(self._canSelectPackage)
+
         self.buttonBar.fromApkButton.clicked.connect(self._fromApkButtonClicked)
         self.buttonBar.selectButton.clicked.connect(self._selectButtonClicked)
         self.buttonBar.cancelButton.clicked.connect(self.reject)
+
+        searchInput = self.packagesList.searchInput
+        searchInput.returnPressed.connect(self._packageMayBeSelected)
+        searchInput.textChanged.connect(self._canSelectPackage)
+        searchInput.arrowUpPressed.connect(self._tryFocusPackagesListAndGoUp)
+        searchInput.arrowDownPressed.connect(self._tryFocusPackagesListAndGoDown)
 
         self.packagesLoadOptions.deviceSelectButton.clicked.connect(
             self._selectAnotherDevice
@@ -116,6 +121,12 @@ class PackageSelectDialog(QDialog):
         self.setTabOrder(self.packagesList.searchInput, self.packagesList.listView)
         self.setTabOrder(self.packagesList.listView, self.packagesList.searchInput)
 
+    def _tryFocusPackagesListAndGoUp(self):
+        self.packagesList.trySetFocusAndGoUp()
+
+    def _tryFocusPackagesListAndGoDown(self):
+        self.packagesList.trySetFocusAndGoDown()
+
     def _canSelectPackage(self):
         canSelect = self.packagesList.canSelectPackage()
         self.buttonBar.selectButton.setEnabled(canSelect)
@@ -143,7 +154,6 @@ class PackageSelectDialog(QDialog):
         msgVerbose = "Device is no longer available. Would you like to switch to another device?"  # fmt: skip
         if msgBoxPrompt(msgBrief, msgBrief, msgVerbose):
             self._selectAnotherDevice(True)
-
 
     def _selectDefaultPackage(self, packages: List[str]):
         #
