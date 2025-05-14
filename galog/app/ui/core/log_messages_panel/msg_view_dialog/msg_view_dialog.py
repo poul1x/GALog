@@ -14,35 +14,17 @@ from PyQt5.QtWidgets import (
 )
 
 from galog.app.paths import iconFile
+from galog.app.ui.base.dialog import BaseDialog
 
 
-class LogMessageViewDialog(QDialog):
-    def _defaultFlags(self):
-        return (
-            Qt.Window
-            | Qt.Dialog
-            | Qt.WindowMaximizeButtonHint
-            | Qt.WindowCloseButtonHint
-        )
-
+class LogMessageViewDialog(BaseDialog):
     def __init__(self, parent: QWidget):
-        super().__init__(parent, self._defaultFlags())
-        self.setObjectName("LogMessageViewPane")
-        self.setWindowTitle("View log message")
+        super().__init__(parent)
         self.initUserInterface()
-
-    def center(self):
-        mainWindow = None
-        for widget in QApplication.topLevelWidgets():
-            if isinstance(widget, QMainWindow):
-                mainWindow = widget
-                break
-
-        assert mainWindow is not None
-        mwGeometry = mainWindow.geometry()
-        geometry = self.frameGeometry()
-        geometry.moveCenter(mwGeometry.center())
-        self.move(geometry.topLeft())
+        self.setWindowTitle("View log message")
+        self.setRelativeGeometry(0.8, 0.8, 900, 600)
+        self.setFixedMinSize(500, 400)
+        self.moveToCenter()
 
     def initUserInterface(self):
         self.logLevelLabel = QLabel()
@@ -87,11 +69,3 @@ class LogMessageViewDialog(QDialog):
         vBoxLayout.addLayout(hBoxLayout)
         vBoxLayout.addWidget(self.logMsgTextBrowser, 1)
         self.setLayout(vBoxLayout)
-
-        screen = QApplication.desktop().screenGeometry()
-        width = int(screen.width() * 0.5)
-        height = int(screen.height() * 0.5)
-        x = (screen.width() - width) // 2
-        y = (screen.height() - height) // 2
-        self.setGeometry(x, y, width, height)
-        self.center()

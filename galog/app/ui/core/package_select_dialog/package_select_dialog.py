@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QVBoxLayout, QWi
 
 from galog.app.apk_info import APK
 from galog.app.app_state import AppState, LastSelectedPackage
+from galog.app.ui.base.dialog import BaseDialog
 from galog.app.ui.quick_dialogs import LoadingDialog
 from galog.app.ui.actions.install_app.controller import InstallAppController
 from galog.app.device import AdbClient
@@ -21,20 +22,19 @@ from .package_loader import PackageLoader
 from .packages_list import PackagesList
 
 
-class PackageSelectDialog(QDialog):
-    def _defaultFlags(self):
-        return Qt.Window | Qt.Dialog | Qt.WindowCloseButtonHint
-
+class PackageSelectDialog(BaseDialog):
     def __init__(self, appState: AppState, parent: QWidget):
-        super().__init__(parent, self._defaultFlags())
+        super().__init__(parent)
         self._appState = appState
-        self.setObjectName("PackageSelectDialog")
-        self.setAttribute(Qt.WA_StyledBackground)
+        self.setWindowFlag(Qt.WindowMaximizeButtonHint, False)
+        self.setWindowTitle("Select Package")
+        self.setRelativeGeometry(0.8, 0.6, 800, 600)
+        self.setFixedMaxSize(800, 600)
+        self.setFixedMinSize(600, 400)
+        self.moveToCenter()
         self.initUserInterface()
         self.initUserInputHandlers()
         self.initFocusPolicy()
-        self.setGeometryAuto()
-        self.center()
         self._refreshSelectedDevice()
 
     def _refreshSelectedDevice(self):
@@ -50,28 +50,6 @@ class PackageSelectDialog(QDialog):
             self.packagesLoadOptions.reloadButton.clicked.emit()
         else:
             super().keyPressEvent(event)
-
-    def setGeometryAuto(self):
-        screen = QApplication.desktop().screenGeometry()
-        width = int(screen.width() * 0.3)
-        height = int(screen.height() * 0.4)
-        x = (screen.width() - width) // 2
-        y = (screen.height() - height) // 2
-        self.setGeometry(x, y, width, height)
-
-    def parent(self):
-        parent = super().parent()
-        if not parent:
-            parent = QApplication.desktop()
-
-        assert isinstance(parent, QWidget)
-        return parent
-
-    def center(self):
-        geometry = self.frameGeometry()
-        parentGeometry = self.parent().geometry()
-        geometry.moveCenter(parentGeometry.center())
-        self.move(geometry.topLeft())
 
     def initUserInputHandlers(self):
         self.packagesLoadOptions.reloadButton.clicked.connect(self._reloadButtonClicked)

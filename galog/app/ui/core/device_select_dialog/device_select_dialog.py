@@ -5,6 +5,7 @@ from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QWidget
 
 from galog.app.app_state import LastSelectedDevice
+from galog.app.ui.base.dialog import BaseDialog
 from galog.app.ui.quick_dialogs import LoadingDialog
 from galog.app.ui.quick_dialogs.loading_dialog import LoadingDialog
 from galog.app.device import AdbClient, DeviceInfo
@@ -23,19 +24,21 @@ else:
     AppState = object
 
 
-class DeviceSelectDialog(QDialog):
+class DeviceSelectDialog(BaseDialog):
     def __init__(self, appState: AppState, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self._autoSelect = False
         self._autoSelectDone = False
         self._appState = appState
-        self.setObjectName("DeviceSelectDialog")
-        self.setAttribute(Qt.WA_StyledBackground)
+        self.setWindowTitle("Select Device")
+        self.setWindowFlag(Qt.WindowMaximizeButtonHint, False)
+        self.setRelativeGeometry(0.8, 0.6, 900, 600)
+        self.setFixedMaxSize(900, 600)
+        self.setFixedMinSize(600, 400)
+        self.moveToCenter()
         self.initUserInterface()
         self.initUserInputHandlers()
         self.initFocusPolicy()
-        self.setGeometryAuto()
-        self.center()
 
     def adbClient(self):
         return AdbClient(
@@ -95,30 +98,8 @@ class DeviceSelectDialog(QDialog):
         self.devicesLoadOptions.setAdbIpAddr(self._appState.adb.ipAddr)
         self.devicesLoadOptions.setAdbPort(str(self._appState.adb.port))
 
-    def parent(self):
-        parent = super().parent()
-        if not parent:
-            parent = QApplication.desktop()
-
-        assert isinstance(parent, QWidget)
-        return parent
-
-    def center(self):
-        geometry = self.frameGeometry()
-        parentGeometry = self.parent().geometry()
-        geometry.moveCenter(parentGeometry.center())
-        self.move(geometry.topLeft())
-
     def setDeviceAutoSelect(self, value: bool):
         self._autoSelect = value
-
-    def setGeometryAuto(self):
-        screen = QApplication.desktop().screenGeometry()
-        width = int(screen.width() * 0.4)
-        height = int(screen.height() * 0.4)
-        x = (screen.width() - width) // 2
-        y = (screen.height() - height) // 2
-        self.setGeometry(x, y, width, height)
 
     def _openLoadingDialog(self):
         self._loadingDialog = LoadingDialog(self)
