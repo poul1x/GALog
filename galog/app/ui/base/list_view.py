@@ -115,23 +115,39 @@ class ListView(QListView):
     def hasSelectedItems(self):
         return bool(self.selectedIndexes())
 
-    def _trySetFocusAndGoUpDown(self):
-        if not self.hasItems():
-            return False
-
-        hasSelectedItems = self.hasSelectedItems()
-        self.setFocus()
-
-        return hasSelectedItems
-
-    def trySetFocus(self):
-        if self.hasItems():
-            self.setFocus()
-
     def trySetFocusAndGoUp(self):
-        if self._trySetFocusAndGoUpDown():
-            self.selectPrevRow()
+        # ListView does not have items
+        # -> do not set focus
+        if not self.hasItems():
+            return
+
+        # ListView has items, but nothing selected
+        # -> set focus (automatically selects first row)
+        if not self.hasSelectedItems():
+            self.setFocus()
+            return
+
+        # ListView has items and something selected
+        # -> set focus (something remains selected)
+        # and select previous row to emit "Go Up" behavior
+        self.setFocus()
+        self.selectPrevRow()
+
 
     def trySetFocusAndGoDown(self):
-        if self._trySetFocusAndGoUpDown():
-            self.selectNextRow()
+        # ListView does not have items
+        # -> do not set focus
+        if not self.hasItems():
+            return
+
+        # ListView has items, but nothing selected
+        # -> set focus (automatically selects first row)
+        if not self.hasSelectedItems():
+            self.setFocus()
+            return
+
+        # ListView has items and something selected
+        # -> set focus (something remains selected)
+        # and select next row to emit "Go Down" behavior
+        self.setFocus()
+        self.selectNextRow()
