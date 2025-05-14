@@ -284,7 +284,7 @@ class LogMessagesPanelController:
             self._loadingDialog = None
 
         self._mainWindow.setCaptureSpecificActionsEnabled(False)
-        msgBoxErr(msgBrief, msgVerbose)
+        msgBoxErr(msgBrief, msgVerbose, self._pane)
 
     def makeWhiteBackground(self):
         self._pane.tableView.setStyleSheet("background: white;")

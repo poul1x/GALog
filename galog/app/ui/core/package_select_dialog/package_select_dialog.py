@@ -147,12 +147,12 @@ class PackageSelectDialog(QDialog):
         self.packagesList.setNoData()
 
         if not isinstance(err, DeviceNotFound):
-            msgBoxErr(err.msgBrief, err.msgVerbose)
+            msgBoxErr(err.msgBrief, err.msgVerbose, self)
             return
 
         msgBrief = "Device not available"
         msgVerbose = "Device is no longer available. Would you like to switch to another device?"  # fmt: skip
-        if msgBoxPrompt(msgBrief, msgBrief, msgVerbose):
+        if msgBoxPrompt(msgBrief, msgVerbose, self):
             self._selectAnotherDevice(True)
 
     def _selectDefaultPackage(self, packages: List[str]):
@@ -176,7 +176,7 @@ class PackageSelectDialog(QDialog):
             self.packagesList.addPackage(package)
 
     def _openLoadingDialog(self):
-        self._loadingDialog = LoadingDialog()
+        self._loadingDialog = LoadingDialog(self)
         self._loadingDialog.setText("Fetching packages...")
         self._loadingDialog.exec_()
 
@@ -229,7 +229,7 @@ class PackageSelectDialog(QDialog):
         except (BadZipFile, ValueError):
             msgBrief = "Operation failed"
             msgVerbose = "Provided file is not a valid APK"
-            msgBoxErr(msgBrief, msgVerbose)
+            msgBoxErr(msgBrief, msgVerbose, self)
             return
 
         if self.packagesList.has(packageName):
@@ -239,7 +239,7 @@ class PackageSelectDialog(QDialog):
 
         msgBrief = "Package not installed"
         prompt = f"This app is not present on the device. Do you want to install the APK and continue this action?"
-        if not msgBoxPrompt(msgBrief, msgBrief, prompt):
+        if not msgBoxPrompt(msgBrief, prompt, self):
             return
 
         deviceSerial = self._appState.lastSelectedDevice.serial

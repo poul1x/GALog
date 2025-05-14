@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from PyQt5.QtCore import QThreadPool, QThread
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QWidget
 from galog.app.app_state import AppState
 from galog.app.device import AdbClient
 
@@ -13,8 +13,8 @@ from enum import Enum
 
 
 class StopAppAction(ShellExecAction):
-    def __init__(self, adbClient: AdbClient):
-        super().__init__(adbClient)
+    def __init__(self, adbClient: AdbClient, parentWidget: Optional[QWidget] = None):
+        super().__init__(adbClient, parentWidget)
         self._setLoadingDialogText("Stop application")
 
     def stopApp(self, deviceName: str, packageName: str):

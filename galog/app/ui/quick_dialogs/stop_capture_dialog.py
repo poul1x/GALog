@@ -1,4 +1,6 @@
 from enum import Enum, auto
+from typing import Optional
+from PyQt5.QtWidgets import QWidget
 
 from PyQt5.QtWidgets import QCheckBox
 
@@ -17,8 +19,8 @@ class StopCaptureDialog(MessageBox):
     AcceptedStopApp = StopCaptureDialogResult.AcceptedStopApp
     Rejected = StopCaptureDialogResult.Rejected
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent: Optional[QWidget] = None):
+        super().__init__(parent)
         self.setHeaderText("Stop capture")
         self.setWindowTitle("Stop capture")
         self.setBodyText("All captured log messages will remain there")

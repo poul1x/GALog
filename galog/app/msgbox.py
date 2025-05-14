@@ -1,13 +1,14 @@
 from typing import Optional
 
 from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QWidget
 
 from galog.app.ui.quick_dialogs import MessageBox
 from galog.app.paths import iconFile
 
 
-def msgBoxInfo(msgBrief: str, msgVerbose: str):
-    messageBox = MessageBox()
+def msgBoxInfo(msgBrief: str, msgVerbose: str, parent: Optional[QWidget] = None):
+    messageBox = MessageBox(parent)
     messageBox.setHeaderText(msgBrief)
     messageBox.setBodyText(msgVerbose)
     messageBox.setIcon(QIcon(iconFile("msgbox-info")))
@@ -16,22 +17,18 @@ def msgBoxInfo(msgBrief: str, msgVerbose: str):
     messageBox.exec_()
 
 
-def msgBoxErr(msgBrief: str, msgVerbose: str, details: Optional[str] = None):
-    messageBox = MessageBox()
+def msgBoxErr(msgBrief: str, msgVerbose: str, parent: Optional[QWidget] = None):
+    messageBox = MessageBox(parent)
     messageBox.setHeaderText(msgBrief)
     messageBox.setBodyText(msgVerbose)
     messageBox.setIcon(QIcon(iconFile("msgbox-error")))
-
-    # if details:
-    #     messageBox.setDetailedText(details)
-
     messageBox.addButton("Ok")
     messageBox.setWindowTitle("Error")
     messageBox.exec_()
 
 
-def msgBoxErr2(msgVerbose: str):
-    messageBox = MessageBox()
+def msgBoxErr2(msgVerbose: str, parent: Optional[QWidget] = None):
+    messageBox = MessageBox(parent)
     messageBox.setBodyText(msgVerbose)
     messageBox.setIcon(QIcon(iconFile("msgbox-error")))
     messageBox.addButton("Ok")
@@ -39,8 +36,8 @@ def msgBoxErr2(msgVerbose: str):
     messageBox.exec_()
 
 
-def msgBoxPrompt(caption: str, body: str):
-    messageBox = MessageBox()
+def msgBoxPrompt(caption: str, body: str, parent: Optional[QWidget] = None):
+    messageBox = MessageBox(parent)
     messageBox.setHeaderText(caption)
     messageBox.setBodyText(body)
     messageBox.setIcon(QIcon(iconFile("msgbox-warning")))
@@ -51,8 +48,8 @@ def msgBoxPrompt(caption: str, body: str):
     return messageBox.exec_() == btnIdYes
 
 
-def msgBoxNotImp():
-    messageBox = MessageBox()
+def msgBoxNotImp(parent: Optional[QWidget] = None):
+    messageBox = MessageBox(parent)
     messageBox.setHeaderText("Feature not implemented")
     messageBox.setBodyText("The feature will be finished soon. Please, be patient")
     messageBox.setIcon(QIcon(iconFile("msgbox-info")))

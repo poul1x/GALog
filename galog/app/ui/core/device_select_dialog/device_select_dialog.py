@@ -121,7 +121,7 @@ class DeviceSelectDialog(QDialog):
         self.setGeometry(x, y, width, height)
 
     def _openLoadingDialog(self):
-        self._loadingDialog = LoadingDialog()
+        self._loadingDialog = LoadingDialog(self)
         self._loadingDialog.setText("Loading device list...")
         self._loadingDialog.exec_()
 
@@ -138,7 +138,7 @@ class DeviceSelectDialog(QDialog):
         if not isValid:
             msgBrief = "Device is unavailable"
             msgVerbose = "Device can not be selected, because it's unavailable"
-            msgBoxErr(msgBrief, msgVerbose)
+            msgBoxErr(msgBrief, msgVerbose, self)
             return
 
         selectedDevice = LastSelectedDevice(serial, displayName)
@@ -198,7 +198,7 @@ class DeviceSelectDialog(QDialog):
     def _deviceLoaderFailed(self, msgBrief: str, msgVerbose: str):
         self._setDevicesEmpty()
         self._closeLoadingDialog()
-        msgBoxErr(msgBrief, msgVerbose)
+        msgBoxErr(msgBrief, msgVerbose, self)
 
     def _apiLevels(self, device: DeviceInfo):
         hasMin = device.details.sdkVerMin != "<N/A>"

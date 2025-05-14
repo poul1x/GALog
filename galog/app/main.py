@@ -150,6 +150,7 @@ class MainWindow(QMainWindow):
         if msgBoxPrompt(
             caption="Do you really want to quit?",
             body="If you close the window, current progress will be lost",
+            parent=self,
         ):
             self.logMessagesPaneController.stopCapture()
             self.cancelThreadPoolTasks()
@@ -229,7 +230,7 @@ class MainWindow(QMainWindow):
         if self.logMessagesPaneController.isCaptureRunning():
             msgBrief = "Capture is running"
             msgVerbose = "Unable to start capture while another capture is running. Please, stop the running capture first"  # fmt: skip
-            msgBoxErr(msgBrief, msgVerbose)
+            msgBoxErr(msgBrief, msgVerbose, self)
             return
 
         if self.appState.lastSelectedDevice is None:
@@ -238,7 +239,7 @@ class MainWindow(QMainWindow):
             if deviceSelectPane.exec_() == DeviceSelectDialog.Rejected:
                 msgBrief = "Device not selected"
                 msgVerbose = "Device was not selected. Unable to start log capture"  # fmt: skip
-                msgBoxInfo(msgBrief, msgVerbose)
+                msgBoxInfo(msgBrief, msgVerbose, self)
                 return
 
             # Add small delay to remove
@@ -255,7 +256,7 @@ class MainWindow(QMainWindow):
         action = self.appState.lastSelectedPackage.action
 
         if action != RunAppAction.DoNotStartApp:
-            _action = StartAppAction(self.adbClient())
+            _action = StartAppAction(self.adbClient(), self)
             _action.startApp(device, package)
             if _action.failed():
                 return
@@ -268,9 +269,9 @@ class MainWindow(QMainWindow):
 
     def clearCaptureOutput(self):
         if msgBoxPrompt(
-            title="Clear capture output",
             caption="Clear capture output?",
             body="All captured log messages will be erased",
+            parent=self,
         ):
             self.logMessagesPaneController.makeWhiteBackground()
             self.logMessagesPaneController.disableMessageFilter()
@@ -285,7 +286,7 @@ class MainWindow(QMainWindow):
         if self.logMessagesPaneController.isCaptureRunning():
             msgBrief = "Capture is running"
             msgVerbose = "Unable to open log file while capture is running. Please, stop the running capture first"  # fmt: skip
-            msgBoxErr(msgBrief, msgVerbose)
+            msgBoxErr(msgBrief, msgVerbose, self)
             return
 
         controller = OpenLogFileController()
@@ -299,7 +300,7 @@ class MainWindow(QMainWindow):
         self.logMessagesPaneController.addLogLines(lines)
 
     def restartCapture(self):
-        dialog = RestartCaptureDialog()
+        dialog = RestartCaptureDialog(self)
         result = dialog.exec_()
         if result == RestartCaptureDialog.Rejected:
             return
@@ -328,7 +329,7 @@ class MainWindow(QMainWindow):
         )
 
     def stopCapture(self):
-        dialog = StopCaptureDialog()
+        dialog = StopCaptureDialog(self)
         result = dialog.exec_()
         if result == StopCaptureDialog.Rejected:
             return
@@ -336,7 +337,7 @@ class MainWindow(QMainWindow):
         if result == StopCaptureDialog.AcceptedStopApp:
             device = self.logMessagesPaneController.device
             package = self.logMessagesPaneController.package
-            action = StopAppAction(self.adbClient())
+            action = StopAppAction(self.adbClient(), self)
             action.stopApp(device, package)
             # Ignore action.failed(), because we want
             # to stop the capture anyway
@@ -514,7 +515,7 @@ class MainWindow(QMainWindow):
         action = QAction("&Clear app data", self)
         action.setShortcut("Ctrl+P")
         action.setStatusTip("Clear user data associated with the app")
-        action.triggered.connect(lambda: msgBoxNotImp())
+        action.triggered.connect(lambda: msgBoxNotImp(self))
         action.setEnabled(False)
         action.setData(True)
         return action
@@ -523,7 +524,7 @@ class MainWindow(QMainWindow):
         action = QAction("&Take screenshot", self)
         action.setShortcut("Ctrl+P")
         action.setStatusTip("Take screenshot")
-        action.triggered.connect(lambda: msgBoxNotImp())
+        action.triggered.connect(lambda: msgBoxNotImp(self))
         action.setEnabled(False)
         action.setData(True)
         return action
@@ -531,7 +532,7 @@ class MainWindow(QMainWindow):
     def rootModeAction(self):
         action = QAction("&Root mode", self)
         action.setStatusTip("Enable/disable root mode")
-        action.triggered.connect(lambda: msgBoxNotImp())
+        action.triggered.connect(lambda: msgBoxNotImp(self))
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -539,7 +540,7 @@ class MainWindow(QMainWindow):
     def rebootDeviceAction(self):
         action = QAction("&Reboot device", self)
         action.setStatusTip("Reboot device")
-        action.triggered.connect(lambda: msgBoxNotImp())
+        action.triggered.connect(lambda: msgBoxNotImp(self))
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -547,7 +548,7 @@ class MainWindow(QMainWindow):
     def shutdownDeviceAction(self):
         action = QAction("&Shutdown device", self)
         action.setStatusTip("Shutdown device")
-        action.triggered.connect(lambda: msgBoxNotImp())
+        action.triggered.connect(lambda: msgBoxNotImp(self))
         action.setEnabled(True)
         action.setData(False)
         return action

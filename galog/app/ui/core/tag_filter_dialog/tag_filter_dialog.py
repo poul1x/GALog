@@ -147,7 +147,7 @@ class TagFilterDialog(BaseDialog):
         if not filteringEnabled:
             caption = "Tag filter will be disabled"
             body = "Current filtering mode is set to 'disabled'. Continue without tag filtering?"
-            if not msgBoxPrompt(caption, body):
+            if not msgBoxPrompt(caption, body, self):
                 return
 
         self.accept()
@@ -156,7 +156,7 @@ class TagFilterDialog(BaseDialog):
         if self.filteredTagsList.hasTag(tag):
             msgBrief = "Tag exists"
             msgVerbose = "Tag has been already added to this filter"
-            msgBoxErr(msgBrief, msgVerbose)
+            msgBoxErr(msgBrief, msgVerbose, self)
             return
 
         self.tagNameInput.clear()
@@ -245,7 +245,7 @@ class TagFilterDialog(BaseDialog):
             return
 
         self._saveLastSelectedDir(filePath)
-        action = ReadFileAction(filePath)
+        action = ReadFileAction(filePath, self)
         action.readTextData(self._readTagList)
         self._updateControlButtonBarState()
 
@@ -255,6 +255,6 @@ class TagFilterDialog(BaseDialog):
             return
 
         self._saveLastSelectedDir(filePath)
-        action = WriteFileAction(filePath)
+        action = WriteFileAction(filePath, self)
         action.writeTextData(self._writeTagList)
         self._updateControlButtonBarState()

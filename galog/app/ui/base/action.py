@@ -1,17 +1,22 @@
+from typing import Optional
+from galog.app.msgbox import msgBoxErr
 from galog.app.ui.quick_dialogs import LoadingDialog
+
+from PyQt5.QtWidgets import QWidget
 
 
 class BaseAction:
-    def __init__(self):
-        self._initLoadingDialog(self.__class__.__name__)
+    def __init__(self, parentWidget: Optional[QWidget] = None):
+        self._parentWidget = parentWidget
+        self._loadingDialog = LoadingDialog(parentWidget)
+        self._loadingDialog.setText(self.__class__.__name__)
         self._success = None
-
-    def _initLoadingDialog(self, text: str):
-        self._loadingDialog = LoadingDialog()
-        self._loadingDialog.setText(text)
 
     def _closeLoadingDialog(self):
         self._loadingDialog.close()
+
+    def _execLoadingDialog(self):
+        self._loadingDialog.exec_()
 
     def _setLoadingDialogText(self, text: str):
         self._loadingDialog.setText(text)
@@ -35,3 +40,6 @@ class BaseAction:
     def _setFailed(self):
         self._closeLoadingDialog()
         self._success = False
+
+    def _msgBoxErr(self, msgBrief: str, msgVerbose: str):
+        msgBoxErr(msgBrief, msgVerbose, self._parentWidget)

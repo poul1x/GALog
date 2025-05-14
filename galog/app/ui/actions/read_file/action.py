@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from PyQt5.QtCore import QThreadPool, QThread
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QWidget
 
 from galog.app.ui.base.action import BaseAction
 from .task import FnReadText, FnReadBinary
@@ -15,15 +15,15 @@ from enum import Enum
 
 
 class ReadFileAction(BaseAction):
-    def __init__(self, filePath: str):
-        super().__init__()
+    def __init__(self, filePath: str, parentWidget: Optional[QWidget] = None):
+        super().__init__(parentWidget)
         self._filePath = filePath
 
     def _succeeded(self):
         self._setSucceeded()
 
     def _failed(self, msgBrief: str, msgVerbose: str):
-        msgBoxErr(msgBrief, msgVerbose)
+        self._msgBoxErr(msgBrief, msgVerbose)
         self._setFailed()
 
     def readTextData(self, fnReadText: FnReadText):
@@ -33,7 +33,7 @@ class ReadFileAction(BaseAction):
         readFileTask.setStartDelay(700)
 
         QThreadPool.globalInstance().start(readFileTask)
-        self._loadingDialog.exec_()
+        self._execLoadingDialog()
 
     def readBinaryData(self, fnReadBinary: FnReadBinary):
         readFileTask = ReadBinaryFileTask(self._filePath, fnReadBinary)
@@ -42,4 +42,4 @@ class ReadFileAction(BaseAction):
         readFileTask.setStartDelay(700)
 
         QThreadPool.globalInstance().start(readFileTask)
-        self._loadingDialog.exec_()
+        self._execLoadingDialog()

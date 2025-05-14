@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from PyQt5.QtCore import QThreadPool, QThread
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QWidget
 
 from galog.app.app_state import AppState
 from galog.app.device.device import AdbClient
@@ -13,9 +13,10 @@ from galog.app.msgbox import msgBoxErr
 
 from enum import Enum
 
+
 class ShellExecAction(BaseAction):
-    def __init__(self, adbClient: AdbClient):
-        super().__init__()
+    def __init__(self, adbClient: AdbClient, parentWidget: Optional[QWidget] = None):
+        super().__init__(parentWidget)
         self._setLoadingDialogText("Execute Shell Commands")
         self._adbClient = adbClient
 
@@ -23,7 +24,7 @@ class ShellExecAction(BaseAction):
         self._setSucceeded()
 
     def _failed(self, msgBrief: str, msgVerbose: str):
-        msgBoxErr(msgBrief, msgVerbose)
+        self._msgBoxErr(msgBrief, msgVerbose)
         self._setFailed()
 
     def executeCommand(self, deviceName: str, command: ShellExecCommand):
@@ -33,7 +34,7 @@ class ShellExecAction(BaseAction):
         task.setStartDelay(700)
 
         QThreadPool.globalInstance().start(task)
-        self._loadingDialog.exec_()
+        self._execLoadingDialog()
 
     def executeManyCommands(self, deviceName: str, commands: List[ShellExecCommand]):
         task = ShellExecTask(deviceName, self._adbClient, commands)
@@ -42,4 +43,4 @@ class ShellExecAction(BaseAction):
         task.setStartDelay(700)
 
         QThreadPool.globalInstance().start(task)
-        self._loadingDialog.exec_()
+        self._execLoadingDialog()

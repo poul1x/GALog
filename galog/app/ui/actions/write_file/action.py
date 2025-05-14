@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from PyQt5.QtCore import QThreadPool, QThread
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QWidget
 from galog.app.ui.base.action import BaseAction
 
 from galog.app.ui.quick_dialogs import LoadingDialog
@@ -13,15 +13,15 @@ from enum import Enum
 
 
 class WriteFileAction(BaseAction):
-    def __init__(self, filePath: str):
-        super().__init__()
+    def __init__(self, filePath: str, parentWidget: Optional[QWidget] = None):
+        super().__init__(parentWidget)
         self._filePath = filePath
 
     def _succeeded(self):
         self._setSucceeded()
 
     def _failed(self, msgBrief: str, msgVerbose: str):
-        msgBoxErr(msgBrief, msgVerbose)
+        self._msgBoxErr(msgBrief, msgVerbose)
         self._setFailed()
 
     def writeTextData(self, fnReadText: FnWriteText):
@@ -31,7 +31,7 @@ class WriteFileAction(BaseAction):
         writeFileTask.setStartDelay(700)
 
         QThreadPool.globalInstance().start(writeFileTask)
-        self._loadingDialog.exec_()
+        self._execLoadingDialog()
 
     def writeBinaryData(self, fnReadBinary: FnWriteBinary):
         writeFileTask = WriteBinaryFileTask(self._filePath, fnReadBinary)
@@ -40,4 +40,4 @@ class WriteFileAction(BaseAction):
         writeFileTask.setStartDelay(700)
 
         QThreadPool.globalInstance().start(writeFileTask)
-        self._loadingDialog.exec_()
+        self._execLoadingDialog()

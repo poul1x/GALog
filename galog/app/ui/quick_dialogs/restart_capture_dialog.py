@@ -1,4 +1,6 @@
 from enum import Enum, auto
+from typing import Optional
+from PyQt5.QtWidgets import QWidget
 
 from .message_box import MessageBox
 
@@ -15,8 +17,8 @@ class RestartCaptureDialog(MessageBox):
     AcceptedRestartDebug = RestartCaptureDialogResult.AcceptedRestartDebug
     Rejected = RestartCaptureDialogResult.Rejected
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent: Optional[QWidget] = None):
+        super().__init__(parent)
         self.setHeaderText("Restart capture")
         self.setWindowTitle("Restart capture")
         self.setBodyText("Restart the capture? The app will be restarted and all captured log messages will be erased") # fmt: skip

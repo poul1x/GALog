@@ -18,7 +18,7 @@ from galog.app.ui.base.widget import BaseWidget
 class LoadingDialog(BaseDialog):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.initUserInterface()
         self.setMinimumWidth(350)
