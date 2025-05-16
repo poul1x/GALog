@@ -1,5 +1,6 @@
 from typing import Optional
-from galog.app.msgbox import msgBoxErr
+from galog.app.msgbox import msgBoxErr as _msgBoxErr
+from galog.app.msgbox import msgBoxPrompt as _msgBoxPrompt
 from galog.app.ui.quick_dialogs import LoadingDialog
 
 from PyQt5.QtWidgets import QWidget
@@ -42,4 +43,7 @@ class BaseAction:
         self._success = False
 
     def _msgBoxErr(self, msgBrief: str, msgVerbose: str):
-        msgBoxErr(msgBrief, msgVerbose, self._parentWidget)
+        _msgBoxErr(msgBrief, msgVerbose, self._parentWidget)
+
+    def _msgBoxPrompt(self, msgBrief: str, msgVerbose: str):
+        return _msgBoxPrompt(msgBrief, msgVerbose, self._parentWidget)

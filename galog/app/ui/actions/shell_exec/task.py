@@ -57,14 +57,16 @@ class CommandFailed(Exception):
 class ShellExecTaskSignals(QObject):
     succeeded = pyqtSignal()
     failed = pyqtSignal(str, str)
+    cmdSucceeded = pyqtSignal(ShellExecResult)
+    cmdFailed = pyqtSignal(ShellExecResult)
 
 
 class ShellExecTask(BaseTask):
     def __init__(
         self,
         deviceName: str,
-        adbClient: AdbClient,
         cmdList: List[ShellExecCommand],
+        adbClient: AdbClient,
     ):
         super().__init__()
         self.signals = ShellExecTaskSignals()
@@ -81,13 +83,17 @@ class ShellExecTask(BaseTask):
         return ShellExecResult(command, succeeded, exitCode, output)
 
     def _execCommandList(self):
-        with deviceRestricted(self._adbClient, self._deviceName) as device:
+        with deviceRestricted(self._deviceName, self._adbClient) as device:
             for command in self._cmdList:
                 result = self._execCommand(device, command)
                 if not result.succeeded:
+                    self.signals.cmdFailed.emit(result)
                     raise CommandFailed(result)
+
                 if command.waitTimeMs > 0:
                     QThread.msleep(command.waitTimeMs)
+
+                self.signals.cmdSucceeded.emit(result)
 
     def _shellExecErrorString(self, execResult: ShellExecResult):
         return (

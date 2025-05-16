@@ -78,7 +78,7 @@ class AndroidAppLogReader:
     def _getAppPidsAndStartReaderThread(self):
         try:
             self._delayIfNeeded()
-            with deviceRestricted(self._client, self._deviceName) as device:
+            with deviceRestricted(self._deviceName, self._client) as device:
                 output: str = device.shell(f"pidof {self._packageName}")
                 self._pids = set(output.split())
 

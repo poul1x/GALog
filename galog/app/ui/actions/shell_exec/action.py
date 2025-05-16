@@ -28,7 +28,7 @@ class ShellExecAction(BaseAction):
         self._setFailed()
 
     def executeCommand(self, deviceName: str, command: ShellExecCommand):
-        task = ShellExecTask(deviceName, self._adbClient, [command])
+        task = ShellExecTask(deviceName, [command], self._adbClient)
         task.signals.succeeded.connect(self._succeeded)
         task.signals.failed.connect(self._failed)
         task.setStartDelay(700)
@@ -37,7 +37,7 @@ class ShellExecAction(BaseAction):
         self._execLoadingDialog()
 
     def executeManyCommands(self, deviceName: str, commands: List[ShellExecCommand]):
-        task = ShellExecTask(deviceName, self._adbClient, commands)
+        task = ShellExecTask(deviceName, commands, self._adbClient)
         task.signals.succeeded.connect(self._succeeded)
         task.signals.failed.connect(self._failed)
         task.setStartDelay(700)

@@ -5,6 +5,7 @@ from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QWidget
 
 from galog.app.app_state import LastSelectedDevice
+from galog.app.ui.actions.list_devices.action import ListDevicesAction
 from galog.app.ui.base.dialog import BaseDialog
 from galog.app.ui.quick_dialogs import LoadingDialog
 from galog.app.ui.quick_dialogs.loading_dialog import LoadingDialog
@@ -15,7 +16,6 @@ from galog.app.msgbox import msgBoxErr
 
 from .load_options import DevicesLoadOptions
 from .button_bar import ButtonBar
-from .device_loader import DeviceLoader
 from .device_table import DeviceTable
 
 if TYPE_CHECKING:
@@ -101,13 +101,8 @@ class DeviceSelectDialog(BaseDialog):
     def setDeviceAutoSelect(self, value: bool):
         self._autoSelect = value
 
-    def _openLoadingDialog(self):
-        self._loadingDialog = LoadingDialog(self)
-        self._loadingDialog.setText("Loading device list...")
-        self._loadingDialog.exec_()
-
     def exec_(self):
-        self._startDeviceListReload()
+        self._refreshDeviceList()
         if self._autoSelect and self._autoSelectDone:
             return DeviceSelectDialog.Accepted
 
@@ -128,19 +123,24 @@ class DeviceSelectDialog(BaseDialog):
         self._appState.adb.port = self.devicesLoadOptions.adbPort()
         self.accept()
 
-    def _startDeviceLoader(self):
-        deviceLoader = DeviceLoader(self.adbClient())
-        deviceLoader.setStartDelay(500)
-        deviceLoader.signals.succeeded.connect(self._deviceLoaderSucceeded)
-        deviceLoader.signals.failed.connect(self._deviceLoaderFailed)
-        QThreadPool.globalInstance().start(deviceLoader)
+    def _refreshDeviceList(self):
+        action = ListDevicesAction(self.adbClient(), self)
+        deviceList = action.listDevices()
+        if deviceList is None:
+            self._setDevicesEmpty()
+            return
 
-    def _startDeviceListReload(self):
-        self._startDeviceLoader()
-        self._openLoadingDialog()
+        self._setDevices(deviceList)
+        if self._canSelectDevice():
+            self._selectDefaultDevice(deviceList)
+
+        if self._autoSelect:
+            if self.deviceTable.selectTheOnlyOneDevice():
+                self._autoSelectDone = True
+                self._deviceSelected()
 
     def _reloadButtonClicked(self):
-        self._startDeviceListReload()
+        self._refreshDeviceList()
 
     def _selectButtonClicked(self):
         self._deviceSelected()
@@ -160,26 +160,6 @@ class DeviceSelectDialog(BaseDialog):
         assert len(deviceList) > 0
         serial = deviceList[0].serial
         self.deviceTable.selectDeviceBySerial(serial)
-
-    def _closeLoadingDialog(self):
-        self._loadingDialog.close()
-
-    def _deviceLoaderSucceeded(self, deviceList: List[DeviceInfo]):
-        self._setDevices(deviceList)
-        if self._canSelectDevice():
-            self._selectDefaultDevice(deviceList)
-
-        if self._autoSelect:
-            if self.deviceTable.selectTheOnlyOneDevice():
-                self._autoSelectDone = True
-                self._deviceSelected()
-
-        self._closeLoadingDialog()
-
-    def _deviceLoaderFailed(self, msgBrief: str, msgVerbose: str):
-        self._setDevicesEmpty()
-        self._closeLoadingDialog()
-        msgBoxErr(msgBrief, msgVerbose, self)
 
     def _apiLevels(self, device: DeviceInfo):
         hasMin = device.details.sdkVerMin != "<N/A>"

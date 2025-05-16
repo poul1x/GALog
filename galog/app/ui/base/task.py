@@ -7,9 +7,9 @@ class BaseTask(QRunnable):
     def __init__(self):
         super().__init__()
         self._msDelay = -1
-        self.initLogger()
+        self._initLogger()
 
-    def initLogger(self):
+    def _initLogger(self):
         self._logger = logging.getLogger(self.__class__.__name__)
 
     def setStartDelay(self, msDelay: int):

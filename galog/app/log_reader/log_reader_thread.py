@@ -159,7 +159,7 @@ class LogcatReaderThread(QThread):
 
     def run(self):
         try:
-            with deviceRestricted(self._client, self._deviceName) as device:
+            with deviceRestricted(self._deviceName, self._client) as device:
                 self._liveLogRead(device)
 
         except DeviceError as e:

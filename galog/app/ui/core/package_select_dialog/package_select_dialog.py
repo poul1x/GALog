@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QVBoxLayout, QWi
 
 from galog.app.apk_info import APK
 from galog.app.app_state import AppState, LastSelectedPackage
+from galog.app.ui.actions.list_packages import ListPackagesAction
 from galog.app.ui.base.dialog import BaseDialog
 from galog.app.ui.quick_dialogs import LoadingDialog
 from galog.app.ui.actions.install_app.controller import InstallAppController
@@ -18,7 +19,6 @@ from galog.app.msgbox import msgBoxErr, msgBoxPrompt
 from ..device_select_dialog import DeviceSelectDialog
 from .button_bar import ButtonBar
 from .load_options import PackagesLoadOptions
-from .package_loader import PackageLoader
 from .packages_list import PackagesList
 
 
@@ -61,13 +61,17 @@ class PackageSelectDialog(BaseDialog):
 
         searchInput = self.packagesList.searchInput
         searchInput.returnPressed.connect(self._packageMayBeSelected)
-        searchInput.textChanged.connect(self._canSelectPackage)
+        searchInput.textChanged.connect(self._manageSelectButtonOnOff)
         searchInput.arrowUpPressed.connect(self._tryFocusPackagesListAndGoUp)
         searchInput.arrowDownPressed.connect(self._tryFocusPackagesListAndGoDown)
 
         self.packagesLoadOptions.deviceSelectButton.clicked.connect(
             self._selectAnotherDevice
         )
+
+    def _manageSelectButtonOnOff(self):
+        canSelect = self.packagesList.canSelectPackage()
+        self.buttonBar.selectButton.setEnabled(canSelect)
 
     def initUserInterface(self):
         self.setWindowTitle("New capture")
@@ -105,34 +109,6 @@ class PackageSelectDialog(BaseDialog):
     def _tryFocusPackagesListAndGoDown(self):
         self.packagesList.trySetFocusAndGoDown()
 
-    def _canSelectPackage(self):
-        canSelect = self.packagesList.canSelectPackage()
-        self.buttonBar.selectButton.setEnabled(canSelect)
-        return canSelect
-
-    def _packageLoaderSucceeded(self, deviceList: List[str]):
-        self._closeLoadingDialog()
-        self.buttonBar.fromApkButton.setEnabled(True)
-        self._setPackages(deviceList)
-
-        if self._canSelectPackage():
-            self._selectDefaultPackage(deviceList)
-
-    def _packageLoaderFailed(self, err: DeviceError):
-        self._closeLoadingDialog()
-        self.buttonBar.selectButton.setEnabled(False)
-        self.buttonBar.fromApkButton.setEnabled(False)
-        self.packagesList.setNoData()
-
-        if not isinstance(err, DeviceNotFound):
-            msgBoxErr(err.msgBrief, err.msgVerbose, self)
-            return
-
-        msgBrief = "Device not available"
-        msgVerbose = "Device is no longer available. Would you like to switch to another device?"  # fmt: skip
-        if msgBoxPrompt(msgBrief, msgVerbose, self):
-            self._selectAnotherDevice(True)
-
     def _selectDefaultPackage(self, packages: List[str]):
         #
         # Select package which was previously set
@@ -153,22 +129,6 @@ class PackageSelectDialog(BaseDialog):
         for package in packages:
             self.packagesList.addPackage(package)
 
-    def _openLoadingDialog(self):
-        self._loadingDialog = LoadingDialog(self)
-        self._loadingDialog.setText("Fetching packages...")
-        self._loadingDialog.exec_()
-
-    def _closeLoadingDialog(self):
-        self._loadingDialog.close()
-
-    def _startPackageLoader(self):
-        deviceSerial = self._appState.lastSelectedDevice.serial
-        packageLoader = PackageLoader(self.adbClient(), deviceSerial)
-        packageLoader.setStartDelay(500)
-        packageLoader.signals.succeeded.connect(self._packageLoaderSucceeded)
-        packageLoader.signals.failed.connect(self._packageLoaderFailed)
-        QThreadPool.globalInstance().start(packageLoader)
-
     def adbClient(self):
         return AdbClient(
             self._appState.adb.ipAddr,
@@ -176,15 +136,30 @@ class PackageSelectDialog(BaseDialog):
         )
 
     def exec_(self):
-        self._startPackageListReload()
+        self._refreshPackagesList()
         return super().exec_()
 
-    def _startPackageListReload(self):
-        self._startPackageLoader()
-        self._openLoadingDialog()
+    def _refreshPackagesList(self):
+        deviceSerial = self._appState.lastSelectedDevice.serial
+        action = ListPackagesAction(self.adbClient(), self)
+        action.setAllowSelectAnotherDevice(True)
+
+        packages = action.listPackages(deviceSerial)
+        if packages is not None:
+            self.buttonBar.fromApkButton.setEnabled(True)
+            self._setPackages(packages)
+            if self.packagesList.canSelectPackage():
+                self.buttonBar.selectButton.setEnabled(True)
+                self._selectDefaultPackage(packages)
+        else:
+            self.buttonBar.selectButton.setEnabled(False)
+            self.buttonBar.fromApkButton.setEnabled(False)
+            self.packagesList.setNoData()
+            if action.needSelectAnotherDevice():
+                self._selectAnotherDevice(autoSelect=True)
 
     def _reloadButtonClicked(self):
-        self._startPackageListReload()
+        self._refreshPackagesList()
 
     def _fromApkButtonClicked(self):
         openFileDialog = QFileDialog()
@@ -247,12 +222,12 @@ class PackageSelectDialog(BaseDialog):
         self._packageSelected(self.packagesList.listView.currentIndex())
 
     def _selectAnotherDevice(self, autoSelect: bool = False):
-        deviceSelectPane = DeviceSelectDialog(self._appState, self.parent())
-        deviceSelectPane.setDeviceAutoSelect(autoSelect)
-        result = deviceSelectPane.exec_()
+        deviceSelectDialog = DeviceSelectDialog(self._appState, self.parent())
+        deviceSelectDialog.setDeviceAutoSelect(autoSelect)
+        result = deviceSelectDialog.exec_()
         if result == 0:
             return
 
         self.packagesList.searchInput.setFocus()
         self._refreshSelectedDevice()
-        self._startPackageListReload()
+        self._refreshPackagesList()
