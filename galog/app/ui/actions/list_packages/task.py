@@ -3,7 +3,7 @@ from typing import Optional
 from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
 
 from galog.app.device import AdbClient, deviceRestricted
-from galog.app.device.errors import DeviceError, DeviceNotFound
+from galog.app.device.errors import DeviceError, DeviceNotFound, DeviceRuntimeError
 from galog.app.ui.base.task import BaseTask
 
 
@@ -33,9 +33,7 @@ class ListPackagesTask(BaseTask):
 
         except Exception:
             self._logger.exception("Got unknown error")
-            msgBrief = "Unknown error"
-            msgVerbose = "Unknown Error - Possibly a bug in the application"
-            self.signals.failed.emit(msgBrief, msgVerbose)
+            self.signals.failed.emit(DeviceRuntimeError("Unknown"))
 
         else:
             self.signals.succeeded.emit()
