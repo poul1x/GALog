@@ -57,11 +57,15 @@ class DeviceSelectDialog(BaseDialog):
 
     def initUserInputHandlers(self):
         self.devicesLoadOptions.reloadButton.clicked.connect(self._reloadButtonClicked)
-        self.deviceTable.searchInput.returnPressed.connect(self._deviceMayBeSelected)
-        self.deviceTable.searchInput.textChanged.connect(self._canSelectDevice)
         self.deviceTable.tableView.rowActivated.connect(self._deviceSelected)
         self.buttonBar.selectButton.clicked.connect(self._selectButtonClicked)
         self.buttonBar.cancelButton.clicked.connect(self.reject)
+
+        searchInput = self.deviceTable.searchInput
+        searchInput.returnPressed.connect(self._deviceMayBeSelected)
+        searchInput.textChanged.connect(self._canSelectDevice)
+        searchInput.arrowUpPressed.connect(self._tryFocusPackagesListAndGoUp)
+        searchInput.arrowDownPressed.connect(self._tryFocusPackagesListAndGoDown)
 
     def initFocusPolicy(self):
         self.devicesLoadOptions.reloadButton.setFocusPolicy(Qt.NoFocus)
@@ -97,6 +101,12 @@ class DeviceSelectDialog(BaseDialog):
 
         self.devicesLoadOptions.setAdbIpAddr(self._appState.adb.ipAddr)
         self.devicesLoadOptions.setAdbPort(str(self._appState.adb.port))
+
+    def _tryFocusPackagesListAndGoUp(self):
+        self.deviceTable.trySetFocusAndGoUp()
+
+    def _tryFocusPackagesListAndGoDown(self):
+        self.deviceTable.trySetFocusAndGoDown()
 
     def setDeviceAutoSelect(self, value: bool):
         self._autoSelect = value

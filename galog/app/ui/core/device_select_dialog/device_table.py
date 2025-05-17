@@ -182,3 +182,9 @@ class DeviceTable(BaseWidget):
         if self.filterModel.rowCount() > 0:
             proxyIndex = self.filterModel.index(0, 0)
             self.selectRowByIndex(proxyIndex)
+
+    def trySetFocusAndGoUp(self):
+        self.tableView.trySetFocusAndGoUp()
+
+    def trySetFocusAndGoDown(self):
+        self.tableView.trySetFocusAndGoDown()

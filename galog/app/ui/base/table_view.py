@@ -1,15 +1,23 @@
 from typing import Optional
 
-from PyQt5.QtCore import QModelIndex, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtCore import (
+    QAbstractItemModel,
+    QModelIndex,
+    pyqtSignal,
+    Qt,
+    QItemSelectionModel,
+)
+from PyQt5.QtGui import QKeyEvent, QFocusEvent
 from PyQt5.QtWidgets import QTableView, QWidget
 
 from ..helpers.hotkeys import HotkeyHelper
+from .item_view_proxy import ItemViewProxy
+import logging
 
 
 class TableView(QTableView):
     #
-    # This widget is used for cross-platform implementation of the 'activated' signal.
+    # This signal is used for cross-platform implementation of the 'activated' signal.
     # Unfortunately, the built-in implementation does not work on MacOS.
     # Therefore, we need to implement handlers for mouse double-click on a row and
     # keyboard shortcuts (<Enter>, <Space>) pressed on the selected row.
@@ -17,18 +25,47 @@ class TableView(QTableView):
 
     rowActivated = pyqtSignal(QModelIndex)
 
-    def _emitRowActivated(self, index: QModelIndex):
-        self.rowActivated.emit(index)
-
     def keyPressEvent(self, event: QKeyEvent):
-        helper = HotkeyHelper(event)
-        if helper.isEnterPressed() or helper.isSpacePressed():
-            indexes = self.selectionModel().selectedIndexes()
-            if indexes:
-                self._emitRowActivated(indexes[0])
-
-        return super().keyPressEvent(event)
+        self._proxy.keyPressEvent(event)
+        super().keyPressEvent(event)
 
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
-        self.doubleClicked.connect(self._emitRowActivated)
+        self._proxy = ItemViewProxy(self)
+
+    def setModel(self, model: Optional[QAbstractItemModel]):
+        self._proxy.setModel(model)
+        super().setModel(model)
+        self._proxy.updateFocusPolicy()
+
+    def focusInEvent(self, e: QFocusEvent):
+        self._proxy.focusInEvent(e)
+        super().focusInEvent(e)
+
+    def selectRow(self, row: int):
+        self._proxy.selectRow(row)
+
+    def selectNextRow(self):
+        self._proxy.selectNextRow()
+
+    def selectPrevRow(self):
+        self._proxy.selectPrevRow()
+
+    def selectRowByIndex(self, index: QModelIndex):
+        self._proxy.selectRowByIndex(index)
+
+    def selectedRows(self):
+        return self._proxy.selectedRows()
+
+    def hasItems(self):
+        return self._proxy.hasItems()
+
+    def hasSelectedItems(self):
+        return self._proxy.hasSelectedItems()
+
+    def trySetFocusAndGoUp(self):
+        return self._proxy.trySetFocusAndGoUp()
+
+    def trySetFocusAndGoDown(self):
+        return self._proxy.trySetFocusAndGoDown()
+
