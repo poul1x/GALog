@@ -49,7 +49,7 @@ from galog.app.ui.actions.save_log_file.controller import SaveLogFileController
 
 from galog.app.ui.core.tag_filter_dialog import TagFilterDialog
 from galog.app.device.device import AdbClient
-from galog.app.hgl_rules import HglRulesStorage
+from galog.app.hrules import HRulesStorage
 from galog.app.logging import initLogging
 from galog.app.msgbox import (
     msgBoxErr,
@@ -136,9 +136,9 @@ class MainWindow(QMainWindow):
                 self.loadFontsFromTar(fontDB, tar)
 
     def initHighlighting(self):
-        rules = HglRulesStorage()
+        rules = HRulesStorage()
         for filepath in highlightingFiles():
-            rules.addRuleset(filepath)
+            rules.addRuleSet(filepath)
 
         self.logMessagesPaneController.setHighlightingRules(rules)
 

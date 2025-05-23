@@ -16,7 +16,7 @@ from galog.app.ui.core.log_messages_panel.msg_view_dialog.controller import (
     LogMessageViewPaneController,
 )
 from galog.app.device.device import AdbClient
-from galog.app.hgl_rules import HglRulesStorage
+from galog.app.hrules import HRulesStorage
 from galog.app.msgbox import msgBoxErr
 
 from .blinking_row import RowBlinkingController
@@ -57,7 +57,7 @@ class LogMessagesPanelController:
         assert self._logReader is not None
         return self._logReader.package
 
-    def setHighlightingRules(self, rules: HglRulesStorage):
+    def setHighlightingRules(self, rules: HRulesStorage):
         self._highlightingRules = rules
 
     def takeControl(self, pane: LogMessagesPanel):

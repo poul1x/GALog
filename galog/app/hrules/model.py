@@ -102,36 +102,36 @@ class TextColorModel(BaseModel):
         return obj
 
 
-class TextHglModel(BaseModel):
+class TextHighlightingModel(BaseModel):
     colors: Optional[TextColorModel] = None
     formatting: Optional[List[FormattingKeywords]] = None
 
     @model_validator(mode="after")
-    def at_least_one_set(cls, obj: "TextHglModel"):
+    def at_least_one_set(cls, obj: "TextHighlightingModel"):
         validate_at_least_one_key_set(obj.model_dump())
         return obj
 
 
-class RegexGroupsHglModel(BaseModel):
+class RegexGroupsHighlightingModel(BaseModel):
     numbers: GroupNumberList
-    highlighting: TextHglModel
+    highlighting: TextHighlightingModel
 
 
-class HglRuleModel(BaseModel):
+class HRuleModel(BaseModel):
     name: NonEmptyStr
     pattern: Pattern
     priority: NonNegativeInt = 500
-    highlighting: Optional[TextHglModel] = None
-    groups: Optional[List[RegexGroupsHglModel]] = None
+    highlighting: Optional[TextHighlightingModel] = None
+    groups: Optional[List[RegexGroupsHighlightingModel]] = None
 
     @model_validator(mode="after")
-    def at_least_one_set(cls, obj: "HglRuleModel"):
+    def at_least_one_set(cls, obj: "HRuleModel"):
         data = obj.model_dump(include={"highlighting", "groups"})
         validate_at_least_one_key_set(data)
         return obj
 
     @model_validator(mode="after")
-    def validate_group_num_ranges(cls, obj: "HglRuleModel"):
+    def validate_group_num_ranges(cls, obj: "HRuleModel"):
         if obj.groups:
             if obj.pattern.groups == 0:
                 msg = "Found regexp groups in rule '%s', however the pattern has no groups"
@@ -148,6 +148,6 @@ class HglRuleModel(BaseModel):
         return obj
 
 
-class HglRulesetModel(BaseModel):
-    rules: List[HglRuleModel]
+class HRuleSetModel(BaseModel):
+    rules: List[HRuleModel]
     version: VersionString

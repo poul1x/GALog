@@ -14,7 +14,7 @@ from PyQt5.QtGui import (
 from PyQt5.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem
 
 from galog.app.ui.core.log_messages_panel.search_task import SearchResult
-from galog.app.hgl_rules import HglRulesStorage
+from galog.app.hrules import HRulesStorage
 from galog.app.ui.core.log_messages_panel.colors import logLevelColor, rowSelectedColor
 from galog.app.ui.helpers.painter import painterSaveRestore
 
@@ -49,7 +49,7 @@ class StyledItemDelegate(QStyledItemDelegate):
     def font(self):
         return self._font
 
-    def setHighlightingRules(self, rules: HglRulesStorage):
+    def setHighlightingRules(self, rules: HRulesStorage):
         self._rules = rules
 
     def setHighlightingEnabled(self, enabled: bool):

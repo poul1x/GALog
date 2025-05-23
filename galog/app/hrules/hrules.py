@@ -8,24 +8,24 @@ from PyQt5.QtGui import QColor, QFont, QTextCharFormat
 
 from .errors import RuleAlreadyExistsError, RuleNotFoundError
 from .model import (
-    HglRuleModel,
-    HglRulesetModel,
-    RegexGroupsHglModel,
+    HRuleModel,
+    HRuleSetModel,
+    RegexGroupsHighlightingModel,
     TextColorModel,
-    TextHglModel,
+    TextHighlightingModel,
 )
 
 
 @dataclass
-class HglRule:
+class HRule:
     pattern: Pattern
     match: Optional[QTextCharFormat]
     groups: Optional[Dict[int, QTextCharFormat]]
     priority: int
 
 
-class HglRulesStorage:
-    _rules: Dict[str, HglRule]
+class HRulesStorage:
+    _rules: Dict[str, HRule]
 
     def __init__(self) -> None:
         self._rules = dict()
@@ -73,7 +73,7 @@ class HglRulesStorage:
 
         return charFormat
 
-    def _loadTextHighlighting(self, hl: TextHglModel):
+    def _loadTextHighlighting(self, hl: TextHighlightingModel):
         charFormat = QTextCharFormat()
         if hl.colors:
             charFormat.merge(self._loadColors(hl.colors))
@@ -83,17 +83,17 @@ class HglRulesStorage:
         return charFormat
 
     def _loadTextHighlightingForGroups(
-        self, rulesetForGroups: List[RegexGroupsHglModel]
+        self, ruleSetForGroups: List[RegexGroupsHighlightingModel]
     ):
         charFormatDict = defaultdict(QTextCharFormat)
-        for groupsRule in rulesetForGroups:
+        for groupsRule in ruleSetForGroups:
             charFormat = self._loadTextHighlighting(groupsRule.highlighting)
             for groupNum in groupsRule.numbers:
                 charFormatDict[groupNum].merge(charFormat)
 
         return dict(charFormatDict)
 
-    def _loadRule(self, rule: HglRuleModel):
+    def _loadRule(self, rule: HRuleModel):
         name = rule.name
         if name in self._rules:
             msg = f"Rule '{name}' already exists"
@@ -102,14 +102,14 @@ class HglRulesStorage:
         assert not (rule.highlighting is None and rule.groups is None)
         match = self._loadTextHighlighting(rule.highlighting) if rule.highlighting else None  # fmt: skip
         groups = self._loadTextHighlightingForGroups(rule.groups) if rule.groups else None  # fmt: skip
-        self._rules[name] = HglRule(rule.pattern, match, groups, rule.priority)
+        self._rules[name] = HRule(rule.pattern, match, groups, rule.priority)
 
-    def addRuleset(self, filepath: str):
+    def addRuleSet(self, filepath: str):
         try:
             with open(filepath, "r", encoding="utf-8") as f:
                 data = yaml.safe_load(f)
 
-            config = HglRulesetModel.model_validate(data)
+            config = HRuleSetModel.model_validate(data)
             for rule in config.rules:
                 self._loadRule(rule)
 

@@ -15,7 +15,7 @@ from ..data_model import Column
 from ..delegate import HighlightingData
 from .msg_view_dialog import LogMessageViewDialog
 from ..search_task import SearchResult
-from galog.app.hgl_rules import HglRulesStorage
+from galog.app.hrules import HRulesStorage
 from galog.app.ui.core.log_messages_panel.colors import logLevelColor, logLevelColorDarker
 from galog.app.paths import styleSheetFile
 
@@ -30,7 +30,7 @@ class LogMessageViewPaneController:
             with open(path, "r", encoding="utf-8") as f:
                 LogMessageViewPaneController.QSS_TEMPLATE = f.read()
 
-    def __init__(self, dataModel: QStandardItemModel, hRules: HglRulesStorage):
+    def __init__(self, dataModel: QStandardItemModel, hRules: HRulesStorage):
         self._loadStyleSheet()
         self._dataModel = dataModel
         self._hRules = hRules
