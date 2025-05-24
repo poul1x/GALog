@@ -14,9 +14,9 @@ from PyQt5.QtGui import (
 from ..data_model import Column
 from ..delegate import HighlightingData
 from .msg_view_dialog import LogMessageViewDialog
-from ..search_task import SearchResult
+from ..log_messages_table.pattern_search_task import SearchResult
 from galog.app.hrules import HRulesStorage
-from galog.app.ui.core.log_messages_panel.colors import logLevelColor, logLevelColorDarker
+from galog.app.ui.core.log_messages_panel.log_messages_table.colors import logLevelColor, logLevelColorDarker
 from galog.app.paths import styleSheetFile
 
 

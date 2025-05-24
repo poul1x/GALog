@@ -26,7 +26,7 @@ class SearchItemTaskSignals(QObject):
     finished = pyqtSignal(list)
 
 
-class SearchItemTask(QRunnable):
+class PatternSearchTask(QRunnable):
     def __init__(self, text: str, searchItems: List[SearchItem]):
         super().__init__()
         self.signals = SearchItemTaskSignals()

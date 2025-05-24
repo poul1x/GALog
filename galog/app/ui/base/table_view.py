@@ -8,14 +8,14 @@ from PyQt5.QtCore import (
     QItemSelectionModel,
 )
 from PyQt5.QtGui import QKeyEvent, QFocusEvent
-from PyQt5.QtWidgets import QTableView, QWidget
+from PyQt5.QtWidgets import QTableView, QWidget, QAbstractItemView
 
 from ..helpers.hotkeys import HotkeyHelper
-from .item_view_proxy import ItemViewProxy
+from .item_view_proxy import ItemViewProxy, ScrollHint
 import logging
 
 
-class TableView(QTableView):
+class BaseTableView(QTableView):
     #
     # This signal is used for cross-platform implementation of the 'activated' signal.
     # Unfortunately, the built-in implementation does not work on MacOS.
@@ -42,8 +42,8 @@ class TableView(QTableView):
         self._proxy.focusInEvent(e)
         super().focusInEvent(e)
 
-    def selectRow(self, row: int):
-        self._proxy.selectRow(row)
+    def selectRow(self, row: int, scroll: Optional[ScrollHint] = None):
+        self._proxy.selectRow(row, scroll)
 
     def selectNextRow(self):
         self._proxy.selectNextRow()
@@ -51,8 +51,8 @@ class TableView(QTableView):
     def selectPrevRow(self):
         self._proxy.selectPrevRow()
 
-    def selectRowByIndex(self, index: QModelIndex):
-        self._proxy.selectRowByIndex(index)
+    def selectRowByIndex(self, index: QModelIndex, scroll: Optional[ScrollHint] = None):
+        self._proxy.selectRowByIndex(index, scroll)
 
     def selectedRows(self):
         return self._proxy.selectedRows()
@@ -68,4 +68,3 @@ class TableView(QTableView):
 
     def trySetFocusAndGoDown(self):
         return self._proxy.trySetFocusAndGoDown()
-

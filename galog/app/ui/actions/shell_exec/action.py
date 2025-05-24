@@ -23,24 +23,42 @@ class ShellExecAction(BaseAction):
     def _succeeded(self):
         self._setSucceeded()
 
+    def _cmdSucceeded(self, result: ShellExecResult):
+        self._logger.info(f"Command succeeded: {result}")
+
     def _failed(self, msgBrief: str, msgVerbose: str):
         self._msgBoxErr(msgBrief, msgVerbose)
         self._setFailed()
 
-    def executeCommand(self, deviceName: str, command: ShellExecCommand):
+    def _cmdFailed(self, result: ShellExecResult):
+        self._logger.warning(f"Command failed: {result}")
+
+    def executeCommand(
+        self,
+        deviceName: str,
+        command: ShellExecCommand,
+        delay: int = 700,
+    ):
         task = ShellExecTask(deviceName, [command], self._adbClient)
+        task.signals.cmdSucceeded.connect(self._cmdSucceeded)
         task.signals.succeeded.connect(self._succeeded)
+        task.signals.cmdFailed.connect(self._cmdFailed)
         task.signals.failed.connect(self._failed)
-        task.setStartDelay(700)
+        task.setStartDelay(delay)
 
         QThreadPool.globalInstance().start(task)
         self._execLoadingDialog()
 
-    def executeManyCommands(self, deviceName: str, commands: List[ShellExecCommand]):
+    def executeManyCommands(
+        self,
+        deviceName: str,
+        commands: List[ShellExecCommand],
+        delay: int = 700,
+    ):
         task = ShellExecTask(deviceName, commands, self._adbClient)
         task.signals.succeeded.connect(self._succeeded)
         task.signals.failed.connect(self._failed)
-        task.setStartDelay(700)
+        task.setStartDelay(delay)
 
         QThreadPool.globalInstance().start(task)
         self._execLoadingDialog()

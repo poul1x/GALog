@@ -4,7 +4,7 @@ from PyQt5.QtCore import QModelIndex, Qt, pyqtSignal, QItemSelectionModel
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QAbstractItemView, QListView, QVBoxLayout, QWidget
 
-from galog.app.ui.base.list_view import ListView
+from galog.app.ui.base.list_view import BaseListView
 from galog.app.ui.base.widget import BaseWidget
 
 
@@ -21,7 +21,7 @@ class FilteredTagsList(BaseWidget):
         vBoxLayout.setContentsMargins(0, 0, 0, 0)
         vBoxLayout.setSpacing(0)
 
-        self.listView = ListView(self)
+        self.listView = BaseListView(self)
         self.listView.setEditTriggers(QListView.NoEditTriggers)
         self.listView.setSelectionMode(QAbstractItemView.ExtendedSelection)
 

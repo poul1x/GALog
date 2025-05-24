@@ -10,13 +10,13 @@ from PyQt5.QtCore import (
 from PyQt5.QtGui import QFocusEvent, QKeyEvent
 from PyQt5.QtWidgets import QListView, QWidget
 
-from galog.app.ui.base.item_view_proxy import ItemViewProxy
+from galog.app.ui.base.item_view_proxy import ItemViewProxy, ScrollHint
 
 from ..helpers.hotkeys import HotkeyHelper
 import logging
 
 
-class ListView(QListView):
+class BaseListView(QListView):
     #
     # This signal is used for cross-platform implementation of the 'activated' signal.
     # Unfortunately, the built-in implementation does not work on MacOS.
@@ -43,8 +43,8 @@ class ListView(QListView):
         self._proxy.focusInEvent(e)
         super().focusInEvent(e)
 
-    def selectRow(self, row: int):
-        self._proxy.selectRow(row)
+    def selectRow(self, row: int, scroll: Optional[ScrollHint] = None):
+        self._proxy.selectRow(row, scroll)
 
     def selectNextRow(self):
         self._proxy.selectNextRow()
@@ -52,8 +52,8 @@ class ListView(QListView):
     def selectPrevRow(self):
         self._proxy.selectPrevRow()
 
-    def selectRowByIndex(self, index: QModelIndex):
-        self._proxy.selectRowByIndex(index)
+    def selectRowByIndex(self, index: QModelIndex, scroll: Optional[ScrollHint] = None):
+        self._proxy.selectRowByIndex(index, scroll)
 
     def selectedRows(self):
         return self._proxy.selectedRows()

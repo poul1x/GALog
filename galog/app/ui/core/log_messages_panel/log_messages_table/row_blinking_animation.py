@@ -1,15 +1,15 @@
 from PyQt5.QtCore import QObject, QRunnable, Qt, QThread, QThreadPool, pyqtSignal
+from PyQt5.QtGui import QStandardItemModel
 
-from .log_messages_panel import LogMessagesPanel
 from .data_model import Column
 
 
 class RowBlinkingSignals(QObject):
     finished = pyqtSignal()
-    invertColors = pyqtSignal(int)
+    blink = pyqtSignal(int)
 
 
-class RowBlinkingWorker(QRunnable):
+class RowBlinkingTimerTask(QRunnable):
     def __init__(self, row: int):
         super().__init__()
         self.signals = RowBlinkingSignals()
@@ -20,9 +20,9 @@ class RowBlinkingWorker(QRunnable):
 
     def run(self):
         for _ in range(self._blinkCount):
-            self.signals.invertColors.emit(self._row)
+            self.signals.blink.emit(self._row)
             QThread.msleep(self._blinkDuration)
-            self.signals.invertColors.emit(self._row)
+            self.signals.blink.emit(self._row)
             QThread.msleep(self._blinkInterval)
 
         self.signals.finished.emit()
@@ -40,27 +40,28 @@ class RowBlinkingWorker(QRunnable):
         return self._blinkDuration
 
 
-class RowBlinkingController:
-    def __init__(self, pane: LogMessagesPanel):
-        self._pane = pane
+class RowBlinkingAnimation(QObject):
 
-    def _finished(self):
-        self._pane.tableView.setEnabled(True)
-        self._pane.tableView.setFocus()
+    finished = pyqtSignal()
 
-    def _invertColors(self, row: int):
-        model = self._pane.regExpFilterModel
-        index = model.index(row, Column.logLevel)
-        inverted = model.data(index, Qt.UserRole)
-        model.setData(index, not inverted, Qt.UserRole)
+    def __init__(self, model: QStandardItemModel) -> None:
+        self._model = model
+        self._inverted = False
 
+    def _invertColors(self):
+        self._inverted = not self._inverted
+
+    def _forceRedrawRow(self, row: int):
+        self._invertColors()
         for column in Column:
-            index = model.index(row, column)
-            model.dataChanged.emit(index, index)
+            index = self._model.index(row, column)
+            self._model.dataChanged.emit(index, index)
 
     def startBlinking(self, row: int):
-        worker = RowBlinkingWorker(row)
-        worker.signals.finished.connect(self._finished)
-        worker.signals.invertColors.connect(self._invertColors)
+        worker = RowBlinkingTimerTask()
+        worker.signals.finished.connect(lambda: self.finished.emit())
+        worker.signals.blink.connect(lambda: self._forceRedrawRow(row))
         QThreadPool.globalInstance().start(worker)
-        self._pane.tableView.setEnabled(False)
+
+    def colorInverted(self):
+        return self._inverted

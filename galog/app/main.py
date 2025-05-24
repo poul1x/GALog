@@ -41,7 +41,7 @@ from galog.app.ui.quick_dialogs.stop_capture_dialog import (
 
 # from galog.app.ui.core.message_view_dialog import LogMessageViewDialog
 from galog.app.ui.core.package_select_dialog import PackageSelectDialog
-from galog.app.ui.core.log_messages_panel.controller import LogMessagesPanelController
+from galog.app.ui.core.log_messages_panel import LogMessagesPanel
 from galog.app.ui.actions.open_log_file.controller import OpenLogFileController
 from galog.app.ui.actions.restart_app.action import RestartAppAction
 from galog.app.ui.actions.start_app import StartAppAction
@@ -78,15 +78,14 @@ from galog.app.ui.core.log_messages_panel import LogMessagesPanel
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
+        self.initAppState()
         self.setObjectName("MainWindow")
         self.setStyle(GALogStyle())
-        self.logMessagesPaneController = LogMessagesPanelController(self)
         self.loadFonts()
-        self.initHighlighting()
         self.initUserInterface()
+        self.initHighlighting()
         self.initLeftPaddingForEachMenu()
         self.increaseHoverAreaForCheckableActions()
-        self.initAppState()
         self.startAdbServer()
 
     def initAppState(self):
@@ -140,7 +139,7 @@ class MainWindow(QMainWindow):
         for filepath in highlightingFiles():
             rules.addRuleSet(filepath)
 
-        self.logMessagesPaneController.setHighlightingRules(rules)
+        self.logMessagesPanel.setHighlightingRules(rules)
 
     def cancelThreadPoolTasks(self):
         QThreadPool.globalInstance().clear()
@@ -152,7 +151,7 @@ class MainWindow(QMainWindow):
             body="If you close the window, current progress will be lost",
             parent=self,
         ):
-            self.logMessagesPaneController.stopCapture()
+            self.logMessagesPanel.stopCapture()
             self.cancelThreadPoolTasks()
             event.accept()
         else:
@@ -206,28 +205,24 @@ class MainWindow(QMainWindow):
 
     def openTagFilter(self):
         dialog = TagFilterDialog(self.appState, self)
-        tagList = self.logMessagesPaneController.uniqueTagNames()
+        tagList = self.logMessagesPanel.uniqueTagNames()
         if dialog.exec_() == TagFilterDialog.Rejected:
             return
 
         config = self.appState.tagFilteringConfig
         if config.mode == TagFilteringMode.ShowMatching:
-            self.logMessagesPaneController.setTagFilteringFn(
-                lambda tag: tag in config.tags
-            )
+            self.logMessagesPanel.setTagFilteringFn(lambda tag: tag in config.tags)
         elif config.mode == TagFilteringMode.HideMatching:
-            self.logMessagesPaneController.setTagFilteringFn(
-                lambda tag: tag not in config.tags
-            )
+            self.logMessagesPanel.setTagFilteringFn(lambda tag: tag not in config.tags)
         else:  # config.mode == TagFilteringMode.Disabled:
-            self.logMessagesPaneController.unsetTagFilteringFn()
+            self.logMessagesPanel.unsetTagFilteringFn()
 
     def showDevices(self):
         deviceSelectPane = DeviceSelectDialog(self.appState, self)
         deviceSelectPane.exec_()
 
     def startCapture(self):
-        if self.logMessagesPaneController.isCaptureRunning():
+        if self.logMessagesPanel.isCaptureRunning():
             msgBrief = "Capture is running"
             msgVerbose = "Unable to start capture while another capture is running. Please, stop the running capture first"  # fmt: skip
             msgBoxErr(msgBrief, msgVerbose, self)
@@ -261,11 +256,11 @@ class MainWindow(QMainWindow):
             if _action.failed():
                 return
 
-        self.logMessagesPaneController.makeWhiteBackground()
-        self.logMessagesPaneController.disableMessageFilter()
-        self.logMessagesPaneController.clearLogLines()
-        self.logMessagesPaneController.startCapture(device, package)
+        self.logMessagesPanel.setWhiteBackground()
+        # self.logMessagesPanel.disableMessageFilter()
+        self.logMessagesPanel.clearLogLines()
         self.setCaptureSpecificActionsEnabled(True)
+        self.logMessagesPanel.startCapture(device, package)
 
     def clearCaptureOutput(self):
         if msgBoxPrompt(
@@ -273,17 +268,17 @@ class MainWindow(QMainWindow):
             body="All captured log messages will be erased",
             parent=self,
         ):
-            self.logMessagesPaneController.makeWhiteBackground()
-            self.logMessagesPaneController.disableMessageFilter()
-            self.logMessagesPaneController.clearLogLines()
+            self.logMessagesPanel.setWhiteBackground()
+            self.logMessagesPanel.disableMessageFilter()
+            self.logMessagesPanel.clearLogLines()
 
     def saveLogFile(self):
-        logLines = self.logMessagesPaneController.logLines()
+        logLines = self.logMessagesPanel.logLines()
         controller = SaveLogFileController(logLines)
         controller.promptSaveFile()
 
     def openLogFile(self):
-        if self.logMessagesPaneController.isCaptureRunning():
+        if self.logMessagesPanel.isCaptureRunning():
             msgBrief = "Capture is running"
             msgVerbose = "Unable to open log file while capture is running. Please, stop the running capture first"  # fmt: skip
             msgBoxErr(msgBrief, msgVerbose, self)
@@ -294,10 +289,10 @@ class MainWindow(QMainWindow):
         if not lines:
             return
 
-        self.logMessagesPaneController.makeWhiteBackground()
-        self.logMessagesPaneController.disableMessageFilter()
-        self.logMessagesPaneController.clearLogLines()
-        self.logMessagesPaneController.addLogLines(lines)
+        self.logMessagesPanel.setWhiteBackground()
+        self.logMessagesPanel.disableMessageFilter()
+        self.logMessagesPanel.clearLogLines()
+        self.logMessagesPanel.addLogLines(lines)
 
     def restartCapture(self):
         dialog = RestartCaptureDialog(self)
@@ -310,17 +305,17 @@ class MainWindow(QMainWindow):
         package = self.appState.lastSelectedPackage.name
         # mode = self.appState.lastSelectedPackage.action
 
-        self.logMessagesPaneController.stopCapture()
-        self.logMessagesPaneController.makeWhiteBackground()
-        self.logMessagesPaneController.disableMessageFilter()
-        self.logMessagesPaneController.clearLogLines()
+        self.logMessagesPanel.stopCapture()
+        self.logMessagesPanel.setWhiteBackground()
+        # self.logMessagesPanel.disableMessageFilter()
+        self.logMessagesPanel.clearLogLines()
 
         action = RestartAppAction(self.adbClient())
         action.restartApp(device, package)
         if action.failed():
             return
 
-        self.logMessagesPaneController.startCapture(device, package)
+        self.logMessagesPanel.startCapture(device, package)
 
     def adbClient(self):
         return AdbClient(
@@ -335,27 +330,27 @@ class MainWindow(QMainWindow):
             return
 
         if result == StopCaptureDialog.AcceptedStopApp:
-            device = self.logMessagesPaneController.device
-            package = self.logMessagesPaneController.package
+            device = self.appState.lastSelectedDevice.serial
+            package = self.appState.lastSelectedPackage.name
             action = StopAppAction(self.adbClient(), self)
             action.stopApp(device, package)
             # Ignore action.failed(), because we want
             # to stop the capture anyway
 
-        self.logMessagesPaneController.stopCapture()
+        self.logMessagesPanel.stopCapture()
         self.setCaptureSpecificActionsEnabled(False)
 
     def enableMessageFilter(self):
-        self.logMessagesPaneController.enableMessageFilter()
+        self.logMessagesPanel.enableMessageFilter()
 
     def toggleLiveReload(self, checkBox: QCheckBox):
-        self.logMessagesPaneController.setLiveReloadEnabled(checkBox.isChecked())
+        self.logMessagesPanel.setLiveReloadEnabled(checkBox.isChecked())
 
     def toggleHighlighting(self, checkBox: QCheckBox):
-        self.logMessagesPaneController.setHighlightingEnabled(checkBox.isChecked())
+        self.logMessagesPanel.setHighlightingEnabled(checkBox.isChecked())
 
     def toggleShowLineNumbers(self, checkBox: QCheckBox):
-        self.logMessagesPaneController.setShowLineNumbers(checkBox.isChecked())
+        self.logMessagesPanel.setShowLineNumbers(checkBox.isChecked())
 
     # def handleInstallApkAction(self):
     #     device = self.capturePaneController.selectedDevice()
@@ -577,6 +572,10 @@ class MainWindow(QMainWindow):
         # adbMenu.addAction(self.rebootDeviceAction())
         # adbMenu.addAction(self.shutdownDeviceAction())
 
+    def captureInterrupted(self, msgBrief: str, msgVerbose: str):
+        self.setCaptureSpecificActionsEnabled(False)
+        msgBoxErr(msgBrief, msgVerbose, self)
+
     def initUserInterface(self):
         screen = QApplication.desktop().screenGeometry()
         width = int(screen.width() * 0.8)
@@ -585,9 +584,10 @@ class MainWindow(QMainWindow):
         y = (screen.height() - height) // 2
         self.setGeometry(x, y, width, height)
 
-        pane = LogMessagesPanel(self)
-        self.logMessagesPaneController.takeControl(pane)
-        self.setCentralWidget(pane)
+        self.logMessagesPanel = LogMessagesPanel(self.appState, self)
+        self.logMessagesPanel.captureInterrupted.connect(self.captureInterrupted)
+
+        self.setCentralWidget(self.logMessagesPanel)
         self.setWindowTitle("galog")
         self.setWindowIcon(QIcon(iconFile("galog")))
 

@@ -5,7 +5,7 @@ from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QListView, QVBoxLayout, QWidget
 
 from galog.app.ui.reusable import SearchInput
-from galog.app.ui.base.list_view import ListView
+from galog.app.ui.base.list_view import BaseListView
 
 
 class PackagesList(QWidget):
@@ -20,7 +20,7 @@ class PackagesList(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        self.listView = ListView(self)
+        self.listView = BaseListView(self)
         self.listView.setEditTriggers(QListView.NoEditTriggers)
 
         self.dataModel = QStandardItemModel(self)

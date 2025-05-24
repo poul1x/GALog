@@ -1,8 +1,15 @@
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import List
+from typing import List, Optional
 
-from PyQt5.QtCore import QModelIndex, QRectF, QSortFilterProxyModel, Qt, pyqtSignal
+from PyQt5.QtCore import (
+    QModelIndex,
+    QRectF,
+    QSortFilterProxyModel,
+    Qt,
+    pyqtSignal,
+    QThreadPool,
+)
 from PyQt5.QtGui import (
     QFont,
     QFontMetrics,
@@ -10,37 +17,30 @@ from PyQt5.QtGui import (
     QTextCharFormat,
     QTextCursor,
     QTextDocument,
+    QStandardItemModel,
 )
 from PyQt5.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem
 
-from galog.app.ui.core.log_messages_panel.search_task import SearchResult
 from galog.app.hrules import HRulesStorage
-from galog.app.ui.core.log_messages_panel.colors import logLevelColor, rowSelectedColor
+from galog.app.ui.core.log_messages_panel.log_messages_table.colors import (
+    logLevelColor,
+    rowSelectedColor,
+)
 from galog.app.ui.helpers.painter import painterSaveRestore
 
-from .data_model import Column
+from .data_model import Column, HighlightingData, LazyHighlightingState
+from .pattern_search_task import PatternSearchTask, SearchItem, SearchResult
+from .row_blinking_animation import RowBlinkingAnimation
 
 
-class LazyHighlightingState(int, Enum):
-    pending = auto()
-    running = auto()
-    done = auto()
-
-
-@dataclass
-class HighlightingData:
-    state: LazyHighlightingState
-    items: List[SearchResult]
-
-
-class StyledItemDelegate(QStyledItemDelegate):
-    lazyHighlighting = pyqtSignal(QModelIndex)
+class LogLineDelegate(QStyledItemDelegate):
     _highlightingEnabled: bool
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self._rules = None
+        self._rowBlinkingAnimation = None
         self._highlightingEnabled = True
+        self._highlightingRules = None
         self._initFont()
 
     def setFont(self, font: QFont):
@@ -50,7 +50,7 @@ class StyledItemDelegate(QStyledItemDelegate):
         return self._font
 
     def setHighlightingRules(self, rules: HRulesStorage):
-        self._rules = rules
+        self._highlightingRules = rules
 
     def setHighlightingEnabled(self, enabled: bool):
         self._highlightingEnabled = enabled
@@ -67,17 +67,20 @@ class StyledItemDelegate(QStyledItemDelegate):
         if index.column() != Column.logMessage:
             return
 
-        if not self._highlightingEnabled:
+        if not self._highlightingEnabled or self._highlightingRules is None:
             return
 
         data: HighlightingData = index.data(Qt.UserRole)
-        if data.state == LazyHighlightingState.done:
-            self.highlightKeywords(doc, data.items)
-        elif data.state == LazyHighlightingState.pending:
+        if data.state == LazyHighlightingState.pending:
             data.state = LazyHighlightingState.running
-            self.lazyHighlighting.emit(index)
-        else:  # data.state == LazyHighlightingState.running:
-            pass
+            self._startLazyHighlightingTask(index)
+            return
+
+        if data.state == LazyHighlightingState.running:
+            return
+
+        assert data.state == LazyHighlightingState.done
+        self._highlightKeywords(doc, data.items)
 
     def _selectedRowHighlightCellText(
         self,
@@ -91,13 +94,13 @@ class StyledItemDelegate(QStyledItemDelegate):
         if index.column() == Column.logLevel:
             fmt = QTextCharFormat()
             fmt.setFontItalic(True)
-            self.highlightAllText(doc, fmt)
+            self._highlightAllText(doc, fmt)
 
         if option.state & QStyle.State_Selected:
             fmt = QTextCharFormat()
             fmt.setFontWeight(QFont.DemiBold)
             fmt.setFontItalic(True)
-            self.highlightAllText(doc, fmt)
+            self._highlightAllText(doc, fmt)
 
     def _selectedRowFillCellBackground(
         self,
@@ -106,9 +109,11 @@ class StyledItemDelegate(QStyledItemDelegate):
         index: QModelIndex,
     ):
         model = index.model()
-        newIndex = model.index(index.row(), Column.logLevel)
-        inverted = model.data(newIndex, Qt.UserRole)
-        logLevel = model.data(newIndex)
+        logLevel = model.index(index.row(), Column.logLevel).data()
+
+        inverted = False
+        if self._rowBlinkingAnimation is not None:
+            inverted = self._rowBlinkingAnimation.colorInverted()
 
         if inverted:
             if option.state & QStyle.State_Selected:
@@ -154,7 +159,7 @@ class StyledItemDelegate(QStyledItemDelegate):
 
     def paint(self, p: QPainter, option: QStyleOptionViewItem, index: QModelIndex):
         assert self._font is not None
-        assert self._rules is not None
+        assert self._highlightingRules is not None
 
         model = index.model()
         if isinstance(model, QSortFilterProxyModel):
@@ -163,7 +168,7 @@ class StyledItemDelegate(QStyledItemDelegate):
         with painterSaveRestore(p) as painter:
             self._drawCellContent(painter, option, index)
 
-    def elidedTextLength(self, doc: QTextDocument):
+    def _elidedTextLength(self, doc: QTextDocument):
         text = doc.toPlainText()
         length = doc.characterCount() - 1
         if text.endswith("..."):
@@ -175,14 +180,14 @@ class StyledItemDelegate(QStyledItemDelegate):
         else:
             return length
 
-    def textLength(self, doc: QTextDocument):
+    def _textLength(self, doc: QTextDocument):
         if doc.property("elided") == True:
-            return self.elidedTextLength(doc)
+            return self._elidedTextLength(doc)
         else:
             return doc.characterCount() - 1
 
-    def highlightKeywords(self, doc: QTextDocument, items: List[SearchResult]):
-        textLength = self.textLength(doc)
+    def _highlightKeywords(self, doc: QTextDocument, items: List[SearchResult]):
+        textLength = self._textLength(doc)
         for item in items:
             if item.begin >= textLength:
                 continue
@@ -191,28 +196,68 @@ class StyledItemDelegate(QStyledItemDelegate):
             if end > textLength:
                 end = textLength - 1
 
-            rule = self._rules.findRule(item.name)
+            rule = self._highlightingRules.findRule(item.name)
             groupNum = item.groupNum
 
             charFormat = rule.match
             if groupNum != 0:
                 charFormat = rule.groups[groupNum]
 
-            self.highlightKeyword(doc, charFormat, item.begin, end)
+            self._highlightKeyword(doc, charFormat, item.begin, end)
 
-    def highlightAllText(self, doc: QTextDocument, charFormat: QTextCharFormat):
+    def _highlightAllText(self, doc: QTextDocument, charFormat: QTextCharFormat):
         cursor = QTextCursor(doc)
         cursor.select(QTextCursor.Document)
         cursor.setCharFormat(charFormat)
 
-    def cursorSelect(self, doc: QTextDocument, begin: int, end: int):
+    def _cursorSelect(self, doc: QTextDocument, begin: int, end: int):
         cursor = QTextCursor(doc)
         cursor.setPosition(begin, QTextCursor.MoveAnchor)
         cursor.setPosition(end, QTextCursor.KeepAnchor)
         return cursor
 
-    def highlightKeyword(
+    def _highlightKeyword(
         self, doc: QTextDocument, charFormat: QTextCharFormat, begin: int, end: int
     ):
-        cursor = self.cursorSelect(doc, begin, end)
+        cursor = self._cursorSelect(doc, begin, end)
         cursor.setCharFormat(charFormat)
+
+    def _lazyHighlightingDataReady(
+        self, index: QModelIndex, results: List[SearchResult]
+    ):
+        data = HighlightingData(
+            state=LazyHighlightingState.done,
+            items=results,
+        )
+
+        model = index.model()
+        model.setData(index, data, Qt.UserRole)
+        model.dataChanged.emit(index, index)
+
+    def _startLazyHighlightingTask(self, index: QModelIndex):
+        assert self._highlightingRules is not None
+        assert index.column() == Column.logMessage
+
+        items = []
+        for name, rule in self._highlightingRules.items():
+            groups = set()
+            if rule.match:
+                groups.add(0)
+            if rule.groups:
+                groups.update(rule.groups.keys())
+
+            item = SearchItem(name, rule.pattern, rule.priority, groups)
+            items.append(item)
+
+        task = PatternSearchTask(index.data(), items)
+        onFinished = lambda results: self._lazyHighlightingDataReady(index, results)
+        task.signals.finished.connect(onFinished)
+        QThreadPool.globalInstance().start(task)
+
+    def startRowBlinking(self, row: int, model: QStandardItemModel):
+        self._rowBlinkingAnimation = RowBlinkingAnimation(model)
+        self._rowBlinkingAnimation.finished.connect(self._deleteAnimation)
+        self._rowBlinkingAnimation.startBlinking(row)
+
+    def _deleteAnimation(self):
+        self._rowBlinkingAnimation = None

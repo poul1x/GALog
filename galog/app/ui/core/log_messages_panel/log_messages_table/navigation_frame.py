@@ -83,7 +83,7 @@ class DownArrowButton(OverlayButton):
         self.setIcon(self._iconHover)
 
 
-class QuickNavigationFrame(QFrame):
+class NavigationFrame(QFrame):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.initUserInterface()

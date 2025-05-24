@@ -13,6 +13,10 @@ from PyQt5.QtWidgets import QListView, QWidget, QAbstractItemView
 from ..helpers.hotkeys import HotkeyHelper
 import logging
 
+from enum import Enum, auto
+
+ScrollHint = QAbstractItemView.ScrollHint
+
 
 class ItemViewProxy:
     _rowActivatedSignal: pyqtBoundSignal
@@ -62,13 +66,13 @@ class ItemViewProxy:
         self._logger.debug("focusInEvent: select first row")
         self.selectRow(0)
 
-    def selectRow(self, row: int):
+    def selectRow(self, row: int, scroll: Optional[ScrollHint] = None):
         model = self._itemView.model()
         if row < 0 or row >= model.rowCount():
             return False
 
         index = model.index(row, 0)
-        self.selectRowByIndex(index)
+        self.selectRowByIndex(index, scroll)
         return True
 
     def selectNextRow(self):
@@ -81,7 +85,7 @@ class ItemViewProxy:
         assert index.isValid(), "Index must be valid"
         return self.selectRow(index.row() - 1)
 
-    def selectRowByIndex(self, index: QModelIndex):
+    def selectRowByIndex(self, index: QModelIndex, scroll: Optional[ScrollHint] = None):
         assert index.isValid(), "Index must be valid"
         self._itemView.setCurrentIndex(index)
 
@@ -89,7 +93,8 @@ class ItemViewProxy:
         selectionModel = self._itemView.selectionModel()
         selectionModel.select(index, flags)
 
-        # self._itemView.scrollTo(index, QAbstractItemView.PositionAtCenter)
+        if scroll:
+            self._itemView.scrollTo(index, scroll)
 
     def selectedRows(self):
         def key(index: QModelIndex):

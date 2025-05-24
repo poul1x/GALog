@@ -19,14 +19,14 @@ from galog.app.device.device import AdbClient
 from galog.app.hrules import HRulesStorage
 from galog.app.msgbox import msgBoxErr
 
-from .blinking_row import RowBlinkingController
+from .log_messages_table.row_blinking_animation import RowBlinkingAnimation
 from galog.app.log_reader import (
     AndroidAppLogReader,
     LogLine,
     ProcessEndedEvent,
     ProcessStartedEvent,
 )
-from .search_task import SearchItem, SearchItemTask, SearchResult
+from .log_messages_table.pattern_search_task import SearchItem, PatternSearchTask, SearchResult
 
 if TYPE_CHECKING:
     from galog.app.main import MainWindow
@@ -90,7 +90,7 @@ class LogMessagesPanelController:
             pane.dataModel, self._highlightingRules
         )
 
-        self._rowBlinkingController = RowBlinkingController(self._pane)
+        self._rowBlinkingController = RowBlinkingAnimation(self._pane)
 
     def _handleSearchByValueChanged(self, index: int):
         searchPane = self._pane.searchPane
@@ -214,31 +214,6 @@ class LogMessagesPanelController:
         if self._scrolling:
             self._pane.tableView.scrollToBottom()
 
-    def _searchDone(self, index: QModelIndex, results: List[SearchResult]):
-        data = HighlightingData(
-            state=LazyHighlightingState.done,
-            items=results,
-        )
-
-        model = index.model()
-        model.setData(index, data, Qt.UserRole)
-        model.dataChanged.emit(index, index)
-
-    def _lazyHighlighting(self, index: QModelIndex):
-        items = []
-        for name, rule in self._highlightingRules.items():
-            groups = set()
-            if rule.match:
-                groups.add(0)
-            if rule.groups:
-                groups.update(rule.groups.keys())
-
-            item = SearchItem(name, rule.pattern, rule.priority, groups)
-            items.append(item)
-
-        task = SearchItemTask(index.data(), items)
-        task.signals.finished.connect(lambda results: self._searchDone(index, results))
-        QThreadPool.globalInstance().start(task)
 
     def addLogLine(self, line: LogLine):
         self._addLogLine(line.level, line.tag, line.msg)

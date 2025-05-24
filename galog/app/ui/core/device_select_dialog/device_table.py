@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (
 from galog.app.ui.base.widget import BaseWidget
 
 from galog.app.ui.reusable import SearchInput
-from galog.app.ui.base.table_view import TableView
+from galog.app.ui.base.table_view import BaseTableView
 
 from .data_model import Columns, DataModel, FilterModel
 
@@ -129,7 +129,7 @@ class DeviceTable(BaseWidget):
         self.filterModel.layoutChanged.connect(self._applySpans)
         self.dataModel.rowsInserted.connect(self._applySpans)
 
-        self.tableView = TableView(self)
+        self.tableView = BaseTableView(self)
         self.tableView.setModel(self.filterModel)
         self.tableView.setCornerButtonEnabled(False)
         self.tableView.setSortingEnabled(True)
