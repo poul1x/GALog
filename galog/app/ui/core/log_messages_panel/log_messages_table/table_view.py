@@ -1,7 +1,7 @@
 from typing import Optional
 
 from PyQt5.QtCore import QRect, QSize, Qt, pyqtSignal
-from PyQt5.QtGui import QColor, QFont, QFontMetrics, QKeyEvent, QPainter, QResizeEvent
+from PyQt5.QtGui import QColor, QFont, QFontMetrics, QKeyEvent, QMouseEvent, QPainter, QResizeEvent
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QTableView, QWidget
 from galog.app.hrules.hrules import HRulesStorage
 
@@ -49,6 +49,14 @@ class VerticalHeader(QHeaderView):
 
 
 class TableView(BaseTableView):
+
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        if event.button() in [Qt.XButton1, Qt.XButton2]:
+            event.ignore()
+            return
+
+        super().mousePressEvent(event)
+
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.initLogLineDelegate()

@@ -6,7 +6,7 @@ from galog.app.log_reader.models import LogLine
 from .navigation_frame import NavigationFrame
 
 from PyQt5.QtCore import QModelIndex, QPoint, Qt, pyqtSignal, QSortFilterProxyModel
-from PyQt5.QtGui import QKeyEvent, QResizeEvent, QStandardItemModel, QFocusEvent
+from PyQt5.QtGui import QKeyEvent, QResizeEvent, QStandardItemModel, QFocusEvent, QMouseEvent
 from PyQt5.QtWidgets import (
     QAction,
     QComboBox,

@@ -25,8 +25,8 @@ from galog.app.ui.helpers.hotkeys import HotkeyHelper
 
 from galog.app.ui.base.widget import BaseWidget
 
-from .log_messages_table import LogMessagesTable
-from .quick_filter_bar import QuickFilterBar
+from .log_messages_table import LogMessagesTable, Column
+from .quick_filter_bar import FilterField, QuickFilterBar
 
 
 class LogMessagesPanel(BaseWidget):
@@ -51,7 +51,6 @@ class LogMessagesPanel(BaseWidget):
         else:
             super().mousePressEvent(event)
 
-
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
         if helper.isEscapePressed():
@@ -67,14 +66,14 @@ class LogMessagesPanel(BaseWidget):
         layout = QVBoxLayout()
         self._logMessagesTable = LogMessagesTable(self)
         self._quickFilterBar = QuickFilterBar(self)
+        self._quickFilterBar.startSearch.connect(self.quickFilterApply)
+
+
         layout.addWidget(self._logMessagesTable, 1)
         layout.addWidget(self._quickFilterBar)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         self.setLayout(layout)
-
-    def _d(self):
-        self.disableQuickFilter()
 
     def setHighlightingRules(self, hrules: HRulesStorage):
         self._logMessagesTable.setHighlightingRules(hrules)
@@ -161,8 +160,13 @@ class LogMessagesPanel(BaseWidget):
 
     ###################
 
-    def quickFilterApply(self, filterField: str, filterText: str):
-        self._logMessagesTable.quickFilterApply(filterField, filterText)
+    def quickFilterApply(self, filterField: FilterField, filterText: str):
+        if filterField == FilterField.Message:
+            self._logMessagesTable.quickFilterApply(Column.logMessage, filterText)
+        elif filterField == FilterField.Tag:
+            self._logMessagesTable.quickFilterApply(Column.tagName, filterText)
+        else: # Level
+            self._logMessagesTable.quickFilterApply(Column.logLevel, filterText)
 
     def quickFilterReset(self):
         self._logMessagesTable.quickFilterReset()

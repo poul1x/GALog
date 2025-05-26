@@ -87,6 +87,7 @@ class NavigationFrame(QFrame):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.initUserInterface()
+        self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
 
     def setMarginTop(self, marginTop: int):
         self._marginTop = marginTop
