@@ -30,7 +30,6 @@ class AndroidAppLogReader:
         self._deviceName = device
         self._packageName = package
         self._readerThread = LogcatReaderThread(client, device)
-        self._startDelay = 0
         self._pids = set(pids)
 
         self.signals = LogReaderSignals()

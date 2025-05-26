@@ -19,7 +19,7 @@ class GetAppPidsAction(ShellExecAction):
 
     def __init__(self, adbClient: AdbClient, parentWidget: Optional[QWidget] = None):
         super().__init__(adbClient, parentWidget)
-        self._setLoadingDialogText("Fetching logs...")
+        self.setLoadingDialogText("Getting App PIDs")
         self._app_pids = None
 
     def _cmdSucceeded(self, result: ShellExecResult):

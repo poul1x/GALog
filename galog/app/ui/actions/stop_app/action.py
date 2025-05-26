@@ -15,7 +15,7 @@ from enum import Enum
 class StopAppAction(ShellExecAction):
     def __init__(self, adbClient: AdbClient, parentWidget: Optional[QWidget] = None):
         super().__init__(adbClient, parentWidget)
-        self._setLoadingDialogText("Stop application")
+        self.setLoadingDialogText("Stop application")
 
     def stopApp(self, deviceName: str, packageName: str):
         command = ShellExecCommand("Stop application", f"am force-stop {packageName}")

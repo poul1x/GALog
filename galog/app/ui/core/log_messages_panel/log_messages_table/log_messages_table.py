@@ -119,6 +119,13 @@ class LogMessagesTable(BaseWidget):
         self._navigationFrame.updateGeometry()
         self._navigationFrame.hideChildren()
 
+        layout = QHBoxLayout()
+        layout.addWidget(self._tableView)
+        layout.setContentsMargins(0,0,0,0)
+        self.setLayout(layout)
+
+
+
     def _navScrollTop(self):
         rowCount = self.topModel().rowCount()
         if rowCount > 0:

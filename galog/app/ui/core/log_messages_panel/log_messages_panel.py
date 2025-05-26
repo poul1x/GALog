@@ -65,9 +65,7 @@ class LogMessagesPanel(BaseWidget):
         # self.searchPane.setFocusPolicy(Qt.StrongFocus)
 
         self.setTabOrder(self._logMessagesTable, self._quickFilterBar.searchInput)
-        self.setTabOrder(
-            self._quickFilterBar.searchInput, self._logMessagesTable._tableView
-        )
+        self.setTabOrder(self._quickFilterBar.searchInput, self._logMessagesTable._tableView)
 
     def _initUserInterface(self):
         layout = QVBoxLayout()
@@ -89,17 +87,18 @@ class LogMessagesPanel(BaseWidget):
         )
 
     def startCapture(self, device: str, package: str):
-        action = GetAppPidsAction(self._adbClient(), self)
+        action = GetAppPidsAction(self._adbClient())
+        action.setLoadingDialogText("Fetching App Logs...")
         pids = action.appPids(device, package)
         if pids is None:
             return
 
         if pids:
             msg = f"App '{package}' is running. PID(s): {', '.join(pids)}"
-            self._addLogLine("S", "galog", msg)
+            self._addOwnLogLine(msg)
         else:
             msg = f"App '{package}' is not running. Waiting for its start..."
-            self._addLogLine("S", "galog", msg)
+            self._addOwnLogLine(msg)
 
         self._logReader = AndroidAppLogReader(self._adbClient(), device, package, pids)
         self._logReader.signals.failed.connect(self._logReaderFailed)
@@ -122,10 +121,13 @@ class LogMessagesPanel(BaseWidget):
         self._liveReload = enabled
 
     def _lineRead(self, line: LogLine):
-        self._addLogLine(line.level, line.tag, line.msg)
+        self._addLogLine(line.tag, line.level, line.msg)
 
     def _addLogLine(self, tagName: str, logLevel: str, message: str):
         self._logMessagesTable.addLogLine(tagName, logLevel, message)
+
+    def _addOwnLogLine(self, message: str):
+        self._addLogLine("GALog", "S", message)
 
     def _appStarted(self, packageName: str):
         if self._liveReload:
@@ -133,19 +135,19 @@ class LogMessagesPanel(BaseWidget):
             # self.disableMessageFilter()
 
         msg = f"App '{packageName}' started"
-        self._addLogLine("S", "galog", msg)
+        self._addOwnLogLine(msg)
 
     def _processStarted(self, event: ProcessStartedEvent):
         msg = f"Process <PID={event.processId}> started for {event.target}"
-        self._addLogLine("S", "galog", msg)
+        self._addOwnLogLine(msg)
 
     def _processEnded(self, event: ProcessEndedEvent):
         msg = f"Process <PID={event.processId}> ended"
-        self._addLogLine("S", "galog", msg)
+        self._addOwnLogLine(msg)
 
     def _appEnded(self, packageName: str):
         msg = f"App '{packageName}' ended"
-        self._addLogLine("S", "galog", msg)
+        self._addOwnLogLine(msg)
 
     def _logReaderFailed(self, msgBrief: str, msgVerbose: str):
         self.stopCapture()

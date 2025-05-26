@@ -15,7 +15,7 @@ from ..shell_exec import ShellExecAction, ShellExecCommand
 class ListDevicesAction(BaseAction):
     def __init__(self, adbClient: AdbClient, parentWidget: Optional[QWidget] = None):
         super().__init__(parentWidget)
-        self._setLoadingDialogText("Loading device list...")
+        self.setLoadingDialogText("Loading device list...")
         self._client = adbClient
         self._deviceList = []
 

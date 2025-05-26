@@ -16,7 +16,7 @@ class StartAppAction(ShellExecAction):
 
     def __init__(self, adbClient: AdbClient, parentWidget: Optional[QWidget] = None):
         super().__init__(adbClient, parentWidget)
-        self._setLoadingDialogText("Start application")
+        self.setLoadingDialogText("Start application")
 
     def startApp(self, deviceName: str, packageName: str):
         command = ShellExecCommand("Start application", f"monkey -p {packageName} 1")

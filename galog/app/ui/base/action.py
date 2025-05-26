@@ -21,7 +21,7 @@ class BaseAction:
     def _execLoadingDialog(self):
         self._loadingDialog.exec_()
 
-    def _setLoadingDialogText(self, text: str):
+    def setLoadingDialogText(self, text: str):
         self._loadingDialog.setText(text)
 
     def _succeededSafe(self):

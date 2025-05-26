@@ -15,7 +15,7 @@ from enum import Enum
 class RestartAppAction(ShellExecAction):
     def __init__(self, adbClient: AdbClient):
         super().__init__(adbClient)
-        self._setLoadingDialogText("Restart application")
+        self.setLoadingDialogText("Restart application")
 
     def restartApp(self, deviceName: str, packageName: str):
         commands = [

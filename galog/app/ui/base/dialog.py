@@ -1,5 +1,5 @@
 from typing import Optional
-from PyQt5.QtWidgets import QDialog, QWidget, QApplication
+from PyQt5.QtWidgets import QDialog, QWidget, QApplication, QMainWindow
 from PyQt5.QtCore import Qt
 
 from .style import GALogStyle
@@ -30,13 +30,21 @@ class BaseDialog(QDialog):
         self.setMinimumWidth(maxWidth)
         self.setMinimumHeight(maxHeight)
 
+    def _findMainWindow(self):
+        for widget in QApplication.topLevelWidgets():
+            if isinstance(widget, QMainWindow):
+                return widget
+        return None
+
     def _parentGeometry(self):
         parent = self.parent()
-        if parent is None:
-            return QApplication.primaryScreen().geometry()
+        if parent is not None:
+            assert isinstance(parent, (QDialog, QMainWindow))
+            return parent.frameGeometry()
         else:
-            assert isinstance(parent, QWidget)
-            return parent.geometry()
+            mainWindow = self._findMainWindow()
+            assert mainWindow is not None
+            return mainWindow.frameGeometry()
 
     def setRelativeGeometry(
         self,

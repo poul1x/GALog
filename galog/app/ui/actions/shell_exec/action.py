@@ -17,7 +17,7 @@ from enum import Enum
 class ShellExecAction(BaseAction):
     def __init__(self, adbClient: AdbClient, parentWidget: Optional[QWidget] = None):
         super().__init__(parentWidget)
-        self._setLoadingDialogText("Execute Shell Commands")
+        self.setLoadingDialogText("Execute Shell Commands")
         self._adbClient = adbClient
 
     def _succeeded(self):

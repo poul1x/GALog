@@ -22,7 +22,6 @@ class ListDevicesTask(BaseTask):
         super().__init__()
         self.signals = ListDevicesTaskSignals()
         self._adbClient = adbClient
-        self._msDelay = None
 
     def entrypoint(self):
         try:

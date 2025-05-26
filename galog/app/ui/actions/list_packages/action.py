@@ -17,7 +17,7 @@ from .task import ListPackagesTask
 class ListPackagesAction(BaseAction):
     def __init__(self, adbClient: AdbClient, parentWidget: Optional[QWidget] = None):
         super().__init__(parentWidget)
-        self._setLoadingDialogText("Fetching packages...")
+        self.setLoadingDialogText("Fetching packages...")
         self._allowSelectAnotherDevice = False
         self._needSelectAnotherDevice = False
         self._adbClient = adbClient
