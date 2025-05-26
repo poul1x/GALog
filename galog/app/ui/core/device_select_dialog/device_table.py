@@ -11,10 +11,10 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from galog.app.ui.base.widget import BaseWidget
+from galog.app.ui.base.widget import Widget
 
 from galog.app.ui.reusable import SearchInput
-from galog.app.ui.base.table_view import BaseTableView
+from galog.app.ui.base.table_view import TableView
 
 from .data_model import Columns, DataModel, FilterModel
 
@@ -24,7 +24,7 @@ class SearchType(int, Enum):
     Name = auto()
 
 
-class DeviceTable(BaseWidget):
+class DeviceTable(Widget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.initUserInterface()
@@ -129,7 +129,7 @@ class DeviceTable(BaseWidget):
         self.filterModel.layoutChanged.connect(self._applySpans)
         self.dataModel.rowsInserted.connect(self._applySpans)
 
-        self.tableView = BaseTableView(self)
+        self.tableView = TableView(self)
         self.tableView.setModel(self.filterModel)
         self.tableView.setCornerButtonEnabled(False)
         self.tableView.setSortingEnabled(True)

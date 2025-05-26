@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QWidget
 import logging
 
 
-class BaseAction:
+class Action:
     def __init__(self, parentWidget: Optional[QWidget] = None):
         self._parentWidget = parentWidget
         self._loadingDialog = LoadingDialog(parentWidget)

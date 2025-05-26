@@ -6,7 +6,7 @@ from galog.app.log_reader.models import LogLine
 from .navigation_frame import NavigationFrame
 
 from PyQt5.QtCore import QModelIndex, QPoint, Qt, pyqtSignal, QSortFilterProxyModel
-from PyQt5.QtGui import QKeyEvent, QResizeEvent, QStandardItemModel, QFocusEvent, QMouseEvent
+from PyQt5.QtGui import QKeyEvent, QResizeEvent, QStandardItemModel, QFocusEvent, QMouseEvent, QGuiApplication
 from PyQt5.QtWidgets import (
     QAction,
     QComboBox,
@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
     QHeaderView,
-    QTableView
+    QTableView, QTableWidget
 )
 
 from galog.app.ui.reusable import SearchInput
@@ -24,7 +24,7 @@ from galog.app.ui.reusable import RegExpFilterModel
 from galog.app.ui.reusable import FnFilterModel
 
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
-from galog.app.ui.base.widget import BaseWidget
+from galog.app.ui.base.widget import Widget
 
 from .table_view import TableView
 
@@ -32,9 +32,7 @@ from .data_model import Column, DataModel
 from .navigation_frame import NavigationFrame
 
 
-class LogMessagesTable(BaseWidget):
-    copyMsgRowsToClipboard = pyqtSignal()
-    copyFullRowsToClipboard = pyqtSignal()
+class LogMessagesTable(Widget):
     cmViewMessage = pyqtSignal(QModelIndex)
     cmGoToOrigin = pyqtSignal(QModelIndex)
     cmGoBack = pyqtSignal()
@@ -52,9 +50,9 @@ class LogMessagesTable(BaseWidget):
         if helper.isCtrlEnterPressed():
             self.rowGoToOrigin.emit()
         elif helper.isCtrlShiftCPressed():
-            self.copyFullRowsToClipboard.emit()
+            self._copySelectedLogLinesToClipboard()
         elif helper.isCtrlCPressed():
-            self.copyMsgRowsToClipboard.emit()
+            self._copySelectedLogMessagesToClipboard()
         else:
             super().keyPressEvent(event)
 
@@ -225,18 +223,31 @@ class LogMessagesTable(BaseWidget):
     #####
 
 
-    def selectedLogLines(self) -> List[LogLine]:
+    def _selectedLogLines(self) -> List[LogLine]:
         result = []
-        for row in sorted(self._tableView.selectedRows()):
+        for row in self._tableView.selectedRows():
             result.append(self._bottomModel().logLine(row))
 
         return result
 
-    def selectedLogMessages(self) -> List[str]:
+    def _selectedLogMessages(self) -> List[str]:
         result = []
-        for row in sorted(self._tableView.selectedRows()):
+        for row in self._tableView.selectedRows():
             result.append(self._bottomModel().logMessage(row))
 
         return result
+
+    def _copyTextToClipboard(self, text: str):
+        QGuiApplication.clipboard().setText(text)
+
+    def _copySelectedLogLinesToClipboard(self):
+        result = []
+        for logLine in self._selectedLogLines():
+            result.append(f"{logLine.level}/{logLine.tag}: {logLine.msg}")
+
+        self._copyTextToClipboard("\n".join(result))
+
+    def _copySelectedLogMessagesToClipboard(self):
+        result = self._selectedLogMessages()
 
 

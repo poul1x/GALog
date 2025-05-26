@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QVBoxLayout, QWi
 from galog.app.apk_info import APK
 from galog.app.app_state import AppState, LastSelectedPackage
 from galog.app.ui.actions.list_packages import ListPackagesAction
-from galog.app.ui.base.dialog import BaseDialog
+from galog.app.ui.base.dialog import Dialog
 from galog.app.ui.quick_dialogs import LoadingDialog
 from galog.app.ui.actions.install_app.controller import InstallAppController
 from galog.app.device import AdbClient
@@ -22,7 +22,7 @@ from .load_options import PackagesLoadOptions
 from .packages_list import PackagesList
 
 
-class PackageSelectDialog(BaseDialog):
+class PackageSelectDialog(Dialog):
     def __init__(self, appState: AppState, parent: QWidget):
         super().__init__(parent)
         self._appState = appState

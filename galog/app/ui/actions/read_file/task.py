@@ -5,7 +5,7 @@ from typing import IO, Callable, List, Optional
 
 from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
 
-from galog.app.ui.base.task import BaseTask
+from galog.app.ui.base.task import Task
 
 from typing import IO, Callable
 
@@ -22,7 +22,7 @@ class ReadFileTaskSignals(QObject):
     failed = pyqtSignal(str, str)
 
 
-class _ReadFileTask(BaseTask):
+class _ReadFileTask(Task):
     def __init__(self, filePath: str):
         super().__init__()
         self.signals = ReadFileTaskSignals()

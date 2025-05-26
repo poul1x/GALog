@@ -1,12 +1,10 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QWidget
-from galog.app.ui.base.widget import BaseWidget
+from galog.app.ui.base.widget import Widget
 
-class BottomButtonBar(BaseWidget):
+class BottomButtonBar(Widget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.setObjectName(self.__class__.__name__)
-        self.setAttribute(Qt.WA_StyledBackground)
         self.initUserInterface()
 
     def initUserInterface(self):

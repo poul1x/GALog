@@ -4,7 +4,7 @@ from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
 
 from galog.app.device import AdbClient, deviceRestricted
 from galog.app.device.errors import DeviceError, DeviceNotFound, DeviceRuntimeError
-from galog.app.ui.base.task import BaseTask
+from galog.app.ui.base.task import Task
 
 
 class ListPackagesTaskSignals(QObject):
@@ -13,7 +13,7 @@ class ListPackagesTaskSignals(QObject):
     failed = pyqtSignal(DeviceError)
 
 
-class ListPackagesTask(BaseTask):
+class ListPackagesTask(Task):
     _adbClient: AdbClient
 
     def __init__(self, deviceName: str, adbClient: AdbClient):

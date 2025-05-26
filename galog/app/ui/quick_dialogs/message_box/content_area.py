@@ -5,10 +5,10 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QWidget
 
 from galog.app.paths import iconFile
-from galog.app.ui.base.widget import BaseWidget
+from galog.app.ui.base.widget import Widget
 
 
-class MessageBoxContentArea(BaseWidget):
+class MessageBoxContentArea(Widget):
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
         self.initUserInterface()

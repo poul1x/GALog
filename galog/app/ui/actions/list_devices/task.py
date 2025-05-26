@@ -6,7 +6,7 @@ from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
 from galog.app.device import AdbClient
 from galog.app.device import DeviceInfo, deviceListWithInfo
 from galog.app.device.errors import DeviceError
-from galog.app.ui.base.task import BaseTask
+from galog.app.ui.base.task import Task
 
 
 class ListDevicesTaskSignals(QObject):
@@ -15,7 +15,7 @@ class ListDevicesTaskSignals(QObject):
     deviceFound = pyqtSignal(DeviceInfo)
 
 
-class ListDevicesTask(BaseTask):
+class ListDevicesTask(Task):
     _adbClient: AdbClient
 
     def __init__(self, adbClient: AdbClient):

@@ -16,7 +16,7 @@ from ..helpers.hotkeys import HotkeyHelper
 import logging
 
 
-class BaseListView(QListView):
+class ListView(QListView):
     #
     # This signal is used for cross-platform implementation of the 'activated' signal.
     # Unfortunately, the built-in implementation does not work on MacOS.

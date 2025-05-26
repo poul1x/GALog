@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QWidget
 
 from galog.app.app_state import LastSelectedDevice
 from galog.app.ui.actions.list_devices.action import ListDevicesAction
-from galog.app.ui.base.dialog import BaseDialog
+from galog.app.ui.base.dialog import Dialog
 from galog.app.ui.quick_dialogs import LoadingDialog
 from galog.app.ui.quick_dialogs.loading_dialog import LoadingDialog
 from galog.app.device import AdbClient, DeviceInfo
@@ -24,7 +24,7 @@ else:
     AppState = object
 
 
-class DeviceSelectDialog(BaseDialog):
+class DeviceSelectDialog(Dialog):
     def __init__(self, appState: AppState, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self._autoSelect = False

@@ -1,9 +1,9 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QPushButton, QVBoxLayout, QWidget
-from galog.app.ui.base.widget import BaseWidget
+from galog.app.ui.base.widget import Widget
 
 
-class ControlButtonBar(BaseWidget):
+class ControlButtonBar(Widget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.initUserInterface()

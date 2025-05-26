@@ -14,10 +14,10 @@ from PyQt5.QtWidgets import (
 )
 
 from galog.app.paths import iconFile
-from galog.app.ui.base.dialog import BaseDialog
+from galog.app.ui.base.dialog import Dialog
 
 
-class LogMessageViewDialog(BaseDialog):
+class LogMessageViewDialog(Dialog):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self.initUserInterface()

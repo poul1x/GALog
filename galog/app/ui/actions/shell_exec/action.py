@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QWidget
 
 from galog.app.app_state import AppState
 from galog.app.device.device import AdbClient
-from galog.app.ui.base.action import BaseAction
+from galog.app.ui.base.action import Action
 from .task import ShellExecCommand, ShellExecResult, ShellExecTask
 
 from galog.app.ui.quick_dialogs import LoadingDialog
@@ -14,7 +14,7 @@ from galog.app.msgbox import msgBoxErr
 from enum import Enum
 
 
-class ShellExecAction(BaseAction):
+class ShellExecAction(Action):
     def __init__(self, adbClient: AdbClient, parentWidget: Optional[QWidget] = None):
         super().__init__(parentWidget)
         self.setLoadingDialogText("Execute Shell Commands")

@@ -7,14 +7,14 @@ from galog.app.device import AdbClient
 from galog.app.device import DeviceInfo
 from galog.app.device.errors import DeviceError, DeviceNotFound
 from galog.app.ui.actions.list_devices.task import ListDevicesTask
-from galog.app.ui.base.action import BaseAction
+from galog.app.ui.base.action import Action
 
 from galog.app.ui.quick_dialogs import LoadingDialog
 from galog.app.msgbox import msgBoxErr, msgBoxPrompt
 from ..shell_exec import ShellExecAction, ShellExecCommand
 from .task import ListPackagesTask
 
-class ListPackagesAction(BaseAction):
+class ListPackagesAction(Action):
     def __init__(self, adbClient: AdbClient, parentWidget: Optional[QWidget] = None):
         super().__init__(parentWidget)
         self.setLoadingDialogText("Fetching packages...")

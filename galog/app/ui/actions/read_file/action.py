@@ -3,7 +3,7 @@ from typing import List, Optional
 from PyQt5.QtCore import QThreadPool, QThread
 from PyQt5.QtWidgets import QWidget
 
-from galog.app.ui.base.action import BaseAction
+from galog.app.ui.base.action import Action
 from .task import FnReadText, FnReadBinary
 
 from galog.app.ui.quick_dialogs import LoadingDialog
@@ -14,7 +14,7 @@ from .task import ReadTextFileTask, ReadBinaryFileTask
 from enum import Enum
 
 
-class ReadFileAction(BaseAction):
+class ReadFileAction(Action):
     def __init__(self, filePath: str, parentWidget: Optional[QWidget] = None):
         super().__init__(parentWidget)
         self._filePath = filePath

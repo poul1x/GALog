@@ -12,7 +12,7 @@ from .data_model import Column, DataModel
 from .log_line_delegate import LogLineDelegate
 from .navigation_frame import NavigationFrame
 
-from galog.app.ui.base.table_view import BaseTableView
+from galog.app.ui.base.table_view import TableView
 
 
 class VerticalHeader(QHeaderView):
@@ -48,7 +48,7 @@ class VerticalHeader(QHeaderView):
         return QSize(fm.width(str(rowNum)) + 5, 0)
 
 
-class TableView(BaseTableView):
+class TableView(TableView):
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         if event.button() in [Qt.XButton1, Qt.XButton2]:
@@ -56,6 +56,10 @@ class TableView(BaseTableView):
             return
 
         super().mousePressEvent(event)
+
+    def keyPressEvent(self, event: QKeyEvent) -> None:
+        print(event.key())
+        super().keyPressEvent(event)
 
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)

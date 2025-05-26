@@ -3,7 +3,7 @@ from PyQt5.QtCore import QRunnable, QThread
 import logging
 
 
-class BaseTask(QRunnable):
+class Task(QRunnable):
     def __init__(self):
         super().__init__()
         self._msDelay = -1

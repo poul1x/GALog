@@ -11,11 +11,11 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from galog.app.ui.base.dialog import BaseDialog
-from galog.app.ui.base.widget import BaseWidget
+from galog.app.ui.base.dialog import Dialog
+from galog.app.ui.base.widget import Widget
 
 
-class LoadingDialog(BaseDialog):
+class LoadingDialog(Dialog):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
@@ -33,7 +33,7 @@ class LoadingDialog(BaseDialog):
         layout.addWidget(self.label)
         layout.addWidget(self.progressBar)
 
-        container = BaseWidget(self)
+        container = Widget(self)
         container.setObjectName("Container")
         container.setLayout(layout)
 

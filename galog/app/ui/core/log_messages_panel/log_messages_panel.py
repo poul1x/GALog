@@ -23,13 +23,13 @@ from galog.app.ui.quick_dialogs.loading_dialog import LoadingDialog
 from galog.app.ui.reusable.search_input.widget import SearchInput
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
 
-from galog.app.ui.base.widget import BaseWidget
+from galog.app.ui.base.widget import Widget
 
 from .log_messages_table import LogMessagesTable, Column
 from .quick_filter_bar import FilterField, QuickFilterBar
 
 
-class LogMessagesPanel(BaseWidget):
+class LogMessagesPanel(Widget):
     cmViewMessage = pyqtSignal(QModelIndex)
     cmGoToOrigin = pyqtSignal(QModelIndex)
     cmGoBack = pyqtSignal()
@@ -55,10 +55,6 @@ class LogMessagesPanel(BaseWidget):
         helper = HotkeyHelper(event)
         if helper.isEscapePressed():
             self.disableQuickFilter()
-        elif helper.isCtrlShiftCPressed():
-            self._copySelectedLogLinesToClipboard()
-        elif helper.isCtrlCPressed():
-            self._copySelectedLogMessagesToClipboard()
         else:
             super().keyPressEvent(event)
 
@@ -217,19 +213,3 @@ class LogMessagesPanel(BaseWidget):
     def focusInEvent(self, event: QFocusEvent) -> None:
         self._logMessagesTable.setFocus()
         event.accept()
-
-    #####
-
-    def _copyTextToClipboard(self, text: str):
-        QGuiApplication.clipboard().setText(text)
-
-    def _copySelectedLogLinesToClipboard(self):
-        result = []
-        for logLine in self._logMessagesTable.selectedLogLines():
-            result.append(f"{logLine.level}/{logLine.tag}: {logLine.msg}")
-
-        self._copyTextToClipboard("\n".join(result))
-
-    def _copySelectedLogMessagesToClipboard(self):
-        result = self._logMessagesTable.selectedLogMessages()
-        self._copyTextToClipboard("\n".join(result))

@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt
 from .style import GALogStyle
 
 
-class BaseDialog(QDialog):
+class Dialog(QDialog):
     @staticmethod
     def _defaultFlags():
         return (

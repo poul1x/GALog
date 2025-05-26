@@ -13,14 +13,14 @@ from PyQt5.QtWidgets import (
 )
 
 from galog.app.paths import styleSheetFile
-from galog.app.ui.base.dialog import BaseDialog
+from galog.app.ui.base.dialog import Dialog
 from galog.app.ui.base.style import GALogStyle
 
 from .button_bar import MessageBoxButtonBar
 from .content_area import MessageBoxContentArea
 
 
-class MessageBox(BaseDialog):
+class MessageBox(Dialog):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self._clickedButtonId = -1

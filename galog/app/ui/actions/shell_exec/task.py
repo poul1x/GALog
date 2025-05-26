@@ -11,7 +11,7 @@ from galog.app.device import AdbClient, deviceRestricted
 from galog.app.device import AdbDevice
 from galog.app.device.errors import DeviceError
 
-from galog.app.ui.base.task import BaseTask
+from galog.app.ui.base.task import Task
 
 from typing import Callable
 
@@ -61,7 +61,7 @@ class ShellExecTaskSignals(QObject):
     cmdFailed = pyqtSignal(ShellExecResult)
 
 
-class ShellExecTask(BaseTask):
+class ShellExecTask(Task):
     def __init__(
         self,
         deviceName: str,

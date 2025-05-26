@@ -6,13 +6,13 @@ from galog.app.app_state import AppState
 from galog.app.device import AdbClient
 from galog.app.device import DeviceInfo
 from galog.app.ui.actions.list_devices.task import ListDevicesTask
-from galog.app.ui.base.action import BaseAction
+from galog.app.ui.base.action import Action
 
 from galog.app.ui.quick_dialogs import LoadingDialog
 from galog.app.msgbox import msgBoxErr
 from ..shell_exec import ShellExecAction, ShellExecCommand
 
-class ListDevicesAction(BaseAction):
+class ListDevicesAction(Action):
     def __init__(self, adbClient: AdbClient, parentWidget: Optional[QWidget] = None):
         super().__init__(parentWidget)
         self.setLoadingDialogText("Loading device list...")

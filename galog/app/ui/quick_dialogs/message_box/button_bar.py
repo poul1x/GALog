@@ -3,10 +3,10 @@ from typing import Optional
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QWidget
 
-from galog.app.ui.base.widget import BaseWidget
+from galog.app.ui.base.widget import Widget
 
 
-class MessageBoxButtonBar(BaseWidget):
+class MessageBoxButtonBar(Widget):
     buttonClicked = pyqtSignal(int)
 
     def __init__(self, parent: Optional[QWidget] = None) -> None:

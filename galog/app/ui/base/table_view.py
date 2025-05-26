@@ -15,7 +15,7 @@ from .item_view_proxy import ItemViewProxy, ScrollHint
 import logging
 
 
-class BaseTableView(QTableView):
+class TableView(QTableView):
     #
     # This signal is used for cross-platform implementation of the 'activated' signal.
     # Unfortunately, the built-in implementation does not work on MacOS.

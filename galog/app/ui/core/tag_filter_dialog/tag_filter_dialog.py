@@ -14,7 +14,7 @@ from galog.app.app_state import AppState, TagFilteringConfig, TagFilteringMode
 
 from galog.app.msgbox import msgBoxErr, msgBoxPrompt
 from galog.app.ui.actions.read_file import FileProcessError
-from galog.app.ui.base.dialog import BaseDialog
+from galog.app.ui.base.dialog import Dialog
 from galog.app.ui.actions.read_file import ReadFileAction
 from galog.app.ui.actions.write_file import WriteFileAction
 from galog.app.ui.helpers.file_filter import FileFilter, FileFilterBuilder
@@ -28,7 +28,7 @@ from .filtered_tags_list import FilteredTagsList
 from .tag_name_input import TagNameInput
 
 
-class TagFilterDialog(BaseDialog):
+class TagFilterDialog(Dialog):
     Accepted = 1
     Rejected = 0
 

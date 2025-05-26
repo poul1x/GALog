@@ -3,9 +3,9 @@ from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QSortFilterProxyModel
 from PyQt5.QtGui import QStandardItem, QStandardItemModel, QFocusEvent
 from PyQt5.QtWidgets import QListView, QVBoxLayout, QWidget, QComboBox, QPushButton, QHBoxLayout
 
-from galog.app.ui.base.widget import BaseWidget
+from galog.app.ui.base.widget import Widget
 from galog.app.ui.reusable import SearchInput
-from galog.app.ui.base.list_view import BaseListView
+from galog.app.ui.base.list_view import ListView
 
 from enum import Enum,auto
 
@@ -15,7 +15,7 @@ class FilterField(int, Enum):
     LogLevel = auto()
 
 
-class QuickFilterBar(BaseWidget):
+class QuickFilterBar(Widget):
     arrowUpPressed = pyqtSignal()
     arrowDownPressed = pyqtSignal()
     startSearch = pyqtSignal(FilterField, str)
