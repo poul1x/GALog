@@ -2,11 +2,20 @@ from typing import Callable, List, Optional
 
 from galog.app.hrules.hrules import HRulesStorage
 from galog.app.log_reader.models import LogLine
+from galog.app.ui.base.table_view import TableView, QTableView
 
 from .navigation_frame import NavigationFrame
 
 from PyQt5.QtCore import QModelIndex, QPoint, Qt, pyqtSignal, QSortFilterProxyModel
-from PyQt5.QtGui import QKeyEvent, QResizeEvent, QStandardItemModel, QFocusEvent, QMouseEvent, QGuiApplication
+from PyQt5.QtGui import (
+    QKeyEvent,
+    QResizeEvent,
+    QStandardItemModel,
+    QFocusEvent,
+    QMouseEvent,
+    QGuiApplication,
+    QFontMetrics,
+)
 from PyQt5.QtWidgets import (
     QAction,
     QComboBox,
@@ -16,7 +25,8 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
     QHeaderView,
-    QTableView, QTableWidget
+    QTableView,
+    QTableWidget,
 )
 
 from galog.app.ui.reusable import SearchInput
@@ -26,38 +36,58 @@ from galog.app.ui.reusable import FnFilterModel
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
 from galog.app.ui.base.widget import Widget
 
-from .table_view import TableView
-
 from .data_model import Column, DataModel
 from .navigation_frame import NavigationFrame
+from .log_line_delegate import LogLineDelegate
+from .vertical_header import VerticalHeader
 
 
-class LogMessagesTable(Widget):
-    cmViewMessage = pyqtSignal(QModelIndex)
-    cmGoToOrigin = pyqtSignal(QModelIndex)
-    cmGoBack = pyqtSignal()
+class LogMessagesTable(TableView):
+    requestShowOriginalLine = pyqtSignal()
+    requestShowFilteredLine = pyqtSignal()
+    requestShowLineDetails = pyqtSignal()
+    requestCopyLogLine = pyqtSignal()
+    requestCopyLogMessage = pyqtSignal()
 
-    rowGoToOrigin = pyqtSignal()
-
-    def __init__(self, parent: Optional[QWidget] = None):
-        super().__init__(parent)
-        self._initUserInterface()
-        self._initUserInputHandlers()
-        self._scrolling = True
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        if event.button() == Qt.XButton2:
+            self.requestShowFilteredLine.emit()
+        else:
+            super().mousePressEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
-        if helper.isCtrlEnterPressed():
-            self.rowGoToOrigin.emit()
-        elif helper.isCtrlShiftCPressed():
-            self._copySelectedLogLinesToClipboard()
+        if helper.isEnterPressed():
+            self.requestShowLineDetails.emit()
+        elif helper.isCtrlEnterPressed():
+            self.requestShowOriginalLine.emit()
+        elif helper.isEscapePressed():
+            self.requestShowFilteredLine.emit()
         elif helper.isCtrlCPressed():
-            self._copySelectedLogMessagesToClipboard()
+            self.requestCopyLogMessage.emit()
+        elif helper.isCtrlShiftCPressed():
+            self.requestCopyLogLine.emit()
         else:
             super().keyPressEvent(event)
 
+    def _initLogLineDelegate(self):
+        self._delegate = LogLineDelegate(self)
+        self.setItemDelegate(self._delegate)
+
+    def setHighlightingRules(self, hrules: HRulesStorage):
+        self._delegate.setHighlightingRules(hrules)
+
+    def __init__(self, parent: Optional[QWidget] = None):
+        super().__init__(parent)
+        self._initDataModel()
+        self._initLogLineDelegate()
+        self._initUserInterface()
+        self._initUserInputHandlers()
+        self._initCustomContextMenu()
+        self._scrolling = True
+
     def _contextMenuExec(self, position: QPoint):
-        index = self._tableView.indexAt(position)
+        index = self.indexAt(position)
         if not index.isValid():
             return
 
@@ -72,9 +102,7 @@ class LogMessagesTable(Widget):
         contextMenu.addAction(actionView)
         contextMenu.addAction(actionOrigin)
         contextMenu.addAction(actionBack)
-
-        viewport = self._tableView.viewport()
-        contextMenu.exec_(viewport.mapToGlobal(position))
+        contextMenu.exec_(self.viewport().mapToGlobal(position))
 
     def _topModel(self) -> QSortFilterProxyModel:
         return self._quickFilterModel
@@ -86,8 +114,7 @@ class LogMessagesTable(Widget):
         self._navigationFrame.upArrowButton.clicked.connect(self._navScrollTop)  # fmt: skip
         self._navigationFrame.downArrowButton.clicked.connect(self._navScrollBottom)  # fmt: skip
 
-
-    def _initUserInterface(self):
+    def _initDataModel(self):
         self._dataModel = DataModel()
         self._dataModel.rowsAboutToBeInserted.connect(self._beforeRowInserted)
         self._dataModel.rowsInserted.connect(self._afterRowInserted)
@@ -99,57 +126,67 @@ class LogMessagesTable(Widget):
         self._quickFilterModel = RegExpFilterModel()
         self._quickFilterModel.setFilteringColumn(Column.logMessage.value)
         self._quickFilterModel.setSourceModel(self._advancedFilterModel)
+        self.setModel(self._quickFilterModel)
 
-        self._tableView = TableView(self)
-        self._tableView.setContextMenuPolicy(Qt.CustomContextMenu)
-        self._tableView.customContextMenuRequested.connect(self._contextMenuExec)
-        self._tableView.setSelectionMode(QTableView.ExtendedSelection)
-        self._tableView.setModel(self._quickFilterModel)
-        self.setFocusProxy(self._tableView)
+    def _initCustomContextMenu(self):
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self._contextMenuExec)
 
-        hHeader = self._tableView.horizontalHeader()
+    def _initUserInterface(self):
+        self.setSelectionBehavior(QTableView.SelectRows)
+        self.setSelectionMode(QTableView.ExtendedSelection)
+        self.setCornerButtonEnabled(False)
+        self.setTabKeyNavigation(False)
+        self.setShowGrid(False)
+
+        font = self._delegate.font()
+        height = QFontMetrics(font).height()
+        height += 5  # vertical padding
+
+        vHeader = VerticalHeader(self)
+        vHeader.setVisible(False)
+        vHeader.setSectionResizeMode(QHeaderView.Fixed)
+        vHeader.setMinimumSectionSize(height)
+        vHeader.setDefaultSectionSize(height)
+        self.setVerticalHeader(vHeader)
+
+        hHeader = self.horizontalHeader()
         hHeader.setSectionResizeMode(Column.logMessage, QHeaderView.Stretch)
         hHeader.setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        self._tableView.setColumnWidth(Column.logLevel, 10)
-        self._tableView.setColumnWidth(Column.tagName, 200)
+        self.setColumnWidth(Column.logLevel, 10)
+        self.setColumnWidth(Column.tagName, 200)
 
         self._navigationFrame = NavigationFrame(self)
-        height = self._tableView.horizontalHeader().height()
-        self._navigationFrame.setMarginTop(height + 10)
+        self._navigationFrame.setMarginTop(hHeader.height() + 10)
         self._navigationFrame.setMarginBottom(10)
         self._navigationFrame.setMarginRight(30)
         self._navigationFrame.setFixedWidth(120)
         self._navigationFrame.updateGeometry()
         self._navigationFrame.hideChildren()
 
-        layout = QHBoxLayout()
-        layout.addWidget(self._tableView)
-        layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(layout)
-
     #####
 
     def _navScrollTop(self):
         rowCount = self._topModel().rowCount()
         if rowCount > 0:
-            self._tableView.scrollToTop()
-            self._tableView.selectRow(0)
+            self.scrollToTop()
+            self.selectRow(0)
 
     def _navScrollBottom(self):
         rowCount = self._topModel().rowCount()
         if rowCount > 0:
-            self._tableView.scrollToBottom()
-            self._tableView.selectRow(rowCount - 1)
+            self.scrollToBottom()
+            self.selectRow(rowCount - 1)
 
     #####
 
     def _beforeRowInserted(self):
-        vbar = self._tableView.verticalScrollBar()
+        vbar = self.verticalScrollBar()
         self._scrolling = vbar.value() == vbar.maximum()
 
     def _afterRowInserted(self):
         if self._scrolling:
-            self._tableView.scrollToBottom()
+            self.scrollToBottom()
 
     #####
 
@@ -157,21 +194,18 @@ class LogMessagesTable(Widget):
         self._navigationFrame.updateGeometry()
         return super().resizeEvent(e)
 
-    def setHighlightingRules(self, hrules: HRulesStorage):
-        self._tableView.setHighlightingRules(hrules)
-
     def setHighlightingEnabled(self, enabled: bool):
-        self._tableView.setHighlightingEnabled(enabled)
+        self._delegate.setHighlightingEnabled(enabled)
         self._refreshVisibleIndexes()
 
     def _refreshVisibleIndexes(self):
-        viewportRect = self._tableView.viewport().rect()
-        topLeft = self._tableView.indexAt(viewportRect.topLeft())
-        bottomRight = self._tableView.indexAt(viewportRect.bottomRight())
+        viewportRect = self.viewport().rect()
+        topLeft = self.indexAt(viewportRect.topLeft())
+        bottomRight = self.indexAt(viewportRect.bottomRight())
         self._topModel().dataChanged.emit(topLeft, bottomRight)
 
     def setWhiteBackground(self):
-        self._tableView.setStyleSheet("background: white;")
+        self.setStyleSheet("background: white;")
 
     #####
 
@@ -197,57 +231,41 @@ class LogMessagesTable(Widget):
     def quickFilterApply(self, column: Column, filterText: str):
         self._quickFilterModel.setFilterKeyColumn(column.value)
         self._quickFilterModel.setFilterFixedString(filterText)
-        self._tableView.selectRow(0)
+        self.selectRow(0)
 
     def quickFilterReset(self):
         self._quickFilterModel.setFilterKeyColumn(Column.logMessage.value)
         self._quickFilterModel.setFilterFixedString("")
-        self._tableView.selectRow(0)
+        self.selectRow(0)
 
     def quickFilterEnabled(self):
         return self._quickFilterModel.filteringEnabled()
 
     def setQuickFilterEnabled(self, enabled: bool):
-        self._tableView.reset()
+        self.reset()
         self._quickFilterModel.setFilteringEnabled(enabled)
         self._navigationFrame.updateGeometry()
 
     #####
 
     def lineNumbersVisible(self):
-        self._tableView.verticalHeader().isVisible()
+        self.verticalHeader().isVisible()
 
     def setLineNumbersVisible(self, visible: bool):
-        self._tableView.verticalHeader().setVisible(visible)
+        self.verticalHeader().setVisible(visible)
 
     #####
 
-
-    def _selectedLogLines(self) -> List[LogLine]:
+    def selectedLogLines(self) -> List[LogLine]:
         result = []
-        for row in self._tableView.selectedRows():
+        for row in self.selectedRows():
             result.append(self._bottomModel().logLine(row))
 
         return result
 
-    def _selectedLogMessages(self) -> List[str]:
+    def selectedLogMessages(self) -> List[str]:
         result = []
-        for row in self._tableView.selectedRows():
+        for row in self.selectedRows():
             result.append(self._bottomModel().logMessage(row))
 
         return result
-
-    def _copyTextToClipboard(self, text: str):
-        QGuiApplication.clipboard().setText(text)
-
-    def _copySelectedLogLinesToClipboard(self):
-        result = []
-        for logLine in self._selectedLogLines():
-            result.append(f"{logLine.level}/{logLine.tag}: {logLine.msg}")
-
-        self._copyTextToClipboard("\n".join(result))
-
-    def _copySelectedLogMessagesToClipboard(self):
-        result = self._selectedLogMessages()
-
-

@@ -30,10 +30,6 @@ from .quick_filter_bar import FilterField, QuickFilterBar
 
 
 class LogMessagesPanel(Widget):
-    cmViewMessage = pyqtSignal(QModelIndex)
-    cmGoToOrigin = pyqtSignal(QModelIndex)
-    cmGoBack = pyqtSignal()
-
     captureInterrupted = pyqtSignal(str, str)
 
     def __init__(self, appState: AppState, parent: Optional[QWidget] = None):
@@ -44,19 +40,6 @@ class LogMessagesPanel(Widget):
         self._liveReload = True
         self._logReader = None
         self._lineNumbersAlwaysVisible = False
-
-    def mousePressEvent(self, event: QMouseEvent):
-        if event.button() == Qt.XButton1:
-            self.disableQuickFilter()
-        else:
-            super().mousePressEvent(event)
-
-    def keyPressEvent(self, event: QKeyEvent):
-        helper = HotkeyHelper(event)
-        if helper.isEscapePressed():
-            self.disableQuickFilter()
-        else:
-            super().keyPressEvent(event)
 
     def _initUserInterface(self):
         layout = QVBoxLayout()
@@ -213,3 +196,19 @@ class LogMessagesPanel(Widget):
     def focusInEvent(self, event: QFocusEvent) -> None:
         self._logMessagesTable.setFocus()
         event.accept()
+
+    #####
+
+    def _copyTextToClipboard(self, text: str):
+        QGuiApplication.clipboard().setText(text)
+
+    def _copySelectedLogLinesToClipboard(self):
+        result = []
+        for logLine in self._logMessagesTable.selectedLogLines():
+            result.append(f"{logLine.level}/{logLine.tag}: {logLine.msg}")
+
+        self._copyTextToClipboard("\n".join(result))
+
+    def _copySelectedLogMessagesToClipboard(self):
+        result = self._logMessagesTable.selectedLogMessages()
+        self._copyTextToClipboard("\n".join(result))

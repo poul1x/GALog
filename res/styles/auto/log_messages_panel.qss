@@ -1,4 +1,4 @@
-#LogMessagesPanel > #LogMessagesTable QHeaderView::section:horizontal {
+#LogMessagesPanel > QTableView > QHeaderView::section:horizontal {
     background-color: #464646;
     color: #f5f5f5;
     border:none;
@@ -10,7 +10,7 @@
     min-height: 30px;
 }
 
-#LogMessagesPanel > #LogMessagesTable QTableView{
+#LogMessagesPanel > QTableView {
     background: white;
     border: none;
     background-image: url('res/images/galog.png');
