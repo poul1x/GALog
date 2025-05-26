@@ -5,7 +5,9 @@ from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from typing import Callable, List
 
 from PyQt5.QtCore import QModelIndex, QSortFilterProxyModel, Qt
-from .pattern_search_task import SearchResult
+
+from galog.app.log_reader import LogLine
+from .pattern_search_task import PatternSearchResult
 
 
 class LazyHighlightingState(int, Enum):
@@ -17,7 +19,7 @@ class LazyHighlightingState(int, Enum):
 @dataclass
 class HighlightingData:
     state: LazyHighlightingState
-    items: List[SearchResult]
+    items: List[PatternSearchResult]
 
 
 class Column(int, Enum):
@@ -32,18 +34,13 @@ class DataModel(QStandardItemModel):
         labels = ["Tag", "Level", "Message"]
         self.setHorizontalHeaderLabels(labels)
 
-    def addLogLine(
-        self,
-        tagName: str,
-        logLevel: str,
-        message: str,
-    ):
+    def addLogLine( self, logLine: LogLine):
         # flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
-        itemLogLevel = QStandardItem(logLevel)
+        itemLogLevel = QStandardItem(logLine.level)
         itemLogLevel.setData(False, Qt.UserRole)  # is row color inverted
         # itemLogLevel.setFlags(flags)
 
-        itemTagName = QStandardItem(tagName)
+        itemTagName = QStandardItem(logLine.tag)
         # itemTagName.setFlags(flags)
 
         data = HighlightingData(
@@ -51,7 +48,7 @@ class DataModel(QStandardItemModel):
             items=[],
         )
 
-        itemLogMessage = QStandardItem(message)
+        itemLogMessage = QStandardItem(logLine.msg)
         itemLogMessage.setData(data, Qt.UserRole)
         # itemLogMessage.setFlags(flags)
 
@@ -65,3 +62,14 @@ class DataModel(QStandardItemModel):
 
     def clearLogLines(self):
         self.removeRows(0, self.rowCount())
+
+    def logLine(self, row: int):
+        return LogLine(
+            level=self.item(row, Column.logLevel).text(),
+            msg=self.item(row, Column.logMessage).text(),
+            tag=self.item(row, Column.tagName).text(),
+            pid=-1,
+        )
+
+    def logMessage(self, row: int):
+        return self.item(row, Column.logMessage).text()

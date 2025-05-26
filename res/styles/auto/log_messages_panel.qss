@@ -1,4 +1,4 @@
-#LogMessagesPanel QHeaderView::section:horizontal {
+#LogMessagesPanel > #LogMessagesTable QHeaderView::section:horizontal {
     background-color: #464646;
     color: #f5f5f5;
     border:none;
@@ -10,7 +10,7 @@
     min-height: 30px;
 }
 
-#LogMessagesPanel QTableView{
+#LogMessagesPanel > #LogMessagesTable QTableView{
     background: white;
     border: none;
     background-image: url('res/images/galog.png');
@@ -18,13 +18,13 @@
     background-position: center;
 }
 
-#LogMessagesSearchPane {
+#LogMessagesPanel > #QuickFilterBar {
     min-height: 20px;
     padding: 15px;
     background: #7b7b7b;
 }
 
-#LogMessagesSearchPane QLineEdit {
+#LogMessagesPanel > #QuickFilterBar > QLineEdit {
     border: none;
     font-family: Roboto;
     font-size: 20px;
@@ -35,38 +35,32 @@
     selection-color: #ffffff;
 }
 
-#LogMessagesSearchPane QComboBox {
+
+#LogMessagesPanel > #QuickFilterBar > QComboBox  {
     border: none;
     font-family: Roboto;
     font-size: 20px;
     padding: 2px;
 }
 
-#LogMessagesSearchPane QComboBox::drop-down {
+#LogMessagesPanel > #QuickFilterBar > QComboBox::drop-down {
 	background-color: white;
 	border: none;
 	padding-left: 0px;
 	padding-right: 5px;
 }
 
-#LogMessagesSearchPane QComboBox::down-arrow {
+#LogMessagesPanel > #QuickFilterBar > QComboBox::down-arrow {
     image: url(res/icons/dropdown.svg);
 }
 
-#LogMessagesSearchPane > QComboBox QListView {
+#LogMessagesPanel > #QuickFilterBar > QComboBox QListView {
     selection-background-color: #464646;
     selection-color: white;
 	border: none;
 }
 
-/* Not working */
-/* #LogMessagesSearchPane > QComboBox QListView::item {
-    padding-top: 2px;
-    padding-bottom: 2px;
-} */
-
-
-#LogMessagesSearchPane QPushButton {
+#LogMessagesPanel > #QuickFilterBar > QPushButton {
     border: none;
     font-family: Roboto;
     font-size: 20px;
@@ -80,7 +74,7 @@
     background: #c8dcff;
 }
 
-#LogMessagesSearchPane QPushButton:hover {
+#LogMessagesPanel > #QuickFilterBar > QPushButton:hover {
     color: #ffffff;
     background: #739fff;
 }

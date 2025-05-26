@@ -29,7 +29,7 @@ from galog.app.ui.core.log_messages_panel.log_messages_table.colors import (
 from galog.app.ui.helpers.painter import painterSaveRestore
 
 from .data_model import Column, HighlightingData, LazyHighlightingState
-from .pattern_search_task import PatternSearchTask, SearchItem, SearchResult
+from .pattern_search_task import PatternSearchTask, PatternSearchItem, PatternSearchResult
 from .row_blinking_animation import RowBlinkingAnimation
 
 
@@ -186,7 +186,7 @@ class LogLineDelegate(QStyledItemDelegate):
         else:
             return doc.characterCount() - 1
 
-    def _highlightKeywords(self, doc: QTextDocument, items: List[SearchResult]):
+    def _highlightKeywords(self, doc: QTextDocument, items: List[PatternSearchResult]):
         textLength = self._textLength(doc)
         for item in items:
             if item.begin >= textLength:
@@ -223,7 +223,7 @@ class LogLineDelegate(QStyledItemDelegate):
         cursor.setCharFormat(charFormat)
 
     def _lazyHighlightingDataReady(
-        self, index: QModelIndex, results: List[SearchResult]
+        self, index: QModelIndex, results: List[PatternSearchResult]
     ):
         data = HighlightingData(
             state=LazyHighlightingState.done,
@@ -246,7 +246,7 @@ class LogLineDelegate(QStyledItemDelegate):
             if rule.groups:
                 groups.update(rule.groups.keys())
 
-            item = SearchItem(name, rule.pattern, rule.priority, groups)
+            item = PatternSearchItem(name, rule.pattern, rule.priority, groups)
             items.append(item)
 
         task = PatternSearchTask(index.data(), items)

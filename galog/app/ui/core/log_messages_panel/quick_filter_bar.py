@@ -1,6 +1,6 @@
 from typing import Optional
 from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QSortFilterProxyModel, Qt, pyqtSignal
-from PyQt5.QtGui import QStandardItem, QStandardItemModel
+from PyQt5.QtGui import QStandardItem, QStandardItemModel, QFocusEvent
 from PyQt5.QtWidgets import QListView, QVBoxLayout, QWidget, QComboBox, QPushButton, QHBoxLayout
 
 from galog.app.ui.base.widget import BaseWidget
@@ -26,45 +26,46 @@ class QuickFilterBar(BaseWidget):
         self._initFocusPolicy()
         self._initUserInputHandlers()
         self.reset()
+        self.hide()
 
     def _initFocusPolicy(self):
-        self.startSearchButton.setFocusPolicy(Qt.NoFocus)
-        self.searchByDropdown.setFocusPolicy(Qt.NoFocus)
-        self.searchInput.setFocusPolicy(Qt.StrongFocus)
+        self._startSearchButton.setFocusPolicy(Qt.NoFocus)
+        self._searchByDropdown.setFocusPolicy(Qt.NoFocus)
+        self._searchInput.setFocusPolicy(Qt.StrongFocus)
 
     def _initUserInputHandlers(self):
-        # self.startSearchButton.clicked.connect()
-        self.searchInput.arrowUpPressed.connect(lambda: self.arrowUpPressed.emit())
-        self.searchInput.arrowDownPressed.connect(lambda: self.arrowDownPressed.emit())
+        self._searchInput.arrowUpPressed.connect(lambda: self.arrowUpPressed.emit())
+        self._searchInput.arrowDownPressed.connect(lambda: self.arrowDownPressed.emit())
+        self._searchInput.returnPressed.connect(self._startSearch)
+        self._startSearchButton.clicked.connect(self._startSearch)
 
     def _initUserInterface(self):
-        self.searchInput = SearchInput(self)
-        self.searchInput.setPlaceholderText("Search message")
-        self.setFocusProxy(self.searchInput)
+        self._searchInput = SearchInput(self)
+        self._searchInput.setPlaceholderText("Search message")
+        self.setFocusProxy(self._searchInput)
 
-        self.searchByDropdown = QComboBox(self)
-        self.searchByDropdown.addItem("Message")
-        self.searchByDropdown.addItem("Tag")
-        self.searchByDropdown.addItem("Log Level")
+        self._searchByDropdown = QComboBox(self)
+        self._searchByDropdown.addItem("Message")
+        self._searchByDropdown.addItem("Tag")
+        self._searchByDropdown.addItem("Log Level")
 
-        self.startSearchButton = QPushButton(self)
-        self.startSearchButton.setText("Search")
+        self._startSearchButton = QPushButton(self)
+        self._startSearchButton.setText("Search")
 
         layout = QHBoxLayout()
         layout.setAlignment(Qt.AlignVCenter)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        layout.addWidget(self.searchInput, 1)
-        layout.addWidget(self.searchByDropdown)
-        layout.addWidget(self.startSearchButton)
+        layout.addWidget(self._searchInput, 1)
+        layout.addWidget(self._searchByDropdown)
+        layout.addWidget(self._startSearchButton)
         self.setLayout(layout)
 
     def _startSearch(self):
-        filterField = FilterField(self.searchByDropdown.currentIndex())
-        self.startSearch.emit(filterField, self.searchInput.text())
+        filterField = FilterField(self._searchByDropdown.currentIndex())
+        self.startSearch.emit(filterField, self._searchInput.text())
 
     def reset(self):
-        self.searchByDropdown.setCurrentIndex(FilterField.Message.value)
-        self.searchInput.clear()
-
+        self._searchByDropdown.setCurrentIndex(FilterField.Message.value)
+        self._searchInput.clear()

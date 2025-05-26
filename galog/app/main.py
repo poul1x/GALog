@@ -211,11 +211,11 @@ class MainWindow(QMainWindow):
 
         config = self.appState.tagFilteringConfig
         if config.mode == TagFilteringMode.ShowMatching:
-            self.logMessagesPanel.setTagFilteringFn(lambda tag: tag in config.tags)
+            self.logMessagesPanel.advancedFilterApply(lambda tag: tag in config.tags)
         elif config.mode == TagFilteringMode.HideMatching:
-            self.logMessagesPanel.setTagFilteringFn(lambda tag: tag not in config.tags)
+            self.logMessagesPanel.advancedFilterApply(lambda tag: tag not in config.tags)
         else:  # config.mode == TagFilteringMode.Disabled:
-            self.logMessagesPanel.unsetTagFilteringFn()
+            self.logMessagesPanel.advancedFilterReset()
 
     def showDevices(self):
         deviceSelectPane = DeviceSelectDialog(self.appState, self)
@@ -257,8 +257,9 @@ class MainWindow(QMainWindow):
                 return
 
         self.logMessagesPanel.setWhiteBackground()
-        # self.logMessagesPanel.disableMessageFilter()
+        self.logMessagesPanel.disableQuickFilter()
         self.logMessagesPanel.clearLogLines()
+
         self.setCaptureSpecificActionsEnabled(True)
         self.logMessagesPanel.startCapture(device, package)
 
@@ -269,7 +270,7 @@ class MainWindow(QMainWindow):
             parent=self,
         ):
             self.logMessagesPanel.setWhiteBackground()
-            self.logMessagesPanel.disableMessageFilter()
+            self.logMessagesPanel.disableQuickFilter()
             self.logMessagesPanel.clearLogLines()
 
     def saveLogFile(self):
@@ -290,7 +291,7 @@ class MainWindow(QMainWindow):
             return
 
         self.logMessagesPanel.setWhiteBackground()
-        self.logMessagesPanel.disableMessageFilter()
+        self.logMessagesPanel.disableQuickFilter()
         self.logMessagesPanel.clearLogLines()
         self.logMessagesPanel.addLogLines(lines)
 
@@ -340,8 +341,8 @@ class MainWindow(QMainWindow):
         self.logMessagesPanel.stopCapture()
         self.setCaptureSpecificActionsEnabled(False)
 
-    def enableMessageFilter(self):
-        self.logMessagesPanel.enableMessageFilter()
+    def enableQuickFilter(self):
+        self.logMessagesPanel.enableQuickFilter()
 
     def toggleLiveReload(self, checkBox: QCheckBox):
         self.logMessagesPanel.setLiveReloadEnabled(checkBox.isChecked())
@@ -350,7 +351,7 @@ class MainWindow(QMainWindow):
         self.logMessagesPanel.setHighlightingEnabled(checkBox.isChecked())
 
     def toggleShowLineNumbers(self, checkBox: QCheckBox):
-        self.logMessagesPanel.setShowLineNumbers(checkBox.isChecked())
+        self.logMessagesPanel.setLineNumbersAlwaysVisible(checkBox.isChecked())
 
     # def handleInstallApkAction(self):
     #     device = self.capturePaneController.selectedDevice()
@@ -405,7 +406,7 @@ class MainWindow(QMainWindow):
         action = QAction("&Find", self)
         action.setShortcut("Ctrl+F")
         action.setStatusTip("Show message filter (hide with ESC)")
-        action.triggered.connect(lambda: self.enableMessageFilter())
+        action.triggered.connect(lambda: self.enableQuickFilter())
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -588,8 +589,8 @@ class MainWindow(QMainWindow):
         self.logMessagesPanel.captureInterrupted.connect(self.captureInterrupted)
 
         self.setCentralWidget(self.logMessagesPanel)
-        self.setWindowTitle("galog")
-        self.setWindowIcon(QIcon(iconFile("galog")))
+        self.setWindowTitle("GALog")
+        self.setWindowIcon(QIcon(iconFile("GALog")))
 
         self.setupMenuBar()
         self.statusBar().show()

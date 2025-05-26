@@ -6,7 +6,7 @@ from PyQt5.QtCore import QObject, QRunnable, pyqtSignal
 
 
 @dataclass
-class SearchItem:
+class PatternSearchItem:
     name: str
     pattern: Pattern
     priority: int
@@ -14,7 +14,7 @@ class SearchItem:
 
 
 @dataclass
-class SearchResult:
+class PatternSearchResult:
     name: str
     priority: int
     groupNum: int
@@ -27,7 +27,7 @@ class SearchItemTaskSignals(QObject):
 
 
 class PatternSearchTask(QRunnable):
-    def __init__(self, text: str, searchItems: List[SearchItem]):
+    def __init__(self, text: str, searchItems: List[PatternSearchItem]):
         super().__init__()
         self.signals = SearchItemTaskSignals()
         self.searchItems = searchItems
@@ -39,12 +39,12 @@ class PatternSearchTask(QRunnable):
             for found in self._search(item):
                 result.append(found)
 
-        def key(item: SearchResult):
+        def key(item: PatternSearchResult):
             return item.priority
 
         self.signals.finished.emit(sorted(result, key=key))
 
-    def _search(self, item: SearchItem):
+    def _search(self, item: PatternSearchItem):
         #
         # We need to find all matches (if needed), including group matches (if needed),
         # and convert them to SearchResult structures, giving lower priority
@@ -63,7 +63,7 @@ class PatternSearchTask(QRunnable):
                 if start == -1 or end == -1:
                     continue
 
-                yield SearchResult(
+                yield PatternSearchResult(
                     item.name,
                     item.priority + groupNum,
                     groupNum,

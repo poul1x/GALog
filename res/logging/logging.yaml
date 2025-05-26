@@ -91,3 +91,6 @@ loggers:
   #   handlers: [hnd_highlighting_delegate]
   #   level: DEBUG
   #   propagate: False
+  item_view_proxy:
+    level: ERROR
+    propagate: False

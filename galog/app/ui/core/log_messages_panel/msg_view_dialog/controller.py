@@ -14,7 +14,7 @@ from PyQt5.QtGui import (
 from ..data_model import Column
 from ..delegate import HighlightingData
 from .msg_view_dialog import LogMessageViewDialog
-from ..log_messages_table.pattern_search_task import SearchResult
+from ..log_messages_table.pattern_search_task import PatternSearchResult
 from galog.app.hrules import HRulesStorage
 from galog.app.ui.core.log_messages_panel.log_messages_table.colors import logLevelColor, logLevelColorDarker
 from galog.app.paths import styleSheetFile
@@ -81,7 +81,7 @@ class LogMessageViewPaneController:
         cursor.setPosition(end, QTextCursor.KeepAnchor)
         return cursor
 
-    def highlightKeyword(self, keyword: SearchResult, charFormat: QTextCharFormat):
+    def highlightKeyword(self, keyword: PatternSearchResult, charFormat: QTextCharFormat):
         if keyword.name == "GenericUrl":
             charFormat.setAnchor(True)
             text = self._pane.logMsgTextBrowser.document().toPlainText()
@@ -131,7 +131,7 @@ class LogMessageViewPaneController:
         styleSheet = styleSheet.replace("$color_darker$", colorDarker)
         self._pane.setStyleSheet(styleSheet)
 
-    def applyHighlighting(self, items: List[SearchResult]):
+    def applyHighlighting(self, items: List[PatternSearchResult]):
         for item in items:
             rule = self._hRules.findRule(item.name)
             groupNum = item.groupNum

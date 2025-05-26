@@ -26,7 +26,7 @@ from galog.app.log_reader import (
     ProcessEndedEvent,
     ProcessStartedEvent,
 )
-from .log_messages_table.pattern_search_task import SearchItem, PatternSearchTask, SearchResult
+from .log_messages_table.pattern_search_task import PatternSearchItem, PatternSearchTask, PatternSearchResult
 
 if TYPE_CHECKING:
     from galog.app.main import MainWindow

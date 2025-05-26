@@ -5,10 +5,10 @@ from typing import Optional
 
 @dataclass
 class LogLine:
-    level: str
     tag: str
-    pid: str
+    level: str
     msg: str
+    pid: str
 
 
 @dataclass

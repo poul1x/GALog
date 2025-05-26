@@ -1,7 +1,7 @@
-from typing import List, Optional
+from typing import Callable, List, Optional
 
 from PyQt5.QtCore import QModelIndex, QPoint, Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtGui import QFocusEvent, QKeyEvent, QMouseEvent, QGuiApplication
 from PyQt5.QtWidgets import (
     QAction,
     QComboBox,
@@ -30,9 +30,6 @@ from .quick_filter_bar import QuickFilterBar
 
 
 class LogMessagesPanel(BaseWidget):
-    toggleMessageFilter = pyqtSignal()
-    copyMsgRowsToClipboard = pyqtSignal()
-    copyFullRowsToClipboard = pyqtSignal()
     cmViewMessage = pyqtSignal(QModelIndex)
     cmGoToOrigin = pyqtSignal(QModelIndex)
     cmGoBack = pyqtSignal()
@@ -46,26 +43,25 @@ class LogMessagesPanel(BaseWidget):
         self._appState = appState
         self._liveReload = True
         self._logReader = None
+        self._lineNumbersAlwaysVisible = False
+
+    def mousePressEvent(self, event: QMouseEvent):
+        if event.button() == Qt.XButton1:
+            self.disableQuickFilter()
+        else:
+            super().mousePressEvent(event)
+
 
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
         if helper.isEscapePressed():
-            self.toggleMessageFilter.emit()
+            self.disableQuickFilter()
         elif helper.isCtrlShiftCPressed():
-            self.copyFullRowsToClipboard.emit()
+            self._copySelectedLogLinesToClipboard()
         elif helper.isCtrlCPressed():
-            self.copyMsgRowsToClipboard.emit()
+            self._copySelectedLogMessagesToClipboard()
         else:
             super().keyPressEvent(event)
-
-    def _initFocusPolicy(self):
-        # self.searchPane.button.setFocusPolicy(Qt.NoFocus)
-        # self.searchPane.searchByDropdown.setFocusPolicy(Qt.NoFocus)
-        # self.searchPane.input.setFocusPolicy(Qt.StrongFocus)
-        # self.searchPane.setFocusPolicy(Qt.StrongFocus)
-
-        self.setTabOrder(self._logMessagesTable, self._quickFilterBar.searchInput)
-        self.setTabOrder(self._quickFilterBar.searchInput, self._logMessagesTable._tableView)
 
     def _initUserInterface(self):
         layout = QVBoxLayout()
@@ -76,6 +72,9 @@ class LogMessagesPanel(BaseWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         self.setLayout(layout)
+
+    def _d(self):
+        self.disableQuickFilter()
 
     def setHighlightingRules(self, hrules: HRulesStorage):
         self._logMessagesTable.setHighlightingRules(hrules)
@@ -121,18 +120,15 @@ class LogMessagesPanel(BaseWidget):
         self._liveReload = enabled
 
     def _lineRead(self, line: LogLine):
-        self._addLogLine(line.tag, line.level, line.msg)
-
-    def _addLogLine(self, tagName: str, logLevel: str, message: str):
-        self._logMessagesTable.addLogLine(tagName, logLevel, message)
+        self._logMessagesTable.addLogLine(line)
 
     def _addOwnLogLine(self, message: str):
-        self._addLogLine("GALog", "S", message)
+        logLine = LogLine("GALog","S", message, -1)
+        self._logMessagesTable.addLogLine(logLine)
 
     def _appStarted(self, packageName: str):
         if self._liveReload:
             self.clearLogLines()
-            # self.disableMessageFilter()
 
         msg = f"App '{packageName}' started"
         self._addOwnLogLine(msg)
@@ -162,3 +158,74 @@ class LogMessagesPanel(BaseWidget):
 
     def setHighlightingEnabled(self, enabled: bool):
         self._logMessagesTable.setHighlightingEnabled(enabled)
+
+    ###################
+
+    def quickFilterApply(self, filterField: str, filterText: str):
+        self._logMessagesTable.quickFilterApply(filterField, filterText)
+
+    def quickFilterReset(self):
+        self._logMessagesTable.quickFilterReset()
+        self._quickFilterBar.reset()
+
+    def advancedFilterApply(self, fn: Callable[[str], bool]):
+        self._logMessagesTable.advancedFilterApply(fn)
+
+    def advancedFilterReset(self):
+        self._logMessagesTable.advancedFilterReset()
+
+    #####
+
+    def setLineNumbersAlwaysVisible(self, visible: bool):
+        self._lineNumbersAlwaysVisible = visible
+        self._logMessagesTable.setLineNumbersVisible(visible)
+
+    def enableQuickFilter(self):
+        self._logMessagesTable.setLineNumbersVisible(True)
+        self._logMessagesTable.setQuickFilterEnabled(True)
+        self._quickFilterBar.show()
+        self._quickFilterBar.setFocus()
+
+
+    def disableQuickFilter(self):
+        if not self._lineNumbersAlwaysVisible:
+            self._logMessagesTable.setLineNumbersVisible(False)
+
+        self._logMessagesTable.setQuickFilterEnabled(False)
+        self._logMessagesTable.setFocus()
+        self._quickFilterBar.hide()
+        self.layout().activate()
+
+    def quickFilterEnabled(self):
+        return self._logMessagesTable.quickFilterEnabled()
+
+    #####
+
+    def _initFocusPolicy(self):
+        self._quickFilterBar.setFocusPolicy(Qt.StrongFocus)
+        self._logMessagesTable.setFocusPolicy(Qt.StrongFocus)
+
+        self.setTabOrder(self._quickFilterBar, self._logMessagesTable)
+        self.setTabOrder(self._logMessagesTable, self._quickFilterBar)
+        self._logMessagesTable.setFocus()
+
+
+    def focusInEvent(self, event: QFocusEvent) -> None:
+        self._logMessagesTable.setFocus()
+        event.accept()
+
+    #####
+
+    def _copyTextToClipboard(self, text: str):
+        QGuiApplication.clipboard().setText(text)
+
+    def _copySelectedLogLinesToClipboard(self):
+        result = []
+        for logLine in self._logMessagesTable.selectedLogLines():
+            result.append(f"{logLine.level}/{logLine.tag}: {logLine.msg}")
+
+        self._copyTextToClipboard("\n".join(result))
+
+    def _copySelectedLogMessagesToClipboard(self):
+        result = self._logMessagesTable.selectedLogMessages()
+        self._copyTextToClipboard("\n".join(result))

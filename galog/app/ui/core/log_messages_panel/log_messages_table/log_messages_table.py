@@ -1,11 +1,12 @@
-from typing import Optional
+from typing import Callable, List, Optional
 
 from galog.app.hrules.hrules import HRulesStorage
+from galog.app.log_reader.models import LogLine
 
 from .navigation_frame import NavigationFrame
 
-from PyQt5.QtCore import QModelIndex, QPoint, Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent, QResizeEvent
+from PyQt5.QtCore import QModelIndex, QPoint, Qt, pyqtSignal, QSortFilterProxyModel
+from PyQt5.QtGui import QKeyEvent, QResizeEvent, QStandardItemModel, QFocusEvent
 from PyQt5.QtWidgets import (
     QAction,
     QComboBox,
@@ -15,6 +16,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
     QHeaderView,
+    QTableView
 )
 
 from galog.app.ui.reusable import SearchInput
@@ -76,33 +78,36 @@ class LogMessagesTable(BaseWidget):
         viewport = self._tableView.viewport()
         contextMenu.exec_(viewport.mapToGlobal(position))
 
-    def topModel(self):
-        return self._regExpFilterModel
+    def _topModel(self) -> QSortFilterProxyModel:
+        return self._quickFilterModel
 
-    def bottomModel(self):
+    def _bottomModel(self) -> DataModel:
         return self._dataModel
 
     def _initUserInputHandlers(self):
         self._navigationFrame.upArrowButton.clicked.connect(self._navScrollTop)  # fmt: skip
         self._navigationFrame.downArrowButton.clicked.connect(self._navScrollBottom)  # fmt: skip
 
+
     def _initUserInterface(self):
         self._dataModel = DataModel()
         self._dataModel.rowsAboutToBeInserted.connect(self._beforeRowInserted)
         self._dataModel.rowsInserted.connect(self._afterRowInserted)
 
-        self._fnFilterModel = FnFilterModel()
-        self._fnFilterModel.setFilteringColumn(Column.tagName.value)
-        self._fnFilterModel.setSourceModel(self._dataModel)
+        self._advancedFilterModel = FnFilterModel()
+        self._advancedFilterModel.setFilteringColumn(Column.tagName.value)
+        self._advancedFilterModel.setSourceModel(self._dataModel)
 
-        self._regExpFilterModel = RegExpFilterModel()
-        self._regExpFilterModel.setFilteringColumn(Column.logMessage.value)
-        self._regExpFilterModel.setSourceModel(self._fnFilterModel)
+        self._quickFilterModel = RegExpFilterModel()
+        self._quickFilterModel.setFilteringColumn(Column.logMessage.value)
+        self._quickFilterModel.setSourceModel(self._advancedFilterModel)
 
         self._tableView = TableView(self)
         self._tableView.setContextMenuPolicy(Qt.CustomContextMenu)
         self._tableView.customContextMenuRequested.connect(self._contextMenuExec)
-        self._tableView.setModel(self._regExpFilterModel)
+        self._tableView.setSelectionMode(QTableView.ExtendedSelection)
+        self._tableView.setModel(self._quickFilterModel)
+        self.setFocusProxy(self._tableView)
 
         hHeader = self._tableView.horizontalHeader()
         hHeader.setSectionResizeMode(Column.logMessage, QHeaderView.Stretch)
@@ -121,22 +126,24 @@ class LogMessagesTable(BaseWidget):
 
         layout = QHBoxLayout()
         layout.addWidget(self._tableView)
-        layout.setContentsMargins(0,0,0,0)
+        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
-
+    #####
 
     def _navScrollTop(self):
-        rowCount = self.topModel().rowCount()
+        rowCount = self._topModel().rowCount()
         if rowCount > 0:
             self._tableView.scrollToTop()
             self._tableView.selectRow(0)
 
     def _navScrollBottom(self):
-        rowCount = self.topModel().rowCount()
+        rowCount = self._topModel().rowCount()
         if rowCount > 0:
             self._tableView.scrollToBottom()
             self._tableView.selectRow(rowCount - 1)
+
+    #####
 
     def _beforeRowInserted(self):
         vbar = self._tableView.verticalScrollBar()
@@ -145,6 +152,8 @@ class LogMessagesTable(BaseWidget):
     def _afterRowInserted(self):
         if self._scrolling:
             self._tableView.scrollToBottom()
+
+    #####
 
     def resizeEvent(self, e: QResizeEvent):
         self._navigationFrame.updateGeometry()
@@ -157,18 +166,77 @@ class LogMessagesTable(BaseWidget):
         self._tableView.setHighlightingEnabled(enabled)
         self._refreshVisibleIndexes()
 
-    def addLogLine(self, tagName: str, logLevel: str, message: str):
-        self._dataModel.addLogLine(tagName, logLevel, message)
-
-    def clearLogLines(self):
-        self._dataModel.clearLogLines()
-
-    def setWhiteBackground(self):
-        self._tableView.setStyleSheet("background: white;")
-
     def _refreshVisibleIndexes(self):
         viewportRect = self._tableView.viewport().rect()
         topLeft = self._tableView.indexAt(viewportRect.topLeft())
         bottomRight = self._tableView.indexAt(viewportRect.bottomRight())
-        self.topModel().dataChanged.emit(topLeft, bottomRight)
+        self._topModel().dataChanged.emit(topLeft, bottomRight)
+
+    def setWhiteBackground(self):
+        self._tableView.setStyleSheet("background: white;")
+
+    #####
+
+    def addLogLine(self, logLine: LogLine):
+        self._dataModel.addLogLine(logLine)
+
+    def clearLogLines(self):
+        self._dataModel.clearLogLines()
+
+    #####
+
+    def advancedFilterApply(self, fn: Callable[[str], bool]):
+        self._advancedFilterModel.setFilteringFn(fn)
+
+    def advancedFilterReset(self):
+        self._advancedFilterModel.setFilteringEnabled(False)
+
+    def advancedFilterEnabled(self):
+        self._advancedFilterModel.filteringEnabled()
+
+    #####
+
+    def quickFilterApply(self, column: Column, filterText: str):
+        self._quickFilterModel.setFilterKeyColumn(column.value)
+        self._quickFilterModel.setFilterFixedString(filterText)
+        self._tableView.selectRow(0)
+
+    def quickFilterReset(self):
+        self._quickFilterModel.setFilterKeyColumn(Column.logMessage.value)
+        self._quickFilterModel.setFilterFixedString("")
+        self._tableView.selectRow(0)
+
+    def quickFilterEnabled(self):
+        return self._quickFilterModel.filteringEnabled()
+
+    def setQuickFilterEnabled(self, enabled: bool):
+        self._tableView.reset()
+        self._quickFilterModel.setFilteringEnabled(enabled)
+        self._navigationFrame.updateGeometry()
+
+    #####
+
+    def lineNumbersVisible(self):
+        self._tableView.verticalHeader().isVisible()
+
+    def setLineNumbersVisible(self, visible: bool):
+        self._tableView.verticalHeader().setVisible(visible)
+
+    #####
+
+
+    def selectedLogLines(self) -> List[LogLine]:
+        result = []
+        for row in sorted(self._tableView.selectedRows()):
+            result.append(self._bottomModel().logLine(row))
+
+        return result
+
+    def selectedLogMessages(self) -> List[str]:
+        result = []
+        for row in sorted(self._tableView.selectedRows()):
+            result.append(self._bottomModel().logMessage(row))
+
+        return result
+
 
