@@ -113,7 +113,9 @@ class LogLineDelegate(QStyledItemDelegate):
 
         inverted = False
         if self._rowBlinkingAnimation is not None:
-            inverted = self._rowBlinkingAnimation.colorInverted()
+            animatedRow = self._rowBlinkingAnimation.row()
+            if index.row() == animatedRow:
+                inverted = self._rowBlinkingAnimation.colorInverted()
 
         if inverted:
             if option.state & QStyle.State_Selected:
@@ -158,13 +160,6 @@ class LogLineDelegate(QStyledItemDelegate):
         doc.drawContents(painter, QRectF(0, 0, textRect.width(), textRect.height()))
 
     def paint(self, p: QPainter, option: QStyleOptionViewItem, index: QModelIndex):
-        assert self._font is not None
-        assert self._highlightingRules is not None
-
-        model = index.model()
-        if isinstance(model, QSortFilterProxyModel):
-            index = model.mapToSource(index)
-
         with painterSaveRestore(p) as painter:
             self._drawCellContent(painter, option, index)
 
@@ -255,9 +250,9 @@ class LogLineDelegate(QStyledItemDelegate):
         QThreadPool.globalInstance().start(task)
 
     def startRowBlinking(self, row: int, model: QStandardItemModel):
-        self._rowBlinkingAnimation = RowBlinkingAnimation(model)
+        self._rowBlinkingAnimation = RowBlinkingAnimation(row, model)
         self._rowBlinkingAnimation.finished.connect(self._deleteAnimation)
-        self._rowBlinkingAnimation.startBlinking(row)
+        self._rowBlinkingAnimation.startBlinking()
 
     def _deleteAnimation(self):
         self._rowBlinkingAnimation = None

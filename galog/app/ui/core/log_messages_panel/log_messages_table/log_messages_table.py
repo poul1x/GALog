@@ -46,27 +46,27 @@ class LogMessagesTable(TableView):
     requestShowOriginalLine = pyqtSignal()
     requestShowFilteredLine = pyqtSignal()
     requestShowLineDetails = pyqtSignal()
-    requestCopyLogLine = pyqtSignal()
-    requestCopyLogMessage = pyqtSignal()
+    requestCopyLogLines = pyqtSignal()
+    requestCopyLogMessages = pyqtSignal()
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
-        if event.button() == Qt.XButton2:
+        if event.button() == Qt.XButton1:
             self.requestShowFilteredLine.emit()
         else:
             super().mousePressEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
-        if helper.isEnterPressed():
-            self.requestShowLineDetails.emit()
-        elif helper.isCtrlEnterPressed():
+        if helper.isCtrlEnterPressed():
             self.requestShowOriginalLine.emit()
+        elif helper.isEnterPressed():
+            self.requestShowLineDetails.emit()
         elif helper.isEscapePressed():
             self.requestShowFilteredLine.emit()
-        elif helper.isCtrlCPressed():
-            self.requestCopyLogMessage.emit()
         elif helper.isCtrlShiftCPressed():
-            self.requestCopyLogLine.emit()
+            self.requestCopyLogLines.emit()
+        elif helper.isCtrlCPressed():
+            self.requestCopyLogMessages.emit()
         else:
             super().keyPressEvent(event)
 
@@ -107,7 +107,7 @@ class LogMessagesTable(TableView):
     def _topModel(self) -> QSortFilterProxyModel:
         return self._quickFilterModel
 
-    def _bottomModel(self) -> DataModel:
+    def _bottomModel(self) -> QStandardItemModel:
         return self._dataModel
 
     def _initUserInputHandlers(self):
@@ -215,6 +215,10 @@ class LogMessagesTable(TableView):
     def clearLogLines(self):
         self._dataModel.clearLogLines()
 
+    def addLogLines(self, logLines: LogLine):
+        for logLine in logLines:
+            self.addLogLine(logLine)
+
     #####
 
     def advancedFilterApply(self, fn: Callable[[str], bool]):
@@ -256,16 +260,34 @@ class LogMessagesTable(TableView):
 
     #####
 
+
+    def _dataModelRow(self, row: int):
+        index2 = self._quickFilterModel.index(row, 0)
+        index1 = self._quickFilterModel.mapToSource(index2)
+        index0 = self._advancedFilterModel.mapToSource(index1)
+        return index0.row()
+
     def selectedLogLines(self) -> List[LogLine]:
         result = []
         for row in self.selectedRows():
-            result.append(self._bottomModel().logLine(row))
+            realRow = self._dataModelRow(row)
+            result.append(self._dataModel.logLine(realRow))
 
         return result
 
     def selectedLogMessages(self) -> List[str]:
         result = []
         for row in self.selectedRows():
-            result.append(self._bottomModel().logMessage(row))
+            realRow = self._dataModelRow(row)
+            result.append(self._dataModel.logMessage(realRow))
 
         return result
+
+    #####
+
+    def resolveOriginalRow(self, filterRow: int):
+        index = self._topModel().index(filterRow, 0)
+        return self._topModel().mapToSource(index).row()
+
+    def startRowBlinking(self, row: int):
+        self._delegate.startRowBlinking(row, self._topModel())

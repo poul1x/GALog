@@ -143,53 +143,6 @@ class LogMessagesPanelController:
         else:
             self._hideLineNumbers()
 
-    def _blinkRow(self):
-        model = self._pane.tableView.model()
-        for _ in range(10):
-            for column in Column:
-                index = model.index(0, column)
-                color1 = model.data(index, Qt.TextColorRole)
-                color2 = model.data(index, Qt.BackgroundRole)
-                model.setData(index, color1, Qt.BackgroundRole)
-                model.setData(index, color2, Qt.TextColorRole)
-            QThread.msleep(500)
-
-    def _jumpBack(self):
-        self.enableMessageFilter(reset=False)
-        index = self._pane.regExpFilterModel.index(self._jumpBackRow, 0)
-        self._jumpBackRow = None
-        self._pane.tableView.selectRow(index.row())
-        flags = QTableView.PositionAtCenter | QTableView.PositionAtTop
-        self._pane.tableView.scrollTo(index, flags)
-        self._pane.tableView.setFocus()
-        self._rowBlinkingController.startBlinking(index.row())
-
-    def _goBack(self):
-        filterModel = self._pane.regExpFilterModel
-        if filterModel.filteringEnabled():
-            return
-
-        if self._jumpBackRow is not None:
-            self._jumpBack()
-
-    def _goToOrigin(self, index: QModelIndex):
-        filterModel = self._pane.regExpFilterModel
-        if filterModel.filteringEnabled():
-            self._jumpToRow(index)
-
-    def _rowGoToOrigin(self):
-        self._goToOrigin(self._pane.tableView.currentIndex())
-
-    def _jumpToRow(self, index: QModelIndex):
-        self._jumpBackRow = index.row()
-        sourceIndex = self._pane.regExpFilterModel.mapToSource(index)
-        self.disableMessageFilter()
-        index = self._pane.regExpFilterModel.index(sourceIndex.row(), 0)
-        self._pane.tableView.selectRow(index.row())
-        flags = QTableView.PositionAtCenter | QTableView.PositionAtTop
-        self._pane.tableView.scrollTo(index, flags)
-        self._rowBlinkingController.startBlinking(index.row())
-
     def _showContentFor(self, index: QModelIndex):
         viewPane = LogMessageViewPanel(self._pane)
         self._viewPaneController.takeControl(viewPane)

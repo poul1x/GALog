@@ -101,7 +101,7 @@ class ItemViewProxy:
             return index.row()
 
         selectionModel = self._itemView.selectionModel()
-        selectedRows = sorted(selectionModel.selectedRows(), key=key, reverse=True)
+        selectedRows = sorted(selectionModel.selectedRows(), key=key)
         return [index.row() for index in selectedRows]
 
     def hasItems(self):

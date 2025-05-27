@@ -34,23 +34,25 @@ class DataModel(QStandardItemModel):
         labels = ["Tag", "Level", "Message"]
         self.setHorizontalHeaderLabels(labels)
 
-    def addLogLine( self, logLine: LogLine):
-        # flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
-        itemLogLevel = QStandardItem(logLine.level)
-        itemLogLevel.setData(False, Qt.UserRole)  # is row color inverted
-        # itemLogLevel.setFlags(flags)
+    def flags(self, index: QModelIndex):
+        default_flags = super().flags(index)
+        return default_flags & ~Qt.ItemIsEditable
 
+    def addLogLine( self, logLine: LogLine):
         itemTagName = QStandardItem(logLine.tag)
-        # itemTagName.setFlags(flags)
+        itemLogLevel = QStandardItem(logLine.level)
+        itemLogMessage = QStandardItem(logLine.msg)
+
+        # Use this to set inverted row color status
+        itemLogLevel.setData(False, Qt.UserRole)
 
         data = HighlightingData(
             state=LazyHighlightingState.pending,
             items=[],
         )
 
-        itemLogMessage = QStandardItem(logLine.msg)
+        # Use this to store data for highlighting
         itemLogMessage.setData(data, Qt.UserRole)
-        # itemLogMessage.setFlags(flags)
 
         self.appendRow(
             [

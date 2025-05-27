@@ -18,6 +18,7 @@ from galog.app.log_reader import AndroidAppLogReader, LogLine
 from galog.app.log_reader import ProcessEndedEvent, ProcessStartedEvent
 from galog.app.msgbox import msgBoxErr
 from galog.app.ui.actions.get_app_pids import GetAppPidsAction
+from galog.app.ui.base.item_view_proxy import ScrollHint
 from galog.app.ui.quick_dialogs.loading_dialog import LoadingDialog
 
 from galog.app.ui.reusable.search_input.widget import SearchInput
@@ -35,18 +36,39 @@ class LogMessagesPanel(Widget):
     def __init__(self, appState: AppState, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self._initUserInterface()
+        self._initUserInputHandlers()
         self._initFocusPolicy()
         self._appState = appState
         self._liveReload = True
         self._logReader = None
         self._lineNumbersAlwaysVisible = False
+        self._lastFilteredRowNum = -1
+
+    def _initUserInputHandlers(self):
+        self._logMessagesTable.requestCopyLogLines.connect(
+            self._copySelectedLogLinesToClipboard
+        )
+
+        self._logMessagesTable.requestCopyLogMessages.connect(
+            self._copySelectedLogMessagesToClipboard
+        )
+
+        self._logMessagesTable.requestShowOriginalLine.connect(
+            self._showOriginalLogLine
+        )
+
+        self._logMessagesTable.requestShowFilteredLine.connect(
+            self._showLastFilteredLogLine
+        )
+
+        self._quickFilterBar.arrowUpPressed.connect(self._tryFocusLogMessagesTableAndGoUp)
+        self._quickFilterBar.arrowDownPressed.connect(self._tryFocusLogMessagesTableAndGoDown)
 
     def _initUserInterface(self):
         layout = QVBoxLayout()
         self._logMessagesTable = LogMessagesTable(self)
         self._quickFilterBar = QuickFilterBar(self)
         self._quickFilterBar.startSearch.connect(self.quickFilterApply)
-
 
         layout.addWidget(self._logMessagesTable, 1)
         layout.addWidget(self._quickFilterBar)
@@ -101,7 +123,7 @@ class LogMessagesPanel(Widget):
         self._logMessagesTable.addLogLine(line)
 
     def _addOwnLogLine(self, message: str):
-        logLine = LogLine("GALog","S", message, -1)
+        logLine = LogLine("GALog", "S", message, -1)
         self._logMessagesTable.addLogLine(logLine)
 
     def _appStarted(self, packageName: str):
@@ -127,9 +149,11 @@ class LogMessagesPanel(Widget):
         self.stopCapture()
         self.captureInterrupted.emit(msgBrief, msgVerbose)
 
-
     def clearLogLines(self):
         self._logMessagesTable.clearLogLines()
+
+    def addLogLines(self, logLines: List[LogLine]):
+        self._logMessagesTable.addLogLines(logLines)
 
     def setWhiteBackground(self):
         self._logMessagesTable.setWhiteBackground()
@@ -144,7 +168,7 @@ class LogMessagesPanel(Widget):
             self._logMessagesTable.quickFilterApply(Column.logMessage, filterText)
         elif filterField == FilterField.Tag:
             self._logMessagesTable.quickFilterApply(Column.tagName, filterText)
-        else: # Level
+        else:  # Level
             self._logMessagesTable.quickFilterApply(Column.logLevel, filterText)
 
     def quickFilterReset(self):
@@ -163,12 +187,24 @@ class LogMessagesPanel(Widget):
         self._lineNumbersAlwaysVisible = visible
         self._logMessagesTable.setLineNumbersVisible(visible)
 
+    def hasLogMessages(self):
+        return self._logMessagesTable.hasItems()
+
     def enableQuickFilter(self):
+
+        # if self._beforeFilterRow == -1:
+        #     assert self.hasLogMessages()
+        #     selectedRows = self._logMessagesTable.selectedRows()
+
+        #     selectedRows = self._logMessagesTable()
+
+        #     if selectedRows:
+        #         self._beforeFilterRow = selectedRows[0]
+
         self._logMessagesTable.setLineNumbersVisible(True)
         self._logMessagesTable.setQuickFilterEnabled(True)
         self._quickFilterBar.show()
         self._quickFilterBar.setFocus()
-
 
     def disableQuickFilter(self):
         if not self._lineNumbersAlwaysVisible:
@@ -192,7 +228,6 @@ class LogMessagesPanel(Widget):
         self.setTabOrder(self._logMessagesTable, self._quickFilterBar)
         self._logMessagesTable.setFocus()
 
-
     def focusInEvent(self, event: QFocusEvent) -> None:
         self._logMessagesTable.setFocus()
         event.accept()
@@ -212,3 +247,46 @@ class LogMessagesPanel(Widget):
     def _copySelectedLogMessagesToClipboard(self):
         result = self._logMessagesTable.selectedLogMessages()
         self._copyTextToClipboard("\n".join(result))
+
+    #####
+
+    def _showOriginalLogLine(self):
+
+        if not self._logMessagesTable.quickFilterEnabled():
+            return
+
+        selectedRows = self._logMessagesTable.selectedRows()
+        assert len(selectedRows) > 0
+        selectedRow = selectedRows[0]
+        self._lastFilteredRowNum = selectedRow
+
+        sourceRow = self._logMessagesTable.resolveOriginalRow(selectedRow)
+
+        self.disableQuickFilter()
+        self._logMessagesTable.selectRow(sourceRow, ScrollHint.PositionAtCenter)
+        self._logMessagesTable.startRowBlinking(sourceRow)
+
+
+    def _showLastFilteredLogLine(self):
+
+        # Disable filter if escape pressed many times
+        if self._lastFilteredRowNum == -1:
+            if self._logMessagesTable.quickFilterEnabled():
+                self.disableQuickFilter()
+            return
+
+        self.enableQuickFilter()
+
+        self._logMessagesTable.selectRow(self._lastFilteredRowNum)
+        self._logMessagesTable.setFocus()
+
+        self._logMessagesTable.startRowBlinking(self._lastFilteredRowNum)
+        self._lastFilteredRowNum = -1
+
+    #####
+
+    def _tryFocusLogMessagesTableAndGoUp(self):
+        self._logMessagesTable.trySetFocusAndGoUp()
+
+    def _tryFocusLogMessagesTableAndGoDown(self):
+        self._logMessagesTable.trySetFocusAndGoDown()
