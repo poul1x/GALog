@@ -42,7 +42,7 @@ class LogMessagesPanel(Widget):
         self._liveReload = True
         self._logReader = None
         self._lineNumbersAlwaysVisible = False
-        self._lastFilteredRowNum = -1
+        self._lastFilterRowNum = -1
 
     def _initUserInputHandlers(self):
         self._logMessagesTable.requestCopyLogLines.connect(
@@ -206,7 +206,11 @@ class LogMessagesPanel(Widget):
         self._quickFilterBar.show()
         self._quickFilterBar.setFocus()
 
-    def disableQuickFilter(self):
+    def disableQuickFilter(self, reset: bool = True):
+
+        if reset:
+            self._unsetLastFilterRowNum()
+
         if not self._lineNumbersAlwaysVisible:
             self._logMessagesTable.setLineNumbersVisible(False)
 
@@ -250,6 +254,15 @@ class LogMessagesPanel(Widget):
 
     #####
 
+    def _setLastFilterRowNum(self, row: int):
+        self._lastFilterRowNum = row
+
+    def _unsetLastFilterRowNum(self):
+        self._setLastFilterRowNum(-1)
+
+    def _hasLastFilterRowNum(self):
+        return self._lastFilterRowNum != -1
+
     def _showOriginalLogLine(self):
 
         if not self._logMessagesTable.quickFilterEnabled():
@@ -258,11 +271,11 @@ class LogMessagesPanel(Widget):
         selectedRows = self._logMessagesTable.selectedRows()
         assert len(selectedRows) > 0
         selectedRow = selectedRows[0]
-        self._lastFilteredRowNum = selectedRow
+        self._setLastFilterRowNum(selectedRow)
 
         sourceRow = self._logMessagesTable.resolveOriginalRow(selectedRow)
 
-        self.disableQuickFilter()
+        self.disableQuickFilter(reset=False)
         self._logMessagesTable.selectRow(sourceRow, ScrollHint.PositionAtCenter)
         self._logMessagesTable.startRowBlinking(sourceRow)
 
@@ -270,18 +283,18 @@ class LogMessagesPanel(Widget):
     def _showLastFilteredLogLine(self):
 
         # Disable filter if escape pressed many times
-        if self._lastFilteredRowNum == -1:
+        if not self._hasLastFilterRowNum():
             if self._logMessagesTable.quickFilterEnabled():
                 self.disableQuickFilter()
             return
 
         self.enableQuickFilter()
 
-        self._logMessagesTable.selectRow(self._lastFilteredRowNum)
+        self._logMessagesTable.selectRow(self._lastFilterRowNum)
         self._logMessagesTable.setFocus()
 
-        self._logMessagesTable.startRowBlinking(self._lastFilteredRowNum)
-        self._lastFilteredRowNum = -1
+        self._logMessagesTable.startRowBlinking(self._lastFilterRowNum)
+        self._unsetLastFilterRowNum()
 
     #####
 

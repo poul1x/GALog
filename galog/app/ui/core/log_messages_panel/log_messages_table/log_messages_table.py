@@ -91,17 +91,21 @@ class LogMessagesTable(TableView):
         if not index.isValid():
             return
 
-        contextMenu = QMenu(self)
         actionView = QAction("View", self)
-        actionOrigin = QAction("Go to origin", self)
-        actionBack = QAction("Go back", self)
-        actionView.triggered.connect(lambda: self.cmViewMessage.emit(index))
-        actionOrigin.triggered.connect(lambda: self.cmGoToOrigin.emit(index))
-        actionBack.triggered.connect(lambda: self.cmGoBack.emit())
+        actionView.triggered.connect(lambda: self.requestShowLineDetails.emit())
 
+        contextMenu = QMenu(self)
         contextMenu.addAction(actionView)
-        contextMenu.addAction(actionOrigin)
-        contextMenu.addAction(actionBack)
+
+        if self.quickFilterEnabled():
+            actionOrigin = QAction("Go to origin", self)
+            actionOrigin.triggered.connect(lambda: self.requestShowOriginalLine.emit())
+            contextMenu.addAction(actionOrigin)
+        else:
+            actionBack = QAction("Go back", self)
+            actionBack.triggered.connect(lambda: self.requestShowFilteredLine.emit())
+            contextMenu.addAction(actionBack)
+
         contextMenu.exec_(self.viewport().mapToGlobal(position))
 
     def _topModel(self) -> QSortFilterProxyModel:

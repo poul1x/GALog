@@ -342,7 +342,8 @@ class MainWindow(QMainWindow):
         self.setCaptureSpecificActionsEnabled(False)
 
     def enableQuickFilter(self):
-        self.logMessagesPanel.enableQuickFilter()
+        if self.logMessagesPanel.hasLogMessages():
+            self.logMessagesPanel.enableQuickFilter()
 
     def toggleLiveReload(self, checkBox: QCheckBox):
         self.logMessagesPanel.setLiveReloadEnabled(checkBox.isChecked())
