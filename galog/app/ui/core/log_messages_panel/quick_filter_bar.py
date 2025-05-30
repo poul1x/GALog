@@ -16,6 +16,7 @@ class FilterField(int, Enum):
 
 
 class QuickFilterBar(Widget):
+    escapePressed = pyqtSignal()
     arrowUpPressed = pyqtSignal()
     arrowDownPressed = pyqtSignal()
     startSearch = pyqtSignal(FilterField, str)
@@ -36,6 +37,7 @@ class QuickFilterBar(Widget):
     def _initUserInputHandlers(self):
         self._searchInput.arrowUpPressed.connect(lambda: self.arrowUpPressed.emit())
         self._searchInput.arrowDownPressed.connect(lambda: self.arrowDownPressed.emit())
+        self._searchInput.escapePressed.connect(lambda: self.escapePressed.emit())
         self._searchInput.returnPressed.connect(self._startSearch)
         self._startSearchButton.clicked.connect(self._startSearch)
 

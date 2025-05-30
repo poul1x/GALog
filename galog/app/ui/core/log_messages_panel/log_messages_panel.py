@@ -71,15 +71,12 @@ class LogMessagesPanel(Widget):
         self._logMessagesTable.requestCopyLogLines.connect(
             self._copySelectedLogLinesToClipboard
         )
-
         self._logMessagesTable.requestCopyLogMessages.connect(
             self._copySelectedLogMessagesToClipboard
         )
-
         self._logMessagesTable.requestJumpToOriginalLine.connect(
             self._handleJumpToOriginalLine
         )
-
         self._logMessagesTable.requestJumpBackToFilterView.connect(
             self._handleJumpBackToFilterView
         )
@@ -89,6 +86,9 @@ class LogMessagesPanel(Widget):
         )
         self._quickFilterBar.arrowDownPressed.connect(
             self._tryFocusLogMessagesTableAndGoDown,
+        )
+        self._quickFilterBar.escapePressed.connect(
+            self._handleJumpBackToFilterView,
         )
 
     def _initUserInterface(self):
