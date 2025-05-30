@@ -21,6 +21,8 @@ class SearchInput(QLineEdit):
     def mousePressEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.XButton1:
             self.escapePressed.emit()
+        elif event.button() == Qt.XButton2:
+            self.returnPressed.emit()
         else:
             super().mousePressEvent(event)
 
