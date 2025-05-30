@@ -52,6 +52,8 @@ class LogMessagesTable(TableView):
     def mousePressEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.XButton1:
             self.requestJumpBackToFilterView.emit()
+        elif event.button() == Qt.XButton2:
+            self.requestJumpToOriginalLine.emit()
         else:
             super().mousePressEvent(event)
 
