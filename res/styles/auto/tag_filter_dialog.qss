@@ -53,18 +53,18 @@
     selection-color: white;
 }
 
-#TagFilterDialog > #FilteredTagsList > QListView {
+#TagFilterDialog > QListView {
 	font-family: Roboto;
 	font-size: 20px;
 	border: 2px solid #464646;
 }
 
-#TagFilterDialog > #FilteredTagsList > QListView::item:hover
+#TagFilterDialog > QListView::item:hover
 {
 	background-color: #f3f3f3;
 }
 
-#TagFilterDialog > #FilteredTagsList > QListView::item:selected
+#TagFilterDialog > QListView::item:selected
 {
 	background-color: #464646;
 	color: #ffffff;

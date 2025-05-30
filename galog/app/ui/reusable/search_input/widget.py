@@ -16,7 +16,7 @@ class SearchInput(QLineEdit):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.setAttribute(Qt.WA_StyledBackground)
-        self.initUserInterface()
+        self._initUserInterface()
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.XButton1:
@@ -37,7 +37,7 @@ class SearchInput(QLineEdit):
         else:
             super().keyPressEvent(event)
 
-    def initUserInterface(self):
+    def _initUserInterface(self):
         self.setPlaceholderText("Search")
         self.addAction(QIcon(iconFile("search")), QLineEdit.LeadingPosition)
 

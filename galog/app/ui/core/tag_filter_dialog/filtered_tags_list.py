@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from PyQt5.QtCore import QModelIndex, Qt, pyqtSignal, QItemSelectionModel
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
@@ -8,31 +8,23 @@ from galog.app.ui.base.list_view import ListView
 from galog.app.ui.base.widget import Widget
 
 
-class FilteredTagsList(Widget):
-    selectionChanged = pyqtSignal()
+class FilteredTagsList(ListView):
+    selectionChange = pyqtSignal()
 
-    def __init__(self, parent: QWidget):
+    def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.initUserInterface()
 
     def initUserInterface(self):
-        vBoxLayout = QVBoxLayout()
-        vBoxLayout.setAlignment(Qt.AlignTop)
-        vBoxLayout.setContentsMargins(0, 0, 0, 0)
-        vBoxLayout.setSpacing(0)
-
-        self.listView = ListView(self)
-        self.listView.setEditTriggers(QListView.NoEditTriggers)
-        self.listView.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.setEditTriggers(QListView.NoEditTriggers)
+        self.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
         self.dataModel = QStandardItemModel(self)
-        self.listView.setModel(self.dataModel)
-        vBoxLayout.addWidget(self.listView)
-        self.setLayout(vBoxLayout)
+        self.setModel(self.dataModel)
 
         # Make it easier to subscribe for this signal in parent widget
-        self.listView.selectionModel().selectionChanged.connect(
-            self.selectionChanged.emit
+        self.selectionModel().selectionChanged.connect(
+            self.selectionChange.emit
         )
 
     def toStringList(self) -> List[str]:
@@ -61,24 +53,15 @@ class FilteredTagsList(Widget):
         return self.dataModel.rowCount() > 0
 
     def hasSelectedTags(self):
-        return bool(self.listView.selectionModel().selectedRows())
+        return bool(self.selectionModel().selectedRows())
 
     def removeSelectedTags(self):
         removedRows = []
-        for row in self.listView.selectedRows():
+        for row in self.selectedRows(reverse=True):
             self.dataModel.removeRow(row)
             removedRows.append(row)
 
-        return removedRows
-
-    def selectTagByRow(self, row: int):
-        return self.listView.selectRow(row)
+        return list(reversed(removedRows))
 
     def removeAllTags(self):
         self.dataModel.clear()
-
-    def trySetFocusAndGoUp(self):
-        return self.listView.trySetFocusAndGoUp()
-
-    def trySetFocusAndGoDown(self):
-        return self.listView.trySetFocusAndGoDown()

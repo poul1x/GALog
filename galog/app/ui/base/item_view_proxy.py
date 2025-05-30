@@ -66,6 +66,9 @@ class ItemViewProxy:
         self._logger.debug("focusInEvent: select first row")
         self.selectRow(0)
 
+    def rowCount(self):
+        return self._itemView.model().rowCount()
+
     def selectRow(self, row: int, scroll: Optional[ScrollHint] = None):
         model = self._itemView.model()
         if row < 0 or row >= model.rowCount():
@@ -96,13 +99,9 @@ class ItemViewProxy:
         if scroll:
             self._itemView.scrollTo(index, scroll)
 
-    def selectedRows(self):
-        def key(index: QModelIndex):
-            return index.row()
-
-        selectionModel = self._itemView.selectionModel()
-        selectedRows = sorted(selectionModel.selectedRows(), key=key)
-        return [index.row() for index in selectedRows]
+    def selectedRows(self, reverse: bool = False):
+        selectedRows = self._itemView.selectionModel().selectedRows()
+        return sorted([index.row() for index in selectedRows], reverse=reverse)
 
     def hasItems(self):
         return self._itemView.model().rowCount() > 0

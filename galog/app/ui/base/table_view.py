@@ -42,6 +42,9 @@ class TableView(QTableView):
         self._proxy.focusInEvent(e)
         super().focusInEvent(e)
 
+    def rowCount(self):
+        return self._proxy.rowCount()
+
     def selectRow(self, row: int, scroll: Optional[ScrollHint] = None):
         self._proxy.selectRow(row, scroll)
 
@@ -54,8 +57,8 @@ class TableView(QTableView):
     def selectRowByIndex(self, index: QModelIndex, scroll: Optional[ScrollHint] = None):
         self._proxy.selectRowByIndex(index, scroll)
 
-    def selectedRows(self):
-        return self._proxy.selectedRows()
+    def selectedRows(self, reverse: bool = False):
+        return self._proxy.selectedRows(reverse)
 
     def hasItems(self):
         return self._proxy.hasItems()

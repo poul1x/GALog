@@ -206,6 +206,8 @@ class MainWindow(QMainWindow):
     def openTagFilter(self):
         dialog = TagFilterDialog(self.appState, self)
         tagList = self.logMessagesPanel.uniqueTagNames()
+        dialog.setTagAutoCompletionStrings(tagList)
+
         if dialog.exec_() == TagFilterDialog.Rejected:
             return
 

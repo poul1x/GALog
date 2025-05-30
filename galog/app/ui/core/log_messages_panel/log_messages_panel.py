@@ -375,3 +375,8 @@ class LogMessagesPanel(Widget):
 
     def _tryFocusLogMessagesTableAndGoDown(self):
         self._logMessagesTable.trySetFocusAndGoDown()
+
+    #####
+
+    def uniqueTagNames(self) -> List[str]:
+        return self._logMessagesTable.uniqueTagNames()

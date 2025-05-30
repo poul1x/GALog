@@ -297,3 +297,8 @@ class LogMessagesTable(TableView):
 
     def startRowBlinking(self, row: int):
         self._delegate.startRowBlinking(row, self._topModel())
+
+    #####
+
+    def uniqueTagNames(self) -> List[str]:
+        return self._dataModel.uniqueTagNames()

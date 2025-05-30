@@ -1,7 +1,7 @@
 import os
-from typing import IO
+from typing import IO, List
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QObject, QEvent
 from PyQt5.QtWidgets import (
     QDialog,
     QWidget,
@@ -40,6 +40,9 @@ class TagFilterDialog(Dialog):
         self._initUserInterface()
         self._initUserInputHandlers()
         self._initFocusPolicy()
+
+    def setTagAutoCompletionStrings(self, tagList: List[str]):
+        self.tagNameInput.setCompletionStrings(tagList)
 
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
@@ -96,14 +99,15 @@ class TagFilterDialog(Dialog):
         self.controlButtonBar.removeAllTagsButton.clicked.connect(self._removeAllTags)
         self.controlButtonBar.saveToFileButton.clicked.connect(self._saveTagsToFile)
         self.controlButtonBar.loadFromFileButton.clicked.connect(self._loadTagsFromFile)
-        self.filteredTagsList.selectionChanged.connect(self._tagListSelectionChanged)
+        self.filteredTagsList.selectionChange.connect(self._tagListSelectionChanged)
         self.tagNameInput.textChanged.connect(self._tagInputStateChanged)
         self.tagNameInput.completionAccepted.connect(self._addTag)
-        self.tagNameInput.returnPressed.connect(self._btnAddTagClicked)
+        self.tagNameInput.textSubmitted.connect(self._addTag)
         self.tagNameInput.arrowUpPressed.connect(self._tryFocusTagsListAndGoUp)
         self.tagNameInput.arrowDownPressed.connect(self._tryFocusTagsListAndGoDown)
         self.bottomButtonBar.buttonSave.clicked.connect(self._btnSaveClicked)
         self.bottomButtonBar.buttonCancel.clicked.connect(self.reject)
+
 
     def _tryFocusTagsListAndGoUp(self):
         self.filteredTagsList.trySetFocusAndGoUp()
@@ -121,8 +125,8 @@ class TagFilterDialog(Dialog):
         self.bottomButtonBar.buttonSave.setFocusPolicy(Qt.NoFocus)
         self.bottomButtonBar.buttonCancel.setFocusPolicy(Qt.NoFocus)
 
-        self.setTabOrder(self.filteredTagsList.listView, self.tagNameInput)
-        self.setTabOrder(self.tagNameInput, self.filteredTagsList.listView)
+        self.setTabOrder(self.filteredTagsList, self.tagNameInput)
+        self.setTabOrder(self.tagNameInput, self.filteredTagsList)
         self.tagNameInput.setFocus()
 
     def _saveFilteringConfig(self):
@@ -198,14 +202,47 @@ class TagFilterDialog(Dialog):
         self.controlButtonBar.removeTagButton.setEnabled(enabled)
 
     def _removeSelectedTags(self):
-        removedRows = self.filteredTagsList.removeSelectedTags()
-        assert len(removedRows) > 0
 
-        rowToSelect = sorted(removedRows)[0]
-        if not self.filteredTagsList.selectTagByRow(rowToSelect):
-            if not self.filteredTagsList.selectTagByRow(rowToSelect - 1):
-                # Empty tag list -> focus on input widget
-                self.tagNameInput.setFocus()
+        #
+        # Get count of rows, which will be removed
+        # If no rows removed, then exit
+        #
+
+        selectedRows = self.filteredTagsList.selectedRows()
+        if not selectedRows:
+            return
+
+        #
+        # Get the next row number
+        # If we are going to remove the last row,
+        # decrease the next row number by one
+        #
+
+        rowToSelect = self.filteredTagsList.selectedRows()[-1] + 1
+        if rowToSelect == self.filteredTagsList.rowCount():
+            rowToSelect -= 1
+
+        #
+        # Remove selected rows.
+        # Our row number will be decreased by count of removed rows
+        #
+
+        removedRows = self.filteredTagsList.removeSelectedTags()
+        rowToSelect -= len(removedRows)
+
+        #
+        # If tag list has at least one item, then make selection
+        # Otherwise, move focus to the search input
+        #
+
+        if self.filteredTagsList.hasItems():
+            self.filteredTagsList.selectRow(rowToSelect)
+        else:
+            self.tagNameInput.setFocus()
+
+        #
+        # Finally, Update button states
+        #
 
         self._updateRemoveAllTagsButtonState()
         self._updateRemoveTagButtonState()

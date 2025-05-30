@@ -38,7 +38,7 @@ class DataModel(QStandardItemModel):
         default_flags = super().flags(index)
         return default_flags & ~Qt.ItemIsEditable
 
-    def addLogLine( self, logLine: LogLine):
+    def addLogLine(self, logLine: LogLine):
         itemTagName = QStandardItem(logLine.tag)
         itemLogLevel = QStandardItem(logLine.level)
         itemLogMessage = QStandardItem(logLine.msg)
@@ -75,3 +75,11 @@ class DataModel(QStandardItemModel):
 
     def logMessage(self, row: int):
         return self.item(row, Column.logMessage).text()
+
+    def uniqueTagNames(self) -> List[str]:
+        result = set()
+        for i in range(self.rowCount()):
+            item = self.item(i, Column.tagName.value)
+            result.add(item.text())
+
+        return list(result)
