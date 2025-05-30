@@ -30,6 +30,28 @@ from .log_messages_table import LogMessagesTable, Column
 from .quick_filter_bar import FilterField, QuickFilterBar
 
 
+class RowBackup:
+    INVALID_VALUE: int = -1
+    _rowNum: int
+
+    def __init__(self):
+        self.delete()
+
+    def setValue(self, rowNum: int):
+        assert rowNum >= 0, "Row number must be zero or greater"
+        self._rowNum = rowNum
+
+    def getValue(self):
+        assert self._rowNum != RowBackup.INVALID_VALUE, "No backup available"
+        return self._rowNum
+
+    def empty(self):
+        return self._rowNum == RowBackup.INVALID_VALUE
+
+    def delete(self):
+        self._rowNum = RowBackup.INVALID_VALUE
+
+
 class LogMessagesPanel(Widget):
     captureInterrupted = pyqtSignal(str, str)
 
@@ -42,7 +64,8 @@ class LogMessagesPanel(Widget):
         self._liveReload = True
         self._logReader = None
         self._lineNumbersAlwaysVisible = False
-        self._lastFilterRowNum = -1
+        self._filterRowBackup = RowBackup()
+        self._originalRowBackup = RowBackup()
 
     def _initUserInputHandlers(self):
         self._logMessagesTable.requestCopyLogLines.connect(
@@ -53,16 +76,20 @@ class LogMessagesPanel(Widget):
             self._copySelectedLogMessagesToClipboard
         )
 
-        self._logMessagesTable.requestShowOriginalLine.connect(
-            self._showOriginalLogLine
+        self._logMessagesTable.requestJumpToOriginalLine.connect(
+            self._handleJumpToOriginalLine
         )
 
-        self._logMessagesTable.requestShowFilteredLine.connect(
-            self._showLastFilteredLogLine
+        self._logMessagesTable.requestJumpBackToFilterView.connect(
+            self._handleJumpBackToFilterView
         )
 
-        self._quickFilterBar.arrowUpPressed.connect(self._tryFocusLogMessagesTableAndGoUp)
-        self._quickFilterBar.arrowDownPressed.connect(self._tryFocusLogMessagesTableAndGoDown)
+        self._quickFilterBar.arrowUpPressed.connect(
+            self._tryFocusLogMessagesTableAndGoUp,
+        )
+        self._quickFilterBar.arrowDownPressed.connect(
+            self._tryFocusLogMessagesTableAndGoDown,
+        )
 
     def _initUserInterface(self):
         layout = QVBoxLayout()
@@ -190,29 +217,61 @@ class LogMessagesPanel(Widget):
     def hasLogMessages(self):
         return self._logMessagesTable.hasItems()
 
-    def enableQuickFilter(self):
+    def _saveOriginalRow(self):
+        assert self.hasLogMessages(), "At least 1 row must be present"
+        if self._logMessagesTable.hasSelectedItems():
+            selectedRows = self._logMessagesTable.selectedRows()
+            self._originalRowBackup.setValue(selectedRows[0])
+        else:
+            self._originalRowBackup.setValue(0)
 
-        # if self._beforeFilterRow == -1:
-        #     assert self.hasLogMessages()
-        #     selectedRows = self._logMessagesTable.selectedRows()
+    def enableQuickFilter(self, saveRow: bool = True):
+        #
+        # If Quick filter has been already enabled,
+        # just set focus and return
+        #
 
-        #     selectedRows = self._logMessagesTable()
+        if self.quickFilterEnabled():
+            self._quickFilterBar.setFocus()
+            return
 
-        #     if selectedRows:
-        #         self._beforeFilterRow = selectedRows[0]
+        #
+        # Save original row to return back
+        # if user cancels filtering
+        #
+
+        if saveRow:
+            self._saveOriginalRow()
+
+        #
+        # Show line numbers, show quick filter bar, set focus
+        #
 
         self._logMessagesTable.setLineNumbersVisible(True)
         self._logMessagesTable.setQuickFilterEnabled(True)
-        self._quickFilterBar.show()
         self._quickFilterBar.setFocus()
+        self._quickFilterBar.show()
 
     def disableQuickFilter(self, reset: bool = True):
+        #
+        # If 'reset' is set to True, delete filter row backup,
+        # e.g. start a clean filtering session
+        #
 
         if reset:
-            self._unsetLastFilterRowNum()
+            self._filterRowBackup.delete()
+
+        #
+        # If 'lineNumbersAlwaysVisible' option is set to True,
+        # keep line numbers visible during quick filter disablement
+        #
 
         if not self._lineNumbersAlwaysVisible:
             self._logMessagesTable.setLineNumbersVisible(False)
+
+        #
+        # Hide quick filter bar and set focus to log messages table
+        #
 
         self._logMessagesTable.setQuickFilterEnabled(False)
         self._logMessagesTable.setFocus()
@@ -254,47 +313,60 @@ class LogMessagesPanel(Widget):
 
     #####
 
-    def _setLastFilterRowNum(self, row: int):
-        self._lastFilterRowNum = row
-
-    def _unsetLastFilterRowNum(self):
-        self._setLastFilterRowNum(-1)
-
-    def _hasLastFilterRowNum(self):
-        return self._lastFilterRowNum != -1
-
-    def _showOriginalLogLine(self):
-
-        if not self._logMessagesTable.quickFilterEnabled():
-            return
-
+    def _firstSelectedRow(self):
         selectedRows = self._logMessagesTable.selectedRows()
         assert len(selectedRows) > 0
-        selectedRow = selectedRows[0]
-        self._setLastFilterRowNum(selectedRow)
+        return selectedRows[0]
 
-        sourceRow = self._logMessagesTable.resolveOriginalRow(selectedRow)
-
-        self.disableQuickFilter(reset=False)
-        self._logMessagesTable.selectRow(sourceRow, ScrollHint.PositionAtCenter)
-        self._logMessagesTable.startRowBlinking(sourceRow)
-
-
-    def _showLastFilteredLogLine(self):
-
-        # Disable filter if escape pressed many times
-        if not self._hasLastFilterRowNum():
-            if self._logMessagesTable.quickFilterEnabled():
-                self.disableQuickFilter()
+    def _handleJumpToOriginalLine(self):
+        if not self.quickFilterEnabled():
             return
 
-        self.enableQuickFilter()
+        #
+        # Backup selected row in filter view
+        #
 
-        self._logMessagesTable.selectRow(self._lastFilterRowNum)
+        selectedRow = self._firstSelectedRow()
+        self._filterRowBackup.setValue(selectedRow)
+
+        #
+        # Resolve original row to jump, when quick filter will be disabled
+        # Then disable quick filter
+        #
+
+        originalRow = self._logMessagesTable.resolveOriginalRow(selectedRow)
+        self.disableQuickFilter(reset=False)
+
+        #
+        # "Jump" to original row after quick filter was disabled
+        # Jump action includes row selection and blinking animation
+        #
+
+        self._logMessagesTable.selectRow(originalRow, ScrollHint.PositionAtCenter)
+        self._logMessagesTable.startRowBlinking(originalRow)
+
+    def _jumpBackToFilterView(self):
+        self.enableQuickFilter(saveRow=False)
+        row = self._filterRowBackup.getValue()
+        self._logMessagesTable.selectRow(row)
+        self._logMessagesTable.startRowBlinking(row)
         self._logMessagesTable.setFocus()
+        self._filterRowBackup.delete()
 
-        self._logMessagesTable.startRowBlinking(self._lastFilterRowNum)
-        self._unsetLastFilterRowNum()
+    def _exitQuickFilter(self):
+        if self.quickFilterEnabled():
+            self.disableQuickFilter()
+
+        if not self._originalRowBackup.empty():
+            row = self._originalRowBackup.getValue()
+            self._logMessagesTable.selectRow(row, ScrollHint.PositionAtCenter)
+            self._originalRowBackup.delete()
+
+    def _handleJumpBackToFilterView(self):
+        if not self._filterRowBackup.empty():
+            self._jumpBackToFilterView()
+        else:
+            self._exitQuickFilter()
 
     #####
 

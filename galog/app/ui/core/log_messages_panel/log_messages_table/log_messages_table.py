@@ -43,26 +43,26 @@ from .vertical_header import VerticalHeader
 
 
 class LogMessagesTable(TableView):
-    requestShowOriginalLine = pyqtSignal()
-    requestShowFilteredLine = pyqtSignal()
+    requestJumpToOriginalLine = pyqtSignal()
+    requestJumpBackToFilterView = pyqtSignal()
     requestShowLineDetails = pyqtSignal()
     requestCopyLogLines = pyqtSignal()
     requestCopyLogMessages = pyqtSignal()
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.XButton1:
-            self.requestShowFilteredLine.emit()
+            self.requestJumpBackToFilterView.emit()
         else:
             super().mousePressEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
         if helper.isCtrlEnterPressed():
-            self.requestShowOriginalLine.emit()
+            self.requestJumpToOriginalLine.emit()
         elif helper.isEnterPressed():
             self.requestShowLineDetails.emit()
         elif helper.isEscapePressed():
-            self.requestShowFilteredLine.emit()
+            self.requestJumpBackToFilterView.emit()
         elif helper.isCtrlShiftCPressed():
             self.requestCopyLogLines.emit()
         elif helper.isCtrlCPressed():
@@ -99,11 +99,11 @@ class LogMessagesTable(TableView):
 
         if self.quickFilterEnabled():
             actionOrigin = QAction("Go to origin", self)
-            actionOrigin.triggered.connect(lambda: self.requestShowOriginalLine.emit())
+            actionOrigin.triggered.connect(lambda: self.requestJumpToOriginalLine.emit())
             contextMenu.addAction(actionOrigin)
         else:
             actionBack = QAction("Go back", self)
-            actionBack.triggered.connect(lambda: self.requestShowFilteredLine.emit())
+            actionBack.triggered.connect(lambda: self.requestJumpBackToFilterView.emit())
             contextMenu.addAction(actionBack)
 
         contextMenu.exec_(self.viewport().mapToGlobal(position))
