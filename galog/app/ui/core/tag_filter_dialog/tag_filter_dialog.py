@@ -17,9 +17,9 @@ from galog.app.ui.actions.read_file import FileProcessError
 from galog.app.ui.base.dialog import Dialog
 from galog.app.ui.actions.read_file import ReadFileAction
 from galog.app.ui.actions.write_file import WriteFileAction
-from galog.app.ui.helpers.file_filter import FileFilter, FileFilterBuilder
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
 from galog.app.ui.quick_dialogs.loading_dialog import LoadingDialog
+from galog.app.ui.reusable.file_picker import FilePicker, FileExtensionFilterBuilder
 
 from .bottom_button_bar import BottomButtonBar
 from .control_button_bar import ControlButtonBar
@@ -252,22 +252,9 @@ class TagFilterDialog(Dialog):
         self._updateControlButtonBarState()
         self.tagNameInput.setFocus()
 
-    def _askSaveTagFilePath(self):
-        return QFileDialog.getSaveFileName(
-            caption="Save Tag List File",
-            directory=self._appState.lastUsedDirPath,
-            filter=FileFilterBuilder.textFile(),
-        )[0]
-
-    def _askOpenTagFilePath(self):
-        return QFileDialog.getOpenFileName(
-            caption="Open Tag List File",
-            directory=self._appState.lastUsedDirPath,
-            filter=FileFilterBuilder.textFile(),
-        )[0]
-
-    def _saveLastSelectedDir(self, filePath: str):
-        self._appState.lastUsedDirPath = os.path.dirname(filePath)
+    def _saveLastSelectedDir(self, filePicker: FilePicker):
+        if filePicker.hasSelectedDirectory():
+            self._appState.lastUsedDirPath = filePicker.selectedDirectory()
 
     def _readTagList(self, f: IO[str]):
         tags = list(filter(lambda s: bool(s), f.read().split()))
@@ -277,21 +264,35 @@ class TagFilterDialog(Dialog):
         f.write("\n".join(self.filteredTagsList.toStringList()))
 
     def _loadTagsFromFile(self):
-        filePath = self._askOpenTagFilePath()
+        filePicker = FilePicker(
+            caption="Load tag list from file",
+            directory=self._appState.lastUsedDirPath,
+            extensionFilter=FileExtensionFilterBuilder.textFile(),
+        )
+
+        filePath = filePicker.askOpenFileRead()
         if not filePath:
             return
 
-        self._saveLastSelectedDir(filePath)
+        self._saveLastSelectedDir(filePicker)
         action = ReadFileAction(filePath, self)
+        action.setLoadingDialogText("Loading tag list from file")
         action.readTextData(self._readTagList)
         self._updateControlButtonBarState()
 
     def _saveTagsToFile(self):
-        filePath = self._askSaveTagFilePath()
+        filePicker = FilePicker(
+            caption="Save tag list to file",
+            directory=self._appState.lastUsedDirPath,
+            extensionFilter=FileExtensionFilterBuilder.textFile(),
+        )
+
+        filePath = filePicker.askOpenFileWrite()
         if not filePath:
             return
 
-        self._saveLastSelectedDir(filePath)
+        self._saveLastSelectedDir(filePicker)
         action = WriteFileAction(filePath, self)
+        action.setLoadingDialogText("Saving tag list to file")
         action.writeTextData(self._writeTagList)
         self._updateControlButtonBarState()
