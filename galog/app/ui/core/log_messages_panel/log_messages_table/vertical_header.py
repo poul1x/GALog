@@ -20,9 +20,9 @@ from PyQt5.QtWidgets import (
     QTableView, QTableWidget
 )
 
-from galog.app.ui.reusable import SearchInput
-from galog.app.ui.reusable import RegExpFilterModel
-from galog.app.ui.reusable import FnFilterModel
+from galog.app.ui.reusable.search_input import SearchInput
+from galog.app.ui.reusable.regexp_filter_model import RegExpFilterModel
+from galog.app.ui.reusable.fn_filter_model import FnFilterModel
 
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
 from galog.app.ui.base.widget import Widget

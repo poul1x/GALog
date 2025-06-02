@@ -4,7 +4,7 @@ from PyQt5.QtGui import QStandardItem, QStandardItemModel, QFocusEvent
 from PyQt5.QtWidgets import QListView, QVBoxLayout, QWidget, QComboBox, QPushButton, QHBoxLayout
 
 from galog.app.ui.base.widget import Widget
-from galog.app.ui.reusable import SearchInput
+from galog.app.ui.reusable.search_input import SearchInput
 from galog.app.ui.base.list_view import ListView
 
 from enum import Enum,auto

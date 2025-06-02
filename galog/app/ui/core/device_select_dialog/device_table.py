@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (
 )
 from galog.app.ui.base.widget import Widget
 
-from galog.app.ui.reusable import SearchInput
+from galog.app.ui.reusable.search_input import SearchInput
 from galog.app.ui.base.table_view import TableView
 
 from .data_model import Columns, DataModel, FilterModel
