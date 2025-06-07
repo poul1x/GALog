@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from dataclasses import dataclass
 from enum import Enum, auto
 
@@ -43,9 +44,6 @@ class DataModel(QStandardItemModel):
         itemLogLevel = QStandardItem(logLine.level)
         itemLogMessage = QStandardItem(logLine.msg)
 
-        # Use this to set inverted row color status
-        itemLogLevel.setData(False, Qt.UserRole)
-
         data = HighlightingData(
             state=LazyHighlightingState.pending,
             items=[],
@@ -62,8 +60,23 @@ class DataModel(QStandardItemModel):
             ]
         )
 
+    @contextmanager
+    def batchInsertMode(self):
+        try:
+            self.beginResetModel()
+            self.blockSignals(True)
+            yield
+
+        finally:
+            self.blockSignals(False)
+            self.endResetModel()
+
     def clearLogLines(self):
         self.removeRows(0, self.rowCount())
+
+    def logLines(self):
+        for row in range(self.rowCount()):
+            yield self.logLine(row)
 
     def logLine(self, row: int):
         return LogLine(

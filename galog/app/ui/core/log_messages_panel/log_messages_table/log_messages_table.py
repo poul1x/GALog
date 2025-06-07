@@ -214,15 +214,24 @@ class LogMessagesTable(TableView):
 
     #####
 
+    def logLineCount(self):
+        return self._dataModel.rowCount()
+
+    def logLine(self, lineNum: int):
+        return self._dataModel.logLine(lineNum)
+
+    def logLines(self):
+        return self._dataModel.logLines()
+
     def addLogLine(self, logLine: LogLine):
         self._dataModel.addLogLine(logLine)
 
     def clearLogLines(self):
         self._dataModel.clearLogLines()
 
-    def addLogLines(self, logLines: LogLine):
-        for logLine in logLines:
-            self.addLogLine(logLine)
+    def enterBatchMode(self):
+        return self._dataModel.batchInsertMode()
+
 
     #####
 

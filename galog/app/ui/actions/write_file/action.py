@@ -24,7 +24,7 @@ class WriteFileAction(Action):
         self._msgBoxErr(msgBrief, msgVerbose)
         self._setFailed()
 
-    def writeTextData(self, fnReadText: FnWriteText):
+    def _writeTextData(self, fnReadText: FnWriteText):
         writeFileTask = WriteTextFileTask(self._filePath, fnReadText)
         writeFileTask.signals.succeeded.connect(self._succeeded)
         writeFileTask.signals.failed.connect(self._failed)
@@ -33,7 +33,7 @@ class WriteFileAction(Action):
         QThreadPool.globalInstance().start(writeFileTask)
         self._execLoadingDialog()
 
-    def writeBinaryData(self, fnReadBinary: FnWriteBinary):
+    def _writeBinaryData(self, fnReadBinary: FnWriteBinary):
         writeFileTask = WriteBinaryFileTask(self._filePath, fnReadBinary)
         writeFileTask.signals.succeeded.connect(self._succeeded)
         writeFileTask.signals.failed.connect(self._failed)

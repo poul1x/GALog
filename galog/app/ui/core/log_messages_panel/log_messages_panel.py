@@ -18,8 +18,13 @@ from galog.app.log_reader import AndroidAppLogReader, LogLine
 from galog.app.log_reader import ProcessEndedEvent, ProcessStartedEvent
 from galog.app.msgbox import msgBoxErr
 from galog.app.ui.actions.get_app_pids import GetAppPidsAction
+from galog.app.ui.actions.read_file import ReadFileAction
+from galog.app.ui.actions.read_log_file import ReadLogFileAction
+from galog.app.ui.actions.write_file import WriteFileAction
+from galog.app.ui.actions.write_log_file import WriteLogFileAction
 from galog.app.ui.base.item_view_proxy import ScrollHint
 from galog.app.ui.quick_dialogs.loading_dialog import LoadingDialog
+from galog.app.ui.reusable.file_picker import FilePicker, FileExtensionFilterBuilder
 
 from galog.app.ui.reusable.search_input.widget import SearchInput
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
@@ -179,9 +184,6 @@ class LogMessagesPanel(Widget):
     def clearLogLines(self):
         self._logMessagesTable.clearLogLines()
 
-    def addLogLines(self, logLines: List[LogLine]):
-        self._logMessagesTable.addLogLines(logLines)
-
     def setWhiteBackground(self):
         self._logMessagesTable.setWhiteBackground()
 
@@ -310,6 +312,23 @@ class LogMessagesPanel(Widget):
     def _copySelectedLogMessagesToClipboard(self):
         result = self._logMessagesTable.selectedLogMessages()
         self._copyTextToClipboard("\n".join(result))
+
+    #####
+
+    def _logLineRead(self, logLine: LogLine):
+        self._logMessagesTable.addLogLine(logLine)
+
+    def loadLogFile(self, filePath: str):
+        action = ReadLogFileAction(filePath)
+        action.setLoadingDialogText("Reading log file")
+        action.lineRead.connect(self._logLineRead)
+        with self._logMessagesTable.enterBatchMode():
+            action.readLogFile()
+
+    def saveLogFile(self, filePath: str):
+        action = WriteLogFileAction(filePath)
+        action.setLoadingDialogText("Saving log output to file")
+        action.writeLogFile(self._logMessagesTable.logLines())
 
     #####
 

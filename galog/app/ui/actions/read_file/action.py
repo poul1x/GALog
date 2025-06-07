@@ -26,7 +26,7 @@ class ReadFileAction(Action):
         self._msgBoxErr(msgBrief, msgVerbose)
         self._setFailed()
 
-    def readTextData(self, fnReadText: FnReadText):
+    def _readTextData(self, fnReadText: FnReadText):
         readFileTask = ReadTextFileTask(self._filePath, fnReadText)
         readFileTask.signals.succeeded.connect(self._succeeded)
         readFileTask.signals.failed.connect(self._failed)
@@ -35,7 +35,7 @@ class ReadFileAction(Action):
         QThreadPool.globalInstance().start(readFileTask)
         self._execLoadingDialog()
 
-    def readBinaryData(self, fnReadBinary: FnReadBinary):
+    def _readBinaryData(self, fnReadBinary: FnReadBinary):
         readFileTask = ReadBinaryFileTask(self._filePath, fnReadBinary)
         readFileTask.signals.succeeded.connect(self._succeeded)
         readFileTask.signals.failed.connect(self._failed)

@@ -21,6 +21,9 @@ class Action:
     def _execLoadingDialog(self):
         self._loadingDialog.exec_()
 
+    def _showLoadingDialog(self):
+        self._loadingDialog.show()
+
     def setLoadingDialogText(self, text: str):
         self._loadingDialog.setText(text)
 

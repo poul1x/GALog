@@ -15,8 +15,8 @@ from galog.app.app_state import AppState, TagFilteringConfig, TagFilteringMode
 from galog.app.msgbox import msgBoxErr, msgBoxPrompt
 from galog.app.ui.actions.read_file import FileProcessError
 from galog.app.ui.base.dialog import Dialog
-from galog.app.ui.actions.read_file import ReadFileAction
-from galog.app.ui.actions.write_file import WriteFileAction
+from galog.app.ui.actions.read_tags_file import ReadTagsFileAction
+from galog.app.ui.actions.write_tags_file import WriteTagsFileAction
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
 from galog.app.ui.quick_dialogs.loading_dialog import LoadingDialog
 from galog.app.ui.reusable.file_picker import FilePicker, FileExtensionFilterBuilder
@@ -107,7 +107,6 @@ class TagFilterDialog(Dialog):
         self.tagNameInput.arrowDownPressed.connect(self._tryFocusTagsListAndGoDown)
         self.bottomButtonBar.buttonSave.clicked.connect(self._btnSaveClicked)
         self.bottomButtonBar.buttonCancel.clicked.connect(self.reject)
-
 
     def _tryFocusTagsListAndGoUp(self):
         self.filteredTagsList.trySetFocusAndGoUp()
@@ -202,7 +201,6 @@ class TagFilterDialog(Dialog):
         self.controlButtonBar.removeTagButton.setEnabled(enabled)
 
     def _removeSelectedTags(self):
-
         #
         # Get count of rows, which will be removed
         # If no rows removed, then exit
@@ -256,13 +254,6 @@ class TagFilterDialog(Dialog):
         if filePicker.hasSelectedDirectory():
             self._appState.lastUsedDirPath = filePicker.selectedDirectory()
 
-    def _readTagList(self, f: IO[str]):
-        tags = list(filter(lambda s: bool(s), f.read().split()))
-        self.filteredTagsList.setTags(tags)
-
-    def _writeTagList(self, f: IO[str]):
-        f.write("\n".join(self.filteredTagsList.toStringList()))
-
     def _loadTagsFromFile(self):
         filePicker = FilePicker(
             caption="Load tag list from file",
@@ -275,9 +266,13 @@ class TagFilterDialog(Dialog):
             return
 
         self._saveLastSelectedDir(filePicker)
-        action = ReadFileAction(filePath, self)
+        action = ReadTagsFileAction(filePath, self)
         action.setLoadingDialogText("Loading tag list from file")
-        action.readTextData(self._readTagList)
+        tags = action.readTagsFile()
+
+        if tags is not None:
+            self.filteredTagsList.setTags(tags)
+
         self._updateControlButtonBarState()
 
     def _saveTagsToFile(self):
@@ -292,7 +287,7 @@ class TagFilterDialog(Dialog):
             return
 
         self._saveLastSelectedDir(filePicker)
-        action = WriteFileAction(filePath, self)
+        action = WriteTagsFileAction(filePath, self)
         action.setLoadingDialogText("Saving tag list to file")
-        action.writeTextData(self._writeTagList)
+        action.writeTagsFile(self.filteredTagsList.toStringList())
         self._updateControlButtonBarState()

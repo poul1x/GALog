@@ -42,10 +42,10 @@ from galog.app.ui.quick_dialogs.stop_capture_dialog import (
 # from galog.app.ui.core.message_view_dialog import LogMessageViewDialog
 from galog.app.ui.core.package_select_dialog import PackageSelectDialog
 from galog.app.ui.core.log_messages_panel import LogMessagesPanel
-from galog.app.ui.actions.open_log_file.controller import OpenLogFileController
+from galog.app.ui.actions.read_log_file.action import ReadLogFileAction
 from galog.app.ui.actions.restart_app.action import RestartAppAction
 from galog.app.ui.actions.start_app import StartAppAction
-from galog.app.ui.actions.save_log_file.controller import SaveLogFileController
+from galog.app.ui.actions.write_log_file.action import WriteLogFileAction
 
 from galog.app.ui.core.tag_filter_dialog import TagFilterDialog
 from galog.app.device.device import AdbClient
@@ -73,6 +73,7 @@ from galog.app.paths import (
 from galog.app.ui.base.style import GALogStyle
 
 from galog.app.ui.core.log_messages_panel import LogMessagesPanel
+from galog.app.ui.reusable.file_picker import FilePicker, FileExtensionFilterBuilder
 
 
 class MainWindow(QMainWindow):
@@ -275,10 +276,23 @@ class MainWindow(QMainWindow):
             self.logMessagesPanel.disableQuickFilter()
             self.logMessagesPanel.clearLogLines()
 
+    def _saveLastSelectedDir(self, filePicker: FilePicker):
+        if filePicker.hasSelectedDirectory():
+            self.appState.lastUsedDirPath = filePicker.selectedDirectory()
+
     def saveLogFile(self):
-        logLines = self.logMessagesPanel.logLines()
-        controller = SaveLogFileController(logLines)
-        controller.promptSaveFile()
+        filePicker = FilePicker(
+            caption="Save log lines to file",
+            directory=self.appState.lastUsedDirPath,
+            extensionFilter=FileExtensionFilterBuilder.logFile(),
+        )
+
+        filePath = filePicker.askOpenFileWrite()
+        if not filePath:
+            return
+
+        self._saveLastSelectedDir(filePicker)
+        self.logMessagesPanel.saveLogFile(filePath)
 
     def openLogFile(self):
         if self.logMessagesPanel.isCaptureRunning():
@@ -287,15 +301,21 @@ class MainWindow(QMainWindow):
             msgBoxErr(msgBrief, msgVerbose, self)
             return
 
-        controller = OpenLogFileController()
-        lines = controller.promptOpenFile()
-        if not lines:
+        filePicker = FilePicker(
+            caption="Load log lines from file",
+            directory=self.appState.lastUsedDirPath,
+            extensionFilter=FileExtensionFilterBuilder.logFile(),
+        )
+
+        filePath = filePicker.askOpenFileRead()
+        if not filePath:
             return
 
+        self._saveLastSelectedDir(filePicker)
+        self.logMessagesPanel.clearLogLines()
         self.logMessagesPanel.setWhiteBackground()
         self.logMessagesPanel.disableQuickFilter()
-        self.logMessagesPanel.clearLogLines()
-        self.logMessagesPanel.addLogLines(lines)
+        self.logMessagesPanel.loadLogFile(filePath)
 
     def restartCapture(self):
         dialog = RestartCaptureDialog(self)
