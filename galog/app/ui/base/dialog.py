@@ -15,9 +15,13 @@ class Dialog(QDialog):
             | Qt.WindowCloseButtonHint
         )
 
-    def __init__(self, parent: Optional[QWidget] = None):
+    def __init__(
+        self,
+        parent: Optional[QWidget] = None,
+        objectName: Optional[str] = None,
+    ):
         super().__init__(parent, self._defaultFlags())
-        self.setObjectName(self.__class__.__name__)
+        self.setObjectName(objectName or self.__class__.__name__)
         self.setAttribute(Qt.WA_StyledBackground)
         self.setWindowTitle("GALog")
         self.setStyle(GALogStyle())

@@ -22,7 +22,7 @@ from .content_area import MessageBoxContentArea
 
 class MessageBox(Dialog):
     def __init__(self, parent: Optional[QWidget] = None):
-        super().__init__(parent)
+        super().__init__(parent, "MessageBox")
         self._clickedButtonId = -1
         self.setFixedMaxSize(450, 250)
         self.setRelativeGeometry(0.2, 0.3, 450, 250)
