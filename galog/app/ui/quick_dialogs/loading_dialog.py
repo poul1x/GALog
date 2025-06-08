@@ -1,15 +1,7 @@
-from datetime import datetime
 from typing import Optional
-from PyQt5.QtCore import Qt, QThread
-from PyQt5.QtWidgets import (
-    QApplication,
-    QLabel,
-    QMainWindow,
-    QProgressBar,
-    QVBoxLayout,
-    QDialog,
-    QWidget,
-)
+
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QLabel, QProgressBar, QVBoxLayout, QWidget
 
 from galog.app.ui.base.dialog import Dialog
 from galog.app.ui.base.widget import Widget

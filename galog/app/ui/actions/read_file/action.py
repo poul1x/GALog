@@ -1,17 +1,11 @@
-from typing import List, Optional
+from typing import Optional
 
-from PyQt5.QtCore import QThreadPool, QThread
+from PyQt5.QtCore import QThreadPool
 from PyQt5.QtWidgets import QWidget
 
 from galog.app.ui.base.action import Action
-from .task import FnReadText, FnReadBinary
 
-from galog.app.ui.quick_dialogs import LoadingDialog
-from galog.app.msgbox import msgBoxErr
-
-from .task import ReadTextFileTask, ReadBinaryFileTask
-
-from enum import Enum
+from .task import FnReadBinary, FnReadText, ReadBinaryFileTask, ReadTextFileTask
 
 
 class ReadFileAction(Action):

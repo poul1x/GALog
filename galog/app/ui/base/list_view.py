@@ -1,19 +1,10 @@
 from typing import Optional
 
-from PyQt5.QtCore import (
-    QAbstractItemModel,
-    QModelIndex,
-    pyqtSignal,
-    Qt,
-    QItemSelectionModel,
-)
+from PyQt5.QtCore import QAbstractItemModel, QModelIndex, pyqtSignal
 from PyQt5.QtGui import QFocusEvent, QKeyEvent
 from PyQt5.QtWidgets import QListView, QWidget
 
 from galog.app.ui.base.item_view_proxy import ItemViewProxy, ScrollHint
-
-from ..helpers.hotkeys import HotkeyHelper
-import logging
 
 
 class ListView(QListView):

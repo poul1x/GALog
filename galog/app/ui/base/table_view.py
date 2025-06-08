@@ -1,18 +1,10 @@
 from typing import Optional
 
-from PyQt5.QtCore import (
-    QAbstractItemModel,
-    QModelIndex,
-    pyqtSignal,
-    Qt,
-    QItemSelectionModel,
-)
-from PyQt5.QtGui import QKeyEvent, QFocusEvent
-from PyQt5.QtWidgets import QTableView, QWidget, QAbstractItemView
+from PyQt5.QtCore import QAbstractItemModel, QModelIndex, pyqtSignal
+from PyQt5.QtGui import QFocusEvent, QKeyEvent
+from PyQt5.QtWidgets import QTableView, QWidget
 
-from ..helpers.hotkeys import HotkeyHelper
 from .item_view_proxy import ItemViewProxy, ScrollHint
-import logging
 
 
 class TableView(QTableView):

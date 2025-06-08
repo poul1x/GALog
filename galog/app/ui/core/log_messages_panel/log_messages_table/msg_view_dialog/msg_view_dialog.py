@@ -1,31 +1,29 @@
 from copy import deepcopy
 from typing import Optional
+
 from PyQt5.QtCore import QSize, Qt, QTimer
-from PyQt5.QtGui import QIcon, QColor, QTextCharFormat, QTextCursor, QGuiApplication
+from PyQt5.QtGui import QColor, QGuiApplication, QIcon, QTextCharFormat, QTextCursor
 from PyQt5.QtWidgets import (
-    QApplication,
-    QDialog,
     QHBoxLayout,
     QLabel,
-    QMainWindow,
     QPushButton,
     QSizePolicy,
     QTextBrowser,
     QVBoxLayout,
     QWidget,
 )
+
 from galog.app.hrules import HRulesStorage
 from galog.app.log_reader import LogLine
-
 from galog.app.paths import iconFile, styleSheetFile
 from galog.app.ui.base.dialog import Dialog
+
 from ..colors import logLevelColor, logLevelColorDarker
 from ..data_model import HighlightingData
 from ..pattern_search_task import PatternSearchResult
 
 
 class LogMessageViewDialog(Dialog):
-
     QSS_TEMPLATE: Optional[str] = None
 
     @staticmethod
@@ -157,7 +155,9 @@ class LogMessageViewDialog(Dialog):
 
             self._highlightKeyword(item, charFormat)
 
-    def _highlightKeyword(self, keyword: PatternSearchResult, charFormat: QTextCharFormat):
+    def _highlightKeyword(
+        self, keyword: PatternSearchResult, charFormat: QTextCharFormat
+    ):
         if keyword.name == "GenericUrl":
             charFormat.setAnchor(True)
             text = self._logMsgTextBrowser.document().toPlainText()

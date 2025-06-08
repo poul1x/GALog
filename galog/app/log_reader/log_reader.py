@@ -1,17 +1,11 @@
-from contextlib import suppress
-from dataclasses import dataclass
-from typing import List, Optional, Tuple
+from typing import List
 
-from ppadb.connection import Connection
-from PyQt5.QtCore import QObject, QThread, QThreadPool, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal
 
-from galog.app.device import AdbClient, deviceRestricted
-from galog.app.device.device import AdbDevice
-from galog.app.device.errors import DeviceError
-from .event import Event
-from .models import LogLine, ProcessEndedEvent, ProcessStartedEvent
+from galog.app.device import AdbClient
+
 from .log_reader_thread import LogcatReaderThread
-import re
+from .models import LogLine, ProcessEndedEvent, ProcessStartedEvent
 
 
 class LogReaderSignals(QObject):

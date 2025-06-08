@@ -1,16 +1,14 @@
+import os
 import shutil
 import subprocess
 import sys
 import tarfile
-from contextlib import suppress
-from typing import Dict, List
-
 import traceback
-import os
-import shutil
-from PyQt5.QtGui import QDesktopServices
-from PyQt5.QtCore import QEvent, QThread, QThreadPool, QStandardPaths, QUrl
-from PyQt5.QtGui import QFontDatabase, QIcon
+from contextlib import suppress
+from typing import List
+
+from PyQt5.QtCore import QEvent, QThread, QThreadPool, QUrl
+from PyQt5.QtGui import QDesktopServices, QFontDatabase, QIcon
 from PyQt5.QtWidgets import (
     QAction,
     QApplication,
@@ -29,36 +27,13 @@ from galog.app.app_state import (
     TagFilteringConfig,
     TagFilteringMode,
 )
-from galog.app.ui.actions.stop_app import StopAppAction
-from galog.app.ui.core.device_select_dialog import DeviceSelectDialog
-from galog.app.ui.quick_dialogs import (
-    RestartCaptureDialog,
-)
-from galog.app.ui.quick_dialogs.stop_capture_dialog import (
-    StopCaptureDialog,
-    StopCaptureDialogResult,
-)
-
-# from galog.app.ui.core.message_view_dialog import LogMessageViewDialog
-from galog.app.ui.core.package_select_dialog import PackageSelectDialog
-from galog.app.ui.core.log_messages_panel import LogMessagesPanel
-from galog.app.ui.actions.read_log_file.action import ReadLogFileAction
-from galog.app.ui.actions.restart_app.action import RestartAppAction
-from galog.app.ui.actions.start_app import StartAppAction
-from galog.app.ui.actions.write_log_file.action import WriteLogFileAction
-
-from galog.app.ui.core.tag_filter_dialog import TagFilterDialog
 from galog.app.device.device import AdbClient
 from galog.app.hrules import HRulesStorage
 from galog.app.logging import initLogging
-from galog.app.msgbox import (
-    msgBoxErr,
-    msgBoxInfo,
-    msgBoxNotImp,
-    msgBoxPrompt,
-)
+from galog.app.msgbox import msgBoxErr, msgBoxInfo, msgBoxNotImp, msgBoxPrompt
 from galog.app.paths import (
     appConfigDir,
+    appDataDir,
     appLogsDir,
     appLogsRootDir,
     appSessionID,
@@ -68,12 +43,20 @@ from galog.app.paths import (
     loggingConfigFile,
     loggingConfigFileInitial,
     styleSheetFiles,
-    appDataDir,
 )
+from galog.app.ui.actions.restart_app.action import RestartAppAction
+from galog.app.ui.actions.start_app import StartAppAction
+from galog.app.ui.actions.stop_app import StopAppAction
 from galog.app.ui.base.style import GALogStyle
-
+from galog.app.ui.core.device_select_dialog import DeviceSelectDialog
 from galog.app.ui.core.log_messages_panel import LogMessagesPanel
-from galog.app.ui.reusable.file_picker import FilePicker, FileExtensionFilterBuilder
+
+# from galog.app.ui.core.message_view_dialog import LogMessageViewDialog
+from galog.app.ui.core.package_select_dialog import PackageSelectDialog
+from galog.app.ui.core.tag_filter_dialog import TagFilterDialog
+from galog.app.ui.quick_dialogs import RestartCaptureDialog
+from galog.app.ui.quick_dialogs.stop_capture_dialog import StopCaptureDialog
+from galog.app.ui.reusable.file_picker import FileExtensionFilterBuilder, FilePicker
 
 
 class MainWindow(QMainWindow):

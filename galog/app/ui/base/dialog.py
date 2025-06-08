@@ -1,6 +1,7 @@
 from typing import Optional
-from PyQt5.QtWidgets import QDialog, QWidget, QApplication, QMainWindow
+
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QWidget
 
 from .style import GALogStyle
 

@@ -1,44 +1,26 @@
 from typing import Callable, List, Optional
 
-from galog.app.hrules.hrules import HRulesStorage
-from galog.app.log_reader.models import LogLine
-from galog.app.ui.base.table_view import TableView, QTableView
-from .msg_view_dialog import LogMessageViewDialog
-
-from .navigation_frame import NavigationFrame
-
-from PyQt5.QtCore import QModelIndex, QPoint, Qt, pyqtSignal, QSortFilterProxyModel
+from PyQt5.QtCore import QModelIndex, QPoint, QSortFilterProxyModel, Qt, pyqtSignal
 from PyQt5.QtGui import (
+    QFontMetrics,
     QKeyEvent,
+    QMouseEvent,
     QResizeEvent,
     QStandardItemModel,
-    QFocusEvent,
-    QMouseEvent,
-    QGuiApplication,
-    QFontMetrics,
 )
-from PyQt5.QtWidgets import (
-    QAction,
-    QComboBox,
-    QHBoxLayout,
-    QMenu,
-    QPushButton,
-    QVBoxLayout,
-    QWidget,
-    QHeaderView,
-    QTableView,
-    QTableWidget,
-)
+from PyQt5.QtWidgets import QAction, QHeaderView, QMenu, QTableView, QWidget
 
-from galog.app.ui.reusable.regexp_filter_model import RegExpFilterModel
-from galog.app.ui.reusable.fn_filter_model import FnFilterModel
-
+from galog.app.hrules.hrules import HRulesStorage
+from galog.app.log_reader.models import LogLine
+from galog.app.ui.base.table_view import QTableView, TableView
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
-from galog.app.ui.base.widget import Widget
+from galog.app.ui.reusable.fn_filter_model import FnFilterModel
+from galog.app.ui.reusable.regexp_filter_model import RegExpFilterModel
 
 from .data_model import Column, DataModel
-from .navigation_frame import NavigationFrame
 from .log_line_delegate import LogLineDelegate
+from .msg_view_dialog import LogMessageViewDialog
+from .navigation_frame import NavigationFrame
 from .vertical_header import VerticalHeader
 
 
@@ -109,16 +91,15 @@ class LogMessagesTable(TableView):
 
         if self.quickFilterEnabled():
             actionOrigin = QAction("Go to origin", self)
-            actionOrigin.triggered.connect(lambda: self.requestJumpToOriginalLine.emit()) # fmt: skip
+            actionOrigin.triggered.connect(lambda: self.requestJumpToOriginalLine.emit())  # fmt: skip
             contextMenu.addAction(actionOrigin)
 
         if canJumpBack:
             actionBack = QAction("Go back", self)
-            actionBack.triggered.connect(lambda: self.requestJumpBackToFilterView.emit()) # fmt: skip
+            actionBack.triggered.connect(lambda: self.requestJumpBackToFilterView.emit())  # fmt: skip
             contextMenu.addAction(actionBack)
 
         contextMenu.exec_(self.viewport().mapToGlobal(position))
-
 
     def _topModel(self) -> QSortFilterProxyModel:
         return self._quickFilterModel
@@ -145,7 +126,6 @@ class LogMessagesTable(TableView):
         self._quickFilterModel.setFilteringColumn(Column.logMessage.value)
         self._quickFilterModel.setSourceModel(self._advancedFilterModel)
         self.setModel(self._quickFilterModel)
-
 
     def _initUserInterface(self):
         self.setSelectionBehavior(QTableView.SelectRows)

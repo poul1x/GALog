@@ -1,19 +1,17 @@
+import logging
 from typing import Optional
 
 from PyQt5.QtCore import (
     QAbstractItemModel,
-    QModelIndex,
-    pyqtBoundSignal,
-    Qt,
     QItemSelectionModel,
+    QModelIndex,
+    Qt,
+    pyqtBoundSignal,
 )
 from PyQt5.QtGui import QFocusEvent, QKeyEvent
-from PyQt5.QtWidgets import QListView, QWidget, QAbstractItemView
+from PyQt5.QtWidgets import QAbstractItemView
 
 from ..helpers.hotkeys import HotkeyHelper
-import logging
-
-from enum import Enum, auto
 
 ScrollHint = QAbstractItemView.ScrollHint
 

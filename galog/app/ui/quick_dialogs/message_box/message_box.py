@@ -2,19 +2,9 @@ from typing import Optional
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import (
-    QApplication,
-    QCheckBox,
-    QDialog,
-    QLabel,
-    QMainWindow,
-    QVBoxLayout,
-    QWidget,
-)
+from PyQt5.QtWidgets import QApplication, QCheckBox, QLabel, QVBoxLayout, QWidget
 
-from galog.app.paths import styleSheetFile
 from galog.app.ui.base.dialog import Dialog
-from galog.app.ui.base.style import GALogStyle
 
 from .button_bar import MessageBoxButtonBar
 from .content_area import MessageBoxContentArea

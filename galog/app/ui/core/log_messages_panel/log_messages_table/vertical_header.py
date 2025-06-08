@@ -1,34 +1,10 @@
-from typing import Callable, List, Optional
+from typing import Optional
 
-from galog.app.hrules.hrules import HRulesStorage
-from galog.app.log_reader.models import LogLine
+from PyQt5.QtCore import QRect, QSize, Qt
+from PyQt5.QtGui import QColor, QFont, QFontMetrics, QPainter
+from PyQt5.QtWidgets import QHeaderView, QWidget
+
 from galog.app.ui.helpers.painter import painterSaveRestore
-
-from .navigation_frame import NavigationFrame
-
-from PyQt5.QtCore import QModelIndex, QPoint, Qt, pyqtSignal, QSortFilterProxyModel, QRect, QSize
-from PyQt5.QtGui import QKeyEvent, QResizeEvent, QStandardItemModel, QFocusEvent, QMouseEvent, QGuiApplication, QFont, QPainter, QColor, QFontMetrics
-from PyQt5.QtWidgets import (
-    QAction,
-    QComboBox,
-    QHBoxLayout,
-    QMenu,
-    QPushButton,
-    QVBoxLayout,
-    QWidget,
-    QHeaderView,
-    QTableView, QTableWidget
-)
-
-from galog.app.ui.reusable.search_input import SearchInput
-from galog.app.ui.reusable.regexp_filter_model import RegExpFilterModel
-from galog.app.ui.reusable.fn_filter_model import FnFilterModel
-
-from galog.app.ui.helpers.hotkeys import HotkeyHelper
-from galog.app.ui.base.widget import Widget
-
-from .data_model import Column, DataModel
-from .navigation_frame import NavigationFrame
 
 
 class VerticalHeader(QHeaderView):

@@ -1,37 +1,25 @@
 from typing import Callable, List, Optional
 
-from PyQt5.QtCore import QModelIndex, QPoint, Qt, pyqtSignal
-from PyQt5.QtGui import QFocusEvent, QKeyEvent, QMouseEvent, QGuiApplication
-from PyQt5.QtWidgets import (
-    QAction,
-    QComboBox,
-    QHBoxLayout,
-    QMenu,
-    QPushButton,
-    QVBoxLayout,
-    QWidget,
-)
+from PyQt5.QtCore import QPoint, Qt, pyqtSignal
+from PyQt5.QtGui import QFocusEvent, QGuiApplication
+from PyQt5.QtWidgets import QVBoxLayout, QWidget
+
 from galog.app.app_state import AppState
 from galog.app.device.device import AdbClient
 from galog.app.hrules import HRulesStorage
-from galog.app.log_reader import AndroidAppLogReader, LogLine
-from galog.app.log_reader import ProcessEndedEvent, ProcessStartedEvent
-from galog.app.msgbox import msgBoxErr
+from galog.app.log_reader import (
+    AndroidAppLogReader,
+    LogLine,
+    ProcessEndedEvent,
+    ProcessStartedEvent,
+)
 from galog.app.ui.actions.get_app_pids import GetAppPidsAction
-from galog.app.ui.actions.read_file import ReadFileAction
 from galog.app.ui.actions.read_log_file import ReadLogFileAction
-from galog.app.ui.actions.write_file import WriteFileAction
 from galog.app.ui.actions.write_log_file import WriteLogFileAction
 from galog.app.ui.base.item_view_proxy import ScrollHint
-from galog.app.ui.quick_dialogs.loading_dialog import LoadingDialog
-from galog.app.ui.reusable.file_picker import FilePicker, FileExtensionFilterBuilder
-
-from galog.app.ui.reusable.search_input.widget import SearchInput
-from galog.app.ui.helpers.hotkeys import HotkeyHelper
-
 from galog.app.ui.base.widget import Widget
 
-from .log_messages_table import LogMessagesTable, Column
+from .log_messages_table import Column, LogMessagesTable
 from .quick_filter_bar import FilterField, QuickFilterBar
 
 

@@ -1,8 +1,7 @@
 from enum import Enum, auto
 from typing import Optional
-from PyQt5.QtWidgets import QWidget
 
-from PyQt5.QtWidgets import QCheckBox
+from PyQt5.QtWidgets import QCheckBox, QWidget
 
 from .message_box import MessageBox
 
@@ -14,7 +13,6 @@ class StopCaptureDialogResult(int, Enum):
 
 
 class StopCaptureDialog(MessageBox):
-
     AcceptedDetachApp = StopCaptureDialogResult.AcceptedDetachApp
     AcceptedStopApp = StopCaptureDialogResult.AcceptedStopApp
     Rejected = StopCaptureDialogResult.Rejected

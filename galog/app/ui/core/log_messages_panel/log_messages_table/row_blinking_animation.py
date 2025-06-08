@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject, QRunnable, Qt, QThread, QThreadPool, pyqtSignal
+from PyQt5.QtCore import QObject, QRunnable, QThread, QThreadPool, pyqtSignal
 from PyQt5.QtGui import QStandardItemModel
 
 from .data_model import Column
@@ -40,7 +40,6 @@ class BlinkingTimerTask(QRunnable):
 
 
 class RowBlinkingAnimation(QObject):
-
     finished = pyqtSignal()
 
     def __init__(self, row: int, model: QStandardItemModel) -> None:

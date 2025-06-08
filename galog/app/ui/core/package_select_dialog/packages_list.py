@@ -4,8 +4,8 @@ from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QSortFilterProxyModel
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QListView, QVBoxLayout, QWidget
 
-from galog.app.ui.reusable.search_input import SearchInput
 from galog.app.ui.base.list_view import ListView
+from galog.app.ui.reusable.search_input import SearchInput
 
 
 class PackagesList(QWidget):

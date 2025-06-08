@@ -1,11 +1,10 @@
 from typing import List, Optional
 
-from PyQt5.QtCore import QModelIndex, Qt, pyqtSignal, QItemSelectionModel
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
-from PyQt5.QtWidgets import QAbstractItemView, QListView, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QAbstractItemView, QListView, QWidget
 
 from galog.app.ui.base.list_view import ListView
-from galog.app.ui.base.widget import Widget
 
 
 class FilteredTagsList(ListView):
@@ -23,9 +22,7 @@ class FilteredTagsList(ListView):
         self.setModel(self.dataModel)
 
         # Make it easier to subscribe for this signal in parent widget
-        self.selectionModel().selectionChanged.connect(
-            self.selectionChange.emit
-        )
+        self.selectionModel().selectionChanged.connect(self.selectionChange.emit)
 
     def toStringList(self) -> List[str]:
         result = []

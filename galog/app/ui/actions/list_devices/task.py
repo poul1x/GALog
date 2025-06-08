@@ -1,10 +1,6 @@
+from PyQt5.QtCore import QObject, pyqtSignal
 
-from typing import Optional
-
-from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
-
-from galog.app.device import AdbClient
-from galog.app.device import DeviceInfo, deviceListWithInfo
+from galog.app.device import AdbClient, DeviceInfo, deviceListWithInfo
 from galog.app.device.errors import DeviceError
 from galog.app.ui.base.task import Task
 

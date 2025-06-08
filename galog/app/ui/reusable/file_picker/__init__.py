@@ -1,4 +1,4 @@
-from .file_picker import FilePicker, FileExtensionFilter, FileExtensionFilterBuilder
+from .file_picker import FileExtensionFilter, FileExtensionFilterBuilder, FilePicker
 
 __all__ = [
     "FilePicker",

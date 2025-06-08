@@ -1,20 +1,18 @@
 from typing import List
 from zipfile import BadZipFile
 
-from PyQt5.QtCore import QModelIndex, Qt, QThreadPool
+from PyQt5.QtCore import QModelIndex, Qt
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QFileDialog, QVBoxLayout, QWidget
 
 from galog.app.apk_info import APK
 from galog.app.app_state import AppState, LastSelectedPackage
+from galog.app.device import AdbClient
+from galog.app.msgbox import msgBoxErr, msgBoxPrompt
+from galog.app.ui.actions.install_app.action import InstallAppAction
 from galog.app.ui.actions.list_packages import ListPackagesAction
 from galog.app.ui.base.dialog import Dialog
-from galog.app.ui.quick_dialogs import LoadingDialog
-from galog.app.ui.actions.install_app.action import InstallAppAction
-from galog.app.device import AdbClient
-from galog.app.device.errors import DeviceError, DeviceNotFound
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
-from galog.app.msgbox import msgBoxErr, msgBoxPrompt
 
 from ..device_select_dialog import DeviceSelectDialog
 from .button_bar import ButtonBar
@@ -191,7 +189,9 @@ class PackageSelectDialog(Dialog):
             return
 
         msgBrief = "Package not installed"
-        prompt = f"This app is not present on the device. Do you want to install and run it?"
+        prompt = (
+            f"This app is not present on the device. Do you want to install and run it?"
+        )
         if not msgBoxPrompt(msgBrief, prompt, self):
             return
 

@@ -1,12 +1,10 @@
-import re
 import os
-import sys
-from typing import Callable
-from PyQt5.QtCore import QStandardPaths
-from pathlib import Path
-
-from datetime import datetime
 import random
+import sys
+from datetime import datetime
+from typing import Callable
+
+from PyQt5.QtCore import QStandardPaths
 
 # Initialize pseudorandom sequences
 random.seed(datetime.now().timestamp())
@@ -119,8 +117,10 @@ def appLogsRootDir():
 def appLogsDir():
     return os.path.join(_APP_DATA_DIR, "logs", _APP_SESSION_ID)
 
+
 def appSessionID():
     return _APP_SESSION_ID
+
 
 def appConfigDir():
     return os.path.join(_APP_DATA_DIR, "config")

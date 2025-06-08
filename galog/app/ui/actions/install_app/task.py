@@ -1,11 +1,9 @@
-from typing import Optional
-
-from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal
 
 from galog.app.device import AdbClient, deviceRestricted
 from galog.app.device.errors import DeviceError, InstallError
-
 from galog.app.ui.base.task import Task
+
 
 class InstallAppTaskSignals(QObject):
     succeeded = pyqtSignal()
@@ -27,7 +25,7 @@ class InstallAppTask(Task):
 
         except InstallError as e:
             msgBrief = "App installation failed"
-            msgVerbose = "Failed to install this APK. Please, ensure the APK is not corrupted and has a valid signature" # fmt: skip
+            msgVerbose = "Failed to install this APK. Please, ensure the APK is not corrupted and has a valid signature"  # fmt: skip
             self.signals.failed.emit(msgBrief, msgVerbose)
 
         except DeviceError as e:

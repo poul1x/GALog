@@ -1,16 +1,12 @@
-from typing import List, Optional
+from typing import Optional
 
-from PyQt5.QtCore import QThreadPool, QThread
+from PyQt5.QtCore import QThreadPool
 from PyQt5.QtWidgets import QWidget
-from galog.app.app_state import AppState
-from galog.app.device import AdbClient
-from galog.app.device import DeviceInfo
+
+from galog.app.device import AdbClient, DeviceInfo
 from galog.app.ui.actions.list_devices.task import ListDevicesTask
 from galog.app.ui.base.action import Action
 
-from galog.app.ui.quick_dialogs import LoadingDialog
-from galog.app.msgbox import msgBoxErr
-from ..shell_exec import ShellExecAction, ShellExecCommand
 
 class ListDevicesAction(Action):
     def __init__(self, adbClient: AdbClient, parentWidget: Optional[QWidget] = None):

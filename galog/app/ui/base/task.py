@@ -1,6 +1,7 @@
-from abc import abstractmethod
-from PyQt5.QtCore import QRunnable, QThread
 import logging
+from abc import abstractmethod
+
+from PyQt5.QtCore import QRunnable, QThread
 
 
 class Task(QRunnable):

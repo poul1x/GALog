@@ -1,14 +1,10 @@
 from typing import Optional
-from zipfile import BadZipFile
 
 from PyQt5.QtCore import QThreadPool
-from PyQt5.QtWidgets import QFileDialog, QWidget
+from PyQt5.QtWidgets import QWidget
 
-from galog.app.apk_info import APK
-from galog.app.ui.quick_dialogs import LoadingDialog
-from galog.app.ui.base.action import Action
 from galog.app.device import AdbClient
-from galog.app.msgbox import msgBoxErr, msgBoxInfo
+from galog.app.ui.base.action import Action
 
 from .task import InstallAppTask
 

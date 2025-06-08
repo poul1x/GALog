@@ -1,22 +1,20 @@
 from typing import TYPE_CHECKING, List, Optional
 
-from PyQt5.QtCore import QModelIndex, Qt, QThreadPool
+from PyQt5.QtCore import QModelIndex, Qt
 from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QVBoxLayout, QWidget
 
 from galog.app.app_state import LastSelectedDevice
-from galog.app.ui.actions.list_devices.action import ListDevicesAction
-from galog.app.ui.base.dialog import Dialog
-from galog.app.ui.quick_dialogs import LoadingDialog
-from galog.app.ui.quick_dialogs.loading_dialog import LoadingDialog
 from galog.app.device import AdbClient, DeviceInfo
 from galog.app.device.device import AdbClient
-from galog.app.ui.helpers.hotkeys import HotkeyHelper
 from galog.app.msgbox import msgBoxErr
+from galog.app.ui.actions.list_devices.action import ListDevicesAction
+from galog.app.ui.base.dialog import Dialog
+from galog.app.ui.helpers.hotkeys import HotkeyHelper
 
-from .load_options import DevicesLoadOptions
 from .button_bar import ButtonBar
 from .device_table import DeviceTable
+from .load_options import DevicesLoadOptions
 
 if TYPE_CHECKING:
     from galog.app.main import AppState

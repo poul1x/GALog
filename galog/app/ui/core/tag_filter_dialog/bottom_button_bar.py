@@ -1,6 +1,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QWidget
+
 from galog.app.ui.base.widget import Widget
+
 
 class BottomButtonBar(Widget):
     def __init__(self, parent: QWidget):

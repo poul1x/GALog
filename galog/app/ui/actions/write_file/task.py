@@ -1,12 +1,9 @@
 from abc import abstractmethod
-from io import TextIOWrapper
-from typing import IO, Callable, List, Optional
+from typing import IO, Callable
 
-from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal
 
 from galog.app.ui.base.task import Task
-
-from typing import IO, Callable
 
 FnWriteText = Callable[[IO[str]], None]
 FnWriteBinary = Callable[[IO[bytes]], None]

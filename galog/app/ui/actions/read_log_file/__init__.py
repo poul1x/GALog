@@ -1,4 +1,4 @@
-from .action import ReadLogFileAction, LogLineParseError
+from .action import LogLineParseError, ReadLogFileAction
 
 __all__ = [
     "ReadLogFileAction",

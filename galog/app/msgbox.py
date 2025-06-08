@@ -3,8 +3,8 @@ from typing import Optional
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget
 
-from galog.app.ui.quick_dialogs import MessageBox
 from galog.app.paths import iconFile
+from galog.app.ui.quick_dialogs import MessageBox
 
 
 def msgBoxInfo(msgBrief: str, msgVerbose: str, parent: Optional[QWidget] = None):

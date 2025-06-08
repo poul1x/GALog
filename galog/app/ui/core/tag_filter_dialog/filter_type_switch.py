@@ -1,6 +1,3 @@
-from enum import Enum, auto
-from typing import Optional
-
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QLabel, QWidget
 
@@ -31,7 +28,6 @@ class FilterTypeSwitch(Widget):
         self.dropdown.currentIndexChanged.connect(self._filterTypeChanged)
         self.dropdown.setCurrentIndex(TagFilteringMode.Disabled.value)
         hBoxLayout.addWidget(self.dropdown)
-
 
     def _filterTypeChanged(self, index: int):
         self.filterTypeChanged.emit(TagFilteringMode(index))

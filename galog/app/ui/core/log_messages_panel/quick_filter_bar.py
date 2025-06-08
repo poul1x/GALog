@@ -1,13 +1,12 @@
+from enum import Enum, auto
 from typing import Optional
-from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QSortFilterProxyModel, Qt, pyqtSignal
-from PyQt5.QtGui import QStandardItem, QStandardItemModel, QFocusEvent
-from PyQt5.QtWidgets import QListView, QVBoxLayout, QWidget, QComboBox, QPushButton, QHBoxLayout
+
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QPushButton, QWidget
 
 from galog.app.ui.base.widget import Widget
 from galog.app.ui.reusable.search_input import SearchInput
-from galog.app.ui.base.list_view import ListView
 
-from enum import Enum,auto
 
 class FilterField(int, Enum):
     Message = 0

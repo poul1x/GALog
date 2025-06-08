@@ -2,10 +2,10 @@ from typing import Optional
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QIcon, QKeyEvent, QMouseEvent
-from PyQt5.QtWidgets import QApplication, QLineEdit, QToolButton, QWidget
+from PyQt5.QtWidgets import QLineEdit, QToolButton, QWidget
 
-from galog.app.ui.helpers.hotkeys import HotkeyHelper
 from galog.app.paths import iconFile
+from galog.app.ui.helpers.hotkeys import HotkeyHelper
 
 
 class SearchInput(QLineEdit):

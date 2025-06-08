@@ -1,7 +1,11 @@
-from .log_reader import AndroidAppLogReader, LogLine, ProcessEndedEvent, ProcessStartedEvent
+from .log_reader import (
+    AndroidAppLogReader,
+    LogLine,
+    ProcessEndedEvent,
+    ProcessStartedEvent,
+)
 
 __all__ = [
-
     "AndroidAppLogReader",
     "LogLine",
     "ProcessEndedEvent",

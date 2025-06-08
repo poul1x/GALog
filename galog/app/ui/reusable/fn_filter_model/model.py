@@ -1,21 +1,10 @@
-from typing import Optional
+from typing import Callable, Optional
 
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QIcon, QKeyEvent
-from PyQt5.QtWidgets import QApplication, QLineEdit, QToolButton, QWidget
-
-from galog.app.ui.helpers.hotkeys import HotkeyHelper
-from galog.app.paths import iconFile
-
-
-from PyQt5.QtGui import QStandardItem, QStandardItemModel
-from typing import Callable
-
-from PyQt5.QtCore import QModelIndex, QSortFilterProxyModel, Qt, QObject
+from PyQt5.QtCore import QModelIndex, QObject, QSortFilterProxyModel, Qt
 
 
 class FnFilterModel(QSortFilterProxyModel):
-    def __init__(self, parent:Optional[QObject] = None):
+    def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
         self.setFilterCaseSensitivity(Qt.CaseInsensitive)
         self.setFilterKeyColumn(0)

@@ -1,16 +1,16 @@
+import re
 from contextlib import suppress
-from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Tuple
 
 from ppadb.connection import Connection
-from PyQt5.QtCore import QObject, QThread, QThreadPool, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal
 
 from galog.app.device import AdbClient, deviceRestricted
 from galog.app.device.device import AdbDevice
 from galog.app.device.errors import DeviceError
+
 from .event import Event
-from .models import LogLine, ProcessStartedEvent, ProcessEndedEvent
-import re
+from .models import LogLine, ProcessEndedEvent, ProcessStartedEvent
 
 IDLE_INTERVAL_MS = 100
 RECV_CHUNK_SIZE = 4096

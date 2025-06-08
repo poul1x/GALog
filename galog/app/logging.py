@@ -1,12 +1,11 @@
-from typing import Any, Dict
-from galog.app.paths import (
-    loggingConfigFile,
-    appLogsDir,
-)
 import logging.config
 import logging.handlers
 import os
+from typing import Dict
+
 import yaml
+
+from galog.app.paths import appLogsDir, loggingConfigFile
 
 
 def updateFileHandlersPaths(config: Dict[str, dict]):

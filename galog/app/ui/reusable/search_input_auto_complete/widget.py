@@ -1,8 +1,7 @@
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
-from PyQt5.QtGui import QFocusEvent, QValidator
-from PyQt5.QtCore import QStringListModel, Qt, pyqtSignal, QObject, QEvent, QModelIndex
-
+from PyQt5.QtCore import QModelIndex, QStringListModel, Qt, pyqtSignal
+from PyQt5.QtGui import QFocusEvent
 from PyQt5.QtWidgets import QCompleter, QWidget
 
 from galog.app.paths import styleSheetFile

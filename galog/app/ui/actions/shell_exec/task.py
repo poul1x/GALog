@@ -1,19 +1,11 @@
-from abc import abstractmethod
 from dataclasses import dataclass
-from enum import Enum, auto
-from io import TextIOWrapper
-from typing import IO, Callable, List, Optional
+from typing import Callable, List
 
-from PyQt5.QtCore import QObject, QRunnable, QThread, pyqtSignal
-from galog.app.app_state import AppState
+from PyQt5.QtCore import QObject, QThread, pyqtSignal
 
-from galog.app.device import AdbClient, deviceRestricted
-from galog.app.device import AdbDevice
+from galog.app.device import AdbClient, AdbDevice, deviceRestricted
 from galog.app.device.errors import DeviceError
-
 from galog.app.ui.base.task import Task
-
-from typing import Callable
 
 ShellExecVerifier = Callable[[str, str], bool]
 _DEFAULT_VERIFIER = lambda code, output: code == "0"

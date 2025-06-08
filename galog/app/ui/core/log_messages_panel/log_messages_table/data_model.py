@@ -1,13 +1,13 @@
 from contextlib import contextmanager
 from dataclasses import dataclass
 from enum import Enum, auto
+from typing import List
 
+from PyQt5.QtCore import QModelIndex, Qt
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
-from typing import Callable, List
-
-from PyQt5.QtCore import QModelIndex, QSortFilterProxyModel, Qt
 
 from galog.app.log_reader import LogLine
+
 from .pattern_search_task import PatternSearchResult
 
 

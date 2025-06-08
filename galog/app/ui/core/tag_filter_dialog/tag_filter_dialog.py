@@ -1,25 +1,16 @@
-import os
-from typing import IO, List
-from PyQt5.QtGui import QKeyEvent
-from PyQt5.QtCore import Qt, QObject, QEvent
-from PyQt5.QtWidgets import (
-    QDialog,
-    QWidget,
-    QApplication,
-    QVBoxLayout,
-    QHBoxLayout,
-    QFileDialog,
-)
-from galog.app.app_state import AppState, TagFilteringConfig, TagFilteringMode
+from typing import List
 
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtWidgets import QDialog, QHBoxLayout, QVBoxLayout, QWidget
+
+from galog.app.app_state import AppState, TagFilteringConfig, TagFilteringMode
 from galog.app.msgbox import msgBoxErr, msgBoxPrompt
-from galog.app.ui.actions.read_file import FileProcessError
-from galog.app.ui.base.dialog import Dialog
 from galog.app.ui.actions.read_tags_file import ReadTagsFileAction
 from galog.app.ui.actions.write_tags_file import WriteTagsFileAction
+from galog.app.ui.base.dialog import Dialog
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
-from galog.app.ui.quick_dialogs.loading_dialog import LoadingDialog
-from galog.app.ui.reusable.file_picker import FilePicker, FileExtensionFilterBuilder
+from galog.app.ui.reusable.file_picker import FileExtensionFilterBuilder, FilePicker
 
 from .bottom_button_bar import BottomButtonBar
 from .control_button_bar import ControlButtonBar

@@ -1,17 +1,12 @@
 from typing import List, Optional
 
-from PyQt5.QtCore import QThreadPool, QThread
+from PyQt5.QtCore import QThreadPool
 from PyQt5.QtWidgets import QWidget
 
-from galog.app.app_state import AppState
 from galog.app.device.device import AdbClient
 from galog.app.ui.base.action import Action
+
 from .task import ShellExecCommand, ShellExecResult, ShellExecTask
-
-from galog.app.ui.quick_dialogs import LoadingDialog
-from galog.app.msgbox import msgBoxErr
-
-from enum import Enum
 
 
 class ShellExecAction(Action):

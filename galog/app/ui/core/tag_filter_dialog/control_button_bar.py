@@ -1,5 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QPushButton, QVBoxLayout, QWidget
+
 from galog.app.ui.base.widget import Widget
 
 

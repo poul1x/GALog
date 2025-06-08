@@ -1,17 +1,13 @@
 import re
-from typing import IO, Callable, List, Optional
+from typing import IO, Optional
 
-from galog.app.ui.actions.read_file import FileProcessError
-from ..read_file import ReadFileAction
+from PyQt5.QtCore import QObject, QThread, pyqtSignal
+from PyQt5.QtWidgets import QWidget
 
-from PyQt5.QtCore import QThreadPool, QObject, pyqtSignal, QThread
-from PyQt5.QtWidgets import QFileDialog, QWidget
-
-from queue import Queue
-
-from galog.app.ui.quick_dialogs import LoadingDialog
 from galog.app.log_reader.log_reader import LogLine
-from galog.app.msgbox import msgBoxErr
+from galog.app.ui.actions.read_file import FileProcessError
+
+from ..read_file import ReadFileAction
 
 REGEX_VTAG = r"^([A-Z])/(.+?): (.*)$"
 
@@ -29,6 +25,7 @@ class LogLineParseError(FileProcessError):
 
 class SignalsInternal(QObject):
     lineRead = pyqtSignal(LogLine)
+
 
 class ReadLogFileAction(ReadFileAction):
     def __init__(self, filePath: str, parentWidget: Optional[QWidget] = None):

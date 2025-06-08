@@ -1,23 +1,14 @@
-from dataclasses import dataclass
-from enum import Enum, auto
-from typing import List, Optional
+from typing import List
 
-from PyQt5.QtCore import (
-    QModelIndex,
-    QRectF,
-    QSortFilterProxyModel,
-    Qt,
-    pyqtSignal,
-    QThreadPool,
-)
+from PyQt5.QtCore import QModelIndex, QRectF, Qt, QThreadPool
 from PyQt5.QtGui import (
     QFont,
     QFontMetrics,
     QPainter,
+    QStandardItemModel,
     QTextCharFormat,
     QTextCursor,
     QTextDocument,
-    QStandardItemModel,
 )
 from PyQt5.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem
 
@@ -29,7 +20,11 @@ from galog.app.ui.core.log_messages_panel.log_messages_table.colors import (
 from galog.app.ui.helpers.painter import painterSaveRestore
 
 from .data_model import Column, HighlightingData, LazyHighlightingState
-from .pattern_search_task import PatternSearchTask, PatternSearchItem, PatternSearchResult
+from .pattern_search_task import (
+    PatternSearchItem,
+    PatternSearchResult,
+    PatternSearchTask,
+)
 from .row_blinking_animation import RowBlinkingAnimation
 
 

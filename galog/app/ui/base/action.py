@@ -1,10 +1,11 @@
+import logging
 from typing import Optional
+
+from PyQt5.QtWidgets import QWidget
+
 from galog.app.msgbox import msgBoxErr as _msgBoxErr
 from galog.app.msgbox import msgBoxPrompt as _msgBoxPrompt
 from galog.app.ui.quick_dialogs import LoadingDialog
-
-from PyQt5.QtWidgets import QWidget
-import logging
 
 
 class Action:
