@@ -16,7 +16,7 @@ class ListDevicesAction(Action):
     def __init__(self, adbClient: AdbClient, parentWidget: Optional[QWidget] = None):
         super().__init__(parentWidget)
         self.setLoadingDialogText("Loading device list...")
-        self._client = adbClient
+        self._adbClient = adbClient
         self._deviceList = []
 
     def _deviceFound(self, deviceInfo: DeviceInfo):
@@ -30,7 +30,7 @@ class ListDevicesAction(Action):
         self._setFailed()
 
     def listDevices(self):
-        task = ListDevicesTask(self._client)
+        task = ListDevicesTask(self._adbClient)
         task.setStartDelay(500)
         task.signals.succeeded.connect(self._succeeded)
         task.signals.deviceFound.connect(self._deviceFound)

@@ -10,7 +10,7 @@ from galog.app.app_state import AppState, LastSelectedPackage
 from galog.app.ui.actions.list_packages import ListPackagesAction
 from galog.app.ui.base.dialog import Dialog
 from galog.app.ui.quick_dialogs import LoadingDialog
-from galog.app.ui.actions.install_app.controller import InstallAppController
+from galog.app.ui.actions.install_app.action import InstallAppAction
 from galog.app.device import AdbClient
 from galog.app.device.errors import DeviceError, DeviceNotFound
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
@@ -191,12 +191,12 @@ class PackageSelectDialog(Dialog):
             return
 
         msgBrief = "Package not installed"
-        prompt = f"This app is not present on the device. Do you want to install the APK and continue this action?"
+        prompt = f"This app is not present on the device. Do you want to install and run it?"
         if not msgBoxPrompt(msgBrief, prompt, self):
             return
 
         deviceSerial = self._appState.lastSelectedDevice.serial
-        action = InstallAppController(self.adbClient())
+        action = InstallAppAction(self.adbClient(), self)
         if not action.installApp(deviceSerial, selectedFiles[0]):
             return
 

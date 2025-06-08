@@ -1,5 +1,5 @@
-from .controller import InstallAppController
+from .action import InstallAppAction
 
 __all__ = [
-    "InstallAppController",
+    "InstallAppAction",
 ]
