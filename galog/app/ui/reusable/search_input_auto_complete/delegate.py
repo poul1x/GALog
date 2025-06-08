@@ -1,7 +1,7 @@
 from typing import Optional
 
-from PyQt5.QtCore import QModelIndex
-from PyQt5.QtGui import QColor, QFont, QPainter, QPalette
+from PyQt5.QtCore import QModelIndex, QSize
+from PyQt5.QtGui import QColor, QFont, QPainter, QPalette, QFontMetrics
 from PyQt5.QtWidgets import (
     QApplication,
     QStyle,
@@ -41,3 +41,8 @@ class CompleterDelegate(QStyledItemDelegate):
         widget: QWidget = option.widget
         style = widget.style() if widget else QApplication.style()
         style.drawControl(QStyle.CE_ItemViewItem, option, painter, widget)
+
+    def sizeHint(self, option: QStyleOptionViewItem, index: QModelIndex):
+        fm = QFontMetrics(self._font)
+        size = super().sizeHint(option, index)
+        return QSize(size.width(), fm.height() + 5)

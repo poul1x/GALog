@@ -1,6 +1,7 @@
 import os
-import random
 import sys
+import random
+import logging
 from datetime import datetime
 from typing import Callable
 
@@ -34,7 +35,6 @@ def _appDataRootDir():
     return os.path.normpath(path)
 
 
-import logging
 
 _APP_NAME = "galog"
 _APP_SESSION_ID = _generateSessionId()

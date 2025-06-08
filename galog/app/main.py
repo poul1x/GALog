@@ -1,5 +1,6 @@
 import os
 import shutil
+import logging
 import subprocess
 import sys
 import tarfile
@@ -703,7 +704,6 @@ def preRunApp():
     removeOldLogs()
 
 
-import logging
 
 
 def runApp():
