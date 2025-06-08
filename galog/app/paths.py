@@ -33,12 +33,13 @@ if not sys.argv[0].endswith(".py"):
 
 
 def _appDataRootDir():
-    return QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+    path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+    return os.path.normpath(path)
 
 
 import logging
 
-_APP_NAME = "GALog"
+_APP_NAME = "galog"
 _APP_SESSION_ID = _generateSessionId()
 _APP_DATA_DIR = os.path.join(_appDataRootDir(), _APP_NAME)
 _LOG = logging.getLogger("Paths")
@@ -119,6 +120,8 @@ def appLogsRootDir():
 def appLogsDir():
     return os.path.join(_APP_DATA_DIR, "logs", _APP_SESSION_ID)
 
+def appSessionID():
+    return _APP_SESSION_ID
 
 def appConfigDir():
     return os.path.join(_APP_DATA_DIR, "config")
@@ -127,8 +130,9 @@ def appConfigDir():
 def posixPath(path: str):
     return Path(path).as_posix()
 
+
 def _fixUrlPath(match: re.Match):
-    def url(path:str):
+    def url(path: str):
         f'url("{path}")'
 
     matched = match.group(1)
@@ -149,6 +153,7 @@ def _fixUrlPath(match: re.Match):
     finalPath = posixPath(fixedPath)
     _LOG.debug("Fixed url %s -> %s:", matched, finalPath)
     return url(finalPath)
+
 
 def fixUrlPaths(styleSheet: str):
     pattern = re.compile(r"url\(\"([^\"]+)\"\)")

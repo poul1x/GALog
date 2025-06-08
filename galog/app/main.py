@@ -61,6 +61,7 @@ from galog.app.paths import (
     appConfigDir,
     appLogsDir,
     appLogsRootDir,
+    appSessionID,
     fontFiles,
     highlightingFiles,
     iconFile,
@@ -216,7 +217,9 @@ class MainWindow(QMainWindow):
         if config.mode == TagFilteringMode.ShowMatching:
             self.logMessagesPanel.advancedFilterApply(lambda tag: tag in config.tags)
         elif config.mode == TagFilteringMode.HideMatching:
-            self.logMessagesPanel.advancedFilterApply(lambda tag: tag not in config.tags)
+            self.logMessagesPanel.advancedFilterApply(
+                lambda tag: tag not in config.tags
+            )
         else:  # config.mode == TagFilteringMode.Disabled:
             self.logMessagesPanel.advancedFilterReset()
 
@@ -639,6 +642,10 @@ def createAppDataFolders():
     if not os.path.exists(configDir):
         os.mkdir(configDir)
 
+    logsRootDir = appLogsRootDir()
+    if not os.path.exists(logsRootDir):
+        os.mkdir(logsRootDir)
+
     logsDir = appLogsDir()
     if not os.path.exists(logsDir):
         os.mkdir(logsDir)
@@ -652,13 +659,17 @@ def createUserAppData():
 
 
 def removeOldLogs():
-    logsDir = appLogsDir()
+    sessionId = appSessionID()
+    logging.info("Running with sessionID: %s", sessionId)
+
     rootDir = appLogsRootDir()
-    for dirPath in os.listdir(rootDir):
-        if dirPath != logsDir:
+    for dirName in os.listdir(rootDir):
+        if dirName == sessionId:
             continue
+
         with suppress(Exception):
-            oldLogDir = os.path.join(rootDir, dirPath)
+            oldLogDir = os.path.join(rootDir, dirName)
+            logging.debug("Remove old logs at: '%s'", oldLogDir)
             shutil.rmtree(oldLogDir)
 
 

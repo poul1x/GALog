@@ -31,26 +31,11 @@ formatters:
         color: red
         bold: True
 handlers:
-  hnd_highlighting_thread:
-    class: logging.handlers.RotatingFileHandler
-    filename: highlighting_thread.log
-    formatter: fmt_no_colors
-    maxBytes: 10000000 # 10Mb
-    backupCount: 3
-    level: NOTSET
-  hnd_highlighting_delegate:
-    class: logging.handlers.RotatingFileHandler
-    filename: highlighting_delegate.log
-    formatter: fmt_no_colors
-    maxBytes: 10000000 # 10Mb
-    backupCount: 3
-    level: NOTSET
-  hnd_root:
-    class: logging.handlers.RotatingFileHandler
+  hnd_file_root:
+    class: logging.FileHandler
     filename: root.log
+    encoding: utf-8
     formatter: fmt_no_colors
-    maxBytes: 100000000 # 100Mb
-    backupCount: 3
     level: NOTSET
   hnd_console_no_colors:
     class: logging.StreamHandler
@@ -66,13 +51,9 @@ handlers:
     class: logging.NullHandler
 loggers:
   '': # root logger
-    handlers: [hnd_console_colors]
-    level: DEBUG
-  main:
+    handlers: [hnd_console_colors, hnd_file_root]
     level: INFO
-    propagate: True
-  highlighting_thread:
-    handlers: [hnd_highlighting_thread]
+  main:
     level: INFO
     propagate: True
   base_task:
@@ -87,10 +68,6 @@ loggers:
   galog_app:
     level: DEBUG
     propagate: True
-  # highlighting_delegate:
-  #   handlers: [hnd_highlighting_delegate]
-  #   level: DEBUG
-  #   propagate: False
   item_view_proxy:
     level: ERROR
     propagate: False
