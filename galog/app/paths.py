@@ -124,36 +124,3 @@ def appSessionID():
 
 def appConfigDir():
     return os.path.join(_APP_DATA_DIR, "config")
-
-
-def posixPath(path: str):
-    return Path(path).as_posix()
-
-
-def _fixUrlPath(match: re.Match):
-    def url(path: str):
-        f'url("{path}")'
-
-    matched = match.group(1)
-    assert isinstance(matched, str)
-
-    try:
-        baseDir, fileName = matched.split("/")
-    except ValueError:
-        _LOG.error("Invalid url '%s'", matched)
-        return url(matched)
-
-    fixedPath = resDirPath(baseDir, fileName)
-    if not os.path.exists(fixedPath):
-        _LOG.error("Path does not exist: '%s'", fixedPath)
-        _LOG.error("Failed to fix url '%s'", matched)
-        return url(matched)
-
-    finalPath = posixPath(fixedPath)
-    _LOG.debug("Fixed url %s -> %s:", matched, finalPath)
-    return url(finalPath)
-
-
-def fixUrlPaths(styleSheet: str):
-    pattern = re.compile(r"url\(\"([^\"]+)\"\)")
-    return re.sub(pattern, _fixUrlPath, styleSheet)

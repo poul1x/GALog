@@ -13,7 +13,7 @@
 #LogMessagesPanel > QTableView {
     background: white;
     border: none;
-    background-image: url('res/images/galog.png');
+    background-image: url(res/images/galog.png);
     background-repeat: no-repeat;
     background-position: center;
 }

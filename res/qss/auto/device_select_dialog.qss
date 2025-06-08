@@ -67,7 +67,7 @@
 }
 
 #DeviceSelectDialog > #DeviceTable[empty="true"] > QTableView {
-    background-image: url("icons/shrug.svg");
+    background-image: url(res/icons/shrug.svg);
     background-position: center;
     background-repeat: no-repeat;
 }

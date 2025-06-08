@@ -69,7 +69,6 @@ from galog.app.paths import (
     loggingConfigFileInitial,
     styleSheetFiles,
     appDataDir,
-    fixUrlPaths,
 )
 from galog.app.ui.base.style import GALogStyle
 
@@ -711,7 +710,7 @@ class GALogApp(QApplication):
             with open(filePath, "r", encoding="utf-8") as f:
                 styleSheet += f.read() + "\n"
 
-        self.setStyleSheet(fixUrlPaths(styleSheet))
+        self.setStyleSheet(styleSheet)
 
 
 def preRunApp():
