@@ -64,6 +64,7 @@ class LogMessagesPanel(Widget):
         super().__init__(parent)
         self._initUserInterface()
         self._initUserInputHandlers()
+        self._initCustomContextMenu()
         self._initFocusPolicy()
         self._appState = appState
         self._liveReload = True
@@ -382,10 +383,13 @@ class LogMessagesPanel(Widget):
             self._originalRowBackup.delete()
 
     def _handleJumpBackToFilterView(self):
-        if not self._filterRowBackup.empty():
+        if self._canJumpBackToFilterView():
             self._jumpBackToFilterView()
         else:
             self._exitQuickFilter()
+
+    def _canJumpBackToFilterView(self):
+        return not self._filterRowBackup.empty()
 
     #####
 
@@ -399,3 +403,13 @@ class LogMessagesPanel(Widget):
 
     def uniqueTagNames(self) -> List[str]:
         return self._logMessagesTable.uniqueTagNames()
+
+    #####
+
+    def _contextMenuExec(self, position: QPoint):
+        canJumpBack = self._canJumpBackToFilterView()
+        self._logMessagesTable.contextMenuExec(position, canJumpBack)
+
+    def _initCustomContextMenu(self):
+        self._logMessagesTable.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._logMessagesTable.customContextMenuRequested.connect(self._contextMenuExec)  # fmt: skip

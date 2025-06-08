@@ -86,10 +86,9 @@ class LogMessagesTable(TableView):
         self._initLogLineDelegate()
         self._initUserInterface()
         self._initUserInputHandlers()
-        self._initCustomContextMenu()
         self._scrolling = True
 
-    def _contextMenuExec(self, position: QPoint):
+    def contextMenuExec(self, position: QPoint, canJumpBack: bool):
         index = self.indexAt(position)
         if not index.isValid():
             return
@@ -104,12 +103,14 @@ class LogMessagesTable(TableView):
             actionOrigin = QAction("Go to origin", self)
             actionOrigin.triggered.connect(lambda: self.requestJumpToOriginalLine.emit()) # fmt: skip
             contextMenu.addAction(actionOrigin)
-        else:
+
+        if canJumpBack:
             actionBack = QAction("Go back", self)
             actionBack.triggered.connect(lambda: self.requestJumpBackToFilterView.emit()) # fmt: skip
             contextMenu.addAction(actionBack)
 
         contextMenu.exec_(self.viewport().mapToGlobal(position))
+
 
     def _topModel(self) -> QSortFilterProxyModel:
         return self._quickFilterModel
@@ -137,9 +138,6 @@ class LogMessagesTable(TableView):
         self._quickFilterModel.setSourceModel(self._advancedFilterModel)
         self.setModel(self._quickFilterModel)
 
-    def _initCustomContextMenu(self):
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self._contextMenuExec)
 
     def _initUserInterface(self):
         self.setSelectionBehavior(QTableView.SelectRows)
