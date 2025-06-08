@@ -392,7 +392,6 @@ class MainWindow(QMainWindow):
         action.setShortcut("Ctrl+Shift+F")
         action.setStatusTip("Open tag filter")
         action.triggered.connect(lambda: self.openTagFilter())
-        # action.setObjectName("capture.new")
         action.setEnabled(True)
         action.setData(False)
         return action
