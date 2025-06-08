@@ -96,8 +96,16 @@ class LogMessagesTable(TableView):
         actionView = QAction("View", self)
         actionView.triggered.connect(lambda: self.requestShowLineDetails.emit(index))
 
+        actionCopyLogLine = QAction("Copy Line(s)", self)
+        actionCopyLogLine.triggered.connect(lambda: self.requestCopyLogLines.emit())
+
+        actionCopyLogMsg = QAction("Copy Message(s)", self)
+        actionCopyLogMsg.triggered.connect(lambda: self.requestCopyLogMessages.emit())
+
         contextMenu = QMenu(self)
         contextMenu.addAction(actionView)
+        contextMenu.addAction(actionCopyLogLine)
+        contextMenu.addAction(actionCopyLogMsg)
 
         if self.quickFilterEnabled():
             actionOrigin = QAction("Go to origin", self)
