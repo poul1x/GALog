@@ -584,7 +584,7 @@ class MainWindow(QMainWindow):
         action.setStatusTip("Show app data folder")
         action.triggered.connect(self.showAppDataFolder)
         action.setEnabled(True)
-        action.setData(True)
+        action.setData(False)
         return action
 
     def showLogsFolderAction(self):
@@ -592,7 +592,7 @@ class MainWindow(QMainWindow):
         action.setStatusTip("Show logs folder")
         action.triggered.connect(self.showLogsFolder)
         action.setEnabled(True)
-        action.setData(True)
+        action.setData(False)
         return action
 
     #####
