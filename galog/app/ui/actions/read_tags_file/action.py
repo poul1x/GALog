@@ -26,7 +26,4 @@ class ReadTagsFileAction(ReadFileAction):
 
     def readTagsFile(self):
         self._readTextData(self._readLogFileImpl)
-        if self.succeeded():
-            return self._result
-        else:
-            return None
+        return self._result if self.succeeded() else None
