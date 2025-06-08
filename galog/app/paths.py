@@ -53,7 +53,7 @@ def _appDataRelativePath(*args: str):
 
 
 def styleSheetFile(name: str):
-    return resDirPath("styles", "manual", name + ".qss")
+    return resDirPath("qss", "manual", name + ".qss")
 
 
 def iconFile(name: str):
@@ -92,7 +92,7 @@ def highlightingFiles():
 
 def styleSheetFiles():
     return dirFilesRecursive(
-        resDirPath("styles", "auto"),
+        resDirPath("qss", "auto"),
         lambda path: path.endswith(".qss"),
     )
 
