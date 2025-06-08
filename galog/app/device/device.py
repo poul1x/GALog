@@ -111,7 +111,7 @@ class AdbClient(Client):
 
 
 @contextmanager
-def deviceRestricted(client: AdbClient, deviceSerial: str):
+def deviceRestricted(deviceSerial: str, client: AdbClient):
     try:
         device, state = client.device_with_state(deviceSerial)
     except (RuntimeError, ConnectionError):

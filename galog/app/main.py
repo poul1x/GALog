@@ -3,9 +3,13 @@ import subprocess
 import sys
 import tarfile
 from contextlib import suppress
-from typing import List
+from typing import Dict, List
 
-from PyQt5.QtCore import QEvent, QThread, QThreadPool
+import traceback
+import os
+import shutil
+from PyQt5.QtGui import QDesktopServices
+from PyQt5.QtCore import QEvent, QThread, QThreadPool, QStandardPaths, QUrl
 from PyQt5.QtGui import QFontDatabase, QIcon
 from PyQt5.QtWidgets import (
     QAction,
@@ -18,74 +22,95 @@ from PyQt5.QtWidgets import (
     QWidgetAction,
 )
 
-from galog.app.app_state import AdbServerSettings, AppState, RunAppAction
-from galog.app.components.device_select_pane.pane import DeviceSelectPane
-from galog.app.components.dialogs import (
-    RestartCaptureDialog,
-    RestartCaptureDialogResult,
+from galog.app.app_state import (
+    AdbServerSettings,
+    AppState,
+    RunAppAction,
+    TagFilteringConfig,
+    TagFilteringMode,
 )
-from galog.app.components.dialogs.stop_capture_dialog import (
+from galog.app.ui.actions.stop_app import StopAppAction
+from galog.app.ui.core.device_select_dialog import DeviceSelectDialog
+from galog.app.ui.quick_dialogs import (
+    RestartCaptureDialog,
+)
+from galog.app.ui.quick_dialogs.stop_capture_dialog import (
     StopCaptureDialog,
     StopCaptureDialogResult,
 )
-from galog.app.components.message_view_pane import LogMessageViewPane
-from galog.app.components.package_select_pane import PackageSelectPane
-from galog.app.components.tag_filter_pane.pane import TagFilterPane
-from galog.app.controllers.kill_app import KillAppController
-from galog.app.controllers.log_messages_pane.controller import LogMessagesPaneController
-from galog.app.controllers.open_log_file.controller import OpenLogFileController
-from galog.app.controllers.restart_app.action import RestartAppAction
-from galog.app.controllers.run_app.controller import RunAppController
-from galog.app.controllers.save_log_file.controller import SaveLogFileController
-from galog.app.controllers.tag_filter_pane.controller import (
-    TagFilteringMode,
-    TagFilterPaneController,
-)
-from galog.app.device.device import AdbClient
-from galog.app.highlighting import HighlightingRules
-from galog.app.util.message_box import (
-    showErrorMsgBox,
-    showInfoMsgBox,
-    showNotImpMsgBox,
-    showPromptMsgBox,
-)
-from galog.app.util.paths import fontFiles, highlightingFiles, iconFile, styleSheetFiles
-from galog.app.util.style import CustomStyle
 
-from .components.log_messages_pane import LogMessagesPane
+# from galog.app.ui.core.message_view_dialog import LogMessageViewDialog
+from galog.app.ui.core.package_select_dialog import PackageSelectDialog
+from galog.app.ui.core.log_messages_panel import LogMessagesPanel
+from galog.app.ui.actions.read_log_file.action import ReadLogFileAction
+from galog.app.ui.actions.restart_app.action import RestartAppAction
+from galog.app.ui.actions.start_app import StartAppAction
+from galog.app.ui.actions.write_log_file.action import WriteLogFileAction
+
+from galog.app.ui.core.tag_filter_dialog import TagFilterDialog
+from galog.app.device.device import AdbClient
+from galog.app.hrules import HRulesStorage
+from galog.app.logging import initLogging
+from galog.app.msgbox import (
+    msgBoxErr,
+    msgBoxInfo,
+    msgBoxNotImp,
+    msgBoxPrompt,
+)
+from galog.app.paths import (
+    appConfigDir,
+    appLogsDir,
+    appLogsRootDir,
+    appSessionID,
+    fontFiles,
+    highlightingFiles,
+    iconFile,
+    loggingConfigFile,
+    loggingConfigFileInitial,
+    styleSheetFiles,
+    appDataDir,
+    fixUrlPaths,
+)
+from galog.app.ui.base.style import GALogStyle
+
+from galog.app.ui.core.log_messages_panel import LogMessagesPanel
+from galog.app.ui.reusable.file_picker import FilePicker, FileExtensionFilterBuilder
 
 
 class MainWindow(QMainWindow):
-    _viewWindows: List[LogMessageViewPane]
-    _liveReload: bool
-
     def __init__(self) -> None:
         super().__init__()
+        self.initAppState()
         self.setObjectName("MainWindow")
-        self.setStyle(CustomStyle())
-        self.startAdbServer()
-        self._searchPane = None
-        self._liveReload = True
-        self.logMessagesPaneController = LogMessagesPaneController(self)
-        self.tagFilterPaneController = TagFilterPaneController(self)
-        self.loadStyleSheet()
+        self.setStyle(GALogStyle())
         self.loadFonts()
-        self.initHighlighting()
         self.initUserInterface()
+        self.initHighlighting()
         self.initLeftPaddingForEachMenu()
         self.increaseHoverAreaForCheckableActions()
+        self.startAdbServer()
+
+    def initAppState(self):
         self.appState = AppState(
-            AdbServerSettings(
+            adb=AdbServerSettings(
                 ipAddr="127.0.0.1",
                 port=5037,
             ),
             lastSelectedDevice=None,
             lastSelectedPackage=None,
+            tagFilteringConfig=TagFilteringConfig.none(),
+            lastUsedDirPath="",
         )
+
+    def isLocalAdbAddr(self):
+        return self.appState.adb.ipAddr.startswith("127")
 
     def startAdbServer(self):
         adb = shutil.which("adb")
         if not adb:
+            return
+
+        if not self.isLocalAdbAddr():
             return
 
         def execAdbServer():
@@ -111,32 +136,24 @@ class MainWindow(QMainWindow):
             with tarfile.open(archive, "r") as tar:
                 self.loadFontsFromTar(fontDB, tar)
 
-    def loadStyleSheet(self):
-        styleSheet = ""
-        for filepath in styleSheetFiles():
-            with open(filepath, "r", encoding="utf-8") as f:
-                styleSheet += f.read() + "\n"
-
-        self.setStyleSheet(styleSheet)
-
     def initHighlighting(self):
-        rules = HighlightingRules()
+        rules = HRulesStorage()
         for filepath in highlightingFiles():
-            rules.addRuleset(filepath)
+            rules.addRuleSet(filepath)
 
-        self.logMessagesPaneController.setHighlightingRules(rules)
+        self.logMessagesPanel.setHighlightingRules(rules)
 
     def cancelThreadPoolTasks(self):
         QThreadPool.globalInstance().clear()
         QThreadPool.globalInstance().waitForDone()
 
     def closeEvent(self, event: QEvent):
-        if showPromptMsgBox(
-            title="Close window",
+        if msgBoxPrompt(
             caption="Do you really want to quit?",
             body="If you close the window, current progress will be lost",
+            parent=self,
         ):
-            self.logMessagesPaneController.stopCapture()
+            self.logMessagesPanel.stopCapture()
             self.cancelThreadPoolTasks()
             event.accept()
         else:
@@ -189,49 +206,49 @@ class MainWindow(QMainWindow):
                         defaultWidget.setStyleSheet("width: 0px;")
 
     def openTagFilter(self):
-        tagList = self.logMessagesPaneController.uniqueTagNames()
-        result = self.tagFilterPaneController.exec_(tagList)
-        if result == TagFilterPane.Rejected:
+        dialog = TagFilterDialog(self.appState, self)
+        tagList = self.logMessagesPanel.uniqueTagNames()
+        dialog.setTagAutoCompletionStrings(tagList)
+
+        if dialog.exec_() == TagFilterDialog.Rejected:
             return
 
-        config = self.tagFilterPaneController.filteringConfig()
+        config = self.appState.tagFilteringConfig
         if config.mode == TagFilteringMode.ShowMatching:
-            self.logMessagesPaneController.setTagFilteringFn(
-                lambda tag: tag in config.tags
-            )
+            self.logMessagesPanel.advancedFilterApply(lambda tag: tag in config.tags)
         elif config.mode == TagFilteringMode.HideMatching:
-            self.logMessagesPaneController.setTagFilteringFn(
+            self.logMessagesPanel.advancedFilterApply(
                 lambda tag: tag not in config.tags
             )
         else:  # config.mode == TagFilteringMode.Disabled:
-            self.logMessagesPaneController.unsetTagFilteringFn()
+            self.logMessagesPanel.advancedFilterReset()
 
     def showDevices(self):
-        deviceSelectPane = DeviceSelectPane(self.appState, self)
+        deviceSelectPane = DeviceSelectDialog(self.appState, self)
         deviceSelectPane.exec_()
 
     def startCapture(self):
-        if self.logMessagesPaneController.isCaptureRunning():
+        if self.logMessagesPanel.isCaptureRunning():
             msgBrief = "Capture is running"
             msgVerbose = "Unable to start capture while another capture is running. Please, stop the running capture first"  # fmt: skip
-            showErrorMsgBox(msgBrief, msgVerbose)
+            msgBoxErr(msgBrief, msgVerbose, self)
             return
 
         if self.appState.lastSelectedDevice is None:
-            deviceSelectPane = DeviceSelectPane(self.appState, self)
+            deviceSelectPane = DeviceSelectDialog(self.appState, self)
             deviceSelectPane.setDeviceAutoSelect(True)
-            if deviceSelectPane.exec_() == DeviceSelectPane.Rejected:
+            if deviceSelectPane.exec_() == DeviceSelectDialog.Rejected:
                 msgBrief = "Device not selected"
                 msgVerbose = "Device was not selected. Unable to start log capture"  # fmt: skip
-                showInfoMsgBox(msgBrief, msgVerbose)
+                msgBoxInfo(msgBrief, msgVerbose, self)
                 return
 
             # Add small delay to remove
             # LoadingDialog flickering
             QThread.msleep(100)
 
-        packageSelectPane = PackageSelectPane(self.appState, self)
-        result = packageSelectPane.exec_()
+        packageSelectDialog = PackageSelectDialog(self.appState, self)
+        result = packageSelectDialog.exec_()
         if result == 0:
             return
 
@@ -240,53 +257,73 @@ class MainWindow(QMainWindow):
         action = self.appState.lastSelectedPackage.action
 
         if action != RunAppAction.DoNotStartApp:
-            controller = RunAppController()
-            # controller.setAppDebug(action == RunAppAction.StartAppDebug)
-            controller.setAppDebug(False)
-            controller.runApp(device, package)
+            _action = StartAppAction(self.adbClient(), self)
+            _action.startApp(device, package)
+            if _action.failed():
+                return
 
-        self.logMessagesPaneController.makeWhiteBackground()
-        self.logMessagesPaneController.disableMessageFilter()
-        self.logMessagesPaneController.clearLogLines()
-        self.logMessagesPaneController.startCapture(device, package)
+        self.logMessagesPanel.setWhiteBackground()
+        self.logMessagesPanel.disableQuickFilter()
+        self.logMessagesPanel.clearLogLines()
+
         self.setCaptureSpecificActionsEnabled(True)
+        self.logMessagesPanel.startCapture(device, package)
 
     def clearCaptureOutput(self):
-        if showPromptMsgBox(
-            title="Clear capture output",
+        if msgBoxPrompt(
             caption="Clear capture output?",
             body="All captured log messages will be erased",
+            parent=self,
         ):
-            self.logMessagesPaneController.makeWhiteBackground()
-            self.logMessagesPaneController.disableMessageFilter()
-            self.logMessagesPaneController.clearLogLines()
+            self.logMessagesPanel.setWhiteBackground()
+            self.logMessagesPanel.disableQuickFilter()
+            self.logMessagesPanel.clearLogLines()
+
+    def _saveLastSelectedDir(self, filePicker: FilePicker):
+        if filePicker.hasSelectedDirectory():
+            self.appState.lastUsedDirPath = filePicker.selectedDirectory()
 
     def saveLogFile(self):
-        logLines = self.logMessagesPaneController.logLines()
-        controller = SaveLogFileController(logLines)
-        controller.promptSaveFile()
+        filePicker = FilePicker(
+            caption="Save log lines to file",
+            directory=self.appState.lastUsedDirPath,
+            extensionFilter=FileExtensionFilterBuilder.logFile(),
+        )
+
+        filePath = filePicker.askOpenFileWrite()
+        if not filePath:
+            return
+
+        self._saveLastSelectedDir(filePicker)
+        self.logMessagesPanel.saveLogFile(filePath)
 
     def openLogFile(self):
-        if self.logMessagesPaneController.isCaptureRunning():
+        if self.logMessagesPanel.isCaptureRunning():
             msgBrief = "Capture is running"
             msgVerbose = "Unable to open log file while capture is running. Please, stop the running capture first"  # fmt: skip
-            showErrorMsgBox(msgBrief, msgVerbose)
+            msgBoxErr(msgBrief, msgVerbose, self)
             return
 
-        controller = OpenLogFileController()
-        lines = controller.promptOpenFile()
-        if not lines:
+        filePicker = FilePicker(
+            caption="Load log lines from file",
+            directory=self.appState.lastUsedDirPath,
+            extensionFilter=FileExtensionFilterBuilder.logFile(),
+        )
+
+        filePath = filePicker.askOpenFileRead()
+        if not filePath:
             return
 
-        self.logMessagesPaneController.makeWhiteBackground()
-        self.logMessagesPaneController.disableMessageFilter()
-        self.logMessagesPaneController.clearLogLines()
-        self.logMessagesPaneController.addLogLines(lines)
+        self._saveLastSelectedDir(filePicker)
+        self.logMessagesPanel.clearLogLines()
+        self.logMessagesPanel.setWhiteBackground()
+        self.logMessagesPanel.disableQuickFilter()
+        self.logMessagesPanel.loadLogFile(filePath)
 
     def restartCapture(self):
-        dialog = RestartCaptureDialog()
+        dialog = RestartCaptureDialog(self)
         result = dialog.exec_()
-        if result == RestartCaptureDialogResult.Rejected:
+        if result == RestartCaptureDialog.Rejected:
             return
 
         assert self.appState.lastSelectedDevice is not None
@@ -294,19 +331,17 @@ class MainWindow(QMainWindow):
         package = self.appState.lastSelectedPackage.name
         # mode = self.appState.lastSelectedPackage.action
 
-        self.logMessagesPaneController.stopCapture()
-        self.logMessagesPaneController.makeWhiteBackground()
-        self.logMessagesPaneController.disableMessageFilter()
-        self.logMessagesPaneController.clearLogLines()
+        self.logMessagesPanel.stopCapture()
+        self.logMessagesPanel.setWhiteBackground()
+        # self.logMessagesPanel.disableMessageFilter()
+        self.logMessagesPanel.clearLogLines()
 
         action = RestartAppAction(self.adbClient())
         action.restartApp(device, package)
+        if action.failed():
+            return
 
-        controller = RunAppController()
-        # controller.setAppDebug(action == RunAppAction.StartAppDebug)
-        controller.setAppDebug(False)
-        controller.runApp(device, package)
-        self.logMessagesPaneController.startCapture(device, package)
+        self.logMessagesPanel.startCapture(device, package)
 
     def adbClient(self):
         return AdbClient(
@@ -315,31 +350,36 @@ class MainWindow(QMainWindow):
         )
 
     def stopCapture(self):
-        dialog = StopCaptureDialog()
+        dialog = StopCaptureDialog(self)
         result = dialog.exec_()
-        if result == StopCaptureDialogResult.Rejected:
+        if result == StopCaptureDialog.Rejected:
             return
 
-        if result == StopCaptureDialogResult.AcceptedKillApp:
-            device = self.logMessagesPaneController.device
-            package = self.logMessagesPaneController.package
-            controller = KillAppController()
-            controller.killApp(device, package)
+        if result == StopCaptureDialog.AcceptedStopApp:
+            device = self.appState.lastSelectedDevice.serial
+            package = self.appState.lastSelectedPackage.name
+            #
+            # Ignore action.failed(), because we want
+            # to stop the capture anyway
+            #
+            action = StopAppAction(self.adbClient(), self)
+            action.stopApp(device, package)
 
-        self.logMessagesPaneController.stopCapture()
+        self.logMessagesPanel.stopCapture()
         self.setCaptureSpecificActionsEnabled(False)
 
-    def enableMessageFilter(self):
-        self.logMessagesPaneController.enableMessageFilter()
+    def enableQuickFilter(self):
+        if self.logMessagesPanel.hasLogMessages():
+            self.logMessagesPanel.enableQuickFilter()
 
     def toggleLiveReload(self, checkBox: QCheckBox):
-        self.logMessagesPaneController.setLiveReloadEnabled(checkBox.isChecked())
+        self.logMessagesPanel.setLiveReloadEnabled(checkBox.isChecked())
 
     def toggleHighlighting(self, checkBox: QCheckBox):
-        self.logMessagesPaneController.setHighlightingEnabled(checkBox.isChecked())
+        self.logMessagesPanel.setHighlightingEnabled(checkBox.isChecked())
 
     def toggleShowLineNumbers(self, checkBox: QCheckBox):
-        self.logMessagesPaneController.setShowLineNumbers(checkBox.isChecked())
+        self.logMessagesPanel.setLineNumbersAlwaysVisible(checkBox.isChecked())
 
     # def handleInstallApkAction(self):
     #     device = self.capturePaneController.selectedDevice()
@@ -357,7 +397,6 @@ class MainWindow(QMainWindow):
         action.setShortcut("Ctrl+Shift+F")
         action.setStatusTip("Open tag filter")
         action.triggered.connect(lambda: self.openTagFilter())
-        # action.setObjectName("capture.new")
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -394,7 +433,7 @@ class MainWindow(QMainWindow):
         action = QAction("&Find", self)
         action.setShortcut("Ctrl+F")
         action.setStatusTip("Show message filter (hide with ESC)")
-        action.triggered.connect(lambda: self.enableMessageFilter())
+        action.triggered.connect(lambda: self.enableQuickFilter())
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -495,20 +534,11 @@ class MainWindow(QMainWindow):
     #     action.setData(False)
     #     return action
 
-    def clearAppDataAction(self):
-        action = QAction("&Clear app data", self)
-        action.setShortcut("Ctrl+P")
-        action.setStatusTip("Clear user data associated with the app")
-        action.triggered.connect(lambda: showNotImpMsgBox())
-        action.setEnabled(False)
-        action.setData(True)
-        return action
-
     def takeScreenshotAction(self):
         action = QAction("&Take screenshot", self)
         action.setShortcut("Ctrl+P")
         action.setStatusTip("Take screenshot")
-        action.triggered.connect(lambda: showNotImpMsgBox())
+        action.triggered.connect(lambda: msgBoxNotImp(self))
         action.setEnabled(False)
         action.setData(True)
         return action
@@ -516,7 +546,7 @@ class MainWindow(QMainWindow):
     def rootModeAction(self):
         action = QAction("&Root mode", self)
         action.setStatusTip("Enable/disable root mode")
-        action.triggered.connect(lambda: showNotImpMsgBox())
+        action.triggered.connect(lambda: msgBoxNotImp(self))
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -524,7 +554,7 @@ class MainWindow(QMainWindow):
     def rebootDeviceAction(self):
         action = QAction("&Reboot device", self)
         action.setStatusTip("Reboot device")
-        action.triggered.connect(lambda: showNotImpMsgBox())
+        action.triggered.connect(lambda: msgBoxNotImp(self))
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -532,10 +562,40 @@ class MainWindow(QMainWindow):
     def shutdownDeviceAction(self):
         action = QAction("&Shutdown device", self)
         action.setStatusTip("Shutdown device")
-        action.triggered.connect(lambda: showNotImpMsgBox())
+        action.triggered.connect(lambda: msgBoxNotImp(self))
         action.setEnabled(True)
         action.setData(False)
         return action
+
+    #####
+
+    def showFolderInFileExplorer(self, dirPath: str):
+        assert os.path.isdir(dirPath), "dirPath must be a directory"
+        QDesktopServices.openUrl(QUrl.fromLocalFile(dirPath))
+
+    def showAppDataFolder(self):
+        self.showFolderInFileExplorer(appDataDir())
+
+    def showLogsFolder(self):
+        self.showFolderInFileExplorer(appLogsDir())
+
+    def showAppDataFolderAction(self):
+        action = QAction("&Show app data folder", self)
+        action.setStatusTip("Show app data folder")
+        action.triggered.connect(self.showAppDataFolder)
+        action.setEnabled(True)
+        action.setData(False)
+        return action
+
+    def showLogsFolderAction(self):
+        action = QAction("&Show logs folder", self)
+        action.setStatusTip("Show logs folder")
+        action.triggered.connect(self.showLogsFolder)
+        action.setEnabled(True)
+        action.setData(False)
+        return action
+
+    #####
 
     def setupMenuBar(self):
         menuBar = self.menuBar()
@@ -553,6 +613,10 @@ class MainWindow(QMainWindow):
         captureMenu.addAction(self.showLineNumbersAction())
         captureMenu.addAction(self.openTagFilterAction())
 
+        captureMenu = menuBar.addMenu("🛠 &Options")
+        captureMenu.addAction(self.showAppDataFolderAction())
+        captureMenu.addAction(self.showLogsFolderAction())
+
         # This will be implemented in the next release
         # adbMenu = menuBar.addMenu("🐞 &ADB")
         # adbMenu.addAction(self.installApkAction())
@@ -560,6 +624,10 @@ class MainWindow(QMainWindow):
         # adbMenu.addAction(self.rootModeAction())
         # adbMenu.addAction(self.rebootDeviceAction())
         # adbMenu.addAction(self.shutdownDeviceAction())
+
+    def captureInterrupted(self, msgBrief: str, msgVerbose: str):
+        self.setCaptureSpecificActionsEnabled(False)
+        msgBoxErr(msgBrief, msgVerbose, self)
 
     def initUserInterface(self):
         screen = QApplication.desktop().screenGeometry()
@@ -569,19 +637,96 @@ class MainWindow(QMainWindow):
         y = (screen.height() - height) // 2
         self.setGeometry(x, y, width, height)
 
-        pane = LogMessagesPane(self)
-        self.logMessagesPaneController.takeControl(pane)
-        self.setCentralWidget(pane)
-        self.setWindowTitle("galog")
-        self.setWindowIcon(QIcon(iconFile("galog")))
+        self.logMessagesPanel = LogMessagesPanel(self.appState, self)
+        self.logMessagesPanel.captureInterrupted.connect(self.captureInterrupted)
+
+        self.setCentralWidget(self.logMessagesPanel)
+        self.setWindowTitle("GALog")
+        self.setWindowIcon(QIcon(iconFile("GALog")))
 
         self.setupMenuBar()
         self.statusBar().show()
 
 
+def tryInitLogging():
+    try:
+        initLogging()
+    except:
+        traceback.print_exc()
+        msgBrief = "Logging not available"
+        msgVerbose = "Failed to init logging. Logging will not be available"
+        msgBoxErr(msgBrief, msgVerbose)
+
+
+def createAppDataFolders():
+    dataDir = appDataDir()
+    if not os.path.exists(dataDir):
+        os.makedirs(dataDir)
+
+    configDir = appConfigDir()
+    if not os.path.exists(configDir):
+        os.mkdir(configDir)
+
+    logsRootDir = appLogsRootDir()
+    if not os.path.exists(logsRootDir):
+        os.mkdir(logsRootDir)
+
+    logsDir = appLogsDir()
+    if not os.path.exists(logsDir):
+        os.mkdir(logsDir)
+
+
+def createUserAppData():
+    userLoggingConfig = loggingConfigFile()
+    if not os.path.exists(userLoggingConfig):
+        initialLoggingConfig = loggingConfigFileInitial()
+        shutil.copy(initialLoggingConfig, userLoggingConfig)
+
+
+def removeOldLogs():
+    sessionId = appSessionID()
+    logging.info("Running with sessionID: %s", sessionId)
+
+    rootDir = appLogsRootDir()
+    for dirName in os.listdir(rootDir):
+        if dirName == sessionId:
+            continue
+
+        with suppress(Exception):
+            oldLogDir = os.path.join(rootDir, dirName)
+            logging.debug("Remove old logs at: '%s'", oldLogDir)
+            shutil.rmtree(oldLogDir)
+
+
+class GALogApp(QApplication):
+    def __init__(self, argv: List[str]) -> None:
+        super().__init__(argv)
+        self._logger = logging.getLogger(self.__class__.__name__)
+        self.loadStyleSheetFiles()
+
+    def loadStyleSheetFiles(self):
+        styleSheet = ""
+        for filePath in styleSheetFiles():
+            self._logger.info("Load styleSheet from '%s'", filePath)
+            with open(filePath, "r", encoding="utf-8") as f:
+                styleSheet += f.read() + "\n"
+
+        self.setStyleSheet(fixUrlPaths(styleSheet))
+
+
+def preRunApp():
+    createAppDataFolders()
+    createUserAppData()
+    tryInitLogging()
+    removeOldLogs()
+
+
+import logging
+
+
 def runApp():
-    app = QApplication(sys.argv)
+    preRunApp()
+    app = GALogApp(sys.argv)
     mainWindow = MainWindow()
     mainWindow.show()
-    print("GALog initialized")
     sys.exit(app.exec())

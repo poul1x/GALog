@@ -1,0 +1,130 @@
+#TagFilterDialog {
+	background: #ffffff;
+}
+
+#TagFilterDialog > #FilterTypeSwitch > QWidget {
+	font-family: Roboto;
+	font-size: 19px;
+}
+
+#TagFilterDialog > #FilterTypeSwitch > QComboBox {
+	border: 2px solid #464646;
+	border-radius: 0px;
+	padding-left: 5px;
+	padding-right: 10px;
+}
+
+#TagFilterDialog > #FilterTypeSwitch > QComboBox::drop-down {
+	background-color: white;
+	border:none;
+	padding-left: 0px;
+	padding-right: 5px;
+}
+
+#TagFilterDialog > #FilterTypeSwitch > QComboBox::down-arrow {
+    image: url(res/icons/dropdown.svg);
+}
+
+#TagFilterDialog > #FilterTypeSwitch > QLabel {
+	margin-left: 5px;
+	font-weight: bold;
+}
+
+#TagFilterDialog > #FilterTypeSwitch QComboBox QAbstractItemView
+{
+    color: #000000;
+    background-color: #ffffff;
+
+	selection-color: #ffffff;
+    selection-background-color: #464646;
+}
+
+
+/* ---------------------------------------- */
+
+#TagFilterDialog > #TagNameInput {
+	border: 2px solid #464646;
+	border-bottom: none;
+	font-family: Roboto;
+	font-size: 20px;
+    padding-top: 2px;
+    padding-bottom: 4px;
+    selection-background-color: #464646;
+    selection-color: white;
+}
+
+#TagFilterDialog > QListView {
+	font-family: Roboto;
+	font-size: 20px;
+	border: 2px solid #464646;
+}
+
+#TagFilterDialog > QListView::item:hover
+{
+	background-color: #f3f3f3;
+}
+
+#TagFilterDialog > QListView::item:selected
+{
+	background-color: #464646;
+	color: #ffffff;
+}
+/* ---------------------------------------- */
+
+#TagFilterDialog > #ControlButtonBar > QPushButton {
+	font-family: Roboto;
+	font-size: 20px;
+	color: #000000;
+	background: #ffffff;
+    border: 2px solid #464646;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+#TagFilterDialog > #ControlButtonBar > QPushButton:disabled {
+	color: #464646
+}
+
+#TagFilterDialog > #ControlButtonBar > QPushButton:hover {
+	background: #464646;
+	color: white;
+}
+
+/* ---------------------------------------- */
+
+#TagFilterDialog > #BottomButtonBar {
+	background: #464646;
+}
+
+#TagFilterDialog > #BottomButtonBar > QPushButton {
+	font-family: Roboto;
+	font-size: 22px;
+	color: #000000;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 30px;
+    padding-right: 30px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+	margin-right: 10px;
+	margin-left: 0px;
+	background: #c8dcff;
+    border: none;
+}
+
+#TagFilterDialog > #BottomButtonBar > QPushButton:disabled {
+	color: #464646
+}
+
+#TagFilterDialog > #BottomButtonBar > QPushButton:focus {
+	background: #a0c3ff;
+}
+
+#TagFilterDialog > #BottomButtonBar > QPushButton:hover {
+	background: #739fff;
+	color: white;
+}
+
+/* ---------------------------------------- */

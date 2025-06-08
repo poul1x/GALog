@@ -1,0 +1,133 @@
+#DeviceSelectDialog {
+	background: #ffffff;
+}
+
+/* Adb Server Settings -------------------------- */
+
+#DeviceSelectDialog > #AdbServerSettings {
+	background: #eeeeee;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+#DeviceSelectDialog > #AdbServerSettings > QLineEdit {
+	border: 2px solid black;
+	border-radius: 0px;
+
+	font-family: Roboto;
+	font-size: 19px;
+}
+
+#DeviceSelectDialog > #AdbServerSettings > QLabel {
+	font-family: Roboto;
+	font-size: 19px;
+	font-weight: bold;
+}
+
+/* Reload Button -------------------------- */
+
+#DeviceSelectDialog > #AdbServerSettings > QPushButton[name="reload"] {
+	font-family: Roboto;
+	font-size: 20px;
+	background: #ffffff;
+	border: 1px solid #464646;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+#DeviceSelectDialog > #AdbServerSettings > QPushButton[name="reload"]:hover {
+	background: #dddddd;
+}
+
+/* Device Table -------------------------- */
+
+#DeviceSelectDialog > #DeviceTable > QTableView > QHeaderView::section:horizontal {
+    background-color: #464646;
+    color: #f5f5f5;
+    border: none;
+    font-family: Roboto;
+    font-weight: bold;
+    font-size: 20px;
+    padding: 5px;
+    margin: 0px;
+    min-height: 30px;
+}
+
+#DeviceSelectDialog > #DeviceTable > QTableView {
+	font-family: Roboto;
+	font-size: 20px;
+    background: white;
+    border: none;
+}
+
+#DeviceSelectDialog > #DeviceTable[empty="false"] > QTableView  {
+    background-image: none;
+}
+
+#DeviceSelectDialog > #DeviceTable[empty="true"] > QTableView {
+    background-image: url("icons/shrug.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#DeviceSelectDialog > #DeviceTable > QTableView::item:hover
+{
+	/* background-color: #f3f3f3; */
+	/* Do not hover cells -> just use white (no hover) */
+	background-color: #ffffff;
+}
+
+#DeviceSelectDialog > #DeviceTable > QTableView::item:selected
+{
+	background-color: #767676;
+	color: #ffffff;
+}
+
+#DeviceSelectDialog > #DeviceTable > QLineEdit {
+	font-family: Roboto;
+    font-size: 20px;
+	background: #eeeeee;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border: none;
+	color: #000000;
+    selection-background-color: #464646;
+    selection-color: #ffffff;
+}
+
+/* BottomButtonBar -------------------------- */
+
+#DeviceSelectDialog > #BottomButtonBar {
+	background: #464646;
+}
+
+#DeviceSelectDialog > #BottomButtonBar > QPushButton {
+	font-family: Roboto;
+	font-size: 22px;
+	color: #000000;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 30px;
+    padding-right: 30px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+	margin-right: 10px;
+	margin-left: 0px;
+	background: #c8dcff;
+    border: none;
+}
+
+#DeviceSelectDialog > #BottomButtonBar > QPushButton:disabled {
+	color: #464646
+}
+
+#DeviceSelectDialog > #BottomButtonBar > QPushButton:focus {
+	background: #a0c3ff;
+}
+
+#DeviceSelectDialog > #BottomButtonBar > QPushButton:hover {
+	background: #739fff;
+	color: white;
+}
