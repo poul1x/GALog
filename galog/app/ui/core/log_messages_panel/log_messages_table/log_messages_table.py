@@ -3,6 +3,7 @@ from typing import Callable, List, Optional
 from galog.app.hrules.hrules import HRulesStorage
 from galog.app.log_reader.models import LogLine
 from galog.app.ui.base.table_view import TableView, QTableView
+from .msg_view_dialog import LogMessageViewDialog
 
 from .navigation_frame import NavigationFrame
 
@@ -44,7 +45,7 @@ from .vertical_header import VerticalHeader
 class LogMessagesTable(TableView):
     requestJumpToOriginalLine = pyqtSignal()
     requestJumpBackToFilterView = pyqtSignal()
-    requestShowLineDetails = pyqtSignal()
+    requestShowLineDetails = pyqtSignal(QModelIndex)
     requestCopyLogLines = pyqtSignal()
     requestCopyLogMessages = pyqtSignal()
 
@@ -61,7 +62,8 @@ class LogMessagesTable(TableView):
         if helper.isCtrlEnterPressed():
             self.requestJumpToOriginalLine.emit()
         elif helper.isEnterPressed():
-            self.requestShowLineDetails.emit()
+            if self.currentIndex().isValid():
+                self.requestShowLineDetails.emit(self.currentIndex())
         elif helper.isEscapePressed():
             self.requestJumpBackToFilterView.emit()
         elif helper.isCtrlShiftCPressed():
@@ -93,18 +95,18 @@ class LogMessagesTable(TableView):
             return
 
         actionView = QAction("View", self)
-        actionView.triggered.connect(lambda: self.requestShowLineDetails.emit())
+        actionView.triggered.connect(lambda: self.requestShowLineDetails.emit(index))
 
         contextMenu = QMenu(self)
         contextMenu.addAction(actionView)
 
         if self.quickFilterEnabled():
             actionOrigin = QAction("Go to origin", self)
-            actionOrigin.triggered.connect(lambda: self.requestJumpToOriginalLine.emit())
+            actionOrigin.triggered.connect(lambda: self.requestJumpToOriginalLine.emit()) # fmt: skip
             contextMenu.addAction(actionOrigin)
         else:
             actionBack = QAction("Go back", self)
-            actionBack.triggered.connect(lambda: self.requestJumpBackToFilterView.emit())
+            actionBack.triggered.connect(lambda: self.requestJumpBackToFilterView.emit()) # fmt: skip
             contextMenu.addAction(actionBack)
 
         contextMenu.exec_(self.viewport().mapToGlobal(position))
@@ -118,6 +120,8 @@ class LogMessagesTable(TableView):
     def _initUserInputHandlers(self):
         self._navigationFrame.upArrowButton.clicked.connect(self._navScrollTop)  # fmt: skip
         self._navigationFrame.downArrowButton.clicked.connect(self._navScrollBottom)  # fmt: skip
+        self.requestShowLineDetails.connect(self._rowActivated)
+        self.rowActivated.connect(self._rowActivated)
 
     def _initDataModel(self):
         self._dataModel = DataModel()
@@ -232,7 +236,6 @@ class LogMessagesTable(TableView):
     def enterBatchMode(self):
         return self._dataModel.batchInsertMode()
 
-
     #####
 
     def advancedFilterApply(self, fn: Callable[[str], bool]):
@@ -274,7 +277,6 @@ class LogMessagesTable(TableView):
 
     #####
 
-
     def _dataModelRow(self, row: int):
         index2 = self._quickFilterModel.index(row, 0)
         index1 = self._quickFilterModel.mapToSource(index2)
@@ -310,3 +312,19 @@ class LogMessagesTable(TableView):
 
     def uniqueTagNames(self) -> List[str]:
         return self._dataModel.uniqueTagNames()
+
+    #####
+
+    def _showLogLineDetails(self, row: int):
+        dialog = LogMessageViewDialog()
+        dialog.setLogLine(self._dataModel.logLine(row))
+        if self._delegate.highlightingEnabled():
+            hRules = self._delegate.highlightingRules()
+            hData = self._dataModel.highlightingData(row)
+            dialog.setHighlighting(hRules, hData)
+
+        dialog.exec_()
+
+    def _rowActivated(self, index: QModelIndex):
+        dataModelRow = self._dataModelRow(index.row())
+        self._showLogLineDetails(dataModelRow)

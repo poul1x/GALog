@@ -49,6 +49,9 @@ class LogLineDelegate(QStyledItemDelegate):
     def font(self):
         return self._font
 
+    def highlightingRules(self):
+        return self._highlightingRules
+
     def setHighlightingRules(self, rules: HRulesStorage):
         self._highlightingRules = rules
 

@@ -1,8 +1,8 @@
-#LogMessageViewPane {
+#LogMessageViewDialog {
 	background-color: $color_darker$;
 }
 
-#LogMessageViewPane QLabel {
+#LogMessageViewDialog QLabel {
 	text-align: left;
 	padding: 2px 2px;
 
@@ -13,9 +13,12 @@
 	font-size: 20px;
 
 	background: $color_normal$;
+
+    selection-background-color: #464646;
+    selection-color: #ffffff;
 }
 
-#LogMessageViewPane QTextEdit {
+#LogMessageViewDialog QTextEdit {
 	padding: 2px 2px;
 
 	border: 2px solid $color_normal$;
@@ -25,9 +28,12 @@
 	font-size: 20px;
 
 	background: $color_normal$;
+
+    selection-background-color: #464646;
+    selection-color: #ffffff;
 }
 
-#LogMessageViewPane QPushButton {
+#LogMessageViewDialog QPushButton {
 	text-align: left;
 	padding: 5px 10px;
 
@@ -42,7 +48,7 @@
 	background: $color_normal$;
 }
 
-#LogMessageViewPane QPushButton:hover {
+#LogMessageViewDialog QPushButton:hover {
 	border: 2px solid white;
 	background: white;
 }

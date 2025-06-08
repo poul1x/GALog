@@ -37,7 +37,7 @@ class LogMessageViewPaneController:
         self._pane = None
 
     def takeControl(self, viewPane: LogMessageViewDialog):
-        viewPane.copyButton.clicked.connect(self.copyButtonClicked)
+        viewPane._copyButton.clicked.connect(self.copyButtonClicked)
         self._pane = viewPane
 
     def _highlightingData(self, row: int) -> HighlightingData:
@@ -58,25 +58,25 @@ class LogMessageViewPaneController:
         self._pane.exec_()
 
     def copyButtonClickedEnd(self, oldText: str):
-        self._pane.copyButton.setEnabled(True)
-        self._pane.copyButton.setText(oldText)
+        self._pane._copyButton.setEnabled(True)
+        self._pane._copyButton.setText(oldText)
 
     def copyButtonClicked(self):
-        self._pane.copyButton.setEnabled(False)
-        oldText = self._pane.copyButton.text()
-        self._pane.copyButton.setText("Copied")
+        self._pane._copyButton.setEnabled(False)
+        oldText = self._pane._copyButton.text()
+        self._pane._copyButton.setText("Copied")
 
         clip = QGuiApplication.clipboard()
-        clip.setText(self._pane.logMsgTextBrowser.toPlainText())
+        clip.setText(self._pane._logMsgTextBrowser.toPlainText())
         QTimer.singleShot(3000, lambda: self.copyButtonClickedEnd(oldText))
 
     def highlightAllText(self, charFormat: QTextCharFormat):
-        cursor = QTextCursor(self._pane.logMsgTextBrowser.document())
+        cursor = QTextCursor(self._pane._logMsgTextBrowser.document())
         cursor.select(QTextCursor.Document)
         cursor.setCharFormat(charFormat)
 
     def cursorSelect(self, begin: int, end: int):
-        cursor = QTextCursor(self._pane.logMsgTextBrowser.document())
+        cursor = QTextCursor(self._pane._logMsgTextBrowser.document())
         cursor.setPosition(begin, QTextCursor.MoveAnchor)
         cursor.setPosition(end, QTextCursor.KeepAnchor)
         return cursor
@@ -84,7 +84,7 @@ class LogMessageViewPaneController:
     def highlightKeyword(self, keyword: PatternSearchResult, charFormat: QTextCharFormat):
         if keyword.name == "GenericUrl":
             charFormat.setAnchor(True)
-            text = self._pane.logMsgTextBrowser.document().toPlainText()
+            text = self._pane._logMsgTextBrowser.document().toPlainText()
             addr = text[keyword.begin : keyword.end]
             charFormat.setAnchorHref(addr)
             charFormat.setToolTip(addr)
@@ -93,10 +93,10 @@ class LogMessageViewPaneController:
         cursor.setCharFormat(charFormat)
 
     def setFontForContent(self, font: QFont):
-        self._pane.logMsgTextBrowser.document().setDefaultFont(font)
+        self._pane._logMsgTextBrowser.document().setDefaultFont(font)
 
     def setTag(self, tag: str):
-        self._pane.tagNameLabel.setText(f"Tag: {tag}")
+        self._pane._tagNameLabel.setText(f"Tag: {tag}")
 
     def setLogLevel(self, logLevel: str):
         if logLevel == "S":
@@ -116,10 +116,10 @@ class LogMessageViewPaneController:
         else:
             desc = "<Unknown level>"
 
-        self._pane.logLevelLabel.setText(f"Log level: {desc}")
+        self._pane._logLevelLabel.setText(f"Log level: {desc}")
 
     def setLogMessage(self, msg: str):
-        self._pane.logMsgTextBrowser.setPlainText(msg)
+        self._pane._logMsgTextBrowser.setPlainText(msg)
 
     def setStyleSheetAuto(self, logLevel: str):
         color = logLevelColor(logLevel).name(QColor.HexRgb)

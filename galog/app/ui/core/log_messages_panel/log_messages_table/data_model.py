@@ -60,6 +60,9 @@ class DataModel(QStandardItemModel):
             ]
         )
 
+    def highlightingData(self, row: int):
+        return self.item(row, Column.logMessage).data(Qt.UserRole)
+
     @contextmanager
     def batchInsertMode(self):
         try:
