@@ -8,8 +8,8 @@ from typing import Dict, List
 import traceback
 import os
 import shutil
-
-from PyQt5.QtCore import QEvent, QThread, QThreadPool, QStandardPaths
+from PyQt5.QtGui import QDesktopServices
+from PyQt5.QtCore import QEvent, QThread, QThreadPool, QStandardPaths, QUrl
 from PyQt5.QtGui import QFontDatabase, QIcon
 from PyQt5.QtWidgets import (
     QAction,
@@ -534,15 +534,6 @@ class MainWindow(QMainWindow):
     #     action.setData(False)
     #     return action
 
-    def clearAppDataAction(self):
-        action = QAction("&Clear app data", self)
-        action.setShortcut("Ctrl+P")
-        action.setStatusTip("Clear user data associated with the app")
-        action.triggered.connect(lambda: msgBoxNotImp(self))
-        action.setEnabled(False)
-        action.setData(True)
-        return action
-
     def takeScreenshotAction(self):
         action = QAction("&Take screenshot", self)
         action.setShortcut("Ctrl+P")
@@ -576,6 +567,36 @@ class MainWindow(QMainWindow):
         action.setData(False)
         return action
 
+    #####
+
+    def showFolderInFileExplorer(self, dirPath: str):
+        assert os.path.isdir(dirPath), "dirPath must be a directory"
+        QDesktopServices.openUrl(QUrl.fromLocalFile(dirPath))
+
+    def showAppDataFolder(self):
+        self.showFolderInFileExplorer(appDataDir())
+
+    def showLogsFolder(self):
+        self.showFolderInFileExplorer(appLogsDir())
+
+    def showAppDataFolderAction(self):
+        action = QAction("&Show app data folder", self)
+        action.setStatusTip("Show app data folder")
+        action.triggered.connect(self.showAppDataFolder)
+        action.setEnabled(True)
+        action.setData(True)
+        return action
+
+    def showLogsFolderAction(self):
+        action = QAction("&Show logs folder", self)
+        action.setStatusTip("Show logs folder")
+        action.triggered.connect(self.showLogsFolder)
+        action.setEnabled(True)
+        action.setData(True)
+        return action
+
+    #####
+
     def setupMenuBar(self):
         menuBar = self.menuBar()
         captureMenu = menuBar.addMenu("📱 &Capture")
@@ -591,6 +612,10 @@ class MainWindow(QMainWindow):
         captureMenu.addAction(self.toggleHighlightingAction())
         captureMenu.addAction(self.showLineNumbersAction())
         captureMenu.addAction(self.openTagFilterAction())
+
+        captureMenu = menuBar.addMenu("🛠 &Options")
+        captureMenu.addAction(self.showAppDataFolderAction())
+        captureMenu.addAction(self.showLogsFolderAction())
 
         # This will be implemented in the next release
         # adbMenu = menuBar.addMenu("🐞 &ADB")

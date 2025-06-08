@@ -36,16 +36,16 @@ handlers:
     filename: root.log
     encoding: utf-8
     formatter: fmt_no_colors
-    level: NOTSET
+    level: INFO
   hnd_console_no_colors:
     class: logging.StreamHandler
     formatter: fmt_no_colors
-    level: NOTSET
+    level: DEBUG
     stream: ext://sys.stdout
   hnd_console_colors:
     class: logging.StreamHandler
     formatter: fmt_colors
-    level: NOTSET
+    level: DEBUG
     stream: ext://sys.stdout
   none:
     class: logging.NullHandler
