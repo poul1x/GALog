@@ -27,9 +27,8 @@ def _generateSessionId():
     )
 
 
-_CWD = "."
 if not sys.argv[0].endswith(".py"):
-    _CWD = os.path.dirname(sys.argv[0])
+    os.chdir(os.path.dirname(sys.argv[0]))
 
 
 def _appDataRootDir():
@@ -46,7 +45,7 @@ _LOG = logging.getLogger("Paths")
 
 
 def resDirPath(*args: str):
-    return os.path.join(_CWD, "res", *args)
+    return os.path.join("res", *args)
 
 
 def _appDataRelativePath(*args: str):
