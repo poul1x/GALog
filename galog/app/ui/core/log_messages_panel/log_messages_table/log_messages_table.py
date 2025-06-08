@@ -237,10 +237,11 @@ class LogMessagesTable(TableView):
         self._dataModel.addLogLine(logLine)
 
     def clearLogLines(self):
-        self._dataModel.clearLogLines()
+        with self._dataModel.enterBatchMode():
+            self._dataModel.clearLogLines()
 
     def enterBatchMode(self):
-        return self._dataModel.batchInsertMode()
+        return self._dataModel.enterBatchMode()
 
     #####
 

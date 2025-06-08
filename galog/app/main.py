@@ -355,10 +355,12 @@ class MainWindow(QMainWindow):
         if result == StopCaptureDialog.AcceptedStopApp:
             device = self.appState.lastSelectedDevice.serial
             package = self.appState.lastSelectedPackage.name
-            action = StopAppAction(self.adbClient(), self)
-            action.stopApp(device, package)
+            #
             # Ignore action.failed(), because we want
             # to stop the capture anyway
+            #
+            action = StopAppAction(self.adbClient(), self)
+            action.stopApp(device, package)
 
         self.logMessagesPanel.stopCapture()
         self.setCaptureSpecificActionsEnabled(False)

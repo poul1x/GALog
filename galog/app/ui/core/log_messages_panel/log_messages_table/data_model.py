@@ -64,7 +64,7 @@ class DataModel(QStandardItemModel):
         return self.item(row, Column.logMessage).data(Qt.UserRole)
 
     @contextmanager
-    def batchInsertMode(self):
+    def enterBatchMode(self):
         try:
             self.beginResetModel()
             self.blockSignals(True)
