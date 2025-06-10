@@ -238,14 +238,4 @@ strip -s $OutDir/PyQt5/Qt5/plugins/imageformats/libqsvg.so
 strip -s $OutDir/PyQt5/Qt5/plugins/platforms/libqxcb.so
 strip -s $OutDir/galog
 
-echo "Pack files"
-upx -q -f -9 $OutDir/libicui18n.so.56
-upx -q -f -9 $OutDir/libQt5Widgets.so.5
-upx -q -f -9 $OutDir/libQt5Svg.so.5
-upx -q -f -9 $OutDir/libicuuc.so.56
-upx -q -f -9 $OutDir/libQt5DBus.so.5
-upx -q -f -9 $OutDir/libQt5XcbQpa.so.5
-upx -q -f -9 $OutDir/libQt5Gui.so.5
-upx -q -f -9 $OutDir/galog
-
 echo "Done"

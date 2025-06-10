@@ -114,16 +114,4 @@ strip -s $OutDir\PyQt5\Qt5\plugins\imageformats\qsvg.dll
 strip -s $OutDir\PyQt5\Qt5\plugins\platforms\qwindows.dll
 strip -s $OutDir\PyQt5\Qt5\plugins\styles\qwindowsvistastyle.dll
 
-Write-Host "Pack files"
-upx -q -9 -f $OutDir\python39.dll
-upx -q -9 -f $OutDir\pydantic_core\_pydantic_core.cp39-win_amd64.pyd
-upx -q -9 -f $OutDir\PyQt5\QtCore.pyd
-upx -q -9 -f $OutDir\PyQt5\QtGui.pyd
-upx -q -9 -f $OutDir\PyQt5\QtWidgets.pyd
-upx -q -9 -f $OutDir\PyQt5\Qt5\bin\Qt5Core.dll
-upx -q -9 -f $OutDir\PyQt5\Qt5\bin\Qt5Gui.dll
-upx -q -9 -f $OutDir\PyQt5\Qt5\bin\Qt5Svg.dll
-upx -q -9 -f $OutDir\PyQt5\Qt5\bin\Qt5Widgets.dll
-upx -q -9 -f $OutDir\galog.exe
-
 Write-Host "Done"
