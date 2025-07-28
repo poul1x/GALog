@@ -53,7 +53,7 @@ class PackagesList(QWidget):
         item.setEnabled(False)
         self.dataModel.appendRow(item)
 
-        item = QStandardItem("¯\_(ツ)_/¯")
+        item = QStandardItem(r"¯\_(ツ)_/¯")
         item.setSelectable(False)
         item.setEnabled(False)
         item.setData(Qt.AlignCenter, Qt.TextAlignmentRole)
