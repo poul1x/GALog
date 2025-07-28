@@ -108,6 +108,8 @@ class LogMessagesTable(TableView):
         return self._dataModel
 
     def _initUserInputHandlers(self):
+        self._topModel().rowsAboutToBeInserted.connect(self._beforeRowInserted)
+        self._topModel().rowsInserted.connect(self._afterRowInserted)
         self._navigationFrame.upArrowButton.clicked.connect(self._navScrollTop)  # fmt: skip
         self._navigationFrame.downArrowButton.clicked.connect(self._navScrollBottom)  # fmt: skip
         self.requestShowLineDetails.connect(self._rowActivated)
@@ -115,13 +117,9 @@ class LogMessagesTable(TableView):
 
     def _initDataModel(self):
         self._dataModel = DataModel()
-        self._dataModel.rowsAboutToBeInserted.connect(self._beforeRowInserted)
-        self._dataModel.rowsInserted.connect(self._afterRowInserted)
-
         self._advancedFilterModel = FnFilterModel()
         self._advancedFilterModel.setFilteringColumn(Column.tagName.value)
         self._advancedFilterModel.setSourceModel(self._dataModel)
-
         self._quickFilterModel = RegExpFilterModel()
         self._quickFilterModel.setFilteringColumn(Column.logMessage.value)
         self._quickFilterModel.setSourceModel(self._advancedFilterModel)
