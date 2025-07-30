@@ -60,24 +60,34 @@
 
 /* -------------------------- */
 
-#PackagesList QListView{
+#PackagesList > QListView {
 	font-family: Roboto;
 	font-size: 20px;
 	border: none;
 }
 
-#PackagesList QListView::item:hover
+#PackagesList[empty="false"] > QListView {
+    background-image: none;
+}
+
+#PackagesList[empty="true"] > QListView {
+    background-image: url(res/icons/shrug.svg);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#PackagesList > QListView::item:hover
 {
 	background-color: #f3f3f3;
 }
 
-#PackagesList QListView::item:selected
+#PackagesList > QListView::item:selected
 {
 	background-color: #464646;
 	color: #ffffff;
 }
 
-#PackagesList QLineEdit {
+#PackagesList > QLineEdit {
 	font-family: Roboto;
     font-size: 20px;
 	background: #eeeeee;

@@ -4,15 +4,14 @@ from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QSortFilterProxyModel
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QListView, QVBoxLayout, QWidget
 
+from galog.app.ui.base.widget import Widget
 from galog.app.ui.base.list_view import ListView
 from galog.app.ui.reusable.search_input import SearchInput
 
 
-class PackagesList(QWidget):
+class PackagesList(Widget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.setObjectName("PackagesList")
-        self.setAttribute(Qt.WA_StyledBackground)
         self.initUserInterface()
 
     def initUserInterface(self):
@@ -41,23 +40,19 @@ class PackagesList(QWidget):
     def addPackage(self, packageName: str):
         self.dataModel.appendRow(QStandardItem(packageName))
 
-    def clear(self):
+    def _removeAllPackages(self):
         rowCount = self.dataModel.rowCount()
         self.dataModel.removeRows(0, rowCount)
 
+    def clear(self):
+        self._removeAllPackages()
+        self.setProperty("empty", "false")
+        self.refreshStyleSheet()
+
     def setNoData(self):
-        self.clear()
-
-        item = QStandardItem()
-        item.setSelectable(False)
-        item.setEnabled(False)
-        self.dataModel.appendRow(item)
-
-        item = QStandardItem(r"¯\_(ツ)_/¯")
-        item.setSelectable(False)
-        item.setEnabled(False)
-        item.setData(Qt.AlignCenter, Qt.TextAlignmentRole)
-        self.dataModel.appendRow(item)
+        self._removeAllPackages()
+        self.setProperty("empty", "true")
+        self.refreshStyleSheet()
 
     def selectRowByIndex(self, index: QModelIndex):
         assert isinstance(index.model(), QSortFilterProxyModel)
