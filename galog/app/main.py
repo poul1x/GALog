@@ -45,7 +45,8 @@ from galog.app.paths import (
     loggingConfigFileInitial,
     styleSheetFiles,
 )
-from galog.app.ui.actions.restart_app.action import RestartAppAction
+from galog.app.ui.actions.get_app_pids import GetAppPidsAction
+from galog.app.ui.actions.restart_app import RestartAppAction
 from galog.app.ui.actions.start_app import StartAppAction
 from galog.app.ui.actions.stop_app import StopAppAction
 from galog.app.ui.base.style import GALogStyle
@@ -237,20 +238,24 @@ class MainWindow(QMainWindow):
 
         device = self.appState.lastSelectedDevice.serial
         package = self.appState.lastSelectedPackage.name
-        action = self.appState.lastSelectedPackage.action
 
-        if action != RunAppAction.DoNotStartApp:
-            _action = StartAppAction(self.adbClient(), self)
-            _action.startApp(device, package)
-            if _action.failed():
-                return
+        action = GetAppPidsAction(self.adbClient())
+        action.setLoadingDialogText("Retrieving app state...")
+        pids = action.appPids(device, package)
+        if action.failed():
+            return
 
+        assert pids is not None
+        self.setCaptureSpecificActionsEnabled(True)
         self.logMessagesPanel.setWhiteBackground()
         self.logMessagesPanel.disableQuickFilter()
         self.logMessagesPanel.clearLogLines()
+        self.logMessagesPanel.startCapture(device, package, pids)
 
-        self.setCaptureSpecificActionsEnabled(True)
-        self.logMessagesPanel.startCapture(device, package)
+        _action = self.appState.lastSelectedPackage.action
+        if _action != RunAppAction.DoNotStartApp and not pids:
+            action = StartAppAction(self.adbClient(), self)
+            action.startApp(device, package)
 
     def clearCaptureOutput(self):
         if msgBoxPrompt(

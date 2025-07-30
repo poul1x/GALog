@@ -1,5 +1,4 @@
 {
-  "python.formatting.provider": "black",
   "files.exclude": {
     "venv/": true,
     "galog/app/resources.py": true
@@ -9,5 +8,4 @@
   ],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
-  "python.pythonPath": "venv\\Scripts\\python.exe"
 }
