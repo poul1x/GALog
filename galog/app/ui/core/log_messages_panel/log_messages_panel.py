@@ -106,20 +106,16 @@ class LogMessagesPanel(Widget):
             int(self._appState.adb.port),
         )
 
-    def startCapture(self, device: str, package: str):
-        action = GetAppPidsAction(self._adbClient())
-        action.setLoadingDialogText("Fetching App Logs...")
-        pids = action.appPids(device, package)
-        if pids is None:
-            return
-
+    def _addAppStateLogLine(self, app: str, pids: List[str]):
         if pids:
-            msg = f"App '{package}' is running. PID(s): {', '.join(pids)}"
+            msg = f"App '{app}' is running. PID(s): {', '.join(pids)}"
             self._addOwnLogLine(msg)
         else:
-            msg = f"App '{package}' is not running. Waiting for its start..."
+            msg = f"App '{app}' is not running. Waiting for its start..."
             self._addOwnLogLine(msg)
 
+    def startCapture(self, device: str, package: str, pids: List[str]):
+        self._addAppStateLogLine(package, pids)
         self._logReader = AndroidAppLogReader(self._adbClient(), device, package, pids)
         self._logReader.signals.failed.connect(self._logReaderFailed)
         self._logReader.signals.appStarted.connect(self._appStarted)

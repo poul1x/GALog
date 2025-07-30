@@ -1,7 +1,7 @@
 QMenuBar {
 	background-color: #ffffff;
 	min-height: 30px;
-	font-family: Roboto;
+	font-family: 'Emoji One', 'Noto Color Emoji', 'Noto Color Emoji [GOOG]', 'Segoe UI Emoji', 'Apple Color Emoji';
 	font-size: 20px;
 }
 
