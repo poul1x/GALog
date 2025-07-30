@@ -164,7 +164,7 @@ class PackageSelectDialog(Dialog):
         openFileDialog.setFileMode(QFileDialog.ExistingFile)
         openFileDialog.setNameFilter("APK Files (*.apk)")
 
-        if not openFileDialog.exec_():
+        if openFileDialog.exec_() == QFileDialog.Rejected:
             return
 
         selectedFiles = openFileDialog.selectedFiles()
@@ -189,9 +189,7 @@ class PackageSelectDialog(Dialog):
             return
 
         msgBrief = "Package not installed"
-        prompt = (
-            f"This app is not present on the device. Do you want to install and run it?"
-        )
+        prompt = f"This app is not present on the device. Do you want to install and run it?" # fmt: skip
         if not msgBoxPrompt(msgBrief, prompt, self):
             return
 
@@ -224,8 +222,8 @@ class PackageSelectDialog(Dialog):
     def _selectAnotherDevice(self, autoSelect: bool = False):
         deviceSelectDialog = DeviceSelectDialog(self._appState, self.parent())
         deviceSelectDialog.setDeviceAutoSelect(autoSelect)
-        result = deviceSelectDialog.exec_()
-        if result == 0:
+
+        if deviceSelectDialog.exec_() == DeviceSelectDialog.Rejected:
             return
 
         self.packagesList.searchInput.setFocus()

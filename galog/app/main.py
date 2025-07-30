@@ -232,8 +232,7 @@ class MainWindow(QMainWindow):
             QThread.msleep(100)
 
         packageSelectDialog = PackageSelectDialog(self.appState, self)
-        result = packageSelectDialog.exec_()
-        if result == 0:
+        if packageSelectDialog.exec_() == PackageSelectDialog.Rejected:
             return
 
         device = self.appState.lastSelectedDevice.serial
@@ -310,8 +309,7 @@ class MainWindow(QMainWindow):
 
     def restartCapture(self):
         dialog = RestartCaptureDialog(self)
-        result = dialog.exec_()
-        if result == RestartCaptureDialog.Rejected:
+        if dialog.exec_() == RestartCaptureDialog.Rejected:
             return
 
         assert self.appState.lastSelectedDevice is not None
@@ -340,6 +338,7 @@ class MainWindow(QMainWindow):
     def stopCapture(self):
         dialog = StopCaptureDialog(self)
         result = dialog.exec_()
+
         if result == StopCaptureDialog.Rejected:
             return
 
