@@ -1,6 +1,7 @@
 import os
 import shutil
 import logging
+import platform
 import subprocess
 import sys
 import tarfile
@@ -9,16 +10,18 @@ from contextlib import suppress
 from typing import List
 
 from PyQt5.QtCore import QEvent, QThread, QThreadPool, QUrl
-from PyQt5.QtGui import QDesktopServices, QFontDatabase, QIcon
+from PyQt5.QtGui import QDesktopServices, QFontDatabase, QFont, QIcon
 from PyQt5.QtWidgets import (
     QAction,
     QApplication,
     QCheckBox,
     QMainWindow,
     QMenu,
+    QMenuBar,
     QStyle,
     QStyleOptionButton,
     QWidgetAction,
+    QWidget,
 )
 
 from galog.app.app_state import (
@@ -53,15 +56,50 @@ from galog.app.ui.base.style import GALogStyle
 from galog.app.ui.core.device_select_dialog import DeviceSelectDialog
 from galog.app.ui.core.log_messages_panel import LogMessagesPanel
 
-# from galog.app.ui.core.message_view_dialog import LogMessageViewDialog
 from galog.app.ui.core.package_select_dialog import PackageSelectDialog
 from galog.app.ui.core.tag_filter_dialog import TagFilterDialog
 from galog.app.ui.quick_dialogs import RestartCaptureDialog
 from galog.app.ui.quick_dialogs.stop_capture_dialog import StopCaptureDialog
 from galog.app.ui.reusable.file_picker import FileExtensionFilterBuilder, FilePicker
 
+class GALogMenuBar(QMenuBar):
+    def __init__(self, parent: QWidget):
+        super().__init__(parent)
+        self._checkEmojiFontSupport()
 
-class MainWindow(QMainWindow):
+    @staticmethod
+    def _preferredEmojiFontFamily():
+        system = platform.system()
+        if system == "Windows":
+            return "Segoe UI Emoji"
+        elif system == "Linux":
+            return "Emoji One"
+        elif system == "Darwin":
+            return "Apple Color Emoji"
+        else:
+            return None
+
+    def _checkEmojiFontSupport(self):
+        self._hasEmojiFont = False
+        emojiFontFamily = self._preferredEmojiFontFamily()
+        if emojiFontFamily in QFontDatabase().families():
+            emojiFont = QFont(emojiFontFamily)
+            self.setFont(emojiFont)
+            self._hasEmojiFont = True
+
+    def addCaptureMenu(self):
+        if self._hasEmojiFont:
+            return self.addMenu("📱 &Capture")
+        else:
+            return self.addMenu("&Capture")
+
+    def addOptionsMenu(self):
+        if self._hasEmojiFont:
+            return self.addMenu("🛠 &Options")
+        else:
+            return self.addMenu("&Options")
+
+class GALogMainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.initAppState()
@@ -584,9 +622,12 @@ class MainWindow(QMainWindow):
 
     #####
 
+
     def setupMenuBar(self):
-        menuBar = self.menuBar()
-        captureMenu = menuBar.addMenu("📱 &Capture")
+        menuBar = GALogMenuBar(self)
+        self.setMenuBar(menuBar)
+
+        captureMenu = menuBar.addCaptureMenu()
         captureMenu.addAction(self.showDevicesAction())
         captureMenu.addAction(self.startCaptureAction())
         captureMenu.addAction(self.restartCaptureAction())
@@ -600,7 +641,7 @@ class MainWindow(QMainWindow):
         captureMenu.addAction(self.showLineNumbersAction())
         captureMenu.addAction(self.openTagFilterAction())
 
-        captureMenu = menuBar.addMenu("🛠 &Options")
+        captureMenu = menuBar.addOptionsMenu()
         captureMenu.addAction(self.showAppDataFolderAction())
         captureMenu.addAction(self.showLogsFolderAction())
 
@@ -708,11 +749,17 @@ def preRunApp():
     removeOldLogs()
 
 
-
-
 def runApp():
     preRunApp()
     app = GALogApp(sys.argv)
-    mainWindow = MainWindow()
+    mainWindow = GALogMainWindow()
     mainWindow.show()
-    sys.exit(app.exec())
+    result = app.exec()
+
+    # Keep this to properly cleanup.
+    # Executable, created with PyInstaller
+    # may get SIGSEGV on exit without this
+    mainWindow.deleteLater()
+
+    # Pass on the exit code
+    sys.exit(result)
