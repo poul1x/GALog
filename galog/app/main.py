@@ -708,11 +708,17 @@ def preRunApp():
     removeOldLogs()
 
 
-
-
 def runApp():
     preRunApp()
     app = GALogApp(sys.argv)
     mainWindow = MainWindow()
     mainWindow.show()
-    sys.exit(app.exec())
+    result = app.exec()
+
+    # Keep this to properly cleanup.
+    # Executable, created with PyInstaller
+    # may get SIGSEGV on exit without this
+    mainWindow.deleteLater()
+
+    # Pass on the exit code
+    sys.exit(result)
