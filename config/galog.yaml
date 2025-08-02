@@ -1,0 +1,8 @@
+adb:
+  ipAddr: '127.0.0.1'
+  port: 5037
+fonts:
+  emoji: null
+  logViewer: null
+  Standard: null
+  Upsized: null

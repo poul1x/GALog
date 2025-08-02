@@ -22,7 +22,7 @@ def randomChar():
 def _generateSessionId():
     return "{}-{}".format(
         datetime.now().replace(microsecond=0).isoformat().replace(":", "-"),
-        randomChar() + randomDigit() + randomChar() + randomDigit(),
+        randomChar() + randomChar() + randomDigit() + randomDigit(),
     )
 
 
@@ -30,20 +30,28 @@ if not sys.argv[0].endswith(".py"):
     os.chdir(os.path.dirname(sys.argv[0]))
 
 
-def _appDataRootDir():
-    path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
-    return os.path.normpath(path)
+def _appDataReadOnlyDirs():
+    return QStandardPaths.standardLocations(QStandardPaths.AppDataLocation)
 
+
+def _appDataRootDir():
+    return QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+
+
+def _appConfigRootDir():
+    return QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)
 
 
 _APP_NAME = "galog"
 _APP_SESSION_ID = _generateSessionId()
 _APP_DATA_DIR = os.path.join(_appDataRootDir(), _APP_NAME)
+_APP_CONFIG_DIR = os.path.join(_appConfigRootDir(), _APP_NAME)
 _LOG = logging.getLogger("Paths")
+_RES_DIR = "res"
 
 
 def resDirPath(*args: str):
-    return os.path.join("res", *args)
+    return os.path.join(_RES_DIR, *args)
 
 
 def _appDataRelativePath(*args: str):
@@ -110,6 +118,22 @@ def appDataDir():
     return _APP_DATA_DIR
 
 
+def appDataReadOnlyDir():
+    # List of standard locations where read only data dir can be placed
+    paths = [os.path.join(path, _APP_NAME) for path in _appDataReadOnlyDirs()]
+
+    # If it's a portable version, try ./<res-dir> path
+    paths.append(os.path.abspath(_RES_DIR))
+
+    # Check directory exists at one of the paths
+    for candidatePath in paths:
+        if os.path.isdir(candidatePath):
+            return candidatePath
+
+    # Nothing found
+    return None
+
+
 def appLogsRootDir():
     return os.path.join(_APP_DATA_DIR, "logs")
 
@@ -124,3 +148,6 @@ def appSessionID():
 
 def appConfigDir():
     return os.path.join(_APP_DATA_DIR, "config")
+
+def appConfigFile():
+    return os.path.join(appConfigDir(), "config.yaml")
