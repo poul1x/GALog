@@ -1,18 +1,25 @@
 import os
 import sys
-import logging
-from datetime import datetime
 from typing import Callable
-from .random import randomSessionId
 
 from PyQt5.QtCore import QStandardPaths
 
-
-
-
-
-def _appDataReadOnlyDirs():
-    return QStandardPaths.standardLocations(QStandardPaths.AppDataLocation)
+from .bootstrap import (
+    ICONS_DIR_NAME,
+    IMAGES_DIR_NAME,
+    RES_DIR_NAME,
+    CONFIG_DIR_NAME,
+    DEPLOYMENT,
+    RUNTIME,
+    OS_NAME,
+    LOGGING_CONFIG_FILE,
+    APP_SESSION_ID,
+    HRULES_DIR_NAME,
+    LOGGING_DIR_NAME,
+    QSS_DIR_NAME,
+    FONTS_DIR_NAME,
+    MAIN_CONFIG_FILE,
+)
 
 
 def _appDataRootDir():
@@ -24,39 +31,33 @@ def _appConfigRootDir():
 
 
 _APP_NAME = "galog"
-_APP_SESSION_ID = randomSessionId()
 _APP_DATA_DIR = os.path.join(_appDataRootDir(), _APP_NAME)
+_APP_RES_DIR = os.path.join(_APP_DATA_DIR, RES_DIR_NAME)
 _APP_CONFIG_DIR = os.path.join(_appConfigRootDir(), _APP_NAME)
-_LOG = logging.getLogger("Paths")
-_RES_DIR = "res"
 
 
-def resDirPath(*args: str):
-    return os.path.join(_RES_DIR, *args)
+def _resDirJoin(*args: str):
+    return os.path.join(_APP_RES_DIR, *args)
 
 
-def _appDataRelativePath(*args: str):
+def _configDirJoin(*args: str):
+    return os.path.join(_APP_CONFIG_DIR, *args)
+
+
+def _appDataDirJoin(*args: str):
     return os.path.join(_APP_DATA_DIR, *args)
 
 
 def styleSheetFile(name: str):
-    return resDirPath("qss", "manual", name + ".qss")
+    return _resDirJoin(QSS_DIR_NAME, "manual", name + ".qss")
 
 
 def iconFile(name: str):
-    return resDirPath("icons", name + ".svg")
+    return _resDirJoin(ICONS_DIR_NAME, name + ".svg")
 
 
 def imageFile(name: str):
-    return resDirPath("images", name + ".png")
-
-
-def loggingConfigFileInitial():
-    return resDirPath("logging", "logging.yaml")
-
-
-def loggingConfigFile():
-    return _appDataRelativePath("config", "logging.yaml")
+    return _resDirJoin(IMAGES_DIR_NAME, name + ".png")
 
 
 def dirFilesRecursive(path: str, fnFilter: Callable[[str], bool]):
@@ -70,65 +71,56 @@ def dirFilesRecursive(path: str, fnFilter: Callable[[str], bool]):
     return result
 
 
-def highlightingFiles():
+def hRulesFiles():
     return dirFilesRecursive(
-        resDirPath("highlighting"),
+        _configDirJoin(HRULES_DIR_NAME),
         lambda path: path.endswith(".yaml"),
     )
 
 
 def styleSheetFiles():
     return dirFilesRecursive(
-        resDirPath("qss", "auto"),
+        _resDirJoin(QSS_DIR_NAME, "auto"),
         lambda path: path.endswith(".qss"),
     )
 
 
 def fontFiles():
     return dirFilesRecursive(
-        resDirPath("fonts"),
+        _resDirJoin(FONTS_DIR_NAME),
         lambda path: path.endswith(".tar.xz"),
     )
-
-
-def appName():
-    return _APP_NAME
 
 
 def appDataDir():
     return _APP_DATA_DIR
 
 
-def appDataReadOnlyDir():
-    # List of standard locations where read only data dir can be placed
-    paths = [os.path.join(path, _APP_NAME) for path in _appDataReadOnlyDirs()]
+def appConfigDir():
+    return _APP_CONFIG_DIR
 
-    # If it's a portable version, try ./<res-dir> path
-    paths.append(os.path.abspath(_RES_DIR))
 
-    # Check directory exists at one of the paths
-    for candidatePath in paths:
-        if os.path.isdir(candidatePath):
-            return candidatePath
+def appResDir():
+    return _APP_RES_DIR
 
-    # Nothing found
-    return None
+
+def appConfigFile():
+    return _configDirJoin(MAIN_CONFIG_FILE)
+
+def hRulesDir():
+    return _configDirJoin(HRULES_DIR_NAME)
+
+def loggingConfigFile():
+    return _configDirJoin(LOGGING_CONFIG_FILE)
+
+
+def loggingConfigFile():
+    return _configDirJoin(LOGGING_CONFIG_FILE)
 
 
 def appLogsRootDir():
-    return os.path.join(_APP_DATA_DIR, "logs")
+    return _appDataDirJoin(LOGGING_DIR_NAME)
 
 
 def appLogsDir():
-    return os.path.join(_APP_DATA_DIR, "logs", _APP_SESSION_ID)
-
-
-def appSessionID():
-    return _APP_SESSION_ID
-
-
-def appConfigDir():
-    return os.path.join("config")
-
-def appConfigFile():
-    return os.path.join(appConfigDir(), "galog.yaml")
+    return _appDataDirJoin(LOGGING_DIR_NAME, APP_SESSION_ID)
