@@ -275,7 +275,7 @@ class GALogMainWindow(QMainWindow):
         self.logMessagesPanel.startCapture(device, package, pids)
 
         _action = self._settings.lastSelectedPackage.action
-        if _action != RunAppAction.DoNotStartApp and not pids:
+        if _action != RunAppAction.DoNotStartApp:
             action = StartAppAction(adbClient(), self)
             action.startApp(device, package)
 
@@ -342,15 +342,12 @@ class GALogMainWindow(QMainWindow):
 
         self.logMessagesPanel.stopCapture()
         self.logMessagesPanel.setWhiteBackground()
-        # self.logMessagesPanel.disableMessageFilter()
         self.logMessagesPanel.clearLogLines()
+        self.logMessagesPanel.startCapture(device, package, pids=[])
 
         action = RestartAppAction(adbClient())
         action.restartApp(device, package)
-        if action.failed():
-            return
 
-        self.logMessagesPanel.startCapture(device, package)
 
     def stopCapture(self):
         dialog = StopCaptureDialog(self)
