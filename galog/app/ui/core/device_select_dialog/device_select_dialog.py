@@ -2,13 +2,14 @@ from ipaddress import IPv4Address
 from typing import TYPE_CHECKING, List, Optional
 
 from PyQt5.QtCore import QModelIndex, Qt
-from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtGui import QKeyEvent, QFocusEvent
 from PyQt5.QtWidgets import QVBoxLayout, QWidget
 
 from galog.app.device import DeviceInfo, adbClient
+from galog.app.device.device import AdbClient
 from galog.app.msgbox import msgBoxErr
 from galog.app.settings.models import LastSelectedDevice
-from galog.app.settings.settings import readSettings
+from galog.app.settings.settings import readSettings, writeSettings
 from galog.app.ui.actions.list_devices.action import ListDevicesAction
 from galog.app.ui.base.dialog import Dialog
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
@@ -57,14 +58,16 @@ class DeviceSelectDialog(Dialog):
 
     def initFocusPolicy(self):
         self.devicesLoadOptions.reloadButton.setFocusPolicy(Qt.NoFocus)
-        self.devicesLoadOptions.ipAddressInput.setFocusPolicy(Qt.NoFocus)
-        self.devicesLoadOptions.portInput.setFocusPolicy(Qt.NoFocus)
         self.buttonBar.selectButton.setFocusPolicy(Qt.NoFocus)
-        self.buttonBar.cancelButton.setFocusPolicy(Qt.NoFocus)
+        self.buttonBar.cancelButton.setFocusPolicy(Qt.ClickFocus)
+        self.devicesLoadOptions.ipAddressInput.setFocusPolicy(Qt.ClickFocus)
+        self.devicesLoadOptions.portInput.setFocusPolicy(Qt.ClickFocus)
 
-        self.deviceTable.searchInput.setFocus()
         self.setTabOrder(self.deviceTable.searchInput, self.deviceTable.tableView)
         self.setTabOrder(self.deviceTable.tableView, self.deviceTable.searchInput)
+        self.setTabOrder(self.devicesLoadOptions.ipAddressInput, self.devicesLoadOptions.portInput) # fmt: skip
+        self.setTabOrder(self.devicesLoadOptions.portInput, self.deviceTable.tableView)
+        self.deviceTable.searchInput.setFocus()
 
     def _canSelectDevice(self):
         canSelect = self.deviceTable.canSelectDevice()
@@ -108,7 +111,6 @@ class DeviceSelectDialog(Dialog):
 
     def _deviceSelected(self, index: Optional[QModelIndex] = None):
         serial, displayName, isValid = self.deviceTable.selectedDevice(index)
-
         if not isValid:
             msgBrief = "Device is unavailable"
             msgVerbose = "Device can not be selected, because it's unavailable"
@@ -119,10 +121,15 @@ class DeviceSelectDialog(Dialog):
         self._settings.adb.port = int(self.devicesLoadOptions.adbPort())
         selectedDevice = LastSelectedDevice.new(serial, displayName)
         self._settings.lastSelectedDevice = selectedDevice
+        writeSettings(self._settings)
         self.accept()
 
     def _refreshDeviceList(self):
-        action = ListDevicesAction(adbClient(), self)
+        ipAddr = self.devicesLoadOptions.adbIpAddr()
+        port = int(self.devicesLoadOptions.adbPort())
+        client = AdbClient(ipAddr, port)
+
+        action = ListDevicesAction(client, self)
         deviceList = action.listDevices()
         if deviceList is None:
             self._setDevicesEmpty()

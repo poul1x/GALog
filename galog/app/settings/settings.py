@@ -39,16 +39,19 @@ def _loadSettingsFromFile():
 
 
 def _saveSettingsToFile(settings: AppSettings):
-    exclude = {
-        "lastSelectedDevice",
-        "lastSelectedPackage",
-        "advancedTagFilter",
-        "lastUsedDirPath",
-    }
+    settingsDict = settings.model_dump(
+        mode="json",
+        exclude={
+            "lastSelectedDevice",
+            "lastSelectedPackage",
+            "advancedFilter",
+            "lastUsedDirPath",
+        },
+    )
 
     configPath = appConfigFile()
     with open(configPath, "w") as f:
-        f.write(yaml.dump(settings.model_dump(exclude=exclude)))
+        f.write(yaml.dump(settingsDict))
 
 
 @mainThreadOnly

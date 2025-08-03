@@ -1,14 +1,14 @@
 adb:
-  ipAddr: '127.0.0.1'
+  ipAddr: 127.0.0.1
   port: 5037
 fonts:
-  emoji: null
-  logViewer:
-    family: 'Roboto Mono'
-    size: 14
   Standard:
-    family: 'Roboto'
+    family: Roboto
     size: 14
   Upsized:
-    family: 'Roboto'
+    family: Roboto
     size: 15
+  emoji: null
+  logViewer:
+    family: Roboto Mono
+    size: 14
