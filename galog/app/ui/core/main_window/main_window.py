@@ -1,45 +1,27 @@
 import os
 import shutil
-import logging
-import platform
 import subprocess
-import sys
 import tarfile
-import traceback
 from contextlib import suppress
-from typing import List
 
 from PyQt5.QtCore import QEvent, QThread, QThreadPool, QUrl
-from PyQt5.QtGui import QDesktopServices, QFontDatabase, QFont, QIcon
+from PyQt5.QtGui import QDesktopServices, QFontDatabase, QIcon
 from PyQt5.QtWidgets import (
     QAction,
     QApplication,
     QCheckBox,
     QMainWindow,
     QMenu,
-    QMenuBar,
     QStyle,
     QStyleOptionButton,
     QWidgetAction,
-    QWidget,
 )
 
 from galog.app.device import adbClient
 from galog.app.hrules import HRulesStorage
-from galog.app.logging import initializeLogging
 from galog.app.msgbox import msgBoxErr, msgBoxInfo, msgBoxNotImp, msgBoxPrompt
-from galog.app.paths import (
-    appConfigDir,
-    appDataDir,
-    appLogsDir,
-    appLogsRootDir,
-    fontFiles,
-    hRulesFiles,
-    iconFile,
-    loggingConfigFile,
-    styleSheetFiles,
-)
-from galog.app.settings import readSettings, writeSettings
+from galog.app.paths import appDataDir, appLogsDir, fontFiles, hRulesFiles, iconFile
+from galog.app.settings import readSettings
 from galog.app.settings.models import RunAppAction, TagFilteringMode
 from galog.app.ui.actions.get_app_pids import GetAppPidsAction
 from galog.app.ui.actions.restart_app import RestartAppAction
@@ -48,15 +30,14 @@ from galog.app.ui.actions.stop_app import StopAppAction
 from galog.app.ui.base.style import GALogStyle
 from galog.app.ui.core.device_select_dialog import DeviceSelectDialog
 from galog.app.ui.core.log_messages_panel import LogMessagesPanel
-
 from galog.app.ui.core.package_select_dialog import PackageSelectDialog
 from galog.app.ui.core.tag_filter_dialog import TagFilterDialog
 from galog.app.ui.quick_dialogs import RestartCaptureDialog
 from galog.app.ui.quick_dialogs.stop_capture_dialog import StopCaptureDialog
 from galog.app.ui.reusable.file_picker import FileExtensionFilterBuilder, FilePicker
-from galog.app.user_data import initializeUserData
 
 from .menubar import GALogMenuBar
+
 
 class GALogMainWindow(QMainWindow):
     def __init__(self) -> None:

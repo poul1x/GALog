@@ -184,7 +184,7 @@ class PackageSelectDialog(Dialog):
             return
 
         msgBrief = "Package not installed"
-        prompt = f"This app is not present on the device. Do you want to install and run it?" # fmt: skip
+        prompt = f"This app is not present on the device. Do you want to install and run it?"  # fmt: skip
         if not msgBoxPrompt(msgBrief, prompt, self):
             return
 

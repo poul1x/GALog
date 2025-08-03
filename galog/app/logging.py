@@ -1,13 +1,11 @@
-from contextlib import suppress
 import logging.config
 import os
 import shutil
+from contextlib import suppress
+from datetime import datetime, timedelta
 from typing import Dict
 
 import yaml
-import os
-
-from datetime import datetime, timedelta
 
 from galog.app.paths import appLogsDir, appLogsRootDir, loggingConfigFile
 

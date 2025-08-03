@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QRegExp, Qt
-from PyQt5.QtGui import QIcon, QRegExpValidator, QFocusEvent
+from PyQt5.QtGui import QFocusEvent, QIcon, QRegExpValidator
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QPushButton, QWidget
 
 from galog.app.paths import iconFile
@@ -59,4 +59,3 @@ class DevicesLoadOptions(Widget):
     def focusInEvent(self, event: QFocusEvent):
         self.ipAddressInput.setFocus()
         event.accept()
-

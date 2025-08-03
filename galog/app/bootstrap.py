@@ -1,7 +1,7 @@
 import os
+import platform
 import sys
 from enum import Enum, auto
-import platform
 
 from galog.app.random import randomSessionId
 

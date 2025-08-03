@@ -23,6 +23,6 @@ class GetAppPidsAction(ShellExecAction):
 
     def appPids(self, deviceName: str, packageName: str):
         command = ShellExecCommand(self._CMD_NAME, f"pidof {packageName}")
-        command.verifier = lambda code, output: True # Always success
+        command.verifier = lambda code, output: True  # Always success
         self.executeCommand(deviceName, command)
         return self._app_pids

@@ -1,24 +1,19 @@
 import os
-import sys
 from typing import Callable
 
 from PyQt5.QtCore import QStandardPaths
 
 from .bootstrap import (
+    APP_SESSION_ID,
+    FONTS_DIR_NAME,
+    HRULES_DIR_NAME,
     ICONS_DIR_NAME,
     IMAGES_DIR_NAME,
-    RES_DIR_NAME,
-    CONFIG_DIR_NAME,
-    DEPLOYMENT,
-    RUNTIME,
-    OS_NAME,
     LOGGING_CONFIG_FILE,
-    APP_SESSION_ID,
-    HRULES_DIR_NAME,
     LOGGING_DIR_NAME,
-    QSS_DIR_NAME,
-    FONTS_DIR_NAME,
     MAIN_CONFIG_FILE,
+    QSS_DIR_NAME,
+    RES_DIR_NAME,
 )
 
 
@@ -107,8 +102,10 @@ def appResDir():
 def appConfigFile():
     return _configDirJoin(MAIN_CONFIG_FILE)
 
+
 def hRulesDir():
     return _configDirJoin(HRULES_DIR_NAME)
+
 
 def loggingConfigFile():
     return _configDirJoin(LOGGING_CONFIG_FILE)

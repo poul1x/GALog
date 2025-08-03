@@ -1,10 +1,12 @@
-from contextlib import contextmanager
-from typing import Optional
-from PyQt5.QtCore import QThread, QCoreApplication
-from galog.app.paths import appConfigFile
-import yaml
-from .models import AppSettings, AdvancedFilterSettings
 from functools import wraps
+from typing import Optional
+
+import yaml
+from PyQt5.QtCore import QCoreApplication, QThread
+
+from galog.app.paths import appConfigFile
+
+from .models import AdvancedFilterSettings, AppSettings
 
 
 def mainThreadOnly(func):

@@ -12,7 +12,6 @@ from galog.app.log_reader import (
     ProcessEndedEvent,
     ProcessStartedEvent,
 )
-from galog.app.ui.actions.get_app_pids import GetAppPidsAction
 from galog.app.ui.actions.read_log_file import ReadLogFileAction
 from galog.app.ui.actions.write_log_file import WriteLogFileAction
 from galog.app.ui.base.item_view_proxy import ScrollHint

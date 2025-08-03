@@ -1,5 +1,5 @@
-from datetime import datetime
 import random
+from datetime import datetime
 
 # Initialize pseudorandom sequences
 random.seed(datetime.now().timestamp())

@@ -1,20 +1,26 @@
-from galog.app.bootstrap import (
-    APP_NAME,
-    DeploymentMode,
-    RES_DIR_NAME,
-    DEPLOYMENT,
-    OS_NAME,
-    CONFIG_DIR_NAME,
-    MAIN_CONFIG_FILE,
-    LOGGING_CONFIG_FILE,
-    HRULES_DIR_NAME,
-)
+import os
+import shutil
 
 from PyQt5.QtCore import QStandardPaths
 
-import os
-import shutil
-import logging
+from galog.app.bootstrap import (
+    APP_NAME,
+    CONFIG_DIR_NAME,
+    DEPLOYMENT,
+    HRULES_DIR_NAME,
+    LOGGING_CONFIG_FILE,
+    MAIN_CONFIG_FILE,
+    RES_DIR_NAME,
+    DeploymentMode,
+)
+from galog.app.paths import (
+    appConfigDir,
+    appConfigFile,
+    appDataDir,
+    appResDir,
+    hRulesDir,
+    loggingConfigFile,
+)
 
 
 def _appDataReadOnlyDirs():
@@ -31,17 +37,6 @@ def _appDataReadOnlyDir():
             return candidatePath
 
     return None
-
-
-from .paths import (
-    appConfigDir,
-    appResDir,
-    appDataDir,
-    appConfigFile,
-    appLogsRootDir,
-    hRulesDir,
-    loggingConfigFile,
-)
 
 
 def initializeUserData():

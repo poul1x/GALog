@@ -1,8 +1,4 @@
-from .settings import (
-    AppSettings,
-    readSettings,
-    writeSettings,
-)
+from .settings import AppSettings, readSettings, writeSettings
 
 __all__ = [
     "AppSettings",

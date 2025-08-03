@@ -1,7 +1,7 @@
 from typing import Optional
 
 from PyQt5.QtCore import QModelIndex, QSize
-from PyQt5.QtGui import QColor, QFont, QPainter, QPalette, QFontMetrics
+from PyQt5.QtGui import QColor, QFont, QFontMetrics, QPainter, QPalette
 from PyQt5.QtWidgets import (
     QApplication,
     QStyle,

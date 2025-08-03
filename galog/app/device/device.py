@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Tuple
 from ppadb.client import Client
 from ppadb.device import Device
 
-from galog.app.settings.settings import readSettings, writeSettings
+from galog.app.settings.settings import readSettings
 
 from .errors import (
     AdbConnectionError,

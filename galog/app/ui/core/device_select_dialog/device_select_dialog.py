@@ -1,11 +1,11 @@
 from ipaddress import IPv4Address
-from typing import TYPE_CHECKING, List, Optional
+from typing import List, Optional
 
 from PyQt5.QtCore import QModelIndex, Qt
-from PyQt5.QtGui import QKeyEvent, QFocusEvent
+from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QVBoxLayout, QWidget
 
-from galog.app.device import DeviceInfo, adbClient
+from galog.app.device import DeviceInfo
 from galog.app.device.device import AdbClient
 from galog.app.msgbox import msgBoxErr
 from galog.app.settings.models import LastSelectedDevice
@@ -65,7 +65,7 @@ class DeviceSelectDialog(Dialog):
 
         self.setTabOrder(self.deviceTable.searchInput, self.deviceTable.tableView)
         self.setTabOrder(self.deviceTable.tableView, self.deviceTable.searchInput)
-        self.setTabOrder(self.devicesLoadOptions.ipAddressInput, self.devicesLoadOptions.portInput) # fmt: skip
+        self.setTabOrder(self.devicesLoadOptions.ipAddressInput, self.devicesLoadOptions.portInput)  # fmt: skip
         self.setTabOrder(self.devicesLoadOptions.portInput, self.deviceTable.tableView)
         self.deviceTable.searchInput.setFocus()
 
