@@ -3,6 +3,12 @@ adb:
   port: 5037
 fonts:
   emoji: null
-  logViewer: null
-  Standard: null
-  Upsized: null
+  logViewer:
+    family: 'Roboto Mono'
+    size: 14
+  Standard:
+    family: 'Roboto'
+    size: 14
+  Upsized:
+    family: 'Roboto'
+    size: 15

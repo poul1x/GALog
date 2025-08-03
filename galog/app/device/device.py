@@ -5,6 +5,8 @@ from typing import Dict, List, Optional, Tuple
 from ppadb.client import Client
 from ppadb.device import Device
 
+from galog.app.settings.settings import readSettings, writeSettings
+
 from .errors import (
     AdbConnectionError,
     DeviceNotFound,
@@ -162,3 +164,10 @@ def deviceListWithInfo(client: AdbClient) -> List[DeviceInfo]:
             result.append(DeviceInfo(device.serial, state))
 
     return result
+
+
+def adbClient():
+    settings = readSettings()
+    ipAddr = str(settings.adb.ipAddr)
+    port = int(settings.adb.port)
+    return AdbClient(ipAddr, port)

@@ -1,8 +1,9 @@
+from contextlib import contextmanager
 from typing import Optional
 from PyQt5.QtCore import QThread, QCoreApplication
-from galog.app import paths
+from galog.app.paths import appConfigFile
 import yaml
-from .models import AppSettings, TagFilteringSettings
+from .models import AppSettings, AdvancedFilterSettings
 from functools import wraps
 
 
@@ -21,40 +22,51 @@ def mainThreadOnly(func):
     return wrapper
 
 
-class AppSettingsProvider:
-    _instance: Optional["AppSettingsProvider"] = None
+_settings: Optional[AppSettings] = None
 
-    def __init__(self):
-        self._configPath = paths.appConfigFile()
-        self._loadSettingsFromFile()
 
-    @mainThreadOnly
-    def __new__(cls):
-        if not cls._instance:
-            cls._instance = super(AppSettingsProvider, cls).__new__(cls)
-        return cls._instance
+@mainThreadOnly
+def _loadSettingsFromFile():
+    configPath = appConfigFile()
+    with open(configPath, "r") as f:
+        settings = AppSettings(**yaml.safe_load(f.read()))
 
-    def _loadSettingsFromFile(self):
-        with open(self._configPath, "r") as f:
-            settings = AppSettings(**yaml.safe_load(f.read()))
+    settings.lastSelectedDevice = None
+    settings.lastSelectedPackage = None
+    settings.advancedFilter = AdvancedFilterSettings.default()
+    settings.lastUsedDirPath = ""
+    return settings
 
-        settings.lastSelectedDevice = None
-        settings.lastSelectedPackage = None
-        settings.lastUsedDirPath = ""
 
-        if settings.advancedTagFilter is None:
-            settings.advancedTagFilter = TagFilteringSettings.default()
+def _saveSettingsToFile(settings: AppSettings):
+    exclude = {
+        "lastSelectedDevice",
+        "lastSelectedPackage",
+        "advancedTagFilter",
+        "lastUsedDirPath",
+    }
 
-        self._settings = settings
+    configPath = appConfigFile()
+    with open(configPath, "w") as f:
+        f.write(yaml.dump(settings.model_dump(exclude=exclude)))
 
-    def _saveSettingsToFile(self, settings: AppSettings):
-        with open(self._configPath, "w") as f:
-            f.write(yaml.dump(settings.model_dump()))
 
-    @mainThreadOnly
-    def settings(self):
-        return self._settings
+@mainThreadOnly
+def reloadSettings():
+    global _settings
+    _settings = _loadSettingsFromFile()
 
-    @mainThreadOnly
-    def saveSettings(self, settings: AppSettings):
-        self._saveSettingsToFile(settings)
+
+@mainThreadOnly
+def readSettings():
+    if _settings is None:
+        reloadSettings()
+
+    assert isinstance(_settings, AppSettings)
+    return _settings
+
+
+@mainThreadOnly
+def writeSettings(settings: AppSettings):
+    correctSettings = AppSettings(**settings.model_dump())
+    _saveSettingsToFile(correctSettings)

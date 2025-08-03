@@ -1,13 +1,14 @@
+from ipaddress import IPv4Address
 from typing import TYPE_CHECKING, List, Optional
 
 from PyQt5.QtCore import QModelIndex, Qt
 from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QVBoxLayout, QWidget
 
-from galog.app.app_state import LastSelectedDevice
-from galog.app.device import AdbClient, DeviceInfo
-from galog.app.device.device import AdbClient
+from galog.app.device import DeviceInfo, adbClient
 from galog.app.msgbox import msgBoxErr
+from galog.app.settings.models import LastSelectedDevice
+from galog.app.settings.settings import readSettings
 from galog.app.ui.actions.list_devices.action import ListDevicesAction
 from galog.app.ui.base.dialog import Dialog
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
@@ -16,18 +17,13 @@ from .button_bar import ButtonBar
 from .device_table import DeviceTable
 from .load_options import DevicesLoadOptions
 
-if TYPE_CHECKING:
-    from galog.app.main import AppState
-else:
-    AppState = object
-
 
 class DeviceSelectDialog(Dialog):
-    def __init__(self, appState: AppState, parent: Optional[QWidget] = None):
+    def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
+        self._settings = readSettings()
         self._autoSelect = False
         self._autoSelectDone = False
-        self._appState = appState
         self.setWindowTitle("Select Device")
         self.setWindowFlag(Qt.WindowMaximizeButtonHint, False)
         self.setRelativeGeometry(0.8, 0.6, 900, 600)
@@ -37,12 +33,6 @@ class DeviceSelectDialog(Dialog):
         self.initUserInterface()
         self.initUserInputHandlers()
         self.initFocusPolicy()
-
-    def adbClient(self):
-        return AdbClient(
-            self._appState.adb.ipAddr,
-            int(self._appState.adb.port),
-        )
 
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
@@ -97,8 +87,8 @@ class DeviceSelectDialog(Dialog):
         vBoxLayoutMain.setSpacing(0)
         self.setLayout(vBoxLayoutMain)
 
-        self.devicesLoadOptions.setAdbIpAddr(self._appState.adb.ipAddr)
-        self.devicesLoadOptions.setAdbPort(str(self._appState.adb.port))
+        self.devicesLoadOptions.setAdbIpAddr(str(self._settings.adb.ipAddr))
+        self.devicesLoadOptions.setAdbPort(str(self._settings.adb.port))
 
     def _tryFocusPackagesListAndGoUp(self):
         self.deviceTable.trySetFocusAndGoUp()
@@ -125,14 +115,14 @@ class DeviceSelectDialog(Dialog):
             msgBoxErr(msgBrief, msgVerbose, self)
             return
 
-        selectedDevice = LastSelectedDevice(serial, displayName)
-        self._appState.lastSelectedDevice = selectedDevice
-        self._appState.adb.ipAddr = self.devicesLoadOptions.adbIpAddr()
-        self._appState.adb.port = self.devicesLoadOptions.adbPort()
+        self._settings.adb.ipAddr = IPv4Address(self.devicesLoadOptions.adbIpAddr())
+        self._settings.adb.port = int(self.devicesLoadOptions.adbPort())
+        selectedDevice = LastSelectedDevice.new(serial, displayName)
+        self._settings.lastSelectedDevice = selectedDevice
         self.accept()
 
     def _refreshDeviceList(self):
-        action = ListDevicesAction(self.adbClient(), self)
+        action = ListDevicesAction(adbClient(), self)
         deviceList = action.listDevices()
         if deviceList is None:
             self._setDevicesEmpty()
@@ -160,8 +150,8 @@ class DeviceSelectDialog(Dialog):
         # Select the first one by default
         #
 
-        if self._appState.lastSelectedDevice is not None:
-            serial = self._appState.lastSelectedDevice.serial
+        if self._settings.lastSelectedDevice is not None:
+            serial = self._settings.lastSelectedDevice.serial
             if self.deviceTable.selectDeviceBySerial(serial):
                 return
 

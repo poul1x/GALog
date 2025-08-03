@@ -4,17 +4,9 @@ from typing import List, Optional
 
 from typing import List, Optional, Union
 
-from pydantic import (
-    AfterValidator,
-    BaseModel,
-    Field,
-    NonNegativeFloat,
-    NonNegativeInt,
-    PositiveInt,
-    conint,
-    constr,
-    model_validator,
-)
+from pydantic import BaseModel, ConfigDict, create_model
+from pydantic import Field
+
 from pydantic.types import Annotated, StringConstraints
 from typing_extensions import Literal
 
@@ -22,12 +14,6 @@ from ipaddress import IPv4Address
 import os
 
 from enum import Enum, auto
-
-
-class RunAppAction(int, Enum):
-    StartApp = 0
-    StartAppDebug = auto()
-    DoNotStartApp = auto()
 
 
 class TagFilteringMode(int, Enum):
@@ -74,15 +60,27 @@ class AdbServerSettings(BaseModel):
     ipAddr: IPv4Address
     port: Port
 
+    @staticmethod
+    def new(ipAddr: IPv4Address, port: Port):
+        return AdbServerSettings(ipAddr=ipAddr, port=port)
+
 
 class LastSelectedDevice(BaseModel):
     serial: NonEmptyStr
     displayName: NonEmptyStr
 
+    @staticmethod
+    def new(serial: NonEmptyStr, displayName: NonEmptyStr):
+        return LastSelectedDevice(serial=serial, displayName=displayName)
+
 
 class LastSelectedPackage(BaseModel):
     name: NonEmptyStr
     action: RunAppAction
+
+    @staticmethod
+    def new(name: NonEmptyStr, action: RunAppAction):
+        return LastSelectedPackage(name=name, action=action)
 
 
 class TagFilteringMode(int, Enum):
@@ -91,20 +89,29 @@ class TagFilteringMode(int, Enum):
     HideMatching = auto()
 
 
-class TagFilteringSettings(BaseModel):
+class AdvancedFilterSettings(BaseModel):
     mode: TagFilteringMode
-    tags: List[str]
+    tags: List[NonEmptyStr]
 
-    def default(self):
-        return TagFilteringSettings(
+    @staticmethod
+    def default():
+        return AdvancedFilterSettings(
             mode=TagFilteringMode.Disabled,
             tags=[],
         )
+
+    @staticmethod
+    def new(mode: TagFilteringMode, tags: List[NonEmptyStr]):
+        return AdvancedFilterSettings(mode=mode, tags=tags)
 
 
 class FontSettings(BaseModel):
     family: NonEmptyStr
     size: FontSize
+
+    @staticmethod
+    def new(family: NonEmptyStr, size: FontSize):
+        return FontSettings(family, family, size=size)
 
 
 class AppFontsSettings(BaseModel):
@@ -118,6 +125,6 @@ class AppSettings(BaseModel):
     adb: AdbServerSettings
     lastSelectedDevice: Optional[LastSelectedDevice] = None
     lastSelectedPackage: Optional[LastSelectedPackage] = None
-    advancedTagFilter: Optional[TagFilteringSettings] = None
+    advancedFilter: Optional[AdvancedFilterSettings] = None
     lastUsedDirPath: str = ""
     fonts: AppFontsSettings

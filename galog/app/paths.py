@@ -1,33 +1,14 @@
 import os
 import sys
-import random
 import logging
 from datetime import datetime
 from typing import Callable
+from .random import randomSessionId
 
 from PyQt5.QtCore import QStandardPaths
 
-# Initialize pseudorandom sequences
-random.seed(datetime.now().timestamp())
 
 
-def randomDigit():
-    return str(random.randint(0, 9))
-
-
-def randomChar():
-    return random.choice("abcdefghijklmnopqrstuvwxyz")
-
-
-def _generateSessionId():
-    return "{}-{}".format(
-        datetime.now().replace(microsecond=0).isoformat().replace(":", "-"),
-        randomChar() + randomChar() + randomDigit() + randomDigit(),
-    )
-
-
-if not sys.argv[0].endswith(".py"):
-    os.chdir(os.path.dirname(sys.argv[0]))
 
 
 def _appDataReadOnlyDirs():
@@ -43,7 +24,7 @@ def _appConfigRootDir():
 
 
 _APP_NAME = "galog"
-_APP_SESSION_ID = _generateSessionId()
+_APP_SESSION_ID = randomSessionId()
 _APP_DATA_DIR = os.path.join(_appDataRootDir(), _APP_NAME)
 _APP_CONFIG_DIR = os.path.join(_appConfigRootDir(), _APP_NAME)
 _LOG = logging.getLogger("Paths")
@@ -147,7 +128,7 @@ def appSessionID():
 
 
 def appConfigDir():
-    return os.path.join(_APP_DATA_DIR, "config")
+    return os.path.join("config")
 
 def appConfigFile():
-    return os.path.join(appConfigDir(), "config.yaml")
+    return os.path.join(appConfigDir(), "galog.yaml")

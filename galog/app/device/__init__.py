@@ -6,6 +6,7 @@ from .device import (
     deviceList,
     deviceListWithInfo,
     deviceRestricted,
+    adbClient,
 )
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "deviceRestricted",
     "DeviceInfo",
     "DeviceDetails",
+    "adbClient",
 ]

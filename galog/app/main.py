@@ -24,14 +24,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from galog.app.app_state import (
-    AdbServerSettings,
-    AppState,
-    RunAppAction,
-    TagFilteringConfig,
-    TagFilteringMode,
-)
-from galog.app.device.device import AdbClient
+from galog.app.device import adbClient
 from galog.app.hrules import HRulesStorage
 from galog.app.logging import initLogging
 from galog.app.msgbox import msgBoxErr, msgBoxInfo, msgBoxNotImp, msgBoxPrompt
@@ -48,6 +41,8 @@ from galog.app.paths import (
     loggingConfigFileInitial,
     styleSheetFiles,
 )
+from galog.app.settings import readSettings, writeSettings
+from galog.app.settings.models import RunAppAction, TagFilteringMode
 from galog.app.ui.actions.get_app_pids import GetAppPidsAction
 from galog.app.ui.actions.restart_app import RestartAppAction
 from galog.app.ui.actions.start_app import StartAppAction
@@ -61,6 +56,7 @@ from galog.app.ui.core.tag_filter_dialog import TagFilterDialog
 from galog.app.ui.quick_dialogs import RestartCaptureDialog
 from galog.app.ui.quick_dialogs.stop_capture_dialog import StopCaptureDialog
 from galog.app.ui.reusable.file_picker import FileExtensionFilterBuilder, FilePicker
+
 
 class GALogMenuBar(QMenuBar):
     def __init__(self, parent: QWidget):
@@ -99,10 +95,11 @@ class GALogMenuBar(QMenuBar):
         else:
             return self.addMenu("&Options")
 
+
 class GALogMainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.initAppState()
+        self._settings = readSettings()
         self.setObjectName("MainWindow")
         self.setStyle(GALogStyle())
         self.loadFonts()
@@ -112,20 +109,8 @@ class GALogMainWindow(QMainWindow):
         self.increaseHoverAreaForCheckableActions()
         self.startAdbServer()
 
-    def initAppState(self):
-        self.appState = AppState(
-            adb=AdbServerSettings(
-                ipAddr="127.0.0.1",
-                port=5037,
-            ),
-            lastSelectedDevice=None,
-            lastSelectedPackage=None,
-            tagFilteringConfig=TagFilteringConfig.none(),
-            lastUsedDirPath="",
-        )
-
     def isLocalAdbAddr(self):
-        return self.appState.adb.ipAddr.startswith("127")
+        return self._settings.adb.ipAddr.is_loopback
 
     def startAdbServer(self):
         adb = shutil.which("adb")
@@ -228,25 +213,25 @@ class GALogMainWindow(QMainWindow):
                         defaultWidget.setStyleSheet("width: 0px;")
 
     def openTagFilter(self):
-        dialog = TagFilterDialog(self.appState, self)
+        dialog = TagFilterDialog(self)
         tagList = self.logMessagesPanel.uniqueTagNames()
         dialog.setTagAutoCompletionStrings(tagList)
 
         if dialog.exec_() == TagFilterDialog.Rejected:
             return
 
-        config = self.appState.tagFilteringConfig
-        if config.mode == TagFilteringMode.ShowMatching:
-            self.logMessagesPanel.advancedFilterApply(lambda tag: tag in config.tags)
-        elif config.mode == TagFilteringMode.HideMatching:
+        tagFilter = self._settings.advancedFilter
+        if tagFilter.mode == TagFilteringMode.ShowMatching:
+            self.logMessagesPanel.advancedFilterApply(lambda tag: tag in tagFilter.tags)
+        elif tagFilter.mode == TagFilteringMode.HideMatching:
             self.logMessagesPanel.advancedFilterApply(
-                lambda tag: tag not in config.tags
+                lambda tag: tag not in tagFilter.tags
             )
         else:  # config.mode == TagFilteringMode.Disabled:
             self.logMessagesPanel.advancedFilterReset()
 
     def showDevices(self):
-        deviceSelectPane = DeviceSelectDialog(self.appState, self)
+        deviceSelectPane = DeviceSelectDialog(self)
         deviceSelectPane.exec_()
 
     def startCapture(self):
@@ -256,8 +241,8 @@ class GALogMainWindow(QMainWindow):
             msgBoxErr(msgBrief, msgVerbose, self)
             return
 
-        if self.appState.lastSelectedDevice is None:
-            deviceSelectPane = DeviceSelectDialog(self.appState, self)
+        if self._settings.lastSelectedDevice is None:
+            deviceSelectPane = DeviceSelectDialog(self)
             deviceSelectPane.setDeviceAutoSelect(True)
             if deviceSelectPane.exec_() == DeviceSelectDialog.Rejected:
                 msgBrief = "Device not selected"
@@ -269,14 +254,14 @@ class GALogMainWindow(QMainWindow):
             # LoadingDialog flickering
             QThread.msleep(100)
 
-        packageSelectDialog = PackageSelectDialog(self.appState, self)
+        packageSelectDialog = PackageSelectDialog(self)
         if packageSelectDialog.exec_() == PackageSelectDialog.Rejected:
             return
 
-        device = self.appState.lastSelectedDevice.serial
-        package = self.appState.lastSelectedPackage.name
+        device = self._settings.lastSelectedDevice.serial
+        package = self._settings.lastSelectedPackage.name
 
-        action = GetAppPidsAction(self.adbClient())
+        action = GetAppPidsAction(adbClient())
         action.setLoadingDialogText("Retrieving app state...")
         pids = action.appPids(device, package)
         if action.failed():
@@ -289,9 +274,9 @@ class GALogMainWindow(QMainWindow):
         self.logMessagesPanel.clearLogLines()
         self.logMessagesPanel.startCapture(device, package, pids)
 
-        _action = self.appState.lastSelectedPackage.action
+        _action = self._settings.lastSelectedPackage.action
         if _action != RunAppAction.DoNotStartApp and not pids:
-            action = StartAppAction(self.adbClient(), self)
+            action = StartAppAction(adbClient(), self)
             action.startApp(device, package)
 
     def clearCaptureOutput(self):
@@ -306,12 +291,12 @@ class GALogMainWindow(QMainWindow):
 
     def _saveLastSelectedDir(self, filePicker: FilePicker):
         if filePicker.hasSelectedDirectory():
-            self.appState.lastUsedDirPath = filePicker.selectedDirectory()
+            self._settings.lastUsedDirPath = filePicker.selectedDirectory()
 
     def saveLogFile(self):
         filePicker = FilePicker(
             caption="Save log lines to file",
-            directory=self.appState.lastUsedDirPath,
+            directory=self._settings.lastUsedDirPath,
             extensionFilter=FileExtensionFilterBuilder.logFile(),
         )
 
@@ -331,7 +316,7 @@ class GALogMainWindow(QMainWindow):
 
         filePicker = FilePicker(
             caption="Load log lines from file",
-            directory=self.appState.lastUsedDirPath,
+            directory=self._settings.lastUsedDirPath,
             extensionFilter=FileExtensionFilterBuilder.logFile(),
         )
 
@@ -350,28 +335,22 @@ class GALogMainWindow(QMainWindow):
         if dialog.exec_() == RestartCaptureDialog.Rejected:
             return
 
-        assert self.appState.lastSelectedDevice is not None
-        device = self.appState.lastSelectedDevice.serial
-        package = self.appState.lastSelectedPackage.name
-        # mode = self.appState.lastSelectedPackage.action
+        assert self._settings.lastSelectedDevice is not None
+        device = self._settings.lastSelectedDevice.serial
+        package = self._settings.lastSelectedPackage.name
+        # mode = settings.lastSelectedPackage.action
 
         self.logMessagesPanel.stopCapture()
         self.logMessagesPanel.setWhiteBackground()
         # self.logMessagesPanel.disableMessageFilter()
         self.logMessagesPanel.clearLogLines()
 
-        action = RestartAppAction(self.adbClient())
+        action = RestartAppAction(adbClient())
         action.restartApp(device, package)
         if action.failed():
             return
 
         self.logMessagesPanel.startCapture(device, package)
-
-    def adbClient(self):
-        return AdbClient(
-            self.appState.adb.ipAddr,
-            int(self.appState.adb.port),
-        )
 
     def stopCapture(self):
         dialog = StopCaptureDialog(self)
@@ -381,13 +360,13 @@ class GALogMainWindow(QMainWindow):
             return
 
         if result == StopCaptureDialog.AcceptedStopApp:
-            device = self.appState.lastSelectedDevice.serial
-            package = self.appState.lastSelectedPackage.name
+            device = self._settings.lastSelectedDevice.serial
+            package = self._settings.lastSelectedPackage.name
             #
             # Ignore action.failed(), because we want
             # to stop the capture anyway
             #
-            action = StopAppAction(self.adbClient(), self)
+            action = StopAppAction(adbClient(), self)
             action.stopApp(device, package)
 
         self.logMessagesPanel.stopCapture()
@@ -622,7 +601,6 @@ class GALogMainWindow(QMainWindow):
 
     #####
 
-
     def setupMenuBar(self):
         menuBar = GALogMenuBar(self)
         self.setMenuBar(menuBar)
@@ -665,7 +643,7 @@ class GALogMainWindow(QMainWindow):
         y = (screen.height() - height) // 2
         self.setGeometry(x, y, width, height)
 
-        self.logMessagesPanel = LogMessagesPanel(self.appState, self)
+        self.logMessagesPanel = LogMessagesPanel(self)
         self.logMessagesPanel.captureInterrupted.connect(self.captureInterrupted)
 
         self.setCentralWidget(self.logMessagesPanel)

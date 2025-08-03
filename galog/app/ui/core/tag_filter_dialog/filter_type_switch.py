@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QLabel, QWidget
 
-from galog.app.app_state import TagFilteringMode
+from galog.app.settings.models import TagFilteringMode
 from galog.app.ui.base.widget import Widget
 
 
