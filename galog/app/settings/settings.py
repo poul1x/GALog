@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Optional
+from typing import List, Optional
 
 import yaml
 from PyQt5.QtCore import QCoreApplication, QThread
@@ -27,32 +27,28 @@ def mainThreadOnly(func):
 _settings: Optional[AppSettings] = None
 
 
+def _setDefaultValues(settings: AppSettings):
+    settings.lastSelectedDevice = None
+    settings.lastSelectedPackage = None
+    settings.advancedFilter = AdvancedFilterSettings.default()
+    settings.lastUsedDirPath = ""
+
+
 @mainThreadOnly
 def _loadSettingsFromFile():
     configPath = appConfigFile()
     with open(configPath, "r") as f:
         settings = AppSettings(**yaml.safe_load(f.read()))
 
-    settings.lastSelectedDevice = None
-    settings.lastSelectedPackage = None
-    settings.advancedFilter = AdvancedFilterSettings.default()
-    settings.lastUsedDirPath = ""
+    _setDefaultValues(settings)
     return settings
 
 
 def _saveSettingsToFile(settings: AppSettings):
-    settingsDict = settings.model_dump(
-        mode="json",
-        exclude={
-            "lastSelectedDevice",
-            "lastSelectedPackage",
-            "advancedFilter",
-            "lastUsedDirPath",
-        },
-    )
-
     configPath = appConfigFile()
     with open(configPath, "w") as f:
+        _setDefaultValues(settings)
+        settingsDict = settings.model_dump(mode="json")
         f.write(yaml.dump(settingsDict))
 
 
