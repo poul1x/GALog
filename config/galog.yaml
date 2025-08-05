@@ -2,13 +2,15 @@ adb:
   ipAddr: 127.0.0.1
   port: 5037
 fonts:
-  standard:
-    family: Roboto
-    size: 14
-  upsized:
-    family: Roboto
-    size: 15
   emoji: null
   logViewer:
     family: Roboto Mono
-    size: 14
+    size: 11
+  standard:
+    family: Roboto
+    size: 11
+  upsized:
+    family: Roboto
+    size: 12
+emojiAddSpace: true
+useEmoji: true

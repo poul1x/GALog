@@ -16,14 +16,15 @@ class GALogMenuBar(QMenuBar):
 
     @staticmethod
     def _preferredEmojiFonts():
-        if OS_NAME == "Windows":
-            return ["Emoji One", "Segoe UI Emoji"]
-        elif OS_NAME == "Linux":
-            return ["Emoji One", "Noto Color Emoji", "Noto Color Emoji [GOOG]"]
-        elif OS_NAME == "Darwin":
-            return ["Emoji One", "Apple Color Emoji"]
-        else:
-            assert False, "Unreachable"
+        return [
+            "Emoji One",
+            "Noto Color Emoji",
+            "Noto Color Emoji [GOOG]",
+            "Twitter Color Emoji",
+            "OpenMoji Color",
+            "Segoe UI Emoji",
+            "Apple Color Emoji",
+        ]
 
     def _findEmojiFont(self, fonts: List[str]):
         for font in self._preferredEmojiFonts():
@@ -38,6 +39,9 @@ class GALogMenuBar(QMenuBar):
         self._hasEmojiFont = True
 
     def _setEmojiFontIfAvailble(self):
+        if self._settings.useEmoji == False:
+            return
+
         allFonts = QFontDatabase().families()
         font = self._settings.fonts.emoji
 
@@ -53,12 +57,18 @@ class GALogMenuBar(QMenuBar):
 
     def addCaptureMenu(self):
         if self._hasEmojiFont:
-            return self.addMenu("📱 &Capture")
+            if self._settings.emojiAddSpace:
+                return self.addMenu("📱 &Capture")
+            else:
+                return self.addMenu("📱&Capture")
         else:
             return self.addMenu("&Capture")
 
     def addOptionsMenu(self):
         if self._hasEmojiFont:
-            return self.addMenu("🛠 &Options")
+            if self._settings.emojiAddSpace:
+                return self.addMenu("🛠 &Options")
+            else:
+                return self.addMenu("🛠&Options")
         else:
             return self.addMenu("&Options")

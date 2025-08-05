@@ -118,3 +118,5 @@ class AppSettings(BaseModel):
     advancedFilter: Optional[AdvancedFilterSettings] = None
     lastUsedDirPath: str = ""
     fonts: AppFontsSettings
+    emojiAddSpace: bool = True
+    useEmoji: bool = True
