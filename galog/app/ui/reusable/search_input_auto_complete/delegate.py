@@ -10,12 +10,19 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
+from galog.app.settings import readSettings
+
 
 class CompleterDelegate(QStyledItemDelegate):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
-        self._font = QFont("Roboto")
-        self._font.setPixelSize(20)
+        self._settings = readSettings()
+        self._setDefaultFont()
+
+    def _setDefaultFont(self):
+        family = self._settings.fonts.standard.family
+        size = self._settings.fonts.standard.size
+        self._font = QFont(family, size)
 
     def paint(
         self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex

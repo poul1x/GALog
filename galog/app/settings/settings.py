@@ -27,29 +27,33 @@ def mainThreadOnly(func):
 _settings: Optional[AppSettings] = None
 
 
-def _setDefaultValues(settings: AppSettings):
-    settings.lastSelectedDevice = None
-    settings.lastSelectedPackage = None
-    settings.advancedFilter = AdvancedFilterSettings.default()
-    settings.lastUsedDirPath = ""
-
-
 @mainThreadOnly
 def _loadSettingsFromFile():
     configPath = appConfigFile()
     with open(configPath, "r") as f:
         settings = AppSettings(**yaml.safe_load(f.read()))
 
-    _setDefaultValues(settings)
+    settings.lastSelectedDevice = None
+    settings.lastSelectedPackage = None
+    settings.advancedFilter = AdvancedFilterSettings.default()
+    settings.lastUsedDirPath = ""
     return settings
 
 
 def _saveSettingsToFile(settings: AppSettings):
+    settingsDict = settings.model_dump(
+        mode="json",
+        exclude={
+            "lastSelectedDevice",
+            "lastSelectedPackage",
+            "advancedFilter",
+            "lastUsedDirPath",
+        },
+    )
+
     configPath = appConfigFile()
     with open(configPath, "w") as f:
-        _setDefaultValues(settings)
-        settingsDict = settings.model_dump(mode="json")
-        f.write(yaml.dump(settingsDict))
+        f.write(yaml.dump(settingsDict, sort_keys=False))
 
 
 @mainThreadOnly

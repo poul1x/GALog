@@ -4,9 +4,11 @@ import traceback
 from typing import List
 
 from PyQt5.QtWidgets import QApplication, QMessageBox
+from PyQt5.QtGui import QFont
 
 from galog.app.logging import initializeLogging
 from galog.app.paths import styleSheetFiles
+from galog.app.settings.settings import readSettings
 from galog.app.ui.core.main_window import GALogMainWindow
 from galog.app.user_data import initializeUserData
 
@@ -16,6 +18,11 @@ class GALogApp(QApplication):
         super().__init__(argv)
         self._logger = logging.getLogger(self.__class__.__name__)
         self.loadStyleSheetFiles()
+        self._settings = readSettings()
+
+        standardFont = self._settings.fonts.standard
+        font = QFont(standardFont.family, standardFont.size)
+        self.setFont(font)
 
     def loadStyleSheetFiles(self):
         styleSheet = ""
@@ -25,18 +32,6 @@ class GALogApp(QApplication):
                 styleSheet += f.read() + "\n"
 
         self.setStyleSheet(styleSheet)
-
-
-def runGUIApp(app: GALogApp):
-    mainWindow = GALogMainWindow()
-    mainWindow.show()
-    result = app.exec()
-
-    # Keep this to properly cleanup.
-    # Executable, created with PyInstaller,
-    # may get SIGSEGV on exit without this
-    mainWindow.deleteLater()
-    return result
 
 
 def initializeLoggingOrDie():
@@ -61,8 +56,9 @@ def initializeUserDataOrDie():
         sys.exit(1)
 
 
-def runGUIApplication(app: GALogApp):
+def runGUIApplication():
     try:
+        app = GALogApp(sys.argv)
         mainWindow = GALogMainWindow()
         mainWindow.show()
         result = app.exec()
@@ -83,7 +79,6 @@ def runGUIApplication(app: GALogApp):
 
 
 def runApp():
-    app = GALogApp(sys.argv)
     initializeUserDataOrDie()
     initializeLoggingOrDie()
-    sys.exit(runGUIApplication(app))
+    sys.exit(runGUIApplication())

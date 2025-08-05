@@ -584,8 +584,8 @@ class GALogMainWindow(QMainWindow):
 
         self.logMessagesPanel = LogMessagesPanel(self)
         self.logMessagesPanel.captureInterrupted.connect(self.captureInterrupted)
-
         self.setCentralWidget(self.logMessagesPanel)
+
         self.setWindowTitle("GALog")
         self.setWindowIcon(QIcon(iconFile("GALog")))
 

@@ -20,7 +20,7 @@ class DevicesLoadOptions(Widget):
         alignRight = Qt.AlignRight | Qt.AlignVCenter
 
         ipAddressLabel = QLabel(self)
-        ipAddressLabel.setText("ADB Server IPv4 address:")
+        ipAddressLabel.setText("ADB Server address:")
         layout.addWidget(ipAddressLabel, alignment=alignLeft)
 
         self.ipAddressInput = QLineEdit(self)

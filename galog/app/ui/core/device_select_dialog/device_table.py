@@ -143,10 +143,6 @@ class DeviceTable(Widget):
         vHeader = self.tableView.verticalHeader()
         vHeader.setVisible(False)
 
-        font = QFont("Roboto")
-        font.setPixelSize(19)
-        self.tableView.setFont(font)
-
         hHeader = self.tableView.horizontalHeader()
         hHeader.setSectionResizeMode(Columns.serial, QHeaderView.Interactive)
         hHeader.setSectionResizeMode(Columns.displayName, QHeaderView.Interactive)

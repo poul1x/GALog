@@ -107,8 +107,8 @@ class FontSettings(BaseModel):
 class AppFontsSettings(BaseModel):
     emoji: Optional[FontSettings] = None
     logViewer: FontSettings
-    Standard: FontSettings
-    Upsized: FontSettings
+    standard: FontSettings
+    upsized: FontSettings
 
 
 class AppSettings(BaseModel):

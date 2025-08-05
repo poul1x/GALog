@@ -16,7 +16,7 @@ from galog.app.ui.base.dialog import Dialog
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
 
 from ..device_select_dialog import DeviceSelectDialog
-from .button_bar import ButtonBar
+from .button_bar import BottomButtonBar
 from .load_options import PackagesLoadOptions
 from .packages_list import PackagesList
 
@@ -83,7 +83,7 @@ class PackageSelectDialog(Dialog):
 
         self.packagesLoadOptions = PackagesLoadOptions(self)
         self.packagesList = PackagesList(self)
-        self.buttonBar = ButtonBar(self)
+        self.buttonBar = BottomButtonBar(self)
 
         layout.addWidget(self.packagesLoadOptions)
         layout.addWidget(self.packagesList)

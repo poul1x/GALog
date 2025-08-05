@@ -20,7 +20,6 @@ class StopCaptureDialog(MessageBox):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.setHeaderText("Stop capture")
-        self.setWindowTitle("Stop capture")
         self.setBodyText("All captured log messages will remain there")
         self.btnIdYes = self.addButton("Yes")
         self.btnIdNo = self.addButton("No")

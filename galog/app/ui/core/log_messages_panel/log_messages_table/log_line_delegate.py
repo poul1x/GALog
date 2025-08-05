@@ -13,6 +13,7 @@ from PyQt5.QtGui import (
 from PyQt5.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem
 
 from galog.app.hrules import HRulesStorage
+from galog.app.settings.settings import readSettings
 from galog.app.ui.core.log_messages_panel.log_messages_table.colors import (
     logLevelColor,
     rowSelectedColor,
@@ -33,13 +34,11 @@ class LogLineDelegate(QStyledItemDelegate):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self._settings = readSettings()
         self._rowBlinkingAnimation = None
         self._highlightingEnabled = True
         self._highlightingRules = None
-        self._initFont()
-
-    def setFont(self, font: QFont):
-        self._font = font
+        self._setDefaultFont()
 
     def font(self):
         return self._font
@@ -56,10 +55,10 @@ class LogLineDelegate(QStyledItemDelegate):
     def highlightingEnabled(self):
         return self._highlightingEnabled
 
-    def _initFont(self):
-        self._font = QFont()
-        self._font.setFamily("Roboto Mono")
-        self._font.setPixelSize(20)
+    def _setDefaultFont(self):
+        family = self._settings.fonts.logViewer.family
+        size = self._settings.fonts.logViewer.size
+        self._font = QFont(family, size)
 
     def _applyLogMessageHighlighting(self, doc: QTextDocument, index: QModelIndex):
         if index.column() != Column.logMessage:

@@ -4,16 +4,20 @@ from PyQt5.QtCore import QRect, QSize, Qt
 from PyQt5.QtGui import QColor, QFont, QFontMetrics, QPainter
 from PyQt5.QtWidgets import QHeaderView, QWidget
 
+from galog.app.settings import readSettings
 from galog.app.ui.helpers.painter import painterSaveRestore
 
 
 class VerticalHeader(QHeaderView):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(Qt.Vertical, parent)
-        self._font = QFont()
-        self._font.setPixelSize(19)
-        self._font.setFamily("Roboto")
-        self._font.setWeight(QFont.Bold)
+        self._settings = readSettings()
+        self._setDefaultFont()
+
+    def _setDefaultFont(self):
+        family = self._settings.fonts.standard.family
+        size = self._settings.fonts.standard.size
+        self._font = QFont(family, size, QFont.Bold)
 
     def _selectedRows(self):
         return [index.row() for index in self.selectionModel().selectedRows()]

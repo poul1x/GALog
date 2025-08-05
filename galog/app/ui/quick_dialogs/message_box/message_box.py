@@ -1,9 +1,10 @@
 from typing import Optional
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtWidgets import QApplication, QCheckBox, QLabel, QVBoxLayout, QWidget
 
+from galog.app.settings import readSettings
 from galog.app.ui.base.dialog import Dialog
 
 from .button_bar import MessageBoxButtonBar
@@ -13,6 +14,7 @@ from .content_area import MessageBoxContentArea
 class MessageBox(Dialog):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent, "MessageBox")
+        self._settings = readSettings()
         self._clickedButtonId = -1
         self.setFixedMaxSize(450, 250)
         self.setRelativeGeometry(0.2, 0.3, 450, 250)
@@ -60,6 +62,11 @@ class MessageBox(Dialog):
         headerTextLabel.setContentsMargins(0, 0, 0, 0)
         headerTextLabel.setWordWrap(True)
         headerTextLabel.setText(text)
+
+        family = self._settings.fonts.upsized.family
+        size = self._settings.fonts.upsized.size
+        headerTextLabel.setFont(QFont(family, size))
+
         layout.insertWidget(index, headerTextLabel)
 
     def setBodyText(self, text: str):

@@ -14,7 +14,7 @@ from galog.app.ui.actions.list_devices.action import ListDevicesAction
 from galog.app.ui.base.dialog import Dialog
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
 
-from .button_bar import ButtonBar
+from .button_bar import BottomButtonBar
 from .device_table import DeviceTable
 from .load_options import DevicesLoadOptions
 
@@ -82,7 +82,7 @@ class DeviceSelectDialog(Dialog):
         self.deviceTable = DeviceTable(self)
         vBoxLayoutMain.addWidget(self.deviceTable)
 
-        self.buttonBar = ButtonBar(self)
+        self.buttonBar = BottomButtonBar(self)
         self.buttonBar.selectButton.setEnabled(False)
         vBoxLayoutMain.addWidget(self.buttonBar)
 

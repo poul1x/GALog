@@ -1,7 +1,11 @@
 from enum import Enum, auto
 
+from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QSizePolicy, QWidget
+
+from galog.app.settings import readSettings
+from galog.app.ui.base.widget import Widget
 
 
 class RunAppAction(int, Enum):
@@ -10,11 +14,9 @@ class RunAppAction(int, Enum):
     DoNotStartApp = auto()
 
 
-class ButtonBar(QWidget):
+class BottomButtonBar(Widget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.setObjectName("CapturePaneButtonBar")
-        self.setAttribute(Qt.WA_StyledBackground)
         self.initUserInterface()
 
     def initUserInterface(self):
