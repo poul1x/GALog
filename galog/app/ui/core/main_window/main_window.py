@@ -29,6 +29,7 @@ from galog.app.ui.actions.start_app import StartAppAction
 from galog.app.ui.actions.stop_app import StopAppAction
 from galog.app.ui.base.style import GALogStyle
 from galog.app.ui.core.device_select_dialog import DeviceSelectDialog
+from galog.app.ui.core.font_manager_dialog.font_manager_dialog import FontManagerDialog
 from galog.app.ui.core.log_messages_panel import LogMessagesPanel
 from galog.app.ui.core.package_select_dialog import PackageSelectDialog
 from galog.app.ui.core.tag_filter_dialog import TagFilterDialog
@@ -51,6 +52,9 @@ class GALogMainWindow(QMainWindow):
         self.initLeftPaddingForEachMenu()
         self.increaseHoverAreaForCheckableActions()
         self.startAdbServer()
+
+        d = FontManagerDialog(self)
+        d.exec()
 
     def isLocalAdbAddr(self):
         return self._settings.adb.ipAddr.is_loopback

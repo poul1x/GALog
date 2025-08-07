@@ -1,0 +1,87 @@
+#FontManagerDialog {
+	background: #ffffff;
+}
+
+#FontPreviewPane {
+	background: #eeeeee;
+}
+
+#FontPreviewPane > QLabel {
+	max-height: 20;
+	padding: 0px;
+}
+
+/* -------------------------- */
+
+#FontList > QListView {
+	border: none;
+}
+
+#FontList[empty="false"] > QListView {
+    background-image: none;
+}
+
+#FontList[empty="true"] > QListView {
+    background-image: url(res/icons/shrug.svg);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#FontList > QListView::item:hover
+{
+	background-color: #f3f3f3;
+}
+
+#FontList > QListView::item:selected
+{
+	background-color: #464646;
+	color: #ffffff;
+}
+
+#FontList > QLineEdit {
+	background: #eeeeee;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border: none;
+	color: #000000;
+    selection-background-color: #464646;
+    selection-color: #ffffff;
+}
+
+/* -------------------------- */
+
+#FontManagerDialog > #BottomButtonBar {
+	background: #464646;
+}
+
+#FontManagerDialog > #BottomButtonBar > QPushButton {
+	background: #ffffff;
+	border: none;
+	padding-top: 8px;
+	padding-bottom: 8px;
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+#FontManagerDialog > #BottomButtonBar > QPushButton:disabled {
+	color: #464646
+}
+
+#FontManagerDialog > #BottomButtonBar > QPushButton[name="select"] {
+	background: #a0c3ff;
+}
+
+#FontManagerDialog > #BottomButtonBar > QPushButton[name="select"]:hover {
+	background: #739fff;
+	color: white;
+}
+
+#FontManagerDialog > #BottomButtonBar > QPushButton[name="cancel"] {
+	background: #f0f0f0;
+}
+
+#FontManagerDialog > #BottomButtonBar > QPushButton[name="cancel"]:hover {
+	background: #dbdbdb;
+}
+
+

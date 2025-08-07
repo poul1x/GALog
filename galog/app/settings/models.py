@@ -5,6 +5,8 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 from pydantic.types import Annotated, StringConstraints
 
+from .constants import MAX_FONT_SIZE, MAX_PORT_LT, MIN_FONT_SIZE, MIN_PORT_GT
+
 
 class TagFilteringMode(int, Enum):
     Disabled = 0
@@ -35,9 +37,10 @@ class TagFilteringMode(int, Enum):
 # DirPath = Annotated[str, AfterValidator(validateDirPath)]
 # FilePath = Annotated[str, AfterValidator(validateFilePath)]
 
+
 NonEmptyStr = Annotated[str, StringConstraints(min_length=1)]
-Port = Annotated[int, Field(gt=0, lt=65536)]
-FontSize = Annotated[int, Field(ge=8, le=20)]
+Port = Annotated[int, Field(gt=MIN_PORT_GT, lt=MAX_PORT_LT)]
+FontSize = Annotated[int, Field(ge=MIN_FONT_SIZE, le=MAX_FONT_SIZE)]
 
 
 class RunAppAction(int, Enum):
