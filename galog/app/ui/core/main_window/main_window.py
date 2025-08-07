@@ -526,6 +526,9 @@ class GALogMainWindow(QMainWindow):
     def showLogsFolder(self):
         self.showFolderInFileExplorer(appLogsDir())
 
+    def openSettings(self):
+        pass
+
     def showAppDataFolderAction(self):
         action = QAction("&Show app data folder", self)
         action.setStatusTip("Show app data folder")
@@ -538,6 +541,14 @@ class GALogMainWindow(QMainWindow):
         action = QAction("&Show logs folder", self)
         action.setStatusTip("Show logs folder")
         action.triggered.connect(self.showLogsFolder)
+        action.setEnabled(True)
+        action.setData(False)
+        return action
+
+    def openSettingsAction(self):
+        action = QAction("&Open settings window", self)
+        action.setStatusTip("Open settings window")
+        action.triggered.connect(self.openSettings)
         action.setEnabled(True)
         action.setData(False)
         return action
@@ -562,7 +573,8 @@ class GALogMainWindow(QMainWindow):
         captureMenu.addAction(self.showLineNumbersAction())
         captureMenu.addAction(self.openTagFilterAction())
 
-        captureMenu = menuBar.addOptionsMenu()
+        captureMenu = menuBar.addToolsMenu()
+        captureMenu.addAction(self.openSettingsAction())
         captureMenu.addAction(self.showAppDataFolderAction())
         captureMenu.addAction(self.showLogsFolderAction())
 
