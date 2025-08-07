@@ -1,4 +1,5 @@
-from typing import List
+from enum import Enum, auto
+from typing import Callable, List
 from zipfile import BadZipFile
 
 from PyQt5.QtCore import QModelIndex, Qt
@@ -8,6 +9,7 @@ from PyQt5.QtWidgets import QFileDialog, QVBoxLayout, QWidget
 from galog.app.apk_info import APK
 from galog.app.device import adbClient
 from galog.app.msgbox import msgBoxErr, msgBoxPrompt
+from galog.app.settings.models import FontSettings
 from galog.app.settings.settings import readSettings, writeSettings
 from galog.app.ui.actions.install_app.action import InstallAppAction
 from galog.app.ui.base.dialog import Dialog
@@ -20,8 +22,8 @@ from .fonts_list import FontList
 
 
 class FontManagerDialog(Dialog):
-    def __init__(self, parent: QWidget):
-        super().__init__(parent)
+    def __init__(self, parent: QWidget, objectName: str):
+        super().__init__(parent, objectName)
         self._settings = readSettings()
         self.setWindowFlag(Qt.WindowMaximizeButtonHint, False)
         self.setRelativeGeometry(0.8, 0.6, 800, 600)
@@ -32,37 +34,30 @@ class FontManagerDialog(Dialog):
         self._initUserInputHandlers()
         self._initFocusPolicy()
         self._loadFonts()
+        self._manageSelectButtonOnOff()
 
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
         if helper.isCtrlFPressed():
-            self.fontsList.searchInput.setFocus()
+            self.fontList.searchInput.setFocus()
         else:
             super().keyPressEvent(event)
 
     def _initUserInputHandlers(self):
-        self.fontsList.listView.rowActivated.connect(self._fontSelected)
-        self.fontsList.listView.selectionModel().currentChanged.connect(self._currentFontChanged)
+        self.fontList.listView.rowActivated.connect(self._fontSelected)
+        self.fontList.currentFontChanged.connect(self._currentFontChanged)
 
         self.buttonBar.selectButton.clicked.connect(self._selectButtonClicked)
         self.buttonBar.cancelButton.clicked.connect(self.reject)
 
-        self.fontPreviewPane.fontSizeSpinBox.valueChanged.connect(self._valueChanged)
-
-        searchInput = self.fontsList.searchInput
+        searchInput = self.fontList.searchInput
         searchInput.returnPressed.connect(self._fontMayBeSelected)
         searchInput.textChanged.connect(self._manageSelectButtonOnOff)
         searchInput.arrowUpPressed.connect(self._tryFocusFontsListAndGoUp)
         searchInput.arrowDownPressed.connect(self._tryFocusFontsListAndGoDown)
 
-    def _valueChanged(self, value: int):
-        font = QFont(self.fontPreviewPane.fontFamily(), value)
-        height= QFontMetrics(font).height()
-        self.fontPreviewPane.fontPreview.setFixedHeight(height)
-        self.fontPreviewPane.setFontSize(value)
-
     def _manageSelectButtonOnOff(self):
-        canSelect = self.fontsList.canSelectFont()
+        canSelect = self.fontList.canSelectFont()
         self.buttonBar.selectButton.setEnabled(canSelect)
 
     def _initUserInterface(self):
@@ -75,77 +70,85 @@ class FontManagerDialog(Dialog):
         layout.setSpacing(0)
 
         self.fontPreviewPane = FontPreviewPane(self)
-        self.fontsList = FontList(self)
+        self.fontList = FontList(self)
         self.buttonBar = BottomButtonBar(self)
 
         layout.addWidget(self.fontPreviewPane)
-        layout.addWidget(self.fontsList)
+        layout.addWidget(self.fontList)
         layout.addWidget(self.buttonBar)
         self.setLayout(layout)
 
     def _initFocusPolicy(self):
-        self.fontPreviewPane.fontPreview.setFocusPolicy(Qt.NoFocus)
+        self.fontPreviewPane.fontPreviewLabel.setFocusPolicy(Qt.NoFocus)
         self.fontPreviewPane.fontSizeSpinBox.setFocusPolicy(Qt.ClickFocus)
         self.buttonBar.selectButton.setFocusPolicy(Qt.NoFocus)
         self.buttonBar.cancelButton.setFocusPolicy(Qt.NoFocus)
 
-        self.fontsList.searchInput.setFocus()
-        self.setTabOrder(self.fontsList.searchInput, self.fontsList.listView)
-        self.setTabOrder(self.fontsList.listView, self.fontsList.searchInput)
+        self.fontList.searchInput.setFocus()
+        self.setTabOrder(self.fontList.searchInput, self.fontList.listView)
+        self.setTabOrder(self.fontList.listView, self.fontList.searchInput)
 
     def _tryFocusFontsListAndGoUp(self):
-        self.fontsList.trySetFocusAndGoUp()
+        self.fontList.trySetFocusAndGoUp()
 
     def _tryFocusFontsListAndGoDown(self):
-        self.fontsList.trySetFocusAndGoDown()
+        self.fontList.trySetFocusAndGoDown()
 
-    def _setFonts(self, fonts: List[str]):
-        self.fontsList.clear()
-        for font in fonts:
-            self.fontsList.addFont(font)
+    def _writeFontSettings(self, fontSettings: FontSettings):
+        raise NotImplementedError()
 
     def _fontSelected(self, index: QModelIndex):
-        # fontName = self.fontsList.selectedFont(index)
-        # selectedAction = self.fontPreviewPane.runAppAction()
-        # selectedFont = LastSelectedFont.new(fontName, selectedAction)
-        # self._settings.lastSelectedFont = selectedFont
+        fontFamily = self.fontPreviewPane.targetFontFamily()
+        fontSize = self.fontPreviewPane.targetFontSize()
+        selectedFont = FontSettings.new(fontFamily, fontSize)
+        self._writeFontSettings(selectedFont)
+        writeSettings(self._settings)
         self.accept()
 
     def _fontMayBeSelected(self):
-        index = self.fontsList.listView.currentIndex()
+        index = self.fontList.listView.currentIndex()
         if not index.isValid():
             return
 
         self._fontSelected(index)
 
     def _selectButtonClicked(self):
-        self._fontSelected(self.fontsList.listView.currentIndex())
+        self._fontSelected(self.fontList.listView.currentIndex())
 
     def _loadFonts(self):
-        fontDB = QFontDatabase()
-        for fontFamily in fontDB.families():
-            self.fontsList.addFont(fontFamily)
+        self._setFonts(
+            self._filterFonts(
+                QFontDatabase().families(),
+            ),
+        )
 
-        assert not self.fontsList.empty()
-        self.fontsList.selectFirstFont()
+        if not self.fontList.empty():
+            self.fontList.selectFirstFont()
 
-    def setFontFamily(self, fontName: str):
-        if self.fontsList.hasFont(fontName):
-            self.fontsList.selectFontByName(fontName)
-            self.fontPreviewPane.setFontFamily(fontName)
+    def _filterFonts(self, fonts: List[str]) -> List[str]:
+        raise NotImplementedError()
 
-    def setFontSize(self, fontSize: str):
-        self.fontPreviewPane.setFontSize(fontSize)
+    def _setFonts(self, fonts: List[str]):
+        self.fontList.clear()
+        for font in fonts:
+            self.fontList.addFont(font)
+
+    def setTargetFontFamily(self, fontName: str):
+        if self.fontList.hasFont(fontName):
+            self.fontList.selectFontByName(fontName)
+            self.fontPreviewPane.setTargetFontFamily(fontName)
+
+    def setTargetFontSize(self, fontSize: str):
+        self.fontPreviewPane.setTargetFontSize(fontSize)
 
     def fontFamily(self):
-        return self.fontsList.selectedFont()
+        return self.fontPreviewPane.targetFontFamily()
 
     def fontSize(self):
-        return self.fontPreviewPane.fontSize()
+        return self.fontPreviewPane.targetFontSize()
 
-    def _currentFontChanged(self, current: QModelIndex, previous: QModelIndex):
-        if not current.isValid():
-            return
+    def _currentFontChanged(self, fontFamily: str):
+        self.fontPreviewPane.setTargetFontFamily(fontFamily)
 
-        data = self.fontsList.filterModel.data(current)
-        self.fontPreviewPane.setFontFamily(data)
+    def setPreviewText(self, text: str):
+        self.fontPreviewPane.setPreviewText(text)

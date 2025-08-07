@@ -104,12 +104,12 @@ class FontSettings(BaseModel):
 
     @staticmethod
     def new(family: NonEmptyStr, size: FontSize):
-        return FontSettings(family, family, size=size)
+        return FontSettings(family=family, size=size)
 
 
 class AppFontsSettings(BaseModel):
     emoji: Optional[FontSettings] = None
-    logViewer: FontSettings
+    monospaced: FontSettings
     standard: FontSettings
     upsized: FontSettings
 

@@ -3,7 +3,7 @@ adb:
   port: 5037
 fonts:
   emoji: null
-  logViewer:
+  monospaced:
     family: Roboto Mono
     size: 11
   standard:

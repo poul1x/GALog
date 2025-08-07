@@ -56,8 +56,8 @@ class LogLineDelegate(QStyledItemDelegate):
         return self._highlightingEnabled
 
     def _setDefaultFont(self):
-        family = self._settings.fonts.logViewer.family
-        size = self._settings.fonts.logViewer.size
+        family = self._settings.fonts.monospaced.family
+        size = self._settings.fonts.monospaced.size
         self._font = QFont(family, size)
 
     def _applyLogMessageHighlighting(self, doc: QTextDocument, index: QModelIndex):

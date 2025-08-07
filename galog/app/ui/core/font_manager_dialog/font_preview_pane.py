@@ -1,5 +1,6 @@
+from typing import Callable
 from PyQt5.QtCore import QRegExp, Qt
-from PyQt5.QtGui import QFocusEvent, QIcon, QRegExpValidator, QFont
+from PyQt5.QtGui import QFocusEvent, QIcon, QRegExpValidator, QFont, QFontMetrics
 from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -18,43 +19,51 @@ from galog.app.ui.base.widget import Widget
 class FontPreviewPane(Widget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.initUserInterface()
+        self._initUserInterface()
+        self._initUserInputHandlers()
+        self.setPreviewText("Preview text")
 
-    def initUserInterface(self):
+    def _initUserInputHandlers(self):
+        self.fontSizeSpinBox.valueChanged.connect(self._fontSizeChanged)
+
+    def _initUserInterface(self):
         layout = QHBoxLayout()
         alignLeft = Qt.AlignLeft | Qt.AlignVCenter
         alignRight = Qt.AlignRight | Qt.AlignVCenter
 
-
-        self.fontPreview = QLabel(self)
-        self.fontPreview.setWordWrap(False)
-        layout.addWidget(self.fontPreview, alignment=alignLeft)
+        self.fontPreviewLabel = QLabel(self)
+        self.fontPreviewLabel.setWordWrap(False)
+        layout.addWidget(self.fontPreviewLabel, alignment=alignLeft)
         layout.addStretch()
 
         self.fontSizeSpinBox = QSpinBox(self)
         self.fontSizeSpinBox.setReadOnly(False)
         self.fontSizeSpinBox.setRange(MIN_FONT_SIZE, MAX_FONT_SIZE)
+        self.fontSizeSpinBox.setValue(self.fontPreviewLabel.font().pointSize())
         self.fontSizeSpinBox.setSingleStep(1)
         layout.addWidget(self.fontSizeSpinBox, alignment=alignRight)
         self.setLayout(layout)
 
-    def _updateFontPreview(self):
-        font = QFont(self.fontFamily(), self.fontSize())
-        self.fontPreview.setFont(font)
+    def _fontSizeChanged(self, value: int):
+        font = QFont(self.targetFontFamily(), value)
+        self.fontPreviewLabel.setFont(font)
 
-    def fontFamily(self):
-        return self.fontPreview.text()
+        height = QFontMetrics(font).height()
+        self.fontPreviewLabel.setFixedHeight(height)
 
-    def setFontFamily(self, fontFamily: str):
-        self.fontPreview.setText(fontFamily)
-        self._updateFontPreview()
+    def targetFontFamily(self):
+        return self.fontPreviewLabel.font().family()
 
-    def fontSize(self):
-        return self.fontSizeSpinBox.value()
+    def targetFontSize(self):
+        return self.fontPreviewLabel.font().pointSize()
 
-    def setFontSize(self, fontSize: int):
-        self.fontSizeSpinBox.setValue(fontSize)
-        self._updateFontPreview()
+    def setTargetFontFamily(self, fontFamily: str):
+        font = QFont(fontFamily, self.targetFontSize())
+        self.fontPreviewLabel.setFont(font)
 
-    def setPreviewText(self):
-        pass
+    def setTargetFontSize(self, size: int):
+        font = QFont(self.targetFontFamily(), size)
+        self.fontPreviewLabel.setFont(font)
+
+    def setPreviewText(self, text: str):
+        self.fontPreviewLabel.setText(text)

@@ -1,6 +1,12 @@
 from typing import Optional
 
-from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QSortFilterProxyModel, Qt
+from PyQt5.QtCore import (
+    QItemSelectionModel,
+    QModelIndex,
+    QSortFilterProxyModel,
+    Qt,
+    pyqtSignal,
+)
 from PyQt5.QtGui import QStandardItem, QStandardItemModel
 from PyQt5.QtWidgets import QListView, QVBoxLayout, QWidget
 
@@ -10,11 +16,26 @@ from galog.app.ui.reusable.search_input import SearchInput
 
 
 class FontList(Widget):
+
+    currentFontChanged = pyqtSignal(str)
+
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.initUserInterface()
+        self._initUserInterface()
+        self._initUserInputHandlers()
 
-    def initUserInterface(self):
+    def _currentFontChanged(self, current: QModelIndex, previous: QModelIndex):
+        if not current.isValid():
+            return
+
+        fontFamily = self.filterModel.data(current)
+        self.currentFontChanged.emit(fontFamily)
+
+    def _initUserInputHandlers(self):
+        selectionModel = self.listView.selectionModel()
+        selectionModel.currentChanged.connect(self._currentFontChanged)
+
+    def _initUserInterface(self):
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
