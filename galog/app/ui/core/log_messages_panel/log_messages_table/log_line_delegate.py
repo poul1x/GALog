@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 
-from PyQt5.QtCore import QModelIndex, QRectF, Qt, QThreadPool
+from PyQt5.QtCore import QModelIndex, QRectF, Qt, QThreadPool, QObject
 from PyQt5.QtGui import (
     QFont,
     QFontMetrics,
@@ -13,6 +13,7 @@ from PyQt5.QtGui import (
 from PyQt5.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem
 
 from galog.app.hrules import HRulesStorage
+from galog.app.settings.notifier import ChangedEntry, SettingsChangeNotifier
 from galog.app.settings.settings import readSettings
 from galog.app.ui.core.log_messages_panel.log_messages_table.colors import (
     logLevelColor,
@@ -32,16 +33,18 @@ from .row_blinking_animation import RowBlinkingAnimation
 class LogLineDelegate(QStyledItemDelegate):
     _highlightingEnabled: bool
 
-    def __init__(self, parent=None):
+    def __init__(self, font: QFont, parent: Optional[QObject] = None):
         super().__init__(parent)
-        self._settings = readSettings()
         self._rowBlinkingAnimation = None
         self._highlightingEnabled = True
         self._highlightingRules = None
-        self._setDefaultFont()
+        self._font = font
 
     def font(self):
         return self._font
+
+    def setFont(self, font: QFont):
+        self._font = font
 
     def highlightingRules(self):
         return self._highlightingRules
@@ -55,10 +58,6 @@ class LogLineDelegate(QStyledItemDelegate):
     def highlightingEnabled(self):
         return self._highlightingEnabled
 
-    def _setDefaultFont(self):
-        family = self._settings.fonts.monospaced.family
-        size = self._settings.fonts.monospaced.size
-        self._font = QFont(family, size)
 
     def _applyLogMessageHighlighting(self, doc: QTextDocument, index: QModelIndex):
         if index.column() != Column.logMessage:

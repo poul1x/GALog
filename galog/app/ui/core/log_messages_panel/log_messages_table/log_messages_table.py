@@ -7,11 +7,14 @@ from PyQt5.QtGui import (
     QMouseEvent,
     QResizeEvent,
     QStandardItemModel,
+    QFont,
 )
 from PyQt5.QtWidgets import QAction, QHeaderView, QMenu, QTableView, QWidget
 
 from galog.app.hrules.hrules import HRulesStorage
 from galog.app.log_reader.models import LogLine
+from galog.app.settings import readSettings
+from galog.app.settings.notifier import ChangedEntry, SettingsChangeNotifier
 from galog.app.ui.base.table_view import QTableView, TableView
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
 from galog.app.ui.reusable.fn_filter_model import FnFilterModel
@@ -56,7 +59,9 @@ class LogMessagesTable(TableView):
             super().keyPressEvent(event)
 
     def _initLogLineDelegate(self):
-        self._delegate = LogLineDelegate(self)
+        fontSettings = self._settings.fonts.monospaced
+        font = QFont(fontSettings.family, fontSettings.size)
+        self._delegate = LogLineDelegate(font, self)
         self.setItemDelegate(self._delegate)
 
     def setHighlightingRules(self, hrules: HRulesStorage):
@@ -64,11 +69,31 @@ class LogMessagesTable(TableView):
 
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
+        self._reloadSettings()
         self._initDataModel()
         self._initLogLineDelegate()
         self._initUserInterface()
         self._initUserInputHandlers()
+        self._subscribeForSettingsChanges()
         self._scrolling = True
+
+    def _reloadSettings(self):
+        self._settings = readSettings()
+
+    def _settingsChanged(self, changedEntry: ChangedEntry):
+        self._reloadSettings()
+        if changedEntry == ChangedEntry.AppFontSettingsMonospaced:
+            self._applyFontSettings()
+
+    def _subscribeForSettingsChanges(self):
+        notifier = SettingsChangeNotifier()
+        notifier.settingsChanged.connect(self._settingsChanged)
+
+    def _applyFontSettings(self):
+        family = self._settings.fonts.monospaced.family
+        size = self._settings.fonts.monospaced.size
+        self._delegate.setFont(QFont(family, size))
+        self._refreshVisibleIndexes()
 
     def contextMenuExec(self, position: QPoint, canJumpBack: bool):
         index = self.indexAt(position)

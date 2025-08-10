@@ -121,7 +121,6 @@ class DeviceSelectDialog(Dialog):
         self._settings.adbServer.port = int(self.devicesLoadOptions.adbPort())
         selectedDevice = LastSelectedDevice.new(serial, displayName)
         self._settings.lastSelectedDevice = selectedDevice
-        writeSettings(self._settings)
         self.accept()
 
     def _refreshDeviceList(self):

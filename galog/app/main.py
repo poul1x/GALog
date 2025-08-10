@@ -8,6 +8,7 @@ from PyQt5.QtGui import QFont
 
 from galog.app.logging import initializeLogging
 from galog.app.paths import styleSheetFiles
+from galog.app.settings.notifier import ChangedEntry, SettingsChangeNotifier
 from galog.app.settings.settings import readSettings
 from galog.app.ui.core.main_window import GALogMainWindow
 from galog.app.user_data import initializeUserData
@@ -16,15 +17,21 @@ from galog.app.user_data import initializeUserData
 class GALogApp(QApplication):
     def __init__(self, argv: List[str]) -> None:
         super().__init__(argv)
+        self._reloadSettings()
         self._logger = logging.getLogger(self.__class__.__name__)
-        self.loadStyleSheetFiles()
+        self._subscribeSettingsChangeEvents()
+        self._loadStyleSheetFiles()
+        self._applyFontSettings()
+
+    def _reloadSettings(self):
         self._settings = readSettings()
 
+    def _applyFontSettings(self):
         standardFont = self._settings.fonts.standard
         font = QFont(standardFont.family, standardFont.size)
         self.setFont(font)
 
-    def loadStyleSheetFiles(self):
+    def _loadStyleSheetFiles(self):
         styleSheet = ""
         for filePath in styleSheetFiles():
             self._logger.info("Load styleSheet from '%s'", filePath)
@@ -32,6 +39,15 @@ class GALogApp(QApplication):
                 styleSheet += f.read() + "\n"
 
         self.setStyleSheet(styleSheet)
+
+    def _settingsChanged(self, changedEntry: ChangedEntry):
+        self._reloadSettings()
+        if changedEntry == ChangedEntry.AppFontSettingsStandard:
+            self._applyFontSettings()
+
+    def _subscribeSettingsChangeEvents(self):
+        notifier = SettingsChangeNotifier()
+        notifier.settingsChanged.connect(self._settingsChanged)
 
 
 def initializeLoggingOrDie():

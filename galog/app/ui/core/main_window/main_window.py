@@ -23,6 +23,7 @@ from galog.app.msgbox import msgBoxErr, msgBoxInfo, msgBoxNotImp, msgBoxPrompt
 from galog.app.paths import appDataDir, appLogsDir, fontFiles, hRulesFiles, iconFile
 from galog.app.settings import readSettings
 from galog.app.settings.models import RunAppAction, TagFilteringMode
+from galog.app.settings.notifier import ChangedEntry, SettingsChangeNotifier
 from galog.app.ui.actions.get_app_pids import GetAppPidsAction
 from galog.app.ui.actions.restart_app import RestartAppAction
 from galog.app.ui.actions.start_app import StartAppAction
@@ -56,6 +57,17 @@ class GALogMainWindow(QMainWindow):
         self.initLeftPaddingForEachMenu()
         self.increaseHoverAreaForCheckableActions()
         self.startAdbServer()
+
+    def _settingsChanged(self, changedEntry: ChangedEntry):
+        self._settings = readSettings()
+        if changedEntry == ChangedEntry.ShowLineNumbers:
+            showLineNumbers = self._settings.logViewer.showLineNumbers
+            self. setLineNumbersAlwaysVisible(showLineNumbers)
+
+    def _initSettingsChangeNotifier(self):
+        notifier = SettingsChangeNotifier()
+        notifier.settingsChanged.connect(self._settingsChanged)
+
 
     def isLocalAdbAddr(self):
         return self._settings.adbServer.ipAddr.is_loopback
@@ -560,8 +572,10 @@ class GALogMainWindow(QMainWindow):
     def setupMenuBar(self):
         menuBar = GALogMenuBar(self)
         self.setMenuBar(menuBar)
+        # menuBar = self.menuBar()
 
         captureMenu = menuBar.addCaptureMenu()
+        # captureMenu = menuBar.addMenu("&Capture")
         captureMenu.addAction(self.showDevicesAction())
         captureMenu.addAction(self.startCaptureAction())
         captureMenu.addAction(self.restartCaptureAction())
@@ -576,6 +590,7 @@ class GALogMainWindow(QMainWindow):
         captureMenu.addAction(self.openTagFilterAction())
 
         captureMenu = menuBar.addToolsMenu()
+        # captureMenu = menuBar.addMenu("&Tools")
         captureMenu.addAction(self.openSettingsAction())
         captureMenu.addAction(self.showAppDataFolderAction())
         captureMenu.addAction(self.showLogsFolderAction())
