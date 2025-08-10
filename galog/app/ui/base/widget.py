@@ -17,3 +17,6 @@ class Widget(QWidget):
         # Force  to update the stylesheet
         # When dynamic property was changed
         self.setStyleSheet(self.styleSheet())
+
+    def setObjectClass(self, className: str):
+        self.setProperty("class", className)

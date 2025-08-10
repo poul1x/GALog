@@ -32,6 +32,7 @@ class StandardFontSection(Widget):
     def __init__(self, settings: AppSettings, parent: QWidget):
         super().__init__(parent)
         self._settings = settings
+        self.setObjectClass("FontSettingsSection")
         self._initUserInterface()
         self._initUserInputHandlers()
         self._initValue()
@@ -78,10 +79,10 @@ class StandardFontSection(Widget):
 
     def value(self):
         items = self.fontButton.text().split(" ")
-        items[1], int(items[0]),
+        items[0], int(items[1]),
 
     def setValue(self, fontFamily: str, fontSize: int):
-        self.fontButton.setText(f"{fontSize} - {fontFamily}")
+        self.fontButton.setText(f"{fontFamily} {fontSize}")
 
     def searchAdapter(self):
         return FontSectionSearchAdapter(self)

@@ -51,6 +51,8 @@ class FontSettingsPane(Widget):
 
     def _initUserInterface(self):
         vBoxLayout = QVBoxLayout()
+        vBoxLayout.setAlignment(Qt.AlignTop)
+
         self.standardFontSection = StandardFontSection(self._settings, self)
         self.upsizedFontSection = UpsizedFontSection(self._settings, self)
         self.monospacedFontSection = MonospacedFontSection(self._settings, self)
@@ -64,22 +66,12 @@ class FontSettingsPane(Widget):
         self.emojiAddSpaceSection.setTitle("Add space before emoji symbols")
         self.emojiAddSpaceSection.setValue(self._settings.fonts.emojiAddSpace)
 
-        self.e1mojiAddSpaceSection = ToggleSection(self._settings, self)
-        self.e1mojiAddSpaceSection.setTitle("Add space before emoji symbols")
-        self.e1mojiAddSpaceSection.setValue(self._settings.fonts.emojiAddSpace)
-
-        self.e2mojiAddSpaceSection = ToggleSection(self._settings, self)
-        self.e2mojiAddSpaceSection.setTitle("Add space before emoji symbols")
-        self.e2mojiAddSpaceSection.setValue(self._settings.fonts.emojiAddSpace)
-
         vBoxLayout.addWidget(self.standardFontSection)
         vBoxLayout.addWidget(self.upsizedFontSection)
         vBoxLayout.addWidget(self.monospacedFontSection)
         vBoxLayout.addWidget(self.emojiFontSection)
         vBoxLayout.addWidget(self.emojiEnabledSection)
         vBoxLayout.addWidget(self.emojiAddSpaceSection)
-        vBoxLayout.addWidget(self.e1mojiAddSpaceSection)
-        vBoxLayout.addWidget(self.e2mojiAddSpaceSection)
 
         self.setLayout(vBoxLayout)
 

@@ -17,7 +17,6 @@ class BottomButtonBar(Widget):
         layout.setContentsMargins(0, 0, 0, 0)
 
         self.applyButton = QPushButton("Apply")
-        self.applyButton.setEnabled(False)
         self.applyButton.setProperty("name", "apply")
         self.applyButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         layout.addWidget(self.applyButton)

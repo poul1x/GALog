@@ -4,7 +4,7 @@ from zipfile import BadZipFile
 
 from PyQt5.QtCore import QModelIndex, Qt
 from PyQt5.QtGui import QKeyEvent, QFontDatabase, QFontMetrics, QFont
-from PyQt5.QtWidgets import QFileDialog, QVBoxLayout, QWidget, QScrollArea
+from PyQt5.QtWidgets import QFileDialog, QVBoxLayout, QWidget, QScrollArea, QSizePolicy
 
 from galog.app.apk_info import APK
 from galog.app.device import adbClient
@@ -15,10 +15,12 @@ from galog.app.settings import (
     writeSettings,
     SettingsChangeNotifier,
     ChangedEntry,
+    AppSettings,
 )
 from galog.app.settings import reloadSettings
 from galog.app.ui.actions.install_app.action import InstallAppAction
 from galog.app.ui.base.dialog import Dialog
+from galog.app.ui.base.widget import Widget
 from galog.app.ui.reusable.search_input import SearchInput
 from .section_search_adapter import SectionSearchAdapter
 from .font_settings_pane import FontSettingsPane
@@ -26,6 +28,20 @@ from galog.app.ui.helpers.hotkeys import HotkeyHelper
 
 from ..device_select_dialog import DeviceSelectDialog
 from .button_bar import BottomButtonBar
+
+
+class SettingsWidget(Widget):
+    def __init__(self, settings: AppSettings, parent: QWidget):
+        super().__init__(parent)
+        self._settings = settings
+
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        self.fontSettingsPane = FontSettingsPane(self._settings, self)
+        layout.addWidget(self.fontSettingsPane)
+        self.setLayout(layout)
 
 
 class AppSettingsDialog(Dialog):
@@ -42,13 +58,14 @@ class AppSettingsDialog(Dialog):
         self._initUserInputHandlers()
         self._initFocusPolicy()
         self._initSearchAdapters()
+        self._setFixedSizePolicy()
 
-    # def keyPressEvent(self, event: QKeyEvent):
-    #     helper = HotkeyHelper(event)
-    #     if helper.isCtrlFPressed():
-    #         self.fontList.searchInput.setFocus()
-    #     else:
-    #         super().keyPressEvent(event)
+    def keyPressEvent(self, event: QKeyEvent):
+        helper = HotkeyHelper(event)
+        if helper.isCtrlFPressed():
+            self.searchInput.setFocus()
+        else:
+            super().keyPressEvent(event)
 
     def _standardFontChanged(self, fontFamily: str, fontSize: int):
         fontSettings = FontSettings.new(fontFamily, fontSize)
@@ -79,35 +96,56 @@ class AppSettingsDialog(Dialog):
         self._settingsCopy.fonts.emojiAddSpace = value
 
     def _initSearchAdapters(self):
+        fontSettingsPane = self.settingsWidget.fontSettingsPane
+
         self._searchAdapters: List[SectionSearchAdapter] = []
-        self._searchAdapters.extend(self.fontSettingsPane.searchAdapters())
+        self._searchAdapters.extend(fontSettingsPane.searchAdapters())
+
+    def _searchTextInSettings(
+        self, text: str, searchAdapters: List[SectionSearchAdapter]
+    ):
+        hasResults = False
+        for searchAdapter in searchAdapters:
+            widget = searchAdapter.value()
+            hasMatch = text in searchAdapter.key()
+            widget.setVisible(hasMatch)
+            hasResults |= hasMatch
+
+        return hasResults
+
+    def _searchInFontSettingsPane(self, text: str):
+        fontSettingsPane = self.settingsWidget.fontSettingsPane
+        hasResults = self._searchTextInSettings(text, fontSettingsPane.searchAdapters())
+        fontSettingsPane.setVisible(hasResults)
+        return hasResults
 
     def _applySectionFilter(self, text: str):
+        hasResults = False
         text = text.lower()
+
+        hasResults |= self._searchInFontSettingsPane(text)
+
+        hasResultsVal = "true" if hasResults else "false"
+        self.settingsWidget.setProperty("hasResults", hasResultsVal)
+        self.settingsWidget.refreshStyleSheet()
+
+    def _setFixedSizePolicy(self):
         for searchAdapter in self._searchAdapters:
             widget = searchAdapter.value()
-            widget.setVisible(text in searchAdapter.key())
+            widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
     def _initUserInputHandlers(self):
-        # self.fontList.listView.rowActivated.connect(self._fontSelected)
-        # self.fontList.currentFontChanged.connect(self._currentFontChanged)
-
+        self.searchInput.textChanged.connect(self._applySectionFilter)
         self.buttonBar.applyButton.clicked.connect(self._applyButtonClicked)
         self.buttonBar.cancelButton.clicked.connect(self.reject)
 
-        self.fontSettingsPane.standardFontChanged.connect(self._standardFontChanged)
-        self.fontSettingsPane.upsizedFontChanged.connect(self._upsizedFontChanged)
-        self.fontSettingsPane.monospacedFontChanged.connect(self._monospacedFontChanged)
-        self.fontSettingsPane.emojiFontChanged.connect(self._emojiFontChanged)
-
-        self.fontSettingsPane.emojiEnabledChanged.connect(self._emojiEnabledChanged)
-        self.fontSettingsPane.emojiAddSpaceChanged.connect(self._emojiAddSpaceChanged)
-
-    # searchInput = self.fontList.searchInput
-    # searchInput.returnPressed.connect(self._fontMayBeSelected)
-    # searchInput.textChanged.connect(self._manageSelectButtonOnOff)
-    # searchInput.arrowUpPressed.connect(self._tryFocusFontsListAndGoUp)
-    # searchInput.arrowDownPressed.connect(self._tryFocusFontsListAndGoDown)
+        fontSettingsPane = self.settingsWidget.fontSettingsPane
+        fontSettingsPane.standardFontChanged.connect(self._standardFontChanged)
+        fontSettingsPane.upsizedFontChanged.connect(self._upsizedFontChanged)
+        fontSettingsPane.monospacedFontChanged.connect(self._monospacedFontChanged)
+        fontSettingsPane.emojiFontChanged.connect(self._emojiFontChanged)
+        fontSettingsPane.emojiEnabledChanged.connect(self._emojiEnabledChanged)
+        fontSettingsPane.emojiAddSpaceChanged.connect(self._emojiAddSpaceChanged)
 
     def _initUserInterface(self):
         self.setWindowTitle("App Settings")
@@ -118,17 +156,18 @@ class AppSettingsDialog(Dialog):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
+        self.scrollArea = QScrollArea(self)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setAttribute(Qt.WA_StyledBackground)
 
-        self.fontSettingsPane = FontSettingsPane(self._settingsCopy, self)
-        scrollArea = QScrollArea(self)
-        scrollArea.setWidget(self.fontSettingsPane)
+        self.settingsWidget = SettingsWidget(self._settingsCopy, self.scrollArea)
+        self.scrollArea.setWidget(self.settingsWidget)
 
         self.buttonBar = BottomButtonBar(self)
         self.searchInput = SearchInput(self)
         self.searchInput.setPlaceholderText("Search settings")
-        self.searchInput.textChanged.connect(self._applySectionFilter)
 
-        layout.addWidget(scrollArea)
+        layout.addWidget(self.scrollArea)
         layout.addStretch(1)
         layout.addWidget(self.searchInput)
         layout.addWidget(self.buttonBar)
