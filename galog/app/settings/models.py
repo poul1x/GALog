@@ -106,9 +106,14 @@ class FontSettings(BaseModel):
     def new(family: NonEmptyStr, size: FontSize):
         return FontSettings(family=family, size=size)
 
+class EmojiFontSettings(BaseModel):
+    family: NonEmptyStr
+    size: FontSize
+    addSpace: bool = True
+    enabled: bool = True
 
 class AppFontsSettings(BaseModel):
-    emoji: Optional[FontSettings] = None
+    emoji: Optional[EmojiFontSettings] = None
     monospaced: FontSettings
     standard: FontSettings
     upsized: FontSettings
@@ -121,5 +126,3 @@ class AppSettings(BaseModel):
     advancedFilter: Optional[AdvancedFilterSettings] = None
     lastUsedDirPath: str = ""
     fonts: AppFontsSettings
-    emojiAddSpace: bool = True
-    useEmoji: bool = True

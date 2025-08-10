@@ -6,7 +6,10 @@ from enum import Enum, auto
 
 class ChangedEntry(int, Enum):
     AppSettings = auto()
-    AppFontSettings = auto()
+    AppFontSettingsStandard = auto()
+    AppFontSettingsUpsized = auto()
+    AppFontSettingsMonospaced = auto()
+    AppFontSettingsEmoji = auto()
     AdvancedFilterSettings = auto()
     AdbServerSettings = auto()
     LastSelectedDevice = auto()

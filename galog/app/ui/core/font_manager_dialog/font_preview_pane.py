@@ -37,10 +37,12 @@ class FontPreviewPane(Widget):
         layout.addStretch()
 
         self.fontSizeSpinBox = QSpinBox(self)
+        self.fontSizeSpinBox.setSingleStep(1)
         self.fontSizeSpinBox.setReadOnly(False)
         self.fontSizeSpinBox.setRange(MIN_FONT_SIZE, MAX_FONT_SIZE)
         self.fontSizeSpinBox.setValue(self.fontPreviewLabel.font().pointSize())
-        self.fontSizeSpinBox.setSingleStep(1)
+        self._fontSizeChanged(self.fontSizeSpinBox.value()) # need this
+
         layout.addWidget(self.fontSizeSpinBox, alignment=alignRight)
         self.setLayout(layout)
 

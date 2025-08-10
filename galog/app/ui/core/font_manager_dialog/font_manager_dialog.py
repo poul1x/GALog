@@ -1,8 +1,8 @@
 from enum import Enum, auto
-from typing import Callable, List
+from typing import Callable, List, Optional
 from zipfile import BadZipFile
 
-from PyQt5.QtCore import QModelIndex, Qt
+from PyQt5.QtCore import QModelIndex, Qt, pyqtSignal
 from PyQt5.QtGui import QKeyEvent, QFontDatabase, QFontMetrics, QFont
 from PyQt5.QtWidgets import QFileDialog, QVBoxLayout, QWidget
 
@@ -10,7 +10,7 @@ from galog.app.apk_info import APK
 from galog.app.device import adbClient
 from galog.app.msgbox import msgBoxErr, msgBoxPrompt
 from galog.app.settings.models import FontSettings
-from galog.app.settings.settings import readSettings, writeSettings
+from galog.app.settings.settings import readSettings, writeSettings, AppSettings
 from galog.app.ui.actions.install_app.action import InstallAppAction
 from galog.app.ui.base.dialog import Dialog
 from .font_preview_pane import FontPreviewPane
@@ -22,9 +22,17 @@ from .fonts_list import FontList
 
 
 class FontManagerDialog(Dialog):
-    def __init__(self, parent: QWidget, objectName: str):
+
+    fontSelected = pyqtSignal(str, int)
+
+    def __init__(
+        self,
+        settings: AppSettings,
+        parent: Optional[QWidget] = None,
+        objectName: Optional[str] = None,
+    ):
         super().__init__(parent, objectName)
-        self._settings = readSettings()
+        self._settings = settings
         self.setWindowFlag(Qt.WindowMaximizeButtonHint, False)
         self.setRelativeGeometry(0.8, 0.6, 800, 600)
         self.setFixedMaxSize(800, 600)
@@ -94,15 +102,10 @@ class FontManagerDialog(Dialog):
     def _tryFocusFontsListAndGoDown(self):
         self.fontList.trySetFocusAndGoDown()
 
-    def _writeFontSettings(self, fontSettings: FontSettings):
-        raise NotImplementedError()
-
     def _fontSelected(self, index: QModelIndex):
         fontFamily = self.fontPreviewPane.targetFontFamily()
         fontSize = self.fontPreviewPane.targetFontSize()
-        selectedFont = FontSettings.new(fontFamily, fontSize)
-        self._writeFontSettings(selectedFont)
-        writeSettings(self._settings)
+        self.fontSelected.emit(fontFamily, fontSize)
         self.accept()
 
     def _fontMayBeSelected(self):
@@ -126,7 +129,7 @@ class FontManagerDialog(Dialog):
             self.fontList.selectFirstFont()
 
     def _filterFonts(self, fonts: List[str]) -> List[str]:
-        raise NotImplementedError()
+        return fonts
 
     def _setFonts(self, fonts: List[str]):
         self.fontList.clear()

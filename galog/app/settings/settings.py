@@ -72,6 +72,9 @@ def readSettings():
 
 
 @mainThreadOnly
-def writeSettings(settings: AppSettings):
+def writeSettings(settings: AppSettings, reload: bool = False):
     correctSettings = AppSettings(**settings.model_dump())
     _saveSettingsToFile(correctSettings)
+
+    if reload:
+        reloadSettings()

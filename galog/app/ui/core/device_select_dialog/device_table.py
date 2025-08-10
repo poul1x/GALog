@@ -161,10 +161,10 @@ class DeviceTable(Widget):
         hBoxLayout = QHBoxLayout()
         hBoxLayout.setContentsMargins(0, 0, 0, 0)
         self.searchInput = SearchInput(self)
-        self.searchInput.textChanged.connect(self.onSearchContentChanged)
-        hBoxLayout.addWidget(self.searchInput, 1)
         self.searchInput.setPlaceholderText("Search device by name or serial")
+        self.searchInput.textChanged.connect(self._searchContentChanged)
         self.searchInput.textChanged.connect(self._applySpans)
+        hBoxLayout.addWidget(self.searchInput, 1)
 
         vBoxLayout = QVBoxLayout()
         vBoxLayout.addWidget(self.tableView)
@@ -173,7 +173,7 @@ class DeviceTable(Widget):
         vBoxLayout.setSpacing(0)
         self.setLayout(vBoxLayout)
 
-    def onSearchContentChanged(self, query: str):
+    def _searchContentChanged(self, query: str):
         self.filterModel.setFilterFixedString(query)
         if self.filterModel.rowCount() > 0:
             proxyIndex = self.filterModel.index(0, 0)

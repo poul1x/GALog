@@ -39,7 +39,7 @@ class GALogMenuBar(QMenuBar):
         self._hasEmojiFont = True
 
     def _setEmojiFontIfAvailble(self):
-        if self._settings.useEmoji == False:
+        if not self._settings.fonts.emoji.enabled:
             return
 
         allFonts = QFontDatabase().families()
@@ -58,7 +58,7 @@ class GALogMenuBar(QMenuBar):
     def addCaptureMenu(self):
         name = "&Capture"
         if self._hasEmojiFont:
-            if self._settings.emojiAddSpace:
+            if self._settings.fonts.emoji.addSpace:
                 return self.addMenu(f"📱 {name}")
             else:
                 return self.addMenu(f"📱{name}")
@@ -68,7 +68,7 @@ class GALogMenuBar(QMenuBar):
     def addToolsMenu(self):
         name = "&Tools"
         if self._hasEmojiFont:
-            if self._settings.emojiAddSpace:
+            if self._settings.fonts.emoji.addSpace:
                 return self.addMenu(f"🛠 {name}")
             else:
                 return self.addMenu(f"🛠{name}")

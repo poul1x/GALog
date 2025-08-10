@@ -28,8 +28,12 @@ from galog.app.ui.actions.restart_app import RestartAppAction
 from galog.app.ui.actions.start_app import StartAppAction
 from galog.app.ui.actions.stop_app import StopAppAction
 from galog.app.ui.base.style import GALogStyle
+from galog.app.ui.core.app_settings_dialog import AppSettingsDialog
 from galog.app.ui.core.device_select_dialog import DeviceSelectDialog
-from galog.app.ui.core.font_manager_dialog import EmojiFontSelectionDialog, StandardFontSelectionDialog
+from galog.app.ui.core.font_manager_dialog import (
+    EmojiFontSelectionDialog,
+    StandardFontSelectionDialog,
+)
 from galog.app.ui.core.log_messages_panel import LogMessagesPanel
 from galog.app.ui.core.package_select_dialog import PackageSelectDialog
 from galog.app.ui.core.tag_filter_dialog import TagFilterDialog
@@ -52,9 +56,6 @@ class GALogMainWindow(QMainWindow):
         self.initLeftPaddingForEachMenu()
         self.increaseHoverAreaForCheckableActions()
         self.startAdbServer()
-
-        d = EmojiFontSelectionDialog(self)
-        d.exec()
 
     def isLocalAdbAddr(self):
         return self._settings.adb.ipAddr.is_loopback
@@ -527,7 +528,7 @@ class GALogMainWindow(QMainWindow):
         self.showFolderInFileExplorer(appLogsDir())
 
     def openSettings(self):
-        pass
+        AppSettingsDialog(self).exec()
 
     def showAppDataFolderAction(self):
         action = QAction("&Show app data folder", self)
@@ -547,6 +548,7 @@ class GALogMainWindow(QMainWindow):
 
     def openSettingsAction(self):
         action = QAction("&Open settings window", self)
+        action.setShortcut("Ctrl+,")
         action.setStatusTip("Open settings window")
         action.triggered.connect(self.openSettings)
         action.setEnabled(True)
