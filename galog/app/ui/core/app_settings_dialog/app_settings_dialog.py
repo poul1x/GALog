@@ -34,12 +34,10 @@ class SettingsWidget(Widget):
     def __init__(self, settings: AppSettings, parent: QWidget):
         super().__init__(parent)
         self._settings = settings
+        self.fontSettingsPane = FontSettingsPane(self._settings, self)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-
-        self.fontSettingsPane = FontSettingsPane(self._settings, self)
         layout.addWidget(self.fontSettingsPane)
         self.setLayout(layout)
 
@@ -57,8 +55,6 @@ class AppSettingsDialog(Dialog):
         self._initUserInterface()
         self._initUserInputHandlers()
         self._initFocusPolicy()
-        self._initSearchAdapters()
-        self._setFixedSizePolicy()
 
     def keyPressEvent(self, event: QKeyEvent):
         helper = HotkeyHelper(event)
@@ -95,12 +91,6 @@ class AppSettingsDialog(Dialog):
         self._entriesChanged.add(ChangedEntry.AppFontSettingsEmoji)
         self._settingsCopy.fonts.emojiAddSpace = value
 
-    def _initSearchAdapters(self):
-        fontSettingsPane = self.settingsWidget.fontSettingsPane
-
-        self._searchAdapters: List[SectionSearchAdapter] = []
-        self._searchAdapters.extend(fontSettingsPane.searchAdapters())
-
     def _searchTextInSettings(
         self, text: str, searchAdapters: List[SectionSearchAdapter]
     ):
@@ -129,11 +119,6 @@ class AppSettingsDialog(Dialog):
         self.settingsWidget.setProperty("hasResults", hasResultsVal)
         self.settingsWidget.refreshStyleSheet()
 
-    def _setFixedSizePolicy(self):
-        for searchAdapter in self._searchAdapters:
-            widget = searchAdapter.value()
-            widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-
     def _initUserInputHandlers(self):
         self.searchInput.textChanged.connect(self._applySectionFilter)
         self.buttonBar.applyButton.clicked.connect(self._applyButtonClicked)
@@ -158,7 +143,6 @@ class AppSettingsDialog(Dialog):
 
         self.scrollArea = QScrollArea(self)
         self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setAttribute(Qt.WA_StyledBackground)
 
         self.settingsWidget = SettingsWidget(self._settingsCopy, self.scrollArea)
         self.scrollArea.setWidget(self.settingsWidget)
@@ -167,8 +151,7 @@ class AppSettingsDialog(Dialog):
         self.searchInput = SearchInput(self)
         self.searchInput.setPlaceholderText("Search settings")
 
-        layout.addWidget(self.scrollArea)
-        layout.addStretch(1)
+        layout.addWidget(self.scrollArea, stretch=1)
         layout.addWidget(self.searchInput)
         layout.addWidget(self.buttonBar)
         self.setLayout(layout)

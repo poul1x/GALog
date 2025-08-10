@@ -10,6 +10,8 @@ from PyQt5.QtWidgets import (
     QWidget,
     QSpinBox,
     QTextEdit,
+    QSizePolicy,
+    QFrame,
 )
 
 from galog.app.paths import iconFile
@@ -40,6 +42,7 @@ class FontSettingsPane(Widget):
         self._settings = settings
         self._initUserInterface()
         self._initUserInputHandlers()
+        self._setFixedSizePolicy()
 
     def _initUserInputHandlers(self):
         self.standardFontSection.fontChanged.connect(self.standardFontChanged.emit)
@@ -52,6 +55,21 @@ class FontSettingsPane(Widget):
     def _initUserInterface(self):
         vBoxLayout = QVBoxLayout()
         vBoxLayout.setAlignment(Qt.AlignTop)
+
+        hBoxLayout = QHBoxLayout()
+        self.titleLabel = QLabel(self)
+        self.titleLabel.setText("Font settings")
+        fontFamily = self._settings.fonts.upsized.family
+        fontSize = self._settings.fonts.upsized.size
+        self.titleLabel.setFont(QFont(fontFamily, fontSize, QFont.Bold))
+
+        self.lineFrame = QFrame(self)
+        self.lineFrame.setFrameShape(QFrame.HLine)
+        self.lineFrame.setFrameShadow(QFrame.Plain)
+        self.lineFrame.setLineWidth(2)
+        hBoxLayout.addWidget(self.titleLabel)
+        hBoxLayout.addWidget(self.lineFrame, stretch=1)
+        vBoxLayout.addLayout(hBoxLayout)
 
         self.standardFontSection = StandardFontSection(self._settings, self)
         self.upsizedFontSection = UpsizedFontSection(self._settings, self)
@@ -84,3 +102,7 @@ class FontSettingsPane(Widget):
             self.emojiEnabledSection.searchAdapter(),
             self.emojiAddSpaceSection.searchAdapter(),
         ]
+
+    def _setFixedSizePolicy(self):
+        for widget in self.findChildren(QWidget):
+            widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

@@ -59,6 +59,7 @@ class StandardFontSection(Widget):
 
     def _initUserInterface(self):
         layout = QHBoxLayout()
+        layout.setContentsMargins(0,0,0,0)
         alignLeft = Qt.AlignLeft | Qt.AlignVCenter
         alignRight = Qt.AlignRight | Qt.AlignVCenter
 

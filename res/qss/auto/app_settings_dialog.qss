@@ -1,5 +1,6 @@
 #AppSettingsDialog {
-	background-color: #ffffff;
+	/* background-color: #e25757; */
+	background: none;
 }
 
 #AppSettingsDialog > QScrollArea {
