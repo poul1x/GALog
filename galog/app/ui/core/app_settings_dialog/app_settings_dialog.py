@@ -72,11 +72,11 @@ class AppSettingsDialog(Dialog):
 
     def _emojiEnabledChanged(self, value: bool):
         self._entriesChanged.add(ChangedEntry.AppFontSettingsEmoji)
-        self._settingsCopy.fonts.emoji.enabled = value
+        self._settingsCopy.fonts.emojiEnabled = value
 
     def _emojiAddSpaceChanged(self, value: bool):
         self._entriesChanged.add(ChangedEntry.AppFontSettingsEmoji)
-        self._settingsCopy.fonts.emoji.addSpace = value
+        self._settingsCopy.fonts.emojiAddSpace = value
 
     def _initSearchAdapters(self):
         self._searchAdapters: List[SectionSearchAdapter] = []

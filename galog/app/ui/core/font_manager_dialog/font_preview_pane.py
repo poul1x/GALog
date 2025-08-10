@@ -41,7 +41,7 @@ class FontPreviewPane(Widget):
         self.fontSizeSpinBox.setReadOnly(False)
         self.fontSizeSpinBox.setRange(MIN_FONT_SIZE, MAX_FONT_SIZE)
         self.fontSizeSpinBox.setValue(self.fontPreviewLabel.font().pointSize())
-        self._fontSizeChanged(self.fontSizeSpinBox.value()) # need this
+        self._fontSizeChanged(self.fontSizeSpinBox.value())  # need this
 
         layout.addWidget(self.fontSizeSpinBox, alignment=alignRight)
         self.setLayout(layout)
@@ -66,6 +66,7 @@ class FontPreviewPane(Widget):
     def setTargetFontSize(self, size: int):
         font = QFont(self.targetFontFamily(), size)
         self.fontPreviewLabel.setFont(font)
+        self.fontSizeSpinBox.setValue(size)
 
     def setPreviewText(self, text: str):
         self.fontPreviewLabel.setText(text)

@@ -58,19 +58,19 @@ class FontSettingsPane(Widget):
 
         self.emojiEnabledSection = ToggleSection(self._settings, self)
         self.emojiEnabledSection.setTitle("Use emoji symbols")
-        self.emojiEnabledSection.setValue(self._settings.fonts.emoji.enabled)
+        self.emojiEnabledSection.setValue(self._settings.fonts.emojiEnabled)
 
         self.emojiAddSpaceSection = ToggleSection(self._settings, self)
         self.emojiAddSpaceSection.setTitle("Add space before emoji symbols")
-        self.emojiAddSpaceSection.setValue(self._settings.fonts.emoji.addSpace)
+        self.emojiAddSpaceSection.setValue(self._settings.fonts.emojiAddSpace)
 
         self.e1mojiAddSpaceSection = ToggleSection(self._settings, self)
         self.e1mojiAddSpaceSection.setTitle("Add space before emoji symbols")
-        self.e1mojiAddSpaceSection.setValue(self._settings.fonts.emoji.addSpace)
+        self.e1mojiAddSpaceSection.setValue(self._settings.fonts.emojiAddSpace)
 
         self.e2mojiAddSpaceSection = ToggleSection(self._settings, self)
         self.e2mojiAddSpaceSection.setTitle("Add space before emoji symbols")
-        self.e2mojiAddSpaceSection.setValue(self._settings.fonts.emoji.addSpace)
+        self.e2mojiAddSpaceSection.setValue(self._settings.fonts.emojiAddSpace)
 
         vBoxLayout.addWidget(self.standardFontSection)
         vBoxLayout.addWidget(self.upsizedFontSection)

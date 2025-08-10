@@ -21,6 +21,7 @@ from galog.app.ui.core.font_manager_dialog import (
     EmojiFontSelectionDialog,
     MonospacedFontSelectionDialog,
     StandardFontSelectionDialog,
+    UpsizedFontSelectionDialog,
 )
 
 
@@ -101,6 +102,9 @@ class UpsizedFontSection(StandardFontSection):
     def __init__(self, settings: AppSettings, parent: QWidget):
         super().__init__(settings, parent)
         self.fontLabel.setText("Upsized font")
+
+    def _fontSelectionDialog(self):
+        return UpsizedFontSelectionDialog(self._settings, self)
 
     def _initValue(self):
         fontFamily = self._settings.fonts.upsized.family
