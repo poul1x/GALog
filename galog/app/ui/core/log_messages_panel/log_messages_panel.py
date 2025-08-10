@@ -1,7 +1,7 @@
 from typing import Callable, List, Optional
 
 from PyQt5.QtCore import QPoint, Qt, pyqtSignal
-from PyQt5.QtGui import QFocusEvent, QGuiApplication
+from PyQt5.QtGui import QFocusEvent, QGuiApplication, QFont
 from PyQt5.QtWidgets import QVBoxLayout, QWidget
 
 from galog.app.device.device import adbClient
@@ -390,3 +390,8 @@ class LogMessagesPanel(Widget):
     def _initCustomContextMenu(self):
         self._logMessagesTable.setContextMenuPolicy(Qt.CustomContextMenu)
         self._logMessagesTable.customContextMenuRequested.connect(self._contextMenuExec)  # fmt: skip
+
+    #####
+
+    def setLogViewerFont(self, font: QFont):
+        self._logMessagesTable.setLogViewerFont(font)

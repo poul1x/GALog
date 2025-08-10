@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import (
     QStyle,
     QStyleOptionButton,
     QWidgetAction,
+    QWidget,
 )
 
 from galog.app.device import adbClient
@@ -48,7 +49,7 @@ from .menubar import GALogMenuBar
 class GALogMainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self._settings = readSettings()
+        self.reloadSettings()
         self.setObjectName("MainWindow")
         self.setStyle(GALogStyle())
         self.loadFonts()
@@ -56,18 +57,44 @@ class GALogMainWindow(QMainWindow):
         self.initHighlighting()
         self.initLeftPaddingForEachMenu()
         self.increaseHoverAreaForCheckableActions()
+        self.subscribeForSettingsChanges()
         self.startAdbServer()
 
-    def _settingsChanged(self, changedEntry: ChangedEntry):
+    def reloadSettings(self):
         self._settings = readSettings()
+
+    def _settingsChanged(self, changedEntry: ChangedEntry):
+        self.reloadSettings()
+        if changedEntry == ChangedEntry.LiveReload:
+            liveReload = self._settings.logViewer.liveReload
+            self.logMessagesPanel.setHighlightingEnabled(liveReload)
+            return
+
         if changedEntry == ChangedEntry.ShowLineNumbers:
             showLineNumbers = self._settings.logViewer.showLineNumbers
-            self. setLineNumbersAlwaysVisible(showLineNumbers)
+            self.logMessagesPanel.setLineNumbersAlwaysVisible(showLineNumbers)
+            return
 
-    def _initSettingsChangeNotifier(self):
+        if changedEntry == ChangedEntry.TextHighlighting:
+            textHighlighting = self._settings.logViewer.textHighlighting
+            self.logMessagesPanel.setHighlightingEnabled(textHighlighting)
+            return
+
+        # if changedEntry == ChangedEntry.AppFontSettingsStandard:
+        #     fontFamily = self._settings.fonts.standard.family
+        #     fontSize = self._settings.fonts.standard.size
+        #     self.logMessagesPanel.setStandardFont(fontFamily, fontSize)
+        #     return
+
+        if changedEntry == ChangedEntry.AppFontSettingsMonospaced:
+            fontFamily = self._settings.fonts.monospaced.family
+            fontSize = self._settings.fonts.monospaced.size
+            self.logMessagesPanel.setLogViewerFont(fontFamily, fontSize)
+            return
+
+    def subscribeForSettingsChanges(self):
         notifier = SettingsChangeNotifier()
         notifier.settingsChanged.connect(self._settingsChanged)
-
 
     def isLocalAdbAddr(self):
         return self._settings.adbServer.ipAddr.is_loopback

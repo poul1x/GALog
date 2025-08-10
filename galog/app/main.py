@@ -3,7 +3,7 @@ import sys
 import traceback
 from typing import List
 
-from PyQt5.QtWidgets import QApplication, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMessageBox, QWidget
 from PyQt5.QtGui import QFont
 
 from galog.app.logging import initializeLogging
@@ -31,6 +31,13 @@ class GALogApp(QApplication):
         font = QFont(standardFont.family, standardFont.size)
         self.setFont(font)
 
+    # def _updateAllWidgets(self):
+    #     for widget in self.topLevelWidgets():
+    #         print(widget)
+    #         for child in widget.findChildren(QWidget):
+    #             print(child)
+    #             child.update()
+
     def _loadStyleSheetFiles(self):
         styleSheet = ""
         for filePath in styleSheetFiles():
@@ -44,6 +51,8 @@ class GALogApp(QApplication):
         self._reloadSettings()
         if changedEntry == ChangedEntry.AppFontSettingsStandard:
             self._applyFontSettings()
+            self._updateAllWidgets()
+            print("Update")
 
     def _subscribeSettingsChangeEvents(self):
         notifier = SettingsChangeNotifier()

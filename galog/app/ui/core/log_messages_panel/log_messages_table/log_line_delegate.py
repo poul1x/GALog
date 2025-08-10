@@ -33,12 +33,17 @@ from .row_blinking_animation import RowBlinkingAnimation
 class LogLineDelegate(QStyledItemDelegate):
     _highlightingEnabled: bool
 
-    def __init__(self, font: QFont, parent: Optional[QObject] = None):
+    def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
         self._rowBlinkingAnimation = None
         self._highlightingEnabled = True
         self._highlightingRules = None
-        self._font = font
+        self._setDefaultFont()
+
+    def _setDefaultFont(self):
+        settings = readSettings()
+        fontSettings = settings.fonts.monospaced
+        self._font = QFont(fontSettings.family, fontSettings.size)
 
     def font(self):
         return self._font
@@ -57,7 +62,6 @@ class LogLineDelegate(QStyledItemDelegate):
 
     def highlightingEnabled(self):
         return self._highlightingEnabled
-
 
     def _applyLogMessageHighlighting(self, doc: QTextDocument, index: QModelIndex):
         if index.column() != Column.logMessage:

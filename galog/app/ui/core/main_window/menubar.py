@@ -1,7 +1,7 @@
 import platform
 from typing import List
 
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QMenu
 from PyQt5.QtGui import QFont, QFontDatabase
 from PyQt5.QtWidgets import QMenuBar, QWidget
 from galog.app.bootstrap import OS_NAME
@@ -27,10 +27,25 @@ class GALogMenuBar(QMenuBar):
             self._applyFontSettings()
 
     def _applyFontSettings(self):
+        if self._settings.fonts.emoji is None:
+            return
+
         font = self._settings.fonts.emoji
         self._setEmojiFont(font.family, font.size)
+
+        if not self._settings.fonts.emojiEnabled:
+            self._hasEmojiFont = False
+
+        titles = [
+            self._menuTitleCapture(),
+            self._menuTitleTools(),
+            "", # The last menu
+        ]
+
+        for i, menu in enumerate(self.findChildren(QMenu)):
+            menu.setTitle(titles[i])
+
         self.update()
-        # QApplication.processEvents()
 
     def _subscribeForSettingsChanges(self):
         notifier = SettingsChangeNotifier()
@@ -76,22 +91,28 @@ class GALogMenuBar(QMenuBar):
             size = self._settings.fonts.standard.size
             self._setEmojiFont(fontFamily, size)
 
-    def addCaptureMenu(self):
+    def _menuTitleCapture(self):
         name = "&Capture"
         if self._hasEmojiFont:
             if self._settings.fonts.emojiAddSpace:
-                return self.addMenu(f"📱 {name}")
+                return f"📱 {name}"
             else:
-                return self.addMenu(f"📱{name}")
+                return f"📱{name}"
         else:
-            return self.addMenu(name)
+            return name
 
-    def addToolsMenu(self):
+    def _menuTitleTools(self):
         name = "&Tools"
         if self._hasEmojiFont:
             if self._settings.fonts.emojiAddSpace:
-                return self.addMenu(f"🛠 {name}")
+                return f"🛠 {name}"
             else:
-                return self.addMenu(f"🛠{name}")
+                return f"🛠{name}"
         else:
-            return self.addMenu(name)
+            return name
+
+    def addCaptureMenu(self):
+        return self.addMenu(self._menuTitleCapture())
+
+    def addToolsMenu(self):
+        return self.addMenu(self._menuTitleTools())
