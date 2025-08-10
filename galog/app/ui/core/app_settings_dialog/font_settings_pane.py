@@ -42,7 +42,6 @@ class FontSettingsPane(Widget):
         self._settings = settings
         self._initUserInterface()
         self._initUserInputHandlers()
-        self._setFixedSizePolicy()
 
     def _initUserInputHandlers(self):
         self.standardFontSection.fontChanged.connect(self.standardFontChanged.emit)
@@ -102,7 +101,3 @@ class FontSettingsPane(Widget):
             self.emojiEnabledSection.searchAdapter(),
             self.emojiAddSpaceSection.searchAdapter(),
         ]
-
-    def _setFixedSizePolicy(self):
-        for widget in self.findChildren(QWidget):
-            widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

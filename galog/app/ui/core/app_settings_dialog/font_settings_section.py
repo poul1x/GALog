@@ -85,6 +85,9 @@ class StandardFontSection(Widget):
     def setValue(self, fontFamily: str, fontSize: int):
         self.fontButton.setText(f"{fontFamily} {fontSize}")
 
+    def setValueNotSet(self):
+        self.fontButton.setText("<Not set>")
+
     def searchAdapter(self):
         return FontSectionSearchAdapter(self)
 
@@ -137,6 +140,9 @@ class EmojiFontSection(StandardFontSection):
         return EmojiFontSelectionDialog(self._settings, self)
 
     def _initValue(self):
-        fontFamily = self._settings.fonts.emoji.family
-        fontSize = self._settings.fonts.emoji.size
-        self.setValue(fontFamily, fontSize)
+        if self._settings.fonts.emoji:
+            fontFamily = self._settings.fonts.emoji.family
+            fontSize = self._settings.fonts.emoji.size
+            self.setValue(fontFamily, fontSize)
+        else:
+            self.setValueNotSet()

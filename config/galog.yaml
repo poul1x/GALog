@@ -1,8 +1,14 @@
-adb:
+adbServer:
   ipAddr: 127.0.0.1
   port: 5037
+logViewer:
+  liveReload: true
+  textHighlighting: true
+  showLineNumbers: false
 fonts:
   emoji: null
+  emojiEnabled: true
+  emojiAddSpace: true
   monospaced:
     family: Roboto Mono
     size: 11

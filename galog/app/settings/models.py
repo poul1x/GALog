@@ -112,14 +112,21 @@ class AppFontsSettings(BaseModel):
     standard: FontSettings
     upsized: FontSettings
     emoji: Optional[FontSettings] = None
-    emojiAddSpace: bool = True
-    emojiEnabled: bool = True
+    emojiAddSpace: bool
+    emojiEnabled: bool
+
+
+class LogViewerSettings(BaseModel):
+    liveReload: bool
+    textHighlighting: bool
+    showLineNumbers: bool
 
 
 class AppSettings(BaseModel):
-    adb: AdbServerSettings
+    adbServer: AdbServerSettings
     lastSelectedDevice: Optional[LastSelectedDevice] = None
     lastSelectedPackage: Optional[LastSelectedPackage] = None
     advancedFilter: Optional[AdvancedFilterSettings] = None
     lastUsedDirPath: str = ""
     fonts: AppFontsSettings
+    logViewer: LogViewerSettings

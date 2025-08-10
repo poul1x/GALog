@@ -171,6 +171,6 @@ def deviceListWithInfo(client: AdbClient) -> List[DeviceInfo]:
 
 def adbClient():
     settings = readSettings()
-    ipAddr = str(settings.adb.ipAddr)
-    port = int(settings.adb.port)
+    ipAddr = str(settings.adbServer.ipAddr)
+    port = int(settings.adbServer.port)
     return AdbClient(ipAddr, port)

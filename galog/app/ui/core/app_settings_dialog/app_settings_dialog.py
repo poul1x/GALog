@@ -28,18 +28,30 @@ from galog.app.ui.helpers.hotkeys import HotkeyHelper
 
 from ..device_select_dialog import DeviceSelectDialog
 from .button_bar import BottomButtonBar
+from .log_viewer_settings_pane import LogViewerSettingsPane
 
 
 class SettingsWidget(Widget):
     def __init__(self, settings: AppSettings, parent: QWidget):
         super().__init__(parent)
         self._settings = settings
+        self._initUserInterface()
+        self._setFixedSizePolicy()
+
+    def _initUserInterface(self):
         self.fontSettingsPane = FontSettingsPane(self._settings, self)
+        self.logViewerSettingsPane = LogViewerSettingsPane(self._settings, self)
 
         layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignTop)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.fontSettingsPane)
+        layout.addWidget(self.logViewerSettingsPane)
         self.setLayout(layout)
+
+    def _setFixedSizePolicy(self):
+        for widget in self.findChildren(QWidget):
+            widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
 
 class AppSettingsDialog(Dialog):
@@ -91,6 +103,18 @@ class AppSettingsDialog(Dialog):
         self._entriesChanged.add(ChangedEntry.AppFontSettingsEmoji)
         self._settingsCopy.fonts.emojiAddSpace = value
 
+    def _liveReloadChanged(self, value: bool):
+        self._entriesChanged.add(ChangedEntry.LiveReload)
+        self._settingsCopy.logViewer.liveReload = value
+
+    def _textHighlightingChanged(self, value: bool):
+        self._entriesChanged.add(ChangedEntry.TextHighlighting)
+        self._settingsCopy.logViewer.textHighlighting = value
+
+    def _showLineNumbersChanged(self, value: bool):
+        self._entriesChanged.add(ChangedEntry.ShowLineNumbers)
+        self._settingsCopy.logViewer.showLineNumbers = value
+
     def _searchTextInSettings(
         self, text: str, searchAdapters: List[SectionSearchAdapter]
     ):
@@ -104,9 +128,15 @@ class AppSettingsDialog(Dialog):
         return hasResults
 
     def _searchInFontSettingsPane(self, text: str):
-        fontSettingsPane = self.settingsWidget.fontSettingsPane
-        hasResults = self._searchTextInSettings(text, fontSettingsPane.searchAdapters())
-        fontSettingsPane.setVisible(hasResults)
+        pane = self.settingsWidget.fontSettingsPane
+        hasResults = self._searchTextInSettings(text, pane.searchAdapters())
+        pane.setVisible(hasResults)
+        return hasResults
+
+    def _searchInLogViewerSettingsPane(self, text: str):
+        pane = self.settingsWidget.logViewerSettingsPane
+        hasResults = self._searchTextInSettings(text, pane.searchAdapters())
+        pane.setVisible(hasResults)
         return hasResults
 
     def _applySectionFilter(self, text: str):
@@ -114,6 +144,7 @@ class AppSettingsDialog(Dialog):
         text = text.lower()
 
         hasResults |= self._searchInFontSettingsPane(text)
+        hasResults |= self._searchInLogViewerSettingsPane(text)
 
         hasResultsVal = "true" if hasResults else "false"
         self.settingsWidget.setProperty("hasResults", hasResultsVal)
@@ -124,13 +155,18 @@ class AppSettingsDialog(Dialog):
         self.buttonBar.applyButton.clicked.connect(self._applyButtonClicked)
         self.buttonBar.cancelButton.clicked.connect(self.reject)
 
-        fontSettingsPane = self.settingsWidget.fontSettingsPane
-        fontSettingsPane.standardFontChanged.connect(self._standardFontChanged)
-        fontSettingsPane.upsizedFontChanged.connect(self._upsizedFontChanged)
-        fontSettingsPane.monospacedFontChanged.connect(self._monospacedFontChanged)
-        fontSettingsPane.emojiFontChanged.connect(self._emojiFontChanged)
-        fontSettingsPane.emojiEnabledChanged.connect(self._emojiEnabledChanged)
-        fontSettingsPane.emojiAddSpaceChanged.connect(self._emojiAddSpaceChanged)
+        pane = self.settingsWidget.fontSettingsPane
+        pane.standardFontChanged.connect(self._standardFontChanged)
+        pane.upsizedFontChanged.connect(self._upsizedFontChanged)
+        pane.monospacedFontChanged.connect(self._monospacedFontChanged)
+        pane.emojiFontChanged.connect(self._emojiFontChanged)
+        pane.emojiEnabledChanged.connect(self._emojiEnabledChanged)
+        pane.emojiAddSpaceChanged.connect(self._emojiAddSpaceChanged)
+
+        pane = self.settingsWidget.logViewerSettingsPane
+        pane.liveReloadChanged.connect(self._liveReloadChanged)
+        pane.textHighlightingChanged.connect(self._textHighlightingChanged)
+        pane.showLineNumbersChanged.connect(self._showLineNumbersChanged)
 
     def _initUserInterface(self):
         self.setWindowTitle("App Settings")

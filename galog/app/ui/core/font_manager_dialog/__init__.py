@@ -14,6 +14,7 @@ class StandardFontSelectionDialog(FontManagerDialog):
         self.setTargetFontFamily(settings.fonts.standard.family)
         self.setTargetFontSize(settings.fonts.standard.size)
 
+
 class UpsizedFontSelectionDialog(FontManagerDialog):
     def __init__(self, settings: AppSettings, parent: QWidget):
         super().__init__(settings, parent, "FontManagerDialog")
@@ -40,8 +41,10 @@ class EmojiFontSelectionDialog(FontManagerDialog):
     def __init__(self, settings: AppSettings, parent: QWidget):
         super().__init__(settings, parent, "FontManagerDialog")
         self.setPreviewText("😂 ❤️ 🔥 🙏 😍 🤣")
-        self.setTargetFontFamily(settings.fonts.emoji.family)
-        self.setTargetFontSize(settings.fonts.emoji.size)
+        emojiFont = settings.fonts.emoji
+        if emojiFont is not None:
+            self.setTargetFontFamily(emojiFont.family)
+            self.setTargetFontSize(emojiFont.size)
 
     def _filterFonts(self, fonts: List[str]):
         return list(filter(self._emoji, fonts))

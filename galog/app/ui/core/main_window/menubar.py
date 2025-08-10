@@ -5,6 +5,7 @@ from PyQt5.QtGui import QFont, QFontDatabase
 from PyQt5.QtWidgets import QMenuBar, QWidget
 from galog.app.bootstrap import OS_NAME
 from galog.app.settings import readSettings
+from galog.app.settings.models import FontSettings
 
 
 class GALogMenuBar(QMenuBar):
@@ -12,7 +13,7 @@ class GALogMenuBar(QMenuBar):
         super().__init__(parent)
         self._hasEmojiFont = False
         self._settings = readSettings()
-        self._setEmojiFontIfAvailble()
+        self._setEmojiFontIfAvailable()
 
     @staticmethod
     def _preferredEmojiFonts():
@@ -38,7 +39,7 @@ class GALogMenuBar(QMenuBar):
         self.setFont(emojiFont)
         self._hasEmojiFont = True
 
-    def _setEmojiFontIfAvailble(self):
+    def _setEmojiFontIfAvailable(self):
         if not self._settings.fonts.emojiEnabled:
             return
 

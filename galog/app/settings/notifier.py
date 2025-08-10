@@ -14,6 +14,9 @@ class ChangedEntry(int, Enum):
     AdbServerSettings = auto()
     LastSelectedDevice = auto()
     LastSelectedPackage = auto()
+    LiveReload = auto()
+    TextHighlighting = auto()
+    ShowLineNumbers = auto()
 
 
 def singleton(class_):

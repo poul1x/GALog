@@ -58,7 +58,7 @@ class GALogMainWindow(QMainWindow):
         self.startAdbServer()
 
     def isLocalAdbAddr(self):
-        return self._settings.adb.ipAddr.is_loopback
+        return self._settings.adbServer.ipAddr.is_loopback
 
     def startAdbServer(self):
         adb = shutil.which("adb")

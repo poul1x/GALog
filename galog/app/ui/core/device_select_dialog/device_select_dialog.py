@@ -90,8 +90,8 @@ class DeviceSelectDialog(Dialog):
         vBoxLayoutMain.setSpacing(0)
         self.setLayout(vBoxLayoutMain)
 
-        self.devicesLoadOptions.setAdbIpAddr(str(self._settings.adb.ipAddr))
-        self.devicesLoadOptions.setAdbPort(str(self._settings.adb.port))
+        self.devicesLoadOptions.setAdbIpAddr(str(self._settings.adbServer.ipAddr))
+        self.devicesLoadOptions.setAdbPort(str(self._settings.adbServer.port))
 
     def _tryFocusPackagesListAndGoUp(self):
         self.deviceTable.trySetFocusAndGoUp()
@@ -117,8 +117,8 @@ class DeviceSelectDialog(Dialog):
             msgBoxErr(msgBrief, msgVerbose, self)
             return
 
-        self._settings.adb.ipAddr = IPv4Address(self.devicesLoadOptions.adbIpAddr())
-        self._settings.adb.port = int(self.devicesLoadOptions.adbPort())
+        self._settings.adbServer.ipAddr = IPv4Address(self.devicesLoadOptions.adbIpAddr())
+        self._settings.adbServer.port = int(self.devicesLoadOptions.adbPort())
         selectedDevice = LastSelectedDevice.new(serial, displayName)
         self._settings.lastSelectedDevice = selectedDevice
         writeSettings(self._settings)
