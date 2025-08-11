@@ -33,7 +33,7 @@ from galog.app.ui.base.style import GALogStyle
 from galog.app.ui.core.app_settings_dialog import AppSettingsDialog
 from galog.app.ui.core.device_select_dialog import DeviceSelectDialog
 from galog.app.ui.core.font_manager_dialog import (
-    EmojiFontSelectionDialog,
+    MenuBarFontSelectionDialog,
     StandardFontSelectionDialog,
 )
 from galog.app.ui.core.log_messages_panel import LogMessagesPanel
@@ -86,8 +86,8 @@ class GALogMainWindow(QMainWindow):
             self.logMessagesPanel.setStandardFont(font)
             return
 
-        if changedEntry == ChangedEntry.AppFontSettingsMonospaced:
-            fontSettings = self._settings.fonts.monospaced
+        if changedEntry == ChangedEntry.AppFontSettingsLogViewer:
+            fontSettings = self._settings.fonts.logViewer
             font = QFont(fontSettings.family, fontSettings.size)
             self.logMessagesPanel.setLogViewerFont(font)
             return
@@ -644,7 +644,7 @@ class GALogMainWindow(QMainWindow):
 
         self.logMessagesPanel = LogMessagesPanel(self)
         self.logMessagesPanel.captureInterrupted.connect(self.captureInterrupted)
-        fontSettings = self._settings.fonts.monospaced
+        fontSettings = self._settings.fonts.logViewer
         font = QFont(fontSettings.family, fontSettings.size)
         self.logMessagesPanel.setLogViewerFont(font)
         self.setCentralWidget(self.logMessagesPanel)

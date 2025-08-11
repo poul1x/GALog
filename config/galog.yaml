@@ -6,15 +6,14 @@ logViewer:
   textHighlighting: true
   showLineNumbers: false
 fonts:
-  emoji: null
   emojiEnabled: true
   emojiAddSpace: true
-  monospaced:
-    family: Roboto Mono
-    size: 11
   standard:
     family: Roboto
     size: 11
-  upsized:
+  logViewer:
+    family: Roboto Mono
+    size: 11
+  menuBar:
     family: Roboto
-    size: 12
+    size: 11

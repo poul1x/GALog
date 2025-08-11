@@ -18,8 +18,8 @@ from galog.app.settings import AppSettings
 from galog.app.ui.base.widget import Widget
 from .section_search_adapter import SectionSearchAdapter
 from galog.app.ui.core.font_manager_dialog import (
-    EmojiFontSelectionDialog,
-    MonospacedFontSelectionDialog,
+    MenuBarFontSelectionDialog,
+    LogViewerFontSelectionDialog,
     StandardFontSelectionDialog,
 )
 

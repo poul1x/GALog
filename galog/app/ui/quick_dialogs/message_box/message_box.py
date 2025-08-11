@@ -25,8 +25,18 @@ class MessageBox(Dialog):
         return self._checkBox
 
     def setCheckBox(self, checkBox: QCheckBox):
+
+        #
+        # First, own the checkBox,
+        # overriding its parent
+        #
+
         layout: QVBoxLayout = self.layout()
         checkBox.setParent(self)
+
+        #
+        # Find ButtonBar widget
+        #
 
         index = -1
         for i in range(layout.count()):
@@ -34,6 +44,12 @@ class MessageBox(Dialog):
             if widget.objectName().startswith("ButtonBar"):
                 index = i
                 break
+
+        #
+        # Insert checkBox right before (above) the ButtonBar
+        # If another checkBox has been already set,
+        # replace it with new one
+        #
 
         assert index > 0
         widget = layout.itemAt(index - 1).widget()
@@ -61,14 +77,16 @@ class MessageBox(Dialog):
         headerTextLabel.setAlignment(Qt.AlignCenter)
         headerTextLabel.setObjectName("HeadTextLabel")
         headerTextLabel.setContentsMargins(0, 0, 0, 0)
+        headerTextLabel.setFont(self._upsizedFont())
         headerTextLabel.setWordWrap(True)
         headerTextLabel.setText(text)
 
-        family = self._settings.fonts.upsized.family
-        size = self._settings.fonts.upsized.size
-        headerTextLabel.setFont(QFont(family, size))
-
         layout.insertWidget(index, headerTextLabel)
+
+    def _upsizedFont(self):
+        family = self._settings.fonts.standard.family
+        size = self._settings.fonts.standard.size + 1
+        return QFont(family, size)
 
     def setBodyText(self, text: str):
         self.contentArea.setBodyText(text)
@@ -79,6 +97,7 @@ class MessageBox(Dialog):
         self.headEmptySpace.setObjectName("HeadEmptySpace")
         self.contentArea = ContentArea(self)
         self.buttonBar = ButtonBar(self)
+        self.buttonBar.setButtonFont(self._upsizedFont())
         self.buttonBar.buttonClicked.connect(self._onButtonClicked)
 
         vBoxLayout.addWidget(self.headEmptySpace)

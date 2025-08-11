@@ -79,27 +79,22 @@ class AppSettingsDialog(Dialog):
         self._entriesChanged.add(ChangedEntry.AppFontSettingsStandard)
         self._settingsCopy.fonts.standard = fontSettings
 
-    def _upsizedFontChanged(self, fontFamily: str, fontSize: int):
+    def _logViewerFontChanged(self, fontFamily: str, fontSize: int):
         fontSettings = FontSettings.new(fontFamily, fontSize)
-        self._entriesChanged.add(ChangedEntry.AppFontSettingsUpsized)
-        self._settingsCopy.fonts.upsized = fontSettings
+        self._entriesChanged.add(ChangedEntry.AppFontSettingsLogViewer)
+        self._settingsCopy.fonts.logViewer = fontSettings
 
-    def _monospacedFontChanged(self, fontFamily: str, fontSize: int):
+    def _menuBarFontChanged(self, fontFamily: str, fontSize: int):
         fontSettings = FontSettings.new(fontFamily, fontSize)
-        self._entriesChanged.add(ChangedEntry.AppFontSettingsMonospaced)
-        self._settingsCopy.fonts.monospaced = fontSettings
-
-    def _emojiFontChanged(self, fontFamily: str, fontSize: int):
-        fontSettings = FontSettings.new(fontFamily, fontSize)
-        self._entriesChanged.add(ChangedEntry.AppFontSettingsEmoji)
-        self._settingsCopy.fonts.emoji = fontSettings
+        self._entriesChanged.add(ChangedEntry.AppFontSettingsMenuBar)
+        self._settingsCopy.fonts.menuBar = fontSettings
 
     def _emojiEnabledChanged(self, value: bool):
-        self._entriesChanged.add(ChangedEntry.AppFontSettingsEmoji)
+        self._entriesChanged.add(ChangedEntry.AppFontSettingsMenuBar)
         self._settingsCopy.fonts.emojiEnabled = value
 
     def _emojiAddSpaceChanged(self, value: bool):
-        self._entriesChanged.add(ChangedEntry.AppFontSettingsEmoji)
+        self._entriesChanged.add(ChangedEntry.AppFontSettingsMenuBar)
         self._settingsCopy.fonts.emojiAddSpace = value
 
     def _liveReloadChanged(self, value: bool):
@@ -156,9 +151,8 @@ class AppSettingsDialog(Dialog):
 
         pane = self.settingsWidget.fontSettingsPane
         pane.standardFontChanged.connect(self._standardFontChanged)
-        pane.upsizedFontChanged.connect(self._upsizedFontChanged)
-        pane.monospacedFontChanged.connect(self._monospacedFontChanged)
-        pane.emojiFontChanged.connect(self._emojiFontChanged)
+        pane.logViewerFontChanged.connect(self._logViewerFontChanged)
+        pane.menuBarFontChanged.connect(self._menuBarFontChanged)
         pane.emojiEnabledChanged.connect(self._emojiEnabledChanged)
         pane.emojiAddSpaceChanged.connect(self._emojiAddSpaceChanged)
 

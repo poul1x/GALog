@@ -108,10 +108,9 @@ class FontSettings(BaseModel):
 
 
 class AppFontsSettings(BaseModel):
-    monospaced: FontSettings
     standard: FontSettings
-    upsized: FontSettings
-    emoji: Optional[FontSettings] = None
+    logViewer: FontSettings
+    menuBar: FontSettings
     emojiAddSpace: bool
     emojiEnabled: bool
 

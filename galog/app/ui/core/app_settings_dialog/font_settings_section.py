@@ -18,10 +18,9 @@ from galog.app.settings.constants import MAX_FONT_SIZE, MIN_FONT_SIZE
 from galog.app.settings import readSettings
 from galog.app.ui.base.widget import Widget
 from galog.app.ui.core.font_manager_dialog import (
-    EmojiFontSelectionDialog,
-    MonospacedFontSelectionDialog,
+    MenuBarFontSelectionDialog,
+    LogViewerFontSelectionDialog,
     StandardFontSelectionDialog,
-    UpsizedFontSelectionDialog,
 )
 
 
@@ -85,9 +84,6 @@ class StandardFontSection(Widget):
     def setValue(self, fontFamily: str, fontSize: int):
         self.fontButton.setText(f"{fontFamily} {fontSize}")
 
-    def setValueNotSet(self):
-        self.fontButton.setText("<Not set>")
-
     def searchAdapter(self):
         return FontSectionSearchAdapter(self)
 
@@ -103,46 +99,29 @@ class FontSectionSearchAdapter(SectionSearchAdapter):
         return self._section
 
 
-class UpsizedFontSection(StandardFontSection):
+class LogViewerFontSection(StandardFontSection):
     def __init__(self, settings: AppSettings, parent: QWidget):
         super().__init__(settings, parent)
-        self.fontLabel.setText("Upsized font")
+        self.fontLabel.setText("Log viewer font")
 
     def _fontSelectionDialog(self):
-        return UpsizedFontSelectionDialog(self._settings, self)
+        return LogViewerFontSelectionDialog(self._settings, self)
 
     def _initValue(self):
-        fontFamily = self._settings.fonts.upsized.family
-        fontSize = self._settings.fonts.upsized.size
+        fontFamily = self._settings.fonts.logViewer.family
+        fontSize = self._settings.fonts.logViewer.size
         self.setValue(fontFamily, fontSize)
 
 
-class MonospacedFontSection(StandardFontSection):
+class MenuBarFontSection(StandardFontSection):
     def __init__(self, settings: AppSettings, parent: QWidget):
         super().__init__(settings, parent)
-        self.fontLabel.setText("Monospaced font")
+        self.fontLabel.setText("Menu bar font")
 
     def _fontSelectionDialog(self):
-        return MonospacedFontSelectionDialog(self._settings, self)
+        return MenuBarFontSelectionDialog(self._settings, self)
 
     def _initValue(self):
-        fontFamily = self._settings.fonts.monospaced.family
-        fontSize = self._settings.fonts.monospaced.size
+        fontFamily = self._settings.fonts.menuBar.family
+        fontSize = self._settings.fonts.menuBar.size
         self.setValue(fontFamily, fontSize)
-
-
-class EmojiFontSection(StandardFontSection):
-    def __init__(self, settings: AppSettings, parent: QWidget):
-        super().__init__(settings, parent)
-        self.fontLabel.setText("Emoji font")
-
-    def _fontSelectionDialog(self):
-        return EmojiFontSelectionDialog(self._settings, self)
-
-    def _initValue(self):
-        if self._settings.fonts.emoji:
-            fontFamily = self._settings.fonts.emoji.family
-            fontSize = self._settings.fonts.emoji.size
-            self.setValue(fontFamily, fontSize)
-        else:
-            self.setValueNotSet()

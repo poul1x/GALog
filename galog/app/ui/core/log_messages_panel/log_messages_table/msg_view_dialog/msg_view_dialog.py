@@ -46,8 +46,8 @@ class LogMessageViewDialog(Dialog):
         self.moveToCenter()
 
     def _setDefaultFont(self, widget: QWidget):
-        family = self._settings.fonts.monospaced.family
-        size = self._settings.fonts.monospaced.size
+        family = self._settings.fonts.logViewer.family
+        size = self._settings.fonts.logViewer.size
         widget.setFont(QFont(family, size))
 
     def _initUserInputHandlers(self):

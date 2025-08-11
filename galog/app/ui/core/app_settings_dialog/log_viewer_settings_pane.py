@@ -23,9 +23,8 @@ from .toggle_section import ToggleSection
 
 from .font_settings_section import (
     StandardFontSection,
-    MonospacedFontSection,
-    EmojiFontSection,
-    UpsizedFontSection,
+    LogViewerFontSection,
+    MenuBarFontSection,
 )
 
 
@@ -58,8 +57,8 @@ class LogViewerSettingsPane(Widget):
         hBoxLayout = QHBoxLayout()
         self.titleLabel = QLabel(self)
         self.titleLabel.setText("Log viewer settings")
-        fontFamily = self._settings.fonts.upsized.family
-        fontSize = self._settings.fonts.upsized.size
+        fontFamily = self._settings.fonts.standard.family
+        fontSize = self._settings.fonts.standard.size - 1
         self.titleLabel.setFont(QFont(fontFamily, fontSize, QFont.Bold))
 
         self.lineFrame = QFrame(self)

@@ -23,17 +23,15 @@ from .toggle_section import ToggleSection
 
 from .font_settings_section import (
     StandardFontSection,
-    MonospacedFontSection,
-    EmojiFontSection,
-    UpsizedFontSection,
+    LogViewerFontSection,
+    MenuBarFontSection,
 )
 
 
 class FontSettingsPane(Widget):
     standardFontChanged = pyqtSignal(str, int)
-    upsizedFontChanged = pyqtSignal(str, int)
-    monospacedFontChanged = pyqtSignal(str, int)
-    emojiFontChanged = pyqtSignal(str, int)
+    logViewerFontChanged = pyqtSignal(str, int)
+    menuBarFontChanged = pyqtSignal(str, int)
     emojiAddSpaceChanged = pyqtSignal(bool)
     emojiEnabledChanged = pyqtSignal(bool)
 
@@ -45,9 +43,8 @@ class FontSettingsPane(Widget):
 
     def _initUserInputHandlers(self):
         self.standardFontSection.fontChanged.connect(self.standardFontChanged.emit)
-        self.upsizedFontSection.fontChanged.connect(self.upsizedFontChanged.emit)
-        self.monospacedFontSection.fontChanged.connect(self.monospacedFontChanged.emit)
-        self.emojiFontSection.fontChanged.connect(self.emojiFontChanged.emit)
+        self.logViewerFontSection.fontChanged.connect(self.logViewerFontChanged.emit)
+        self.menuBarFontSection.fontChanged.connect(self.menuBarFontChanged.emit)
         self.emojiAddSpaceSection.valueChanged.connect(self.emojiAddSpaceChanged.emit)
         self.emojiEnabledSection.valueChanged.connect(self.emojiEnabledChanged.emit)
 
@@ -58,8 +55,8 @@ class FontSettingsPane(Widget):
         hBoxLayout = QHBoxLayout()
         self.titleLabel = QLabel(self)
         self.titleLabel.setText("Font settings")
-        fontFamily = self._settings.fonts.upsized.family
-        fontSize = self._settings.fonts.upsized.size
+        fontFamily = self._settings.fonts.standard.family
+        fontSize = self._settings.fonts.standard.size - 1
         self.titleLabel.setFont(QFont(fontFamily, fontSize, QFont.Bold))
 
         self.lineFrame = QFrame(self)
@@ -71,9 +68,8 @@ class FontSettingsPane(Widget):
         vBoxLayout.addLayout(hBoxLayout)
 
         self.standardFontSection = StandardFontSection(self._settings, self)
-        self.upsizedFontSection = UpsizedFontSection(self._settings, self)
-        self.monospacedFontSection = MonospacedFontSection(self._settings, self)
-        self.emojiFontSection = EmojiFontSection(self._settings, self)
+        self.logViewerFontSection = LogViewerFontSection(self._settings, self)
+        self.menuBarFontSection = MenuBarFontSection(self._settings, self)
 
         self.emojiEnabledSection = ToggleSection(self._settings, self)
         self.emojiEnabledSection.setTitle("Use emoji symbols")
@@ -84,9 +80,8 @@ class FontSettingsPane(Widget):
         self.emojiAddSpaceSection.setValue(self._settings.fonts.emojiAddSpace)
 
         vBoxLayout.addWidget(self.standardFontSection)
-        vBoxLayout.addWidget(self.upsizedFontSection)
-        vBoxLayout.addWidget(self.monospacedFontSection)
-        vBoxLayout.addWidget(self.emojiFontSection)
+        vBoxLayout.addWidget(self.logViewerFontSection)
+        vBoxLayout.addWidget(self.menuBarFontSection)
         vBoxLayout.addWidget(self.emojiEnabledSection)
         vBoxLayout.addWidget(self.emojiAddSpaceSection)
 
@@ -95,9 +90,8 @@ class FontSettingsPane(Widget):
     def searchAdapters(self):
         return [
             self.standardFontSection.searchAdapter(),
-            self.upsizedFontSection.searchAdapter(),
-            self.monospacedFontSection.searchAdapter(),
-            self.emojiFontSection.searchAdapter(),
+            self.logViewerFontSection.searchAdapter(),
+            self.menuBarFontSection.searchAdapter(),
             self.emojiEnabledSection.searchAdapter(),
             self.emojiAddSpaceSection.searchAdapter(),
         ]

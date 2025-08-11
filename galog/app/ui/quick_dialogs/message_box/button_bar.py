@@ -14,7 +14,7 @@ class ButtonBar(Widget):
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
         self._initUserInterface()
-        self._settings = readSettings()
+        self._buttonFont = self.font()
         self._buttonCount = 0
 
     def _initUserInterface(self):
@@ -24,15 +24,17 @@ class ButtonBar(Widget):
         hBoxLayout.setSpacing(0)
         self.setLayout(hBoxLayout)
 
-    def _setDefaultButtonFont(self, button: QPushButton):
-        family = self._settings.fonts.upsized.family
-        size = self._settings.fonts.upsized.size
-        button.setFont(QFont(family, size))
+    def setButtonFont(self, font: QFont):
+        self._buttonFont = font
+
+    def buttonFont(self):
+        return self._buttonFont
+
 
     def addButton(self, name: str):
         buttonId = self._buttonCount
         button = QPushButton(name, self)
-        self._setDefaultButtonFont(button)
+        button.setFont(self._buttonFont)
         button.clicked.connect(lambda: self.buttonClicked.emit(buttonId))
         self.layout().addWidget(button)
         self._buttonCount += 1
