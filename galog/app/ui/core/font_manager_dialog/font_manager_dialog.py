@@ -17,7 +17,7 @@ from .font_preview_pane import FontPreviewPane
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
 
 from ..device_select_dialog import DeviceSelectDialog
-from .button_bar import BottomButtonBar
+from .button_bar import ButtonBar
 from .fonts_list import FontList
 
 
@@ -25,14 +25,10 @@ class FontManagerDialog(Dialog):
 
     fontSelected = pyqtSignal(str, int)
 
-    def __init__(
-        self,
-        settings: AppSettings,
-        parent: Optional[QWidget] = None,
-        objectName: Optional[str] = None,
-    ):
-        super().__init__(parent, objectName)
+    def __init__(self, settings: AppSettings, parent: QWidget):
+        super().__init__(parent)
         self._settings = settings
+        self.setObjectClass("FontManagerDialog")
         self.setWindowFlag(Qt.WindowMaximizeButtonHint, False)
         self.setRelativeGeometry(0.8, 0.6, 800, 600)
         self.setFixedMaxSize(800, 600)
@@ -79,7 +75,7 @@ class FontManagerDialog(Dialog):
 
         self.fontPreviewPane = FontPreviewPane(self)
         self.fontList = FontList(self)
-        self.buttonBar = BottomButtonBar(self)
+        self.buttonBar = ButtonBar(self)
 
         layout.addWidget(self.fontPreviewPane)
         layout.addWidget(self.fontList)

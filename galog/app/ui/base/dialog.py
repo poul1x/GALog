@@ -19,13 +19,15 @@ class Dialog(QDialog):
     def __init__(
         self,
         parent: Optional[QWidget] = None,
-        objectName: Optional[str] = None,
     ):
         super().__init__(parent, self._defaultFlags())
-        self.setObjectName(objectName or self.__class__.__name__)
+        self.setObjectName(self.__class__.__name__)
         self.setAttribute(Qt.WA_StyledBackground)
         self.setWindowTitle("GALog")
         self.setStyle(GALogStyle())
+
+    def setObjectClass(self, className: str):
+        self.setProperty("class", className)
 
     def setFixedMaxSize(self, maxWidth: int, maxHeight: int):
         self.setMaximumWidth(maxWidth)

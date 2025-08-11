@@ -8,7 +8,7 @@ from galog.app.settings import readSettings
 from galog.app.ui.base.widget import Widget
 
 
-class MessageBoxButtonBar(Widget):
+class ButtonBar(Widget):
     buttonClicked = pyqtSignal(int)
 
     def __init__(self, parent: Optional[QWidget] = None) -> None:

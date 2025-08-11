@@ -6,7 +6,7 @@ from galog.app.settings import readSettings
 from galog.app.ui.base.widget import Widget
 
 
-class BottomButtonBar(Widget):
+class ButtonBar(Widget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self._initUserInterface()

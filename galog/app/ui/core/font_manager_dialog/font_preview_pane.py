@@ -49,7 +49,6 @@ class FontPreviewPane(Widget):
     def _fontSizeChanged(self, value: int):
         font = QFont(self.targetFontFamily(), value)
         self.fontPreviewLabel.setFont(font)
-
         height = QFontMetrics(font).height()
         self.fontPreviewLabel.setFixedHeight(height)
 

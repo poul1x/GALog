@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QWidget
 
 class StandardFontSelectionDialog(FontManagerDialog):
     def __init__(self, settings: AppSettings, parent: QWidget):
-        super().__init__(settings, parent, "FontManagerDialog")
+        super().__init__(settings, parent)
         self.setPreviewText("Lorem ipsum dolor sit amet")
         self.setTargetFontFamily(settings.fonts.standard.family)
         self.setTargetFontSize(settings.fonts.standard.size)
@@ -17,7 +17,7 @@ class StandardFontSelectionDialog(FontManagerDialog):
 
 class UpsizedFontSelectionDialog(FontManagerDialog):
     def __init__(self, settings: AppSettings, parent: QWidget):
-        super().__init__(settings, parent, "FontManagerDialog")
+        super().__init__(settings, parent)
         self.setPreviewText("Lorem ipsum dolor sit amet")
         self.setTargetFontFamily(settings.fonts.upsized.family)
         self.setTargetFontSize(settings.fonts.upsized.size)
@@ -25,7 +25,7 @@ class UpsizedFontSelectionDialog(FontManagerDialog):
 
 class MonospacedFontSelectionDialog(FontManagerDialog):
     def __init__(self, settings: AppSettings, parent: QWidget):
-        super().__init__(settings, parent, "FontManagerDialog")
+        super().__init__(settings, parent)
         self.setPreviewText("App 'com.android.settings' is running")
         self.setTargetFontFamily(settings.fonts.monospaced.family)
         self.setTargetFontSize(settings.fonts.monospaced.size)
@@ -39,8 +39,8 @@ class MonospacedFontSelectionDialog(FontManagerDialog):
 
 class EmojiFontSelectionDialog(FontManagerDialog):
     def __init__(self, settings: AppSettings, parent: QWidget):
-        super().__init__(settings, parent, "FontManagerDialog")
-        self.setPreviewText("😂 ❤️ 🔥 🙏 😍 🤣")
+        super().__init__(settings, parent)
+        self.setPreviewText("📱Capture 🛠Tools")
         emojiFont = settings.fonts.emoji
         if emojiFont is not None:
             self.setTargetFontFamily(emojiFont.family)

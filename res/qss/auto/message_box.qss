@@ -1,52 +1,52 @@
 /*
-#MessageBoxHeadTextLabel {
+#HeadTextLabel {
 	border: 1px solid red;
 }
 
-#MessageBoxMainTextLabel {
+#MainTextLabel {
 
 	border: 1px solid green;
 }
 
-#MessageBoxContentArea {
+#ContentArea {
 
 	border: 1px solid blue;
 }
 
-#MessageBoxButtonBar {
+#ButtonBar {
 	border: 1px solid red;
 } */
 
-#MessageBox {
+.MessageBox {
     background-color: #ffffff;
 }
 
-#MessageBoxHeadEmptySpace {
+.MessageBox > #HeadEmptySpace {
 	background-color: #464646;
 	min-height: 30px;
 }
 
-#MessageBoxHeadTextLabel {
+.MessageBox > #HeadTextLabel {
 	font-weight: bold;
 	color: #464646;
 	padding-top: 10px;
 }
 
-#MessageBoxIconLabel {
+.MessageBox > #ContentArea > #IconLabel {
 	margin-left: 15px;
 	margin-right: 15px;
 }
 
-#MessageBoxMainTextLabel {
+.MessageBox > #ContentArea > #MainTextLabel {
 	color: #464646;
     margin-right: 10px;
 }
 
-#MessageBoxButtonBar {
+.MessageBox > #ButtonBar {
 	background: #464646;
 }
 
-#MessageBoxButtonBar > QPushButton {
+.MessageBox > #ButtonBar > QPushButton {
 	color: #000000;
     padding-top: 8px;
     padding-bottom: 8px;
@@ -60,20 +60,20 @@
     border: none;
 }
 
-#MessageBoxButtonBar > QPushButton:disabled {
+.MessageBox > #ButtonBar > QPushButton:disabled {
 	color: #464646
 }
 
-#MessageBoxButtonBar > QPushButton:focus {
+.MessageBox > #ButtonBar > QPushButton:focus {
 	background: #a0c3ff;
 }
 
-#MessageBoxButtonBar > QPushButton:hover {
+.MessageBox > #ButtonBar > QPushButton:hover {
 	background: #739fff;
 	color: white;
 }
 
-#MessageBox > QCheckBox {
+.MessageBox > QCheckBox {
 	font-style: italic;
 	margin-left: 10px;
 	margin-right: 10px;

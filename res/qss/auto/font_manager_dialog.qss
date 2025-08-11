@@ -1,16 +1,16 @@
-#FontManagerDialog {
+.FontManagerDialog {
 	background: #ffffff;
 }
 
-#FontPreviewPane {
+.FontManagerDialog > #FontPreviewPane {
 	background: #eeeeee;
 }
 
-#FontPreviewPane > QLabel {
+.FontManagerDialog > #FontPreviewPane > QLabel {
 	padding: 0px;
 }
 
-#FontPreviewPane > QSpinBox {
+.FontManagerDialog > #FontPreviewPane > QSpinBox {
     selection-background-color: #464646;
 	background-color: white;
     color: #464646;
@@ -18,32 +18,32 @@
 
 /* -------------------------- */
 
-#FontList > QListView {
+.FontManagerDialog > #FontList > QListView {
 	border: none;
 }
 
-#FontList[empty="false"] > QListView {
+.FontManagerDialog > #FontList[empty="false"] > QListView {
     background-image: none;
 }
 
-#FontList[empty="true"] > QListView {
+.FontManagerDialog > #FontList[empty="true"] > QListView {
     background-image: url(res/icons/shrug.svg);
     background-position: center;
     background-repeat: no-repeat;
 }
 
-#FontList > QListView::item:hover
+.FontManagerDialog > #FontList > QListView::item:hover
 {
 	background-color: #f3f3f3;
 }
 
-#FontList > QListView::item:selected
+.FontManagerDialog > #FontList > QListView::item:selected
 {
 	background-color: #464646;
 	color: #ffffff;
 }
 
-#FontList > QLineEdit {
+.FontManagerDialog > #FontList > QLineEdit {
 	background: #eeeeee;
 	padding-top: 5px;
 	padding-bottom: 5px;
@@ -55,11 +55,11 @@
 
 /* -------------------------- */
 
-#FontManagerDialog > #BottomButtonBar {
+.FontManagerDialog > #ButtonBar {
 	background: #464646;
 }
 
-#FontManagerDialog > #BottomButtonBar > QPushButton {
+.FontManagerDialog > #ButtonBar > QPushButton {
 	background: #ffffff;
 	border: none;
 	padding-top: 8px;
@@ -70,25 +70,25 @@
 	margin-bottom: 12px;
 }
 
-#FontManagerDialog > #BottomButtonBar > QPushButton:disabled {
+.FontManagerDialog > #ButtonBar > QPushButton:disabled {
 	color: #464646
 }
 
-#FontManagerDialog > #BottomButtonBar > QPushButton[name="select"] {
+.FontManagerDialog > #ButtonBar > QPushButton[name="select"] {
 	background: #a0c3ff;
 }
 
-#FontManagerDialog > #BottomButtonBar > QPushButton[name="select"]:hover {
+.FontManagerDialog > #ButtonBar > QPushButton[name="select"]:hover {
 	background: #739fff;
 	color: white;
 }
 
-#FontManagerDialog > #BottomButtonBar > QPushButton[name="cancel"] {
+.FontManagerDialog > #ButtonBar > QPushButton[name="cancel"] {
 	background: #f0f0f0;
 	margin-right: 12px;
 }
 
-#FontManagerDialog > #BottomButtonBar > QPushButton[name="cancel"]:hover {
+.FontManagerDialog > #ButtonBar > QPushButton[name="cancel"]:hover {
 	background: #dbdbdb;
 }
 

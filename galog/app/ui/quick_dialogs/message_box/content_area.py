@@ -8,7 +8,7 @@ from galog.app.paths import iconFile
 from galog.app.ui.base.widget import Widget
 
 
-class MessageBoxContentArea(Widget):
+class ContentArea(Widget):
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
         self.initUserInterface()
@@ -18,12 +18,12 @@ class MessageBoxContentArea(Widget):
 
         self.iconLabel = QLabel(self)
         self.iconLabel.setAlignment(Qt.AlignCenter)
-        self.iconLabel.setObjectName("MessageBoxIconLabel")
+        self.iconLabel.setObjectName("IconLabel")
         self.iconLabel.setContentsMargins(0, 0, 0, 0)
         self.setIcon(QIcon(iconFile("msgbox-info")))
 
         self.mainTextLabel = QLabel(self)
-        self.mainTextLabel.setObjectName("MessageBoxMainTextLabel")
+        self.mainTextLabel.setObjectName("MainTextLabel")
         self.mainTextLabel.setWordWrap(True)
         self.mainTextLabel.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
