@@ -19,45 +19,9 @@ QMenu {
 	border: none;
 }
 
-QMenu::item {
-	padding-top: 2px;
-	padding-bottom: 2px;
-	/* padding-left: auto; */
-	padding-right: 50px;
-}
-
 QMenu::item:selected {
 	background: #464646;
 	color: #ffffff;
-}
-
-QMenu QCheckBox {
-	margin: 0px;
-	border: none;
-
-	/* padding-left: auto; */
-	padding-top: 2px;
-	padding-bottom: 2px;
-}
-
-QMenu QCheckBox:hover {
-	background: #464646;
-	color: #ffffff;
-}
-
-QMenu QCheckBox::indicator {
-	background: none;
-	border: none;
-	width: 22px;
-	height: 22px;
-}
-
-QMenu QCheckBox::indicator:checked {
-	background: url(res/icons/checked-black.svg)
-}
-
-QMenu QCheckBox::indicator:checked:hover {
-	background: url(res/icons/checked-white.svg)
 }
 
 QStatusBar {

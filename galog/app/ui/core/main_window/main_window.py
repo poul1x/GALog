@@ -55,8 +55,6 @@ class GALogMainWindow(QMainWindow):
         self.loadFonts()
         self.initUserInterface()
         self.initHighlighting()
-        self.initLeftPaddingForEachMenu()
-        self.increaseHoverAreaForCheckableActions()
         self.subscribeForSettingsChanges()
         self.startAdbServer()
 
@@ -67,7 +65,7 @@ class GALogMainWindow(QMainWindow):
         self.reloadSettings()
         if changedEntry == ChangedEntry.LiveReload:
             liveReload = self._settings.logViewer.liveReload
-            self.logMessagesPanel.setHighlightingEnabled(liveReload)
+            self.logMessagesPanel.setLiveReloadEnabled(liveReload)
             return
 
         if changedEntry == ChangedEntry.ShowLineNumbers:
@@ -168,36 +166,6 @@ class GALogMainWindow(QMainWindow):
             for action in fileMenu.actions():
                 if action.data() == True:
                     action.setEnabled(enabled)
-
-    def getCheckBoxRectWidthWithSpacing(self, checkBox: QCheckBox):
-        return self.getCheckBoxRectWidth(checkBox) + self.getCheckBoxLabelSpacing(checkBox)  # fmt: skip
-
-    def initMenuLeftPadding(self, menu: QMenu):
-        paddingLeft = 30  # default
-        for action in menu.actions():
-            if isinstance(action, QWidgetAction):
-                defaultWidget = action.defaultWidget()
-                if isinstance(defaultWidget, QCheckBox):
-                    paddingLeft = self.getCheckBoxRectWidthWithSpacing(defaultWidget)
-                    break
-
-        menu.setStyleSheet("QMenu::item { padding-left: %dpx; }" % paddingLeft)
-
-    def initLeftPaddingForEachMenu(self):
-        menuBar = self.menuBar()
-        for menu in menuBar.findChildren(QMenu):
-            self.initMenuLeftPadding(menu)
-
-    def increaseHoverAreaForCheckableActions(self):
-        menuBar = self.menuBar()
-        for menu in menuBar.findChildren(QMenu):
-            for action in menu.actions():
-                if isinstance(action, QWidgetAction):
-                    defaultWidget = action.defaultWidget()
-                    if isinstance(defaultWidget, QCheckBox):
-                        # hacky & dirty way to make entire line hoverable
-                        defaultWidget.setText(defaultWidget.text() + " " * 64)
-                        defaultWidget.setStyleSheet("width: 0px;")
 
     def openTagFilter(self):
         dialog = TagFilterDialog(self)
@@ -345,10 +313,12 @@ class GALogMainWindow(QMainWindow):
         if result == StopCaptureDialog.AcceptedStopApp:
             device = self._settings.lastSelectedDevice.serial
             package = self._settings.lastSelectedPackage.name
+
             #
             # Ignore action.failed(), because we want
             # to stop the capture anyway
             #
+
             action = StopAppAction(adbClient(), self)
             action.stopApp(device, package)
 
@@ -358,26 +328,6 @@ class GALogMainWindow(QMainWindow):
     def enableQuickFilter(self):
         if self.logMessagesPanel.hasLogMessages():
             self.logMessagesPanel.enableQuickFilter()
-
-    def toggleLiveReload(self, checkBox: QCheckBox):
-        self.logMessagesPanel.setLiveReloadEnabled(checkBox.isChecked())
-
-    def toggleHighlighting(self, checkBox: QCheckBox):
-        self.logMessagesPanel.setHighlightingEnabled(checkBox.isChecked())
-
-    def toggleShowLineNumbers(self, checkBox: QCheckBox):
-        self.logMessagesPanel.setLineNumbersAlwaysVisible(checkBox.isChecked())
-
-    # def handleInstallApkAction(self):
-    #     device = self.capturePaneController.selectedDevice()
-    #     if device is None:
-    #         msgBrief = "Operation failed"
-    #         msgVerbose = "No device selected (Select device in 'Capture->New' [tmp])"
-    #         showErrorMsgBox(msgBrief, msgVerbose)
-    #         return
-
-    #     controller = InstallAppController()
-    #     controller.promptInstallApp(device)
 
     def openTagFilterAction(self):
         action = QAction("&Tag filter", self)
@@ -463,97 +413,6 @@ class GALogMainWindow(QMainWindow):
         action.setData(False)
         return action
 
-    def getCheckBoxRectWidth(self, checkBox: QCheckBox):
-        option = QStyleOptionButton()
-        option.initFrom(checkBox)
-        style = checkBox.style()
-        rect = style.subElementRect(QStyle.SE_CheckBoxIndicator, option, checkBox)
-        return rect.width()
-
-    def getCheckBoxLabelSpacing(self, checkBox: QCheckBox):
-        return checkBox.style().pixelMetric(
-            QStyle.PM_CheckBoxLabelSpacing, None, checkBox
-        )
-
-    def liveReloadAction(self):
-        action = QWidgetAction(self)
-        checkBox = QCheckBox("Live reload")
-        checkBox.stateChanged.connect(lambda: self.toggleLiveReload(checkBox))
-        checkBox.setChecked(True)
-
-        action.setDefaultWidget(checkBox)
-        action.setStatusTip("Enable/disable log pane reload on app restart")
-        action.setEnabled(True)
-        action.setData(False)
-        return action
-
-    def toggleHighlightingAction(self):
-        action = QWidgetAction(self)
-        checkBox = QCheckBox("Text highlighting")
-        checkBox.stateChanged.connect(lambda: self.toggleHighlighting(checkBox))
-        checkBox.setChecked(True)
-
-        action.setDefaultWidget(checkBox)
-        action.setStatusTip("Enable/disable text highlighting in log messages pane")
-        action.setEnabled(True)
-        action.setData(False)
-        return action
-
-    def showLineNumbersAction(self):
-        action = QWidgetAction(self)
-        checkBox = QCheckBox("Show line numbers")
-        checkBox.stateChanged.connect(lambda: self.toggleShowLineNumbers(checkBox))
-        checkBox.setChecked(False)
-        self.checkBox = checkBox
-
-        action.setDefaultWidget(checkBox)
-        action.setStatusTip("Show/Hide log line numbers")
-        action.setEnabled(True)
-        action.setData(False)
-        return action
-
-    # def installApkAction(self):
-    #     action = QAction("&Install APK", self)
-    #     action.setShortcut("Ctrl+I")
-    #     action.setStatusTip("Install app from APK file")
-    #     action.triggered.connect(self.handleInstallApkAction)
-    #     action.setEnabled(True)
-    #     action.setData(False)
-    #     return action
-
-    def takeScreenshotAction(self):
-        action = QAction("&Take screenshot", self)
-        action.setShortcut("Ctrl+P")
-        action.setStatusTip("Take screenshot")
-        action.triggered.connect(lambda: msgBoxNotImp(self))
-        action.setEnabled(False)
-        action.setData(True)
-        return action
-
-    def rootModeAction(self):
-        action = QAction("&Root mode", self)
-        action.setStatusTip("Enable/disable root mode")
-        action.triggered.connect(lambda: msgBoxNotImp(self))
-        action.setEnabled(True)
-        action.setData(False)
-        return action
-
-    def rebootDeviceAction(self):
-        action = QAction("&Reboot device", self)
-        action.setStatusTip("Reboot device")
-        action.triggered.connect(lambda: msgBoxNotImp(self))
-        action.setEnabled(True)
-        action.setData(False)
-        return action
-
-    def shutdownDeviceAction(self):
-        action = QAction("&Shutdown device", self)
-        action.setStatusTip("Shutdown device")
-        action.triggered.connect(lambda: msgBoxNotImp(self))
-        action.setEnabled(True)
-        action.setData(False)
-        return action
-
     #####
 
     def showFolderInFileExplorer(self, dirPath: str):
@@ -599,10 +458,8 @@ class GALogMainWindow(QMainWindow):
     def setupMenuBar(self):
         menuBar = GALogMenuBar(self)
         self.setMenuBar(menuBar)
-        # menuBar = self.menuBar()
 
         captureMenu = menuBar.addCaptureMenu()
-        # captureMenu = menuBar.addMenu("&Capture")
         captureMenu.addAction(self.showDevicesAction())
         captureMenu.addAction(self.startCaptureAction())
         captureMenu.addAction(self.restartCaptureAction())
@@ -611,13 +468,9 @@ class GALogMainWindow(QMainWindow):
         captureMenu.addAction(self.openLogFileAction())
         captureMenu.addAction(self.saveLogFileAction())
         captureMenu.addAction(self.messageFilterAction())
-        captureMenu.addAction(self.liveReloadAction())
-        captureMenu.addAction(self.toggleHighlightingAction())
-        captureMenu.addAction(self.showLineNumbersAction())
         captureMenu.addAction(self.openTagFilterAction())
 
         captureMenu = menuBar.addToolsMenu()
-        # captureMenu = menuBar.addMenu("&Tools")
         captureMenu.addAction(self.openSettingsAction())
         captureMenu.addAction(self.showAppDataFolderAction())
         captureMenu.addAction(self.showLogsFolderAction())
