@@ -38,14 +38,9 @@ class LogLineDelegate(QStyledItemDelegate):
         self._rowBlinkingAnimation = None
         self._highlightingEnabled = True
         self._highlightingRules = None
-        self._setDefaultFont()
-
-    def _setDefaultFont(self):
-        settings = readSettings()
-        fontSettings = settings.fonts.monospaced
-        self._font = QFont(fontSettings.family, fontSettings.size)
 
     def font(self):
+        assert self._font is not None
         return self._font
 
     def setFont(self, font: QFont):
@@ -137,10 +132,10 @@ class LogLineDelegate(QStyledItemDelegate):
         index: QModelIndex,
     ):
         doc = QTextDocument()
-        doc.setDefaultFont(self._font)
+        doc.setDefaultFont(self.font())
         doc.setProperty("elided", False)
 
-        fm = QFontMetrics(self._font)
+        fm = QFontMetrics(self.font())
         textRect = option.widget.style().subElementRect(
             QStyle.SE_ItemViewItemText, option, option.widget
         )

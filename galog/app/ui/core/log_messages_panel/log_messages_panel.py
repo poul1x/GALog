@@ -393,5 +393,10 @@ class LogMessagesPanel(Widget):
 
     #####
 
+    def setStandardFont(self, font: QFont):
+        for widget in self.findChildren(QWidget):
+            widget.setFont(font)
+            widget.update()
+
     def setLogViewerFont(self, font: QFont):
         self._logMessagesTable.setLogViewerFont(font)

@@ -5,7 +5,7 @@ import tarfile
 from contextlib import suppress
 
 from PyQt5.QtCore import QEvent, QThread, QThreadPool, QUrl
-from PyQt5.QtGui import QDesktopServices, QFontDatabase, QIcon
+from PyQt5.QtGui import QDesktopServices, QFontDatabase, QIcon, QFont
 from PyQt5.QtWidgets import (
     QAction,
     QApplication,
@@ -80,16 +80,16 @@ class GALogMainWindow(QMainWindow):
             self.logMessagesPanel.setHighlightingEnabled(textHighlighting)
             return
 
-        # if changedEntry == ChangedEntry.AppFontSettingsStandard:
-        #     fontFamily = self._settings.fonts.standard.family
-        #     fontSize = self._settings.fonts.standard.size
-        #     self.logMessagesPanel.setStandardFont(fontFamily, fontSize)
-        #     return
+        if changedEntry == ChangedEntry.AppFontSettingsStandard:
+            fontSettings = self._settings.fonts.standard
+            font = QFont(fontSettings.family, fontSettings.size)
+            self.logMessagesPanel.setStandardFont(font)
+            return
 
         if changedEntry == ChangedEntry.AppFontSettingsMonospaced:
-            fontFamily = self._settings.fonts.monospaced.family
-            fontSize = self._settings.fonts.monospaced.size
-            self.logMessagesPanel.setLogViewerFont(fontFamily, fontSize)
+            fontSettings = self._settings.fonts.monospaced
+            font = QFont(fontSettings.family, fontSettings.size)
+            self.logMessagesPanel.setLogViewerFont(font)
             return
 
     def subscribeForSettingsChanges(self):
@@ -644,6 +644,9 @@ class GALogMainWindow(QMainWindow):
 
         self.logMessagesPanel = LogMessagesPanel(self)
         self.logMessagesPanel.captureInterrupted.connect(self.captureInterrupted)
+        fontSettings = self._settings.fonts.monospaced
+        font = QFont(fontSettings.family, fontSettings.size)
+        self.logMessagesPanel.setLogViewerFont(font)
         self.setCentralWidget(self.logMessagesPanel)
 
         self.setWindowTitle("GALog")
