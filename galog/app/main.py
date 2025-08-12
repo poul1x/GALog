@@ -10,45 +10,8 @@ from galog.app.logging import initializeLogging
 from galog.app.paths import styleSheetFiles
 from galog.app.settings.notifier import ChangedEntry, SettingsChangeNotifier
 from galog.app.settings.settings import readSettings
-from galog.app.ui.core.main_window import GALogMainWindow
+from galog.app.ui.core.main_window import MainWindow
 from galog.app.user_data import initializeUserData
-
-
-class GALogApp(QApplication):
-    def __init__(self, argv: List[str]) -> None:
-        super().__init__(argv)
-        self._reloadSettings()
-        self._logger = logging.getLogger(self.__class__.__name__)
-        self._subscribeSettingsChangeEvents()
-        self._loadStyleSheetFiles()
-        self._applyFontSettings()
-
-    def _reloadSettings(self):
-        self._settings = readSettings()
-
-    def _applyFontSettings(self):
-        standardFont = self._settings.fonts.standard
-        font = QFont(standardFont.family, standardFont.size)
-        self.setFont(font)
-
-    def _loadStyleSheetFiles(self):
-        styleSheet = ""
-        for filePath in styleSheetFiles():
-            self._logger.info("Load styleSheet from '%s'", filePath)
-            with open(filePath, "r", encoding="utf-8") as f:
-                styleSheet += f.read() + "\n"
-
-        self.setStyleSheet(styleSheet)
-
-    def _settingsChanged(self, changedEntry: ChangedEntry):
-        self._reloadSettings()
-        if changedEntry == ChangedEntry.AppFontSettingsStandard:
-            self._applyFontSettings()
-
-    def _subscribeSettingsChangeEvents(self):
-        notifier = SettingsChangeNotifier()
-        notifier.settingsChanged.connect(self._settingsChanged)
-
 
 def initializeLoggingOrDie():
     try:
@@ -72,9 +35,9 @@ def initializeUserDataOrDie():
         sys.exit(1)
 
 
-def runGUIApplication(app: GALogApp):
+def runGUIApplication(app: QApplication):
     try:
-        mainWindow = GALogMainWindow()
+        mainWindow = MainWindow()
         mainWindow.show()
         result = app.exec()
 
@@ -94,7 +57,7 @@ def runGUIApplication(app: GALogApp):
 
 
 def runApp():
-    app = GALogApp(sys.argv)
+    app = QApplication(sys.argv)
     initializeUserDataOrDie()
     initializeLoggingOrDie()
     sys.exit(runGUIApplication(app))

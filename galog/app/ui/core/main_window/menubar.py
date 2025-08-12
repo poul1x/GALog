@@ -5,7 +5,7 @@ from galog.app.settings import readSettings
 from galog.app.settings.notifier import ChangedEntry, SettingsChangeNotifier
 
 
-class GALogMenuBar(QMenuBar):
+class MenuBar(QMenuBar):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self._reloadSettings()

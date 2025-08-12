@@ -31,8 +31,9 @@ def _appDataReadOnlyDir():
     if DEPLOYMENT == DeploymentMode.Portable:
         return os.path.abspath(os.curdir)
 
-    for path in _appDataReadOnlyDirs():
-        candidatePath = os.path.join(path, APP_NAME)
+    for dirPath in _appDataReadOnlyDirs():
+        absDirPath = os.path.abspath(dirPath)
+        candidatePath = os.path.join(absDirPath, APP_NAME)
         if os.path.isdir(candidatePath):
             return candidatePath
 

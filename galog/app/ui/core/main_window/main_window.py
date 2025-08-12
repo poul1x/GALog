@@ -11,7 +11,14 @@ from PyQt5.QtWidgets import QAction, QApplication, QMainWindow, QMenu
 from galog.app.device import adbClient
 from galog.app.hrules import HRulesStorage
 from galog.app.msgbox import msgBoxErr, msgBoxInfo, msgBoxPrompt
-from galog.app.paths import appDataDir, appLogsDir, fontFiles, hRulesFiles, iconFile
+from galog.app.paths import (
+    appDataDir,
+    appLogsDir,
+    fontFiles,
+    hRulesFiles,
+    iconFile,
+    styleSheetFiles,
+)
 from galog.app.settings import readSessionSettings, readSettings
 from galog.app.settings.models import RunAppAction, TagFilteringMode
 from galog.app.settings.notifier import ChangedEntry, SettingsChangeNotifier
@@ -29,10 +36,10 @@ from galog.app.ui.quick_dialogs import RestartCaptureDialog
 from galog.app.ui.quick_dialogs.stop_capture_dialog import StopCaptureDialog
 from galog.app.ui.reusable.file_picker import FileExtensionFilterBuilder, FilePicker
 
-from .menubar import GALogMenuBar
+from .menubar import MenuBar
 
 
-class GALogMainWindow(QMainWindow):
+class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.reloadSettings()
@@ -40,6 +47,8 @@ class GALogMainWindow(QMainWindow):
         self.setObjectName("MainWindow")
         self.setStyle(GALogStyle())
         self.loadFonts()
+        self.setDefaultFont()
+        self.loadStyleSheetFiles()
         self.initUserInterface()
         self.initHighlighting()
         self.subscribeForSettingsChanges()
@@ -50,6 +59,11 @@ class GALogMainWindow(QMainWindow):
 
     def reloadSessionSettings(self):
         self._sessionSettings = readSessionSettings()
+
+    def setDefaultFont(self):
+        fontSettings = self._settings.fonts.standard
+        font = QFont(fontSettings.family, fontSettings.size)
+        QApplication.setFont(font)
 
     def _settingsChanged(self, changedEntry: ChangedEntry):
         self.reloadSettings()
@@ -72,6 +86,7 @@ class GALogMainWindow(QMainWindow):
             fontSettings = self._settings.fonts.standard
             font = QFont(fontSettings.family, fontSettings.size)
             self.logMessagesPanel.setStandardFont(font)
+            QApplication.setFont(font)
             return
 
         if changedEntry == ChangedEntry.AppFontSettingsLogViewer:
@@ -117,6 +132,15 @@ class GALogMainWindow(QMainWindow):
         for archive in fontFiles():
             with tarfile.open(archive, "r") as tar:
                 self.loadFontsFromTar(fontDB, tar)
+
+    def loadStyleSheetFiles(self):
+        styleSheet = ""
+        for filePath in styleSheetFiles():
+            # self._logger.info("Load styleSheet from '%s'", filePath)
+            with open(filePath, "r", encoding="utf-8") as f:
+                styleSheet += f.read() + "\n"
+
+        self.setStyleSheet(styleSheet)
 
     def initHighlighting(self):
         rules = HRulesStorage()
@@ -442,7 +466,7 @@ class GALogMainWindow(QMainWindow):
     #####
 
     def setupMenuBar(self):
-        menuBar = GALogMenuBar(self)
+        menuBar = MenuBar(self)
         self.setMenuBar(menuBar)
 
         captureMenu = menuBar.addCaptureMenu()
