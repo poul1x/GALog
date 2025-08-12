@@ -6,7 +6,7 @@ from PyQt5.QtCore import QCoreApplication, QThread
 
 from galog.app.paths import appConfigFile
 
-from .models import AdvancedFilterSettings, AppSettings
+from .models import AdvancedFilterSettings, AppSessionSettings, AppSettings
 
 
 def mainThreadOnly(func):
@@ -24,6 +24,7 @@ def mainThreadOnly(func):
     return wrapper
 
 
+_sessionSettings: Optional[AppSessionSettings] = None
 _settings: Optional[AppSettings] = None
 
 
@@ -33,39 +34,21 @@ def _loadSettingsFromFile():
     with open(configPath, "r") as f:
         settings = AppSettings(**yaml.safe_load(f.read()))
 
-    settings.lastSelectedDevice = None
-    settings.lastSelectedPackage = None
-    settings.advancedFilter = AdvancedFilterSettings.default()
-    settings.lastUsedDirPath = ""
     return settings
 
 
 def _saveSettingsToFile(settings: AppSettings):
-    settingsDict = settings.model_dump(
-        mode="json",
-        exclude={
-            "lastSelectedDevice",
-            "lastSelectedPackage",
-            "advancedFilter",
-            "lastUsedDirPath",
-        },
-    )
-
     configPath = appConfigFile()
     with open(configPath, "w") as f:
+        settingsDict = settings.model_dump(mode="json")
         f.write(yaml.dump(settingsDict, sort_keys=False))
 
 
 @mainThreadOnly
-def reloadSettings():
-    global _settings
-    _settings = _loadSettingsFromFile()
-
-
-@mainThreadOnly
 def readSettings():
+    global _settings
     if _settings is None:
-        reloadSettings()
+        _settings = _loadSettingsFromFile()
 
     assert isinstance(_settings, AppSettings)
     return _settings
@@ -77,4 +60,15 @@ def writeSettings(settings: AppSettings, reload: bool = False):
     _saveSettingsToFile(correctSettings)
 
     if reload:
-        reloadSettings()
+        global _settings
+        _settings = None
+
+
+@mainThreadOnly
+def readSessionSettings():
+    global _sessionSettings
+    if _sessionSettings is None:
+        _sessionSettings = AppSessionSettings.new()
+
+    assert isinstance(_sessionSettings, AppSessionSettings)
+    return _sessionSettings

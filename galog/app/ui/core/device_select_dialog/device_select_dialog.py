@@ -9,7 +9,7 @@ from galog.app.device import DeviceInfo
 from galog.app.device.device import AdbClient
 from galog.app.msgbox import msgBoxErr
 from galog.app.settings.models import LastSelectedDevice
-from galog.app.settings.settings import readSettings, writeSettings
+from galog.app.settings.settings import readSessionSettings, readSettings, writeSettings
 from galog.app.ui.actions.list_devices.action import ListDevicesAction
 from galog.app.ui.base.dialog import Dialog
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
@@ -23,6 +23,7 @@ class DeviceSelectDialog(Dialog):
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self._settings = readSettings()
+        self._sessionSettings = readSessionSettings()
         self._autoSelect = False
         self._autoSelectDone = False
         self.setWindowTitle("Select Device")
@@ -117,10 +118,12 @@ class DeviceSelectDialog(Dialog):
             msgBoxErr(msgBrief, msgVerbose, self)
             return
 
-        self._settings.adbServer.ipAddr = IPv4Address(self.devicesLoadOptions.adbIpAddr())
+        self._settings.adbServer.ipAddr = IPv4Address(
+            self.devicesLoadOptions.adbIpAddr()
+        )
         self._settings.adbServer.port = int(self.devicesLoadOptions.adbPort())
         selectedDevice = LastSelectedDevice.new(serial, displayName)
-        self._settings.lastSelectedDevice = selectedDevice
+        self._sessionSettings.lastSelectedDevice = selectedDevice
         self.accept()
 
     def _refreshDeviceList(self):
@@ -156,8 +159,8 @@ class DeviceSelectDialog(Dialog):
         # Select the first one by default
         #
 
-        if self._settings.lastSelectedDevice is not None:
-            serial = self._settings.lastSelectedDevice.serial
+        if self._sessionSettings.lastSelectedDevice is not None:
+            serial = self._sessionSettings.lastSelectedDevice.serial
             if self.deviceTable.selectDeviceBySerial(serial):
                 return
 

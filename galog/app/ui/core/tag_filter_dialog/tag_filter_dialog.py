@@ -5,7 +5,7 @@ from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QDialog, QHBoxLayout, QVBoxLayout, QWidget
 
 from galog.app.msgbox import msgBoxErr, msgBoxPrompt
-from galog.app.settings import readSettings
+from galog.app.settings import readSettings, readSessionSettings
 from galog.app.settings.models import AdvancedFilterSettings, TagFilteringMode
 from galog.app.ui.actions.read_tags_file import ReadTagsFileAction
 from galog.app.ui.actions.write_tags_file import WriteTagsFileAction
@@ -27,6 +27,7 @@ class TagFilterDialog(Dialog):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self._settings = readSettings()
+        self._sessionSettings = readSessionSettings()
         self._initUserInterface()
         self._initUserInputHandlers()
         self._initFocusPolicy()
@@ -123,7 +124,7 @@ class TagFilterDialog(Dialog):
     def _saveFilteringConfig(self):
         switch = self.filterTypeSwitch
         tagList = self.filteredTagsList
-        self._settings.advancedFilter = AdvancedFilterSettings(
+        self._sessionSettings.advancedFilter = AdvancedFilterSettings(
             mode=switch.filteringMode(),
             tags=tagList.toStringList(),
         )
@@ -131,8 +132,8 @@ class TagFilterDialog(Dialog):
         return switch.filteringMode() != TagFilteringMode.Disabled
 
     def _applyFilteringConfig(self):
-        mode = self._settings.advancedFilter.mode
-        tags = self._settings.advancedFilter.tags
+        mode = self._sessionSettings.advancedFilter.mode
+        tags = self._sessionSettings.advancedFilter.tags
         self.filterTypeSwitch.setFilteringMode(mode)
         self.filteredTagsList.setTags(tags)
         self._updateControlButtonBarState()
@@ -244,12 +245,12 @@ class TagFilterDialog(Dialog):
 
     def _saveLastSelectedDir(self, filePicker: FilePicker):
         if filePicker.hasSelectedDirectory():
-            self._settings.lastUsedDirPath = filePicker.selectedDirectory()
+            self._sessionSettings.lastUsedDirPath = filePicker.selectedDirectory()
 
     def _loadTagsFromFile(self):
         filePicker = FilePicker(
             caption="Load tag list from file",
-            directory=self._settings.lastUsedDirPath,
+            directory=self._sessionSettings.lastUsedDirPath,
             extensionFilter=FileExtensionFilterBuilder.textFile(),
         )
 
@@ -270,7 +271,7 @@ class TagFilterDialog(Dialog):
     def _saveTagsToFile(self):
         filePicker = FilePicker(
             caption="Save tag list to file",
-            directory=self._settings.lastUsedDirPath,
+            directory=self._sessionSettings.lastUsedDirPath,
             extensionFilter=FileExtensionFilterBuilder.textFile(),
         )
 

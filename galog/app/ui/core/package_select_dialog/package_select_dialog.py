@@ -9,7 +9,7 @@ from galog.app.apk_info import APK
 from galog.app.device import adbClient
 from galog.app.msgbox import msgBoxErr, msgBoxPrompt
 from galog.app.settings.models import LastSelectedPackage
-from galog.app.settings.settings import readSettings
+from galog.app.settings.settings import readSettings, readSessionSettings
 from galog.app.ui.actions.install_app.action import InstallAppAction
 from galog.app.ui.actions.list_packages import ListPackagesAction
 from galog.app.ui.base.dialog import Dialog
@@ -25,6 +25,7 @@ class PackageSelectDialog(Dialog):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self._settings = readSettings()
+        self._sessionSettings = readSessionSettings()
         self.setWindowFlag(Qt.WindowMaximizeButtonHint, False)
         self.setWindowTitle("Select Package")
         self.setRelativeGeometry(0.8, 0.6, 800, 600)
@@ -37,8 +38,8 @@ class PackageSelectDialog(Dialog):
         self._refreshSelectedDevice()
 
     def _refreshSelectedDevice(self):
-        assert self._settings.lastSelectedDevice is not None
-        deviceName = self._settings.lastSelectedDevice.displayName
+        assert self._sessionSettings.lastSelectedDevice is not None
+        deviceName = self._sessionSettings.lastSelectedDevice.displayName
         self.packagesLoadOptions.setDeviceName(deviceName)
 
     def keyPressEvent(self, event: QKeyEvent):
@@ -115,8 +116,8 @@ class PackageSelectDialog(Dialog):
         # Select the first one by default
         #
 
-        if self._settings.lastSelectedPackage is not None:
-            packageName = self._settings.lastSelectedPackage.name
+        if self._sessionSettings.lastSelectedPackage is not None:
+            packageName = self._sessionSettings.lastSelectedPackage.name
             if self.packagesList.selectPackageByName(packageName):
                 return
 
@@ -133,7 +134,7 @@ class PackageSelectDialog(Dialog):
         return super().exec_()
 
     def _refreshPackagesList(self):
-        deviceSerial = self._settings.lastSelectedDevice.serial
+        deviceSerial = self._sessionSettings.lastSelectedDevice.serial
         action = ListPackagesAction(adbClient(), self)
         action.setAllowSelectAnotherDevice(True)
 
@@ -188,7 +189,7 @@ class PackageSelectDialog(Dialog):
         if not msgBoxPrompt(msgBrief, prompt, self):
             return
 
-        deviceSerial = self._settings.lastSelectedDevice.serial
+        deviceSerial = self._sessionSettings.lastSelectedDevice.serial
         action = InstallAppAction(adbClient(), self)
         if not action.installApp(deviceSerial, selectedFiles[0]):
             return
@@ -201,7 +202,7 @@ class PackageSelectDialog(Dialog):
         packageName = self.packagesList.selectedPackage(index)
         selectedAction = self.packagesLoadOptions.runAppAction()
         selectedPackage = LastSelectedPackage.new(packageName, selectedAction)
-        self._settings.lastSelectedPackage = selectedPackage
+        self._sessionSettings.lastSelectedPackage = selectedPackage
         self.accept()
 
     def _packageMayBeSelected(self):

@@ -15,7 +15,6 @@ from galog.app.settings import (
     writeSettings,
     AppSettings,
 )
-from galog.app.settings import reloadSettings
 from galog.app.settings.notifier import ChangedEntry, SettingsChangeNotifier
 from galog.app.ui.actions.install_app.action import InstallAppAction
 from galog.app.ui.base.dialog import Dialog

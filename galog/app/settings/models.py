@@ -123,9 +123,21 @@ class LogViewerSettings(BaseModel):
 
 class AppSettings(BaseModel):
     adbServer: AdbServerSettings
-    lastSelectedDevice: Optional[LastSelectedDevice] = None
-    lastSelectedPackage: Optional[LastSelectedPackage] = None
-    advancedFilter: Optional[AdvancedFilterSettings] = None
-    lastUsedDirPath: str = ""
     fonts: AppFontsSettings
     logViewer: LogViewerSettings
+
+
+class AppSessionSettings(BaseModel):
+    lastSelectedDevice: Optional[LastSelectedDevice]
+    lastSelectedPackage: Optional[LastSelectedPackage]
+    advancedFilter: Optional[AdvancedFilterSettings]
+    lastUsedDirPath: str
+
+    @staticmethod
+    def new():
+        return AppSessionSettings(
+            lastSelectedDevice=None,
+            lastSelectedPackage=None,
+            advancedFilter=AdvancedFilterSettings.default(),
+            lastUsedDirPath="",
+        )

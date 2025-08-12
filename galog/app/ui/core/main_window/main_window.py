@@ -25,6 +25,7 @@ from galog.app.paths import appDataDir, appLogsDir, fontFiles, hRulesFiles, icon
 from galog.app.settings import readSettings
 from galog.app.settings.models import RunAppAction, TagFilteringMode
 from galog.app.settings.notifier import ChangedEntry, SettingsChangeNotifier
+from galog.app.settings import readSessionSettings
 from galog.app.ui.actions.get_app_pids import GetAppPidsAction
 from galog.app.ui.actions.restart_app import RestartAppAction
 from galog.app.ui.actions.start_app import StartAppAction
@@ -50,6 +51,7 @@ class GALogMainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.reloadSettings()
+        self.reloadSessionSettings()
         self.setObjectName("MainWindow")
         self.setStyle(GALogStyle())
         self.loadFonts()
@@ -60,6 +62,9 @@ class GALogMainWindow(QMainWindow):
 
     def reloadSettings(self):
         self._settings = readSettings()
+
+    def reloadSessionSettings(self):
+        self._sessionSettings = readSessionSettings()
 
     def _settingsChanged(self, changedEntry: ChangedEntry):
         self.reloadSettings()
@@ -175,7 +180,7 @@ class GALogMainWindow(QMainWindow):
         if dialog.exec_() == TagFilterDialog.Rejected:
             return
 
-        tagFilter = self._settings.advancedFilter
+        tagFilter = self._sessionSettings.advancedFilter
         if tagFilter.mode == TagFilteringMode.ShowMatching:
             self.logMessagesPanel.advancedFilterApply(lambda tag: tag in tagFilter.tags)
         elif tagFilter.mode == TagFilteringMode.HideMatching:
@@ -196,7 +201,7 @@ class GALogMainWindow(QMainWindow):
             msgBoxErr(msgBrief, msgVerbose, self)
             return
 
-        if self._settings.lastSelectedDevice is None:
+        if self._sessionSettings.lastSelectedDevice is None:
             deviceSelectPane = DeviceSelectDialog(self)
             deviceSelectPane.setDeviceAutoSelect(True)
             if deviceSelectPane.exec_() == DeviceSelectDialog.Rejected:
@@ -213,8 +218,8 @@ class GALogMainWindow(QMainWindow):
         if packageSelectDialog.exec_() == PackageSelectDialog.Rejected:
             return
 
-        device = self._settings.lastSelectedDevice.serial
-        package = self._settings.lastSelectedPackage.name
+        device = self._sessionSettings.lastSelectedDevice.serial
+        package = self._sessionSettings.lastSelectedPackage.name
 
         action = GetAppPidsAction(adbClient())
         action.setLoadingDialogText("Retrieving app state...")
@@ -229,7 +234,7 @@ class GALogMainWindow(QMainWindow):
         self.logMessagesPanel.clearLogLines()
         self.logMessagesPanel.startCapture(device, package, pids)
 
-        _action = self._settings.lastSelectedPackage.action
+        _action = self._sessionSettings.lastSelectedPackage.action
         if _action != RunAppAction.DoNotStartApp:
             action = StartAppAction(adbClient(), self)
             action.startApp(device, package)
@@ -246,12 +251,12 @@ class GALogMainWindow(QMainWindow):
 
     def _saveLastSelectedDir(self, filePicker: FilePicker):
         if filePicker.hasSelectedDirectory():
-            self._settings.lastUsedDirPath = filePicker.selectedDirectory()
+            self._sessionSettings.lastUsedDirPath = filePicker.selectedDirectory()
 
     def saveLogFile(self):
         filePicker = FilePicker(
             caption="Save log lines to file",
-            directory=self._settings.lastUsedDirPath,
+            directory=self._sessionSettings.lastUsedDirPath,
             extensionFilter=FileExtensionFilterBuilder.logFile(),
         )
 
@@ -271,7 +276,7 @@ class GALogMainWindow(QMainWindow):
 
         filePicker = FilePicker(
             caption="Load log lines from file",
-            directory=self._settings.lastUsedDirPath,
+            directory=self._sessionSettings.lastUsedDirPath,
             extensionFilter=FileExtensionFilterBuilder.logFile(),
         )
 
@@ -290,9 +295,9 @@ class GALogMainWindow(QMainWindow):
         if dialog.exec_() == RestartCaptureDialog.Rejected:
             return
 
-        assert self._settings.lastSelectedDevice is not None
-        device = self._settings.lastSelectedDevice.serial
-        package = self._settings.lastSelectedPackage.name
+        assert self._sessionSettings.lastSelectedDevice is not None
+        device = self._sessionSettings.lastSelectedDevice.serial
+        package = self._sessionSettings.lastSelectedPackage.name
         # mode = settings.lastSelectedPackage.action
 
         self.logMessagesPanel.stopCapture()
@@ -311,8 +316,8 @@ class GALogMainWindow(QMainWindow):
             return
 
         if result == StopCaptureDialog.AcceptedStopApp:
-            device = self._settings.lastSelectedDevice.serial
-            package = self._settings.lastSelectedPackage.name
+            device = self._sessionSettings.lastSelectedDevice.serial
+            package = self._sessionSettings.lastSelectedPackage.name
 
             #
             # Ignore action.failed(), because we want

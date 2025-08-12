@@ -1,8 +1,8 @@
-from .settings import AppSettings, readSettings, writeSettings, reloadSettings
+from .settings import AppSettings, readSettings, writeSettings, readSessionSettings
 
 __all__ = [
     "AppSettings",
     "readSettings",
+    "readSessionSettings",
     "writeSettings",
-    "reloadSettings",
 ]
