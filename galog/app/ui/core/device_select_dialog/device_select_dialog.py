@@ -9,7 +9,7 @@ from galog.app.device import DeviceInfo
 from galog.app.device.device import AdbClient
 from galog.app.msgbox import msgBoxErr
 from galog.app.settings.models import LastSelectedDevice
-from galog.app.settings.settings import readSessionSettings, readSettings, writeSettings
+from galog.app.settings.settings import readSessionSettings, readSettings
 from galog.app.ui.actions.list_devices.action import ListDevicesAction
 from galog.app.ui.base.dialog import Dialog
 from galog.app.ui.helpers.hotkeys import HotkeyHelper

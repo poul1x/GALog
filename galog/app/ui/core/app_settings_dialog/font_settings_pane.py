@@ -1,31 +1,16 @@
-from typing import Callable
-from PyQt5.QtCore import QRegExp, Qt, pyqtSignal
-from PyQt5.QtGui import QFocusEvent, QIcon, QRegExpValidator, QFont, QFontMetrics
-from PyQt5.QtWidgets import (
-    QVBoxLayout,
-    QHBoxLayout,
-    QLabel,
-    QLineEdit,
-    QPushButton,
-    QWidget,
-    QSpinBox,
-    QTextEdit,
-    QSizePolicy,
-    QFrame,
-)
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
 
-from galog.app.paths import iconFile
-from galog.app.settings.constants import MAX_FONT_SIZE, MIN_FONT_SIZE
-from galog.app.settings import readSettings
 from galog.app.settings import AppSettings
 from galog.app.ui.base.widget import Widget
-from .toggle_section import ToggleSection
 
 from .font_settings_section import (
-    StandardFontSection,
     LogViewerFontSection,
     MenuBarFontSection,
+    StandardFontSection,
 )
+from .toggle_section import ToggleSection
 
 
 class FontSettingsPane(Widget):

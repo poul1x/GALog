@@ -1,7 +1,6 @@
-from typing import List, Optional
-from PyQt5.QtCore import QEvent, pyqtSignal, QObject
-from PyQt5.QtWidgets import QApplication
 from enum import Enum, auto
+
+from PyQt5.QtCore import QObject, pyqtSignal
 
 
 class ChangedEntry(int, Enum):
@@ -20,10 +19,12 @@ class ChangedEntry(int, Enum):
 
 def singleton(class_):
     instances = {}
+
     def getinstance(*args, **kwargs):
         if class_ not in instances:
             instances[class_] = class_(*args, **kwargs)
         return instances[class_]
+
     return getinstance
 
 

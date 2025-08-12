@@ -2,7 +2,14 @@ from copy import deepcopy
 from typing import Optional
 
 from PyQt5.QtCore import QSize, Qt, QTimer
-from PyQt5.QtGui import QColor, QGuiApplication, QIcon, QTextCharFormat, QTextCursor, QFont
+from PyQt5.QtGui import (
+    QColor,
+    QFont,
+    QGuiApplication,
+    QIcon,
+    QTextCharFormat,
+    QTextCursor,
+)
 from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,

@@ -1,12 +1,12 @@
 from functools import wraps
-from typing import List, Optional
+from typing import Optional
 
 import yaml
 from PyQt5.QtCore import QCoreApplication, QThread
 
 from galog.app.paths import appConfigFile
 
-from .models import AdvancedFilterSettings, AppSessionSettings, AppSettings
+from .models import AppSessionSettings, AppSettings
 
 
 def mainThreadOnly(func):

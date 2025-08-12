@@ -1,10 +1,11 @@
 from typing import List
 
-from galog.app.settings.models import FontSettings
-from galog.app.settings import AppSettings
-from .font_manager_dialog import FontManagerDialog
 from PyQt5.QtGui import QFont, QFontInfo
 from PyQt5.QtWidgets import QWidget
+
+from galog.app.settings import AppSettings
+
+from .font_manager_dialog import FontManagerDialog
 
 
 class StandardFontSelectionDialog(FontManagerDialog):

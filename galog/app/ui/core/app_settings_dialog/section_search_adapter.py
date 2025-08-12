@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+
 from PyQt5.QtWidgets import QWidget
+
 
 class SectionSearchAdapter(ABC):
     @abstractmethod
@@ -9,4 +11,3 @@ class SectionSearchAdapter(ABC):
     @abstractmethod
     def value(self) -> QWidget:
         pass
-

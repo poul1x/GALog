@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from PyQt5.QtCore import QModelIndex, QRectF, Qt, QThreadPool, QObject
+from PyQt5.QtCore import QModelIndex, QObject, QRectF, Qt, QThreadPool
 from PyQt5.QtGui import (
     QFont,
     QFontMetrics,
@@ -13,8 +13,6 @@ from PyQt5.QtGui import (
 from PyQt5.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem
 
 from galog.app.hrules import HRulesStorage
-from galog.app.settings.notifier import ChangedEntry, SettingsChangeNotifier
-from galog.app.settings.settings import readSettings
 from galog.app.ui.core.log_messages_panel.log_messages_table.colors import (
     logLevelColor,
     rowSelectedColor,

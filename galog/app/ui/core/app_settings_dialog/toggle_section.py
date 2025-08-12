@@ -1,31 +1,13 @@
-from typing import Callable
-from PyQt5.QtCore import QRegExp, Qt, pyqtSignal
-from PyQt5.QtGui import QFocusEvent, QIcon, QRegExpValidator, QFont, QFontMetrics
-from PyQt5.QtWidgets import (
-    QHBoxLayout,
-    QLabel,
-    QLineEdit,
-    QPushButton,
-    QWidget,
-    QSpinBox,
-    QTextEdit,
-)
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QHBoxLayout, QLabel, QPushButton, QWidget
 
-from galog.app.paths import iconFile
-from galog.app.settings.constants import MAX_FONT_SIZE, MIN_FONT_SIZE
-from galog.app.settings import readSettings
 from galog.app.settings import AppSettings
 from galog.app.ui.base.widget import Widget
+
 from .section_search_adapter import SectionSearchAdapter
-from galog.app.ui.core.font_manager_dialog import (
-    MenuBarFontSelectionDialog,
-    LogViewerFontSelectionDialog,
-    StandardFontSelectionDialog,
-)
 
 
 class ToggleSection(Widget):
-
     valueChanged = pyqtSignal(bool)
 
     def __init__(self, settings: AppSettings, parent: QWidget):
@@ -49,7 +31,7 @@ class ToggleSection(Widget):
 
     def _initUserInterface(self):
         layout = QHBoxLayout()
-        layout.setContentsMargins(0,0,0,0)
+        layout.setContentsMargins(0, 0, 0, 0)
         alignLeft = Qt.AlignLeft | Qt.AlignVCenter
         alignRight = Qt.AlignRight | Qt.AlignVCenter
 
@@ -88,4 +70,3 @@ class ToggleSectionSearchAdapter(SectionSearchAdapter):
 
     def value(self):
         return self._section
-

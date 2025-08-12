@@ -1,10 +1,8 @@
 from enum import Enum, auto
 
-from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QSizePolicy, QWidget
 
-from galog.app.settings import readSettings
 from galog.app.ui.base.widget import Widget
 
 

@@ -3,8 +3,8 @@ import sys
 import traceback
 from typing import List
 
-from PyQt5.QtWidgets import QApplication, QMessageBox, QWidget
 from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QApplication, QMessageBox
 
 from galog.app.logging import initializeLogging
 from galog.app.paths import styleSheetFiles

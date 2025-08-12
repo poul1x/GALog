@@ -1,22 +1,30 @@
 from typing import Callable, List, Optional
 
-from PyQt5.QtCore import QModelIndex, QPoint, QSortFilterProxyModel, Qt, pyqtSignal
+from PyQt5.QtCore import (
+    QModelIndex,
+    QPoint,
+    QRect,
+    QSize,
+    QSortFilterProxyModel,
+    Qt,
+    pyqtSignal,
+)
 from PyQt5.QtGui import (
+    QColor,
+    QFont,
     QFontMetrics,
     QKeyEvent,
     QMouseEvent,
+    QPainter,
     QResizeEvent,
-    QStandardItemModel,
-    QFont,
 )
 from PyQt5.QtWidgets import QAction, QHeaderView, QMenu, QTableView, QWidget
 
 from galog.app.hrules.hrules import HRulesStorage
 from galog.app.log_reader.models import LogLine
-from galog.app.settings import readSettings
-from galog.app.settings.notifier import ChangedEntry, SettingsChangeNotifier
 from galog.app.ui.base.table_view import QTableView, TableView
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
+from galog.app.ui.helpers.painter import painterSaveRestore
 from galog.app.ui.reusable.fn_filter_model import FnFilterModel
 from galog.app.ui.reusable.regexp_filter_model import RegExpFilterModel
 
@@ -24,15 +32,6 @@ from .data_model import Column, DataModel
 from .log_line_delegate import LogLineDelegate
 from .msg_view_dialog import LogMessageViewDialog
 from .navigation_frame import NavigationFrame
-
-from typing import Optional
-
-from PyQt5.QtCore import QRect, QSize, Qt
-from PyQt5.QtGui import QColor, QFont, QFontMetrics, QPainter
-from PyQt5.QtWidgets import QHeaderView, QWidget
-
-from galog.app.settings import readSettings
-from galog.app.ui.helpers.painter import painterSaveRestore
 
 
 class VerticalHeader(QHeaderView):
@@ -187,7 +186,6 @@ class LogMessagesTable(TableView):
         self.setStyleSheet(self.styleSheet())
 
     def _refreshBackgroundIfHasResults(self):
-
         #
         # Handle situation when initially filter has no results,
         # but new matching log line appeared later

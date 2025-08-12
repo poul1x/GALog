@@ -1,32 +1,21 @@
-from enum import Enum, auto
-from typing import Callable, List
-from zipfile import BadZipFile
+from typing import List
 
-from PyQt5.QtCore import QModelIndex, Qt
-from PyQt5.QtGui import QKeyEvent, QFontDatabase, QFontMetrics, QFont
-from PyQt5.QtWidgets import QFileDialog, QVBoxLayout, QWidget, QScrollArea, QSizePolicy
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtWidgets import QScrollArea, QSizePolicy, QVBoxLayout, QWidget
 
-from galog.app.apk_info import APK
-from galog.app.device import adbClient
-from galog.app.msgbox import msgBoxErr, msgBoxPrompt
+from galog.app.settings import AppSettings, readSettings, writeSettings
 from galog.app.settings.models import FontSettings
-from galog.app.settings import (
-    readSettings,
-    writeSettings,
-    AppSettings,
-)
 from galog.app.settings.notifier import ChangedEntry, SettingsChangeNotifier
-from galog.app.ui.actions.install_app.action import InstallAppAction
 from galog.app.ui.base.dialog import Dialog
 from galog.app.ui.base.widget import Widget
-from galog.app.ui.reusable.search_input import SearchInput
-from .section_search_adapter import SectionSearchAdapter
-from .font_settings_pane import FontSettingsPane
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
+from galog.app.ui.reusable.search_input import SearchInput
 
-from ..device_select_dialog import DeviceSelectDialog
 from .button_bar import BottomButtonBar
+from .font_settings_pane import FontSettingsPane
 from .log_viewer_settings_pane import LogViewerSettingsPane
+from .section_search_adapter import SectionSearchAdapter
 
 
 class SettingsWidget(Widget):

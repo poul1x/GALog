@@ -2,7 +2,6 @@ from enum import Enum, auto
 from typing import Optional
 
 from PyQt5.QtCore import QItemSelectionModel, QModelIndex, Qt
-from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QHBoxLayout,

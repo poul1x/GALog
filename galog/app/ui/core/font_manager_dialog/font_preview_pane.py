@@ -1,17 +1,7 @@
-from typing import Callable
-from PyQt5.QtCore import QRegExp, Qt
-from PyQt5.QtGui import QFocusEvent, QIcon, QRegExpValidator, QFont, QFontMetrics
-from PyQt5.QtWidgets import (
-    QHBoxLayout,
-    QLabel,
-    QLineEdit,
-    QPushButton,
-    QWidget,
-    QSpinBox,
-    QTextEdit,
-)
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont, QFontMetrics
+from PyQt5.QtWidgets import QHBoxLayout, QLabel, QSpinBox, QWidget
 
-from galog.app.paths import iconFile
 from galog.app.settings.constants import MAX_FONT_SIZE, MIN_FONT_SIZE
 from galog.app.ui.base.widget import Widget
 

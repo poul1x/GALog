@@ -16,7 +16,6 @@ from galog.app.ui.reusable.search_input import SearchInput
 
 
 class FontList(Widget):
-
     currentFontChanged = pyqtSignal(str)
 
     def __init__(self, parent: QWidget):

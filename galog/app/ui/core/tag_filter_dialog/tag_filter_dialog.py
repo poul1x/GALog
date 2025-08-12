@@ -5,7 +5,7 @@ from PyQt5.QtGui import QKeyEvent
 from PyQt5.QtWidgets import QDialog, QHBoxLayout, QVBoxLayout, QWidget
 
 from galog.app.msgbox import msgBoxErr, msgBoxPrompt
-from galog.app.settings import readSettings, readSessionSettings
+from galog.app.settings import readSessionSettings, readSettings
 from galog.app.settings.models import AdvancedFilterSettings, TagFilteringMode
 from galog.app.ui.actions.read_tags_file import ReadTagsFileAction
 from galog.app.ui.actions.write_tags_file import WriteTagsFileAction

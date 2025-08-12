@@ -1,9 +1,8 @@
 from enum import Enum, auto
 from typing import Optional
 
-from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QPushButton, QWidget, QSizePolicy
+from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QPushButton, QSizePolicy, QWidget
 
 from galog.app.ui.base.widget import Widget
 from galog.app.ui.reusable.search_input import SearchInput

@@ -9,7 +9,7 @@ from galog.app.apk_info import APK
 from galog.app.device import adbClient
 from galog.app.msgbox import msgBoxErr, msgBoxPrompt
 from galog.app.settings.models import LastSelectedPackage
-from galog.app.settings.settings import readSettings, readSessionSettings
+from galog.app.settings.settings import readSessionSettings, readSettings
 from galog.app.ui.actions.install_app.action import InstallAppAction
 from galog.app.ui.actions.list_packages import ListPackagesAction
 from galog.app.ui.base.dialog import Dialog

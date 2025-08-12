@@ -1,7 +1,7 @@
 from typing import Callable, List, Optional
 
 from PyQt5.QtCore import QPoint, Qt, pyqtSignal
-from PyQt5.QtGui import QFocusEvent, QGuiApplication, QFont
+from PyQt5.QtGui import QFocusEvent, QFont, QGuiApplication
 from PyQt5.QtWidgets import QVBoxLayout, QWidget
 
 from galog.app.device.device import adbClient
@@ -12,8 +12,6 @@ from galog.app.log_reader import (
     ProcessEndedEvent,
     ProcessStartedEvent,
 )
-from galog.app.settings.notifier import ChangedEntry, SettingsChangeNotifier
-from galog.app.settings import readSettings
 from galog.app.ui.actions.read_log_file import ReadLogFileAction
 from galog.app.ui.actions.write_log_file import WriteLogFileAction
 from galog.app.ui.base.item_view_proxy import ScrollHint

@@ -1,28 +1,19 @@
-from enum import Enum, auto
-from typing import Callable, List, Optional
-from zipfile import BadZipFile
+from typing import List
 
 from PyQt5.QtCore import QModelIndex, Qt, pyqtSignal
-from PyQt5.QtGui import QKeyEvent, QFontDatabase, QFontMetrics, QFont
-from PyQt5.QtWidgets import QFileDialog, QVBoxLayout, QWidget
+from PyQt5.QtGui import QFontDatabase, QKeyEvent
+from PyQt5.QtWidgets import QVBoxLayout, QWidget
 
-from galog.app.apk_info import APK
-from galog.app.device import adbClient
-from galog.app.msgbox import msgBoxErr, msgBoxPrompt
-from galog.app.settings.models import FontSettings
-from galog.app.settings.settings import readSettings, writeSettings, AppSettings
-from galog.app.ui.actions.install_app.action import InstallAppAction
+from galog.app.settings.settings import AppSettings
 from galog.app.ui.base.dialog import Dialog
-from .font_preview_pane import FontPreviewPane
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
 
-from ..device_select_dialog import DeviceSelectDialog
 from .button_bar import ButtonBar
+from .font_preview_pane import FontPreviewPane
 from .fonts_list import FontList
 
 
 class FontManagerDialog(Dialog):
-
     fontSelected = pyqtSignal(str, int)
 
     def __init__(self, settings: AppSettings, parent: QWidget):

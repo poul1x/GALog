@@ -1,7 +1,7 @@
 from typing import Optional
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QCheckBox, QLabel, QVBoxLayout, QWidget
 
 from galog.app.settings import readSettings
@@ -25,7 +25,6 @@ class MessageBox(Dialog):
         return self._checkBox
 
     def setCheckBox(self, checkBox: QCheckBox):
-
         #
         # First, own the checkBox,
         # overriding its parent
