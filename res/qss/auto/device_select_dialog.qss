@@ -4,24 +4,24 @@
 
 /* Adb Server Settings -------------------------- */
 
-#DeviceSelectDialog > #DevicesLoadOptions {
+#DevicesLoadOptions {
 	background: #eeeeee;
 	padding-top: 20px;
 	padding-bottom: 20px;
 }
 
-#DeviceSelectDialog > #DevicesLoadOptions > QLineEdit {
+#DevicesLoadOptions > QLineEdit {
 	border: 2px solid black;
 	border-radius: 0px;
 }
 
-#DeviceSelectDialog > #DevicesLoadOptions > QLabel {
+#DevicesLoadOptions > QLabel {
 	font-weight: bold;
 }
 
 /* Reload Button -------------------------- */
 
-#DeviceSelectDialog > #DevicesLoadOptions > QPushButton[name="reload"] {
+#DevicesLoadOptions > QPushButton[name="reload"] {
 	background: #ffffff;
 	border: 1px solid #464646;
 	padding-top: 2px;
@@ -30,13 +30,13 @@
 	padding-right: 10px;
 }
 
-#DeviceSelectDialog > #DevicesLoadOptions > QPushButton[name="reload"]:hover {
+#DevicesLoadOptions > QPushButton[name="reload"]:hover {
 	background: #dddddd;
 }
 
 /* Device Table -------------------------- */
 
-#DeviceSelectDialog > #DeviceTable > QTableView > QHeaderView::section:horizontal {
+#DeviceTable > QTableView > QHeaderView::section:horizontal {
     background-color: #464646;
     color: #f5f5f5;
     border: none;
@@ -46,8 +46,8 @@
     min-height: 30px;
 }
 
-#DeviceSelectDialog > #DeviceTable > QTableView {
-    background: white;
+#DeviceTable > QTableView {
+    background-color: white;
     border: none;
 }
 
@@ -67,36 +67,20 @@
     background-repeat: no-repeat;
 }
 
-
-#SettingsWidget {
-	background-color: #ffffff;
-}
-
-#SettingsWidget[hasResults="true"] {
-    background-image: none;
-}
-
-#SettingsWidget[hasResults="false"] {
-    background-image: url(res/images/no-results.png);
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-
-#DeviceSelectDialog > #DeviceTable > QTableView::item:hover
+#DeviceTable > QTableView::item:hover
 {
 	/* background-color: #f3f3f3; */
 	/* Do not hover cells -> just use white (no hover) */
 	background-color: #ffffff;
 }
 
-#DeviceSelectDialog > #DeviceTable > QTableView::item:selected
+#DeviceTable > QTableView::item:selected
 {
 	background-color: #767676;
 	color: #ffffff;
 }
 
-#DeviceSelectDialog > #DeviceTable > QLineEdit {
+#DeviceTable > QLineEdit {
 	background: #eeeeee;
 	padding-top: 5px;
 	padding-bottom: 5px;
