@@ -1,5 +1,4 @@
 -r requirements-base.txt
-pyqt5-tools~=5.0
 pyqt5-stubs~=5.0
 black~=23.0
 autoflake~=2.0

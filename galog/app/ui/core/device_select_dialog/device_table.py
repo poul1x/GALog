@@ -143,10 +143,6 @@ class DeviceTable(Widget):
         vHeader = self.tableView.verticalHeader()
         vHeader.setVisible(False)
 
-        font = QFont("Roboto")
-        font.setPixelSize(19)
-        self.tableView.setFont(font)
-
         hHeader = self.tableView.horizontalHeader()
         hHeader.setSectionResizeMode(Columns.serial, QHeaderView.Interactive)
         hHeader.setSectionResizeMode(Columns.displayName, QHeaderView.Interactive)
@@ -165,10 +161,10 @@ class DeviceTable(Widget):
         hBoxLayout = QHBoxLayout()
         hBoxLayout.setContentsMargins(0, 0, 0, 0)
         self.searchInput = SearchInput(self)
-        self.searchInput.textChanged.connect(self.onSearchContentChanged)
-        hBoxLayout.addWidget(self.searchInput, 1)
         self.searchInput.setPlaceholderText("Search device by name or serial")
+        self.searchInput.textChanged.connect(self._searchContentChanged)
         self.searchInput.textChanged.connect(self._applySpans)
+        hBoxLayout.addWidget(self.searchInput, 1)
 
         vBoxLayout = QVBoxLayout()
         vBoxLayout.addWidget(self.tableView)
@@ -177,11 +173,19 @@ class DeviceTable(Widget):
         vBoxLayout.setSpacing(0)
         self.setLayout(vBoxLayout)
 
-    def onSearchContentChanged(self, query: str):
+    def _refreshBackground(self):
+        filterModel = self.filterModel
+        hasResults = "true" if filterModel.hasResults() else "false"
+        self.setProperty("hasResults", hasResults)
+        self.refreshStyleSheet()
+
+    def _searchContentChanged(self, query: str):
         self.filterModel.setFilterFixedString(query)
-        if self.filterModel.rowCount() > 0:
+        if self.filterModel.hasResults():
             proxyIndex = self.filterModel.index(0, 0)
             self.selectRowByIndex(proxyIndex)
+
+        self._refreshBackground()
 
     def trySetFocusAndGoUp(self):
         self.tableView.trySetFocusAndGoUp()

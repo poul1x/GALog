@@ -1,73 +1,59 @@
 import os
-import sys
-import random
-import logging
-from datetime import datetime
 from typing import Callable
 
 from PyQt5.QtCore import QStandardPaths
 
-# Initialize pseudorandom sequences
-random.seed(datetime.now().timestamp())
-
-
-def randomDigit():
-    return str(random.randint(0, 9))
-
-
-def randomChar():
-    return random.choice("abcdefghijklmnopqrstuvwxyz")
-
-
-def _generateSessionId():
-    return "{}-{}".format(
-        datetime.now().replace(microsecond=0).isoformat().replace(":", "-"),
-        randomChar() + randomDigit() + randomChar() + randomDigit(),
-    )
-
-
-if not sys.argv[0].endswith(".py"):
-    os.chdir(os.path.dirname(sys.argv[0]))
+from .bootstrap import (
+    APP_SESSION_ID,
+    FONTS_DIR_NAME,
+    HRULES_DIR_NAME,
+    ICONS_DIR_NAME,
+    IMAGES_DIR_NAME,
+    LOGGING_CONFIG_FILE,
+    LOGGING_DIR_NAME,
+    MAIN_CONFIG_FILE,
+    QSS_DIR_NAME,
+    RES_DIR_NAME,
+)
 
 
 def _appDataRootDir():
-    path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
-    return os.path.normpath(path)
+    return QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
 
+
+def _appConfigRootDir():
+    return QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)
 
 
 _APP_NAME = "galog"
-_APP_SESSION_ID = _generateSessionId()
 _APP_DATA_DIR = os.path.join(_appDataRootDir(), _APP_NAME)
-_LOG = logging.getLogger("Paths")
+_APP_RES_DIR = os.path.join(_APP_DATA_DIR, RES_DIR_NAME)
+# _APP_RES_DIR = os.path.join(".", RES_DIR_NAME)
+_APP_CONFIG_DIR = os.path.join(_appConfigRootDir(), _APP_NAME)
 
 
-def resDirPath(*args: str):
-    return os.path.join("res", *args)
+def _resDirJoin(*args: str):
+    return os.path.join(_APP_RES_DIR, *args)
 
 
-def _appDataRelativePath(*args: str):
+def _configDirJoin(*args: str):
+    return os.path.join(_APP_CONFIG_DIR, *args)
+
+
+def _appDataDirJoin(*args: str):
     return os.path.join(_APP_DATA_DIR, *args)
 
 
 def styleSheetFile(name: str):
-    return resDirPath("qss", "manual", name + ".qss")
+    return _resDirJoin(QSS_DIR_NAME, "manual", name + ".qss")
 
 
 def iconFile(name: str):
-    return resDirPath("icons", name + ".svg")
+    return _resDirJoin(ICONS_DIR_NAME, name + ".svg")
 
 
 def imageFile(name: str):
-    return resDirPath("images", name + ".png")
-
-
-def loggingConfigFileInitial():
-    return resDirPath("logging", "logging.yaml")
-
-
-def loggingConfigFile():
-    return _appDataRelativePath("config", "logging.yaml")
+    return _resDirJoin(IMAGES_DIR_NAME, name + ".png")
 
 
 def dirFilesRecursive(path: str, fnFilter: Callable[[str], bool]):
@@ -81,46 +67,58 @@ def dirFilesRecursive(path: str, fnFilter: Callable[[str], bool]):
     return result
 
 
-def highlightingFiles():
+def hRulesFiles():
     return dirFilesRecursive(
-        resDirPath("highlighting"),
+        _configDirJoin(HRULES_DIR_NAME),
         lambda path: path.endswith(".yaml"),
     )
 
 
 def styleSheetFiles():
     return dirFilesRecursive(
-        resDirPath("qss", "auto"),
+        _resDirJoin(QSS_DIR_NAME, "auto"),
         lambda path: path.endswith(".qss"),
     )
 
 
 def fontFiles():
     return dirFilesRecursive(
-        resDirPath("fonts"),
+        _resDirJoin(FONTS_DIR_NAME),
         lambda path: path.endswith(".tar.xz"),
     )
-
-
-def appName():
-    return _APP_NAME
 
 
 def appDataDir():
     return _APP_DATA_DIR
 
 
+def appConfigDir():
+    return _APP_CONFIG_DIR
+
+
+def appResDir():
+    return _APP_RES_DIR
+
+
+def appConfigFile():
+    return _configDirJoin(MAIN_CONFIG_FILE)
+
+
+def hRulesDir():
+    return _configDirJoin(HRULES_DIR_NAME)
+
+
+def loggingConfigFile():
+    return _configDirJoin(LOGGING_CONFIG_FILE)
+
+
+def loggingConfigFile():
+    return _configDirJoin(LOGGING_CONFIG_FILE)
+
+
 def appLogsRootDir():
-    return os.path.join(_APP_DATA_DIR, "logs")
+    return _appDataDirJoin(LOGGING_DIR_NAME)
 
 
 def appLogsDir():
-    return os.path.join(_APP_DATA_DIR, "logs", _APP_SESSION_ID)
-
-
-def appSessionID():
-    return _APP_SESSION_ID
-
-
-def appConfigDir():
-    return os.path.join(_APP_DATA_DIR, "config")
+    return _appDataDirJoin(LOGGING_DIR_NAME, APP_SESSION_ID)

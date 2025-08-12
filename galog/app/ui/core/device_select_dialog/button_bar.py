@@ -1,15 +1,17 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QSizePolicy, QWidget
+from PyQt5.QtGui import QFont
+
+from galog.app.settings import readSettings
+from galog.app.ui.base.widget import Widget
 
 
-class ButtonBar(QWidget):
+class BottomButtonBar(Widget):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
-        self.setObjectName("BottomButtonBar")
-        self.setAttribute(Qt.WA_StyledBackground)
-        self.initUserInterface()
+        self._initUserInterface()
 
-    def initUserInterface(self):
+    def _initUserInterface(self):
         layout = QHBoxLayout()
         layout.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         layout.setContentsMargins(0, 0, 0, 0)

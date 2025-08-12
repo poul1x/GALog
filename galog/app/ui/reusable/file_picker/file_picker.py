@@ -80,6 +80,7 @@ class FilePicker:
         return filePath
 
     def selectedDirectory(self):
+        assert self._lastSelectedDir is not None
         return self._lastSelectedDir
 
     def hasSelectedDirectory(self):

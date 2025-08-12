@@ -9,9 +9,6 @@
 #PackagesLoadOptions QComboBox {
 	border: 1px solid black;
 	border-radius: 0px;
-
-	font-family: Roboto;
-	font-size: 19px;
 }
 
 #PackagesLoadOptions QComboBox::drop-down {
@@ -35,15 +32,10 @@
 }
 
 #PackagesLoadOptions QLabel {
-	font-family: Roboto;
-	font-size: 19px;
 	font-weight: bold;
 }
 
 #PackagesLoadOptions QPushButton {
-	font-family: Roboto;
-	font-family: Roboto;
-	font-size: 20px;
 	background: #ffffff;
 	border: 1px solid #464646;
 	padding-top: 2px;
@@ -61,17 +53,21 @@
 /* -------------------------- */
 
 #PackagesList > QListView {
-	font-family: Roboto;
-	font-size: 20px;
 	border: none;
 }
 
-#PackagesList[empty="false"] > QListView {
+#PackagesList[empty="false"][hasResults="true"] > QListView {
     background-image: none;
 }
 
+#PackagesList[empty="false"][hasResults="false"] > QListView {
+    background-image: url(res/images/no-results.png);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 #PackagesList[empty="true"] > QListView {
-    background-image: url(res/icons/shrug.svg);
+    background-image: url(res/images/shrug.svg);
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -88,8 +84,6 @@
 }
 
 #PackagesList > QLineEdit {
-	font-family: Roboto;
-    font-size: 20px;
 	background: #eeeeee;
 	padding-top: 5px;
 	padding-bottom: 5px;
@@ -101,13 +95,11 @@
 
 /* -------------------------- */
 
-#CapturePaneButtonBar {
+#PackageSelectDialog > #BottomButtonBar {
 	background: #464646;
 }
 
-#CapturePaneButtonBar QPushButton {
-	font-family: Roboto;
-	font-size: 20px;
+#PackageSelectDialog > #BottomButtonBar > QPushButton {
 	background: #ffffff;
 	border: none;
 	padding-top: 8px;
@@ -116,33 +108,33 @@
 	padding-right: 20px;
 }
 
-#CapturePaneButtonBar QPushButton:disabled {
+#PackageSelectDialog > #BottomButtonBar > QPushButton:disabled {
 	color: #464646
 }
 
-#CapturePaneButtonBar QPushButton[name="select"] {
+#PackageSelectDialog > #BottomButtonBar > QPushButton[name="select"] {
 	background: #a0c3ff;
 }
 
-#CapturePaneButtonBar QPushButton[name="select"]:hover {
+#PackageSelectDialog > #BottomButtonBar > QPushButton[name="select"]:hover {
 	background: #739fff;
 	color: white;
 }
 
-#CapturePaneButtonBar QPushButton[name="fromAPK"] {
+#PackageSelectDialog > #BottomButtonBar > QPushButton[name="fromAPK"] {
 	background: #c8dcff;
 }
 
-#CapturePaneButtonBar QPushButton[name="fromAPK"]:hover {
+#PackageSelectDialog > #BottomButtonBar > QPushButton[name="fromAPK"]:hover {
 	background: #739fff;
 	color: white;
 }
 
-#CapturePaneButtonBar QPushButton[name="cancel"] {
+#PackageSelectDialog > #BottomButtonBar > QPushButton[name="cancel"] {
 	background: #f0f0f0;
 }
 
-#CapturePaneButtonBar QPushButton[name="cancel"]:hover {
+#PackageSelectDialog > #BottomButtonBar > QPushButton[name="cancel"]:hover {
 	background: #dbdbdb;
 }
 

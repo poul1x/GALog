@@ -1,11 +1,10 @@
 from typing import Callable, List, Optional
 
 from PyQt5.QtCore import QPoint, Qt, pyqtSignal
-from PyQt5.QtGui import QFocusEvent, QGuiApplication
+from PyQt5.QtGui import QFocusEvent, QGuiApplication, QFont
 from PyQt5.QtWidgets import QVBoxLayout, QWidget
 
-from galog.app.app_state import AppState
-from galog.app.device.device import AdbClient
+from galog.app.device.device import adbClient
 from galog.app.hrules import HRulesStorage
 from galog.app.log_reader import (
     AndroidAppLogReader,
@@ -13,7 +12,8 @@ from galog.app.log_reader import (
     ProcessEndedEvent,
     ProcessStartedEvent,
 )
-from galog.app.ui.actions.get_app_pids import GetAppPidsAction
+from galog.app.settings.notifier import ChangedEntry, SettingsChangeNotifier
+from galog.app.settings import readSettings
 from galog.app.ui.actions.read_log_file import ReadLogFileAction
 from galog.app.ui.actions.write_log_file import WriteLogFileAction
 from galog.app.ui.base.item_view_proxy import ScrollHint
@@ -48,13 +48,12 @@ class RowBackup:
 class LogMessagesPanel(Widget):
     captureInterrupted = pyqtSignal(str, str)
 
-    def __init__(self, appState: AppState, parent: Optional[QWidget] = None):
+    def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self._initUserInterface()
         self._initUserInputHandlers()
         self._initCustomContextMenu()
         self._initFocusPolicy()
-        self._appState = appState
         self._liveReload = True
         self._logReader = None
         self._lineNumbersAlwaysVisible = False
@@ -100,12 +99,6 @@ class LogMessagesPanel(Widget):
     def setHighlightingRules(self, hrules: HRulesStorage):
         self._logMessagesTable.setHighlightingRules(hrules)
 
-    def _adbClient(self):
-        return AdbClient(
-            self._appState.adb.ipAddr,
-            int(self._appState.adb.port),
-        )
-
     def _addAppStateLogLine(self, app: str, pids: List[str]):
         if pids:
             msg = f"App '{app}' is running. PID(s): {', '.join(pids)}"
@@ -116,7 +109,7 @@ class LogMessagesPanel(Widget):
 
     def startCapture(self, device: str, package: str, pids: List[str]):
         self._addAppStateLogLine(package, pids)
-        self._logReader = AndroidAppLogReader(self._adbClient(), device, package, pids)
+        self._logReader = AndroidAppLogReader(adbClient(), device, package, pids)
         self._logReader.signals.failed.connect(self._logReaderFailed)
         self._logReader.signals.appStarted.connect(self._appStarted)
         self._logReader.signals.appEnded.connect(self._appEnded)
@@ -168,9 +161,6 @@ class LogMessagesPanel(Widget):
 
     def clearLogLines(self):
         self._logMessagesTable.clearLogLines()
-
-    def setWhiteBackground(self):
-        self._logMessagesTable.setWhiteBackground()
 
     def setHighlightingEnabled(self, enabled: bool):
         self._logMessagesTable.setHighlightingEnabled(enabled)
@@ -397,3 +387,13 @@ class LogMessagesPanel(Widget):
     def _initCustomContextMenu(self):
         self._logMessagesTable.setContextMenuPolicy(Qt.CustomContextMenu)
         self._logMessagesTable.customContextMenuRequested.connect(self._contextMenuExec)  # fmt: skip
+
+    #####
+
+    def setStandardFont(self, font: QFont):
+        for widget in self.findChildren(QWidget):
+            widget.setFont(font)
+            widget.update()
+
+    def setLogViewerFont(self, font: QFont):
+        self._logMessagesTable.setLogViewerFont(font)

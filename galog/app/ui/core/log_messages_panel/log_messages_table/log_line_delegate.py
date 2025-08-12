@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 
-from PyQt5.QtCore import QModelIndex, QRectF, Qt, QThreadPool
+from PyQt5.QtCore import QModelIndex, QRectF, Qt, QThreadPool, QObject
 from PyQt5.QtGui import (
     QFont,
     QFontMetrics,
@@ -13,6 +13,8 @@ from PyQt5.QtGui import (
 from PyQt5.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem
 
 from galog.app.hrules import HRulesStorage
+from galog.app.settings.notifier import ChangedEntry, SettingsChangeNotifier
+from galog.app.settings.settings import readSettings
 from galog.app.ui.core.log_messages_panel.log_messages_table.colors import (
     logLevelColor,
     rowSelectedColor,
@@ -31,18 +33,18 @@ from .row_blinking_animation import RowBlinkingAnimation
 class LogLineDelegate(QStyledItemDelegate):
     _highlightingEnabled: bool
 
-    def __init__(self, parent=None):
+    def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
         self._rowBlinkingAnimation = None
         self._highlightingEnabled = True
         self._highlightingRules = None
-        self._initFont()
+
+    def font(self):
+        assert self._font is not None
+        return self._font
 
     def setFont(self, font: QFont):
         self._font = font
-
-    def font(self):
-        return self._font
 
     def highlightingRules(self):
         return self._highlightingRules
@@ -55,11 +57,6 @@ class LogLineDelegate(QStyledItemDelegate):
 
     def highlightingEnabled(self):
         return self._highlightingEnabled
-
-    def _initFont(self):
-        self._font = QFont()
-        self._font.setFamily("Roboto Mono")
-        self._font.setPixelSize(20)
 
     def _applyLogMessageHighlighting(self, doc: QTextDocument, index: QModelIndex):
         if index.column() != Column.logMessage:
@@ -135,10 +132,10 @@ class LogLineDelegate(QStyledItemDelegate):
         index: QModelIndex,
     ):
         doc = QTextDocument()
-        doc.setDefaultFont(self._font)
+        doc.setDefaultFont(self.font())
         doc.setProperty("elided", False)
 
-        fm = QFontMetrics(self._font)
+        fm = QFontMetrics(self.font())
         textRect = option.widget.style().subElementRect(
             QStyle.SE_ItemViewItemText, option, option.widget
         )

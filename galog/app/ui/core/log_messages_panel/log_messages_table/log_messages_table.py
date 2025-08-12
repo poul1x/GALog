@@ -7,11 +7,14 @@ from PyQt5.QtGui import (
     QMouseEvent,
     QResizeEvent,
     QStandardItemModel,
+    QFont,
 )
 from PyQt5.QtWidgets import QAction, QHeaderView, QMenu, QTableView, QWidget
 
 from galog.app.hrules.hrules import HRulesStorage
 from galog.app.log_reader.models import LogLine
+from galog.app.settings import readSettings
+from galog.app.settings.notifier import ChangedEntry, SettingsChangeNotifier
 from galog.app.ui.base.table_view import QTableView, TableView
 from galog.app.ui.helpers.hotkeys import HotkeyHelper
 from galog.app.ui.reusable.fn_filter_model import FnFilterModel
@@ -21,7 +24,58 @@ from .data_model import Column, DataModel
 from .log_line_delegate import LogLineDelegate
 from .msg_view_dialog import LogMessageViewDialog
 from .navigation_frame import NavigationFrame
-from .vertical_header import VerticalHeader
+
+from typing import Optional
+
+from PyQt5.QtCore import QRect, QSize, Qt
+from PyQt5.QtGui import QColor, QFont, QFontMetrics, QPainter
+from PyQt5.QtWidgets import QHeaderView, QWidget
+
+from galog.app.settings import readSettings
+from galog.app.ui.helpers.painter import painterSaveRestore
+
+
+class VerticalHeader(QHeaderView):
+    def __init__(self, parent: Optional[QWidget] = None):
+        super().__init__(Qt.Vertical, parent)
+        self.setSectionResizeMode(QHeaderView.Fixed)
+
+    def refreshSectionSize(self):
+        height = QFontMetrics(self._font).height()
+        height += 6  # vertical padding
+        self.setMinimumSectionSize(height)
+        self.setDefaultSectionSize(height)
+
+    def setFont(self, font: QFont):
+        self._font = font
+        self.refreshSectionSize()
+
+    def font(self):
+        return self._font
+
+    def _selectedRows(self):
+        return [index.row() for index in self.selectionModel().selectedRows()]
+
+    def paintSection(self, _painter: QPainter, rect: QRect, index: int):
+        align = Qt.AlignCenter
+        lightColor = QColor("#FFFFFF")
+        darkColor = QColor("#464646")
+
+        with painterSaveRestore(_painter) as painter:
+            if index in self._selectedRows():
+                painter.fillRect(rect, darkColor)
+                painter.setPen(lightColor)
+            else:
+                painter.fillRect(rect, lightColor)
+                painter.setPen(darkColor)
+
+            painter.setFont(self._font)
+            painter.drawText(rect, align, str(index + 1))
+
+    def sizeHint(self) -> QSize:
+        fm = QFontMetrics(self._font)
+        rowNum = self.model().rowCount()
+        return QSize(fm.width(str(rowNum)) + 5, 0)
 
 
 class LogMessagesTable(TableView):
@@ -70,6 +124,17 @@ class LogMessagesTable(TableView):
         self._initUserInputHandlers()
         self._scrolling = True
 
+    def setLogViewerFont(self, font: QFont):
+        boldFont = QFont(font)
+        boldFont.setWeight(QFont.Bold)
+        vHeader: VerticalHeader = self.verticalHeader()
+        vHeader.setFont(boldFont)
+        self._delegate.setFont(font)
+        self._refreshVisibleIndexes()
+
+    def logViewerFont(self):
+        return self._delegate.font()
+
     def contextMenuExec(self, position: QPoint, canJumpBack: bool):
         index = self.indexAt(position)
         if not index.isValid():
@@ -104,16 +169,44 @@ class LogMessagesTable(TableView):
     def _topModel(self) -> QSortFilterProxyModel:
         return self._quickFilterModel
 
-    def _bottomModel(self) -> QStandardItemModel:
-        return self._dataModel
-
     def _initUserInputHandlers(self):
         self._topModel().rowsAboutToBeInserted.connect(self._beforeRowInserted)
         self._topModel().rowsInserted.connect(self._afterRowInserted)
+        self._dataModel.rowsInserted.connect(self._rowsInserted)
         self._navigationFrame.upArrowButton.clicked.connect(self._navScrollTop)  # fmt: skip
         self._navigationFrame.downArrowButton.clicked.connect(self._navScrollBottom)  # fmt: skip
         self.requestShowLineDetails.connect(self._rowActivated)
         self.rowActivated.connect(self._rowActivated)
+
+    def _refreshBackground(self):
+        quickFilterModel = self._quickFilterModel
+        quickFilter = "on" if quickFilterModel.filteringEnabled() else "off"
+        hasResults = "true" if quickFilterModel.hasResults() else "false"
+        self.setProperty("hasResults", hasResults)
+        self.setProperty("quickFilter", quickFilter)
+        self.setStyleSheet(self.styleSheet())
+
+    def _refreshBackgroundIfHasResults(self):
+
+        #
+        # Handle situation when initially filter has no results,
+        # but new matching log line appeared later
+        #
+
+        if not self._quickFilterModel.filteringEnabled():
+            return
+
+        if not self._quickFilterModel.hasResults():
+            return
+
+        if not self.property("hasResults") == "false":
+            return
+
+        self.setProperty("hasResults", "true")
+        self.setStyleSheet(self.styleSheet())
+
+    def _rowsInserted(self, parent: QModelIndex, first: int, last: int):
+        self._refreshBackgroundIfHasResults()
 
     def _initDataModel(self):
         self._dataModel = DataModel()
@@ -132,15 +225,8 @@ class LogMessagesTable(TableView):
         self.setTabKeyNavigation(False)
         self.setShowGrid(False)
 
-        font = self._delegate.font()
-        height = QFontMetrics(font).height()
-        height += 5  # vertical padding
-
         vHeader = VerticalHeader(self)
         vHeader.setVisible(False)
-        vHeader.setSectionResizeMode(QHeaderView.Fixed)
-        vHeader.setMinimumSectionSize(height)
-        vHeader.setDefaultSectionSize(height)
         self.setVerticalHeader(vHeader)
 
         hHeader = self.horizontalHeader()
@@ -197,9 +283,6 @@ class LogMessagesTable(TableView):
         bottomRight = self.indexAt(viewportRect.bottomRight())
         self._topModel().dataChanged.emit(topLeft, bottomRight)
 
-    def setWhiteBackground(self):
-        self.setStyleSheet("background: white;")
-
     #####
 
     def logLineCount(self):
@@ -237,11 +320,13 @@ class LogMessagesTable(TableView):
     def quickFilterApply(self, column: Column, filterText: str):
         self._quickFilterModel.setFilterKeyColumn(column.value)
         self._quickFilterModel.setFilterFixedString(filterText)
+        self._refreshBackground()
         self.selectRow(0)
 
     def quickFilterReset(self):
         self._quickFilterModel.setFilterKeyColumn(Column.logMessage.value)
         self._quickFilterModel.setFilterFixedString("")
+        self._refreshBackground()
         self.selectRow(0)
 
     def quickFilterEnabled(self):
@@ -251,6 +336,7 @@ class LogMessagesTable(TableView):
         self.reset()
         self._quickFilterModel.setFilteringEnabled(enabled)
         self._navigationFrame.updateGeometry()
+        self._refreshBackground()
 
     #####
 

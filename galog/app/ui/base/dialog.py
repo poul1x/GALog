@@ -19,13 +19,15 @@ class Dialog(QDialog):
     def __init__(
         self,
         parent: Optional[QWidget] = None,
-        objectName: Optional[str] = None,
     ):
         super().__init__(parent, self._defaultFlags())
-        self.setObjectName(objectName or self.__class__.__name__)
+        self.setObjectName(self.__class__.__name__)
         self.setAttribute(Qt.WA_StyledBackground)
         self.setWindowTitle("GALog")
         self.setStyle(GALogStyle())
+
+    def setObjectClass(self, className: str):
+        self.setProperty("class", className)
 
     def setFixedMaxSize(self, maxWidth: int, maxHeight: int):
         self.setMaximumWidth(maxWidth)
@@ -41,11 +43,21 @@ class Dialog(QDialog):
                 return widget
         return None
 
+    def _searchDialogOrMainWindow(self, widget: QWidget):
+        while widget is not None:
+            if isinstance(widget, (QDialog, QMainWindow)):
+                break
+
+            widget = widget.parent()
+
+        return widget
+
     def _parentGeometry(self):
         parent = self.parent()
         if parent is not None:
-            assert isinstance(parent, (QDialog, QMainWindow))
-            return parent.frameGeometry()
+            suitableParent = self._searchDialogOrMainWindow(parent)
+            assert suitableParent is not None, "parent is not a dialog or main window"
+            return suitableParent.frameGeometry()
         else:
             mainWindow = self._findMainWindow()
             assert mainWindow is not None

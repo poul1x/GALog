@@ -3,8 +3,6 @@
 }
 
 #TagFilterDialog > #FilterTypeSwitch > QWidget {
-	font-family: Roboto;
-	font-size: 19px;
 }
 
 #TagFilterDialog > #FilterTypeSwitch > QComboBox {
@@ -45,8 +43,6 @@
 #TagFilterDialog > #TagNameInput {
 	border: 2px solid #464646;
 	border-bottom: none;
-	font-family: Roboto;
-	font-size: 20px;
     padding-top: 2px;
     padding-bottom: 4px;
     selection-background-color: #464646;
@@ -54,8 +50,6 @@
 }
 
 #TagFilterDialog > QListView {
-	font-family: Roboto;
-	font-size: 20px;
 	border: 2px solid #464646;
 }
 
@@ -72,8 +66,6 @@
 /* ---------------------------------------- */
 
 #TagFilterDialog > #ControlButtonBar > QPushButton {
-	font-family: Roboto;
-	font-size: 20px;
 	color: #000000;
 	background: #ffffff;
     border: 2px solid #464646;
@@ -99,19 +91,19 @@
 }
 
 #TagFilterDialog > #BottomButtonBar > QPushButton {
-	font-family: Roboto;
-	font-size: 22px;
 	color: #000000;
     padding-top: 8px;
     padding-bottom: 8px;
-    padding-left: 30px;
-    padding-right: 30px;
+    padding-left: 20px;
+    padding-right: 20px;
     margin-top: 16px;
     margin-bottom: 16px;
-	margin-right: 10px;
-	margin-left: 0px;
 	background: #c8dcff;
     border: none;
+}
+
+#TagFilterDialog > #BottomButtonBar > QPushButton[name="cancel"] {
+	margin-right: 12px;
 }
 
 #TagFilterDialog > #BottomButtonBar > QPushButton:disabled {

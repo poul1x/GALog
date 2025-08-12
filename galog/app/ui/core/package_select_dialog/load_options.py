@@ -2,8 +2,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QLabel, QPushButton, QWidget
 
-from galog.app.app_state import RunAppAction
 from galog.app.paths import iconFile
+from galog.app.settings.models import RunAppAction
 
 
 class PackagesLoadOptions(QWidget):

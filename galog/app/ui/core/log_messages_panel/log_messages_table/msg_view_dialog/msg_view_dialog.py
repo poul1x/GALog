@@ -2,7 +2,7 @@ from copy import deepcopy
 from typing import Optional
 
 from PyQt5.QtCore import QSize, Qt, QTimer
-from PyQt5.QtGui import QColor, QGuiApplication, QIcon, QTextCharFormat, QTextCursor
+from PyQt5.QtGui import QColor, QGuiApplication, QIcon, QTextCharFormat, QTextCursor, QFont
 from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import (
 from galog.app.hrules import HRulesStorage
 from galog.app.log_reader import LogLine
 from galog.app.paths import iconFile, styleSheetFile
+from galog.app.settings import readSettings
 from galog.app.ui.base.dialog import Dialog
 
 from ..colors import logLevelColor, logLevelColorDarker
@@ -35,6 +36,7 @@ class LogMessageViewDialog(Dialog):
 
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
+        self._settings = readSettings()
         self._initUserInterface()
         self._initUserInputHandlers()
         self._loadStyleSheetTemplate()
@@ -42,6 +44,11 @@ class LogMessageViewDialog(Dialog):
         self.setRelativeGeometry(0.8, 0.8, 900, 600)
         self.setFixedMinSize(500, 400)
         self.moveToCenter()
+
+    def _setDefaultFont(self, widget: QWidget):
+        family = self._settings.fonts.logViewer.family
+        size = self._settings.fonts.logViewer.size
+        widget.setFont(QFont(family, size))
 
     def _initUserInputHandlers(self):
         self._copyButton.clicked.connect(self._copyButtonClicked)
@@ -61,6 +68,7 @@ class LogMessageViewDialog(Dialog):
 
     def _initUserInterface(self):
         self._logLevelLabel = QLabel()
+        self._setDefaultFont(self._logLevelLabel)
         self._logLevelLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self._logLevelLabel.setFixedWidth(300)
         self._logLevelLabel.setTextInteractionFlags(
@@ -68,12 +76,14 @@ class LogMessageViewDialog(Dialog):
         )
 
         self._tagNameLabel = QLabel()
+        self._setDefaultFont(self._tagNameLabel)
         self._tagNameLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self._tagNameLabel.setTextInteractionFlags(
             Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard
         )
 
         self._copyButton = QPushButton()
+        self._setDefaultFont(self._copyButton)
         self._copyButton.setIcon(QIcon(iconFile("copy")))
         self._copyButton.setText("Copy contents")
         self._copyButton.setFixedWidth(220)
@@ -94,6 +104,7 @@ class LogMessageViewDialog(Dialog):
         hBoxLayout.addLayout(hRightBoxLayout)
 
         self._logMsgTextBrowser = QTextBrowser()
+        self._setDefaultFont(self._logMsgTextBrowser)
         self._logMsgTextBrowser.setOpenExternalLinks(True)
         self._logMsgTextBrowser.setReadOnly(True)
 

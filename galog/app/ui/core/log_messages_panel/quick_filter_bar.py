@@ -1,8 +1,9 @@
 from enum import Enum, auto
 from typing import Optional
 
+from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QPushButton, QWidget
+from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QPushButton, QWidget, QSizePolicy
 
 from galog.app.ui.base.widget import Widget
 from galog.app.ui.reusable.search_input import SearchInput
@@ -33,16 +34,25 @@ class QuickFilterBar(Widget):
         self._searchByDropdown.setFocusPolicy(Qt.NoFocus)
         self._searchInput.setFocusPolicy(Qt.StrongFocus)
 
+    def _filterFieldChanged(self, index: int):
+        filterField = FilterField(index)
+        if filterField == FilterField.Message:
+            self._searchInput.setPlaceholderText("Search message")
+        elif filterField == FilterField.Tag:
+            self._searchInput.setPlaceholderText("Filter messages by tag")
+        else:  # LogLevel
+            self._searchInput.setPlaceholderText("Filter messages by log level")
+
     def _initUserInputHandlers(self):
         self._searchInput.arrowUpPressed.connect(lambda: self.arrowUpPressed.emit())
         self._searchInput.arrowDownPressed.connect(lambda: self.arrowDownPressed.emit())
         self._searchInput.escapePressed.connect(lambda: self.escapePressed.emit())
         self._searchInput.returnPressed.connect(self._startSearch)
         self._startSearchButton.clicked.connect(self._startSearch)
+        self._searchByDropdown.currentIndexChanged.connect(self._filterFieldChanged)
 
     def _initUserInterface(self):
         self._searchInput = SearchInput(self)
-        self._searchInput.setPlaceholderText("Search message")
         self.setFocusProxy(self._searchInput)
 
         self._searchByDropdown = QComboBox(self)
@@ -52,11 +62,15 @@ class QuickFilterBar(Widget):
 
         self._startSearchButton = QPushButton(self)
         self._startSearchButton.setText("Search")
+        self._startSearchButton.setSizePolicy(
+            QSizePolicy.Expanding,
+            QSizePolicy.Expanding,
+        )
 
         layout = QHBoxLayout()
+        layout.setSpacing(6)
+        layout.setContentsMargins(10, 10, 10, 10)
         layout.setAlignment(Qt.AlignVCenter)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
 
         layout.addWidget(self._searchInput, 1)
         layout.addWidget(self._searchByDropdown)
@@ -69,4 +83,5 @@ class QuickFilterBar(Widget):
 
     def reset(self):
         self._searchByDropdown.setCurrentIndex(FilterField.Message.value)
+        self._filterFieldChanged(FilterField.Message.value)
         self._searchInput.clear()
