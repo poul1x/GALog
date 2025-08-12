@@ -24,7 +24,12 @@ from galog.app.paths import (
 
 
 def _appDataReadOnlyDirs():
-    return QStandardPaths.standardLocations(QStandardPaths.AppDataLocation)
+    return [
+        os.path.abspath(path)
+        for path in QStandardPaths.standardLocations(
+            QStandardPaths.AppDataLocation,
+        )
+    ]
 
 
 def _appDataReadOnlyDir():
@@ -32,8 +37,7 @@ def _appDataReadOnlyDir():
         return os.path.abspath(os.curdir)
 
     for dirPath in _appDataReadOnlyDirs():
-        absDirPath = os.path.abspath(dirPath)
-        candidatePath = os.path.join(absDirPath, APP_NAME)
+        candidatePath = os.path.join(dirPath, APP_NAME)
         if os.path.isdir(candidatePath):
             return candidatePath
 

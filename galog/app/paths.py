@@ -18,11 +18,15 @@ from .bootstrap import (
 
 
 def _appDataRootDir():
-    return QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+    return os.path.abspath(
+        QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+    )
 
 
 def _appConfigRootDir():
-    return QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)
+    return os.path.abspath(
+        QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)
+    )
 
 
 _APP_NAME = "galog"
