@@ -14,7 +14,12 @@ class GALogMenuBar(QMenuBar):
     def __init__(self, parent: QWidget):
         super().__init__(parent)
         self._reloadSettings()
+        self._setDefaultFont()
         self._subscribeForSettingsChanges()
+
+    def _setDefaultFont(self):
+        font = self._settings.fonts.menuBar
+        self.setFont(QFont(font.family, font.size))
 
     def _reloadSettings(self):
         self._settings = readSettings()
@@ -25,9 +30,6 @@ class GALogMenuBar(QMenuBar):
             self._applyFontSettings()
 
     def _applyFontSettings(self):
-        font = self._settings.fonts.menuBar
-        self.setFont(QFont(font.family, font.size))
-
         titles = [
             self._menuTitleCapture(),
             self._menuTitleTools(),
@@ -37,6 +39,7 @@ class GALogMenuBar(QMenuBar):
         for i, menu in enumerate(self.findChildren(QMenu)):
             menu.setTitle(titles[i])
 
+        self._setDefaultFont()
         self.update()
 
     def _subscribeForSettingsChanges(self):

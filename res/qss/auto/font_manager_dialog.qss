@@ -18,32 +18,39 @@
 
 /* -------------------------- */
 
-.FontManagerDialog > #FontList > QListView {
+#FontList > QListView {
 	border: none;
 }
 
-.FontManagerDialog > #FontList[empty="false"] > QListView {
+#FontList[empty="false"][hasResults="true"] > QListView {
     background-image: none;
 }
 
-.FontManagerDialog > #FontList[empty="true"] > QListView {
-    background-image: url(res/icons/shrug.svg);
+#FontList[empty="false"][hasResults="false"] > QListView {
+    background-image: url(res/images/no-results.png);
     background-position: center;
     background-repeat: no-repeat;
 }
 
-.FontManagerDialog > #FontList > QListView::item:hover
+#FontList[empty="true"] > QListView {
+    background-image: url(res/images/shrug.svg);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+
+#FontList > QListView::item:hover
 {
 	background-color: #f3f3f3;
 }
 
-.FontManagerDialog > #FontList > QListView::item:selected
+#FontList > QListView::item:selected
 {
 	background-color: #464646;
 	color: #ffffff;
 }
 
-.FontManagerDialog > #FontList > QLineEdit {
+#FontList > QLineEdit {
 	background: #eeeeee;
 	padding-top: 5px;
 	padding-bottom: 5px;

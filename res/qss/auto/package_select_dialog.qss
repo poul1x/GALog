@@ -56,12 +56,18 @@
 	border: none;
 }
 
-#PackagesList[empty="false"] > QListView {
+#PackagesList[empty="false"][hasResults="true"] > QListView {
     background-image: none;
 }
 
+#PackagesList[empty="false"][hasResults="false"] > QListView {
+    background-image: url(res/images/no-results.png);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 #PackagesList[empty="true"] > QListView {
-    background-image: url(res/icons/shrug.svg);
+    background-image: url(res/images/shrug.svg);
     background-position: center;
     background-repeat: no-repeat;
 }

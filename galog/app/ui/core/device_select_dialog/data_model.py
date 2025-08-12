@@ -85,3 +85,6 @@ class FilterModel(QSortFilterProxyModel):
         serial = sourceModel.index(sourceRow, Columns.serial, sourceParent).data()
         name = sourceModel.index(sourceRow, Columns.displayName, sourceParent).data()
         return regex.indexIn(serial) != -1 or regex.indexIn(name) != -1
+
+    def hasResults(self):
+        return self.rowCount() > 0

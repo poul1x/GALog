@@ -16,7 +16,7 @@
 }
 
 #SettingsWidget[hasResults="false"] {
-    background-image: url(res/icons/no-results-found.svg);
+    background-image: url(res/images/no-results.png);
     background-position: center;
     background-repeat: no-repeat;
 }

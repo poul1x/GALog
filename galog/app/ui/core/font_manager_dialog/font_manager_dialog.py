@@ -121,7 +121,9 @@ class FontManagerDialog(Dialog):
             ),
         )
 
-        if not self.fontList.empty():
+        if self.fontList.empty():
+            self.fontList.setNoData()
+        else:
             self.fontList.selectFirstFont()
 
     def _filterFonts(self, fonts: List[str]) -> List[str]:

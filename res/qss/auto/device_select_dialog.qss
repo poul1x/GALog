@@ -51,15 +51,37 @@
     border: none;
 }
 
-#DeviceSelectDialog > #DeviceTable[empty="false"] > QTableView  {
+#DeviceTable[empty="false"][hasResults="true"] > QTableView {
     background-image: none;
 }
 
-#DeviceSelectDialog > #DeviceTable[empty="true"] > QTableView {
-    background-image: url(res/icons/shrug.svg);
+#DeviceTable[empty="false"][hasResults="false"] > QTableView {
+    background-image: url(res/images/no-results.png);
     background-position: center;
     background-repeat: no-repeat;
 }
+
+#DeviceTable[empty="true"] > QTableView {
+    background-image: url(res/images/shrug.svg);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+
+#SettingsWidget {
+	background-color: #ffffff;
+}
+
+#SettingsWidget[hasResults="true"] {
+    background-image: none;
+}
+
+#SettingsWidget[hasResults="false"] {
+    background-image: url(res/images/no-results.png);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 
 #DeviceSelectDialog > #DeviceTable > QTableView::item:hover
 {

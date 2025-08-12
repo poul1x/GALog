@@ -103,11 +103,19 @@ class FontList(Widget):
         items = self.dataModel.findItems(fontName, Qt.MatchExactly)
         return items[0].row() if items else -1
 
+    def _refreshBackground(self):
+        filterModel = self.filterModel
+        hasResults = "true" if filterModel.rowCount() > 0 else "false"
+        self.setProperty("hasResults", hasResults)
+        self.refreshStyleSheet()
+
     def _onSearchContentChanged(self, query: str):
         self.filterModel.setFilterFixedString(query)
         if self.filterModel.rowCount() > 0:
             proxyIndex = self.filterModel.index(0, 0)
             self.selectRowByIndex(proxyIndex)
+
+        self._refreshBackground()
 
     def hasFont(self, fontName: str):
         return self.findFontRowByName(fontName) != -1

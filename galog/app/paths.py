@@ -27,8 +27,8 @@ def _appConfigRootDir():
 
 _APP_NAME = "galog"
 _APP_DATA_DIR = os.path.join(_appDataRootDir(), _APP_NAME)
-# _APP_RES_DIR = os.path.join(_APP_DATA_DIR, RES_DIR_NAME)
-_APP_RES_DIR = os.path.join(".", RES_DIR_NAME)
+_APP_RES_DIR = os.path.join(_APP_DATA_DIR, RES_DIR_NAME)
+# _APP_RES_DIR = os.path.join(".", RES_DIR_NAME)
 _APP_CONFIG_DIR = os.path.join(_appConfigRootDir(), _APP_NAME)
 
 
