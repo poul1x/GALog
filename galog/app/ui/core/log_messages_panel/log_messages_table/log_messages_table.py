@@ -169,16 +169,44 @@ class LogMessagesTable(TableView):
     def _topModel(self) -> QSortFilterProxyModel:
         return self._quickFilterModel
 
-    def _bottomModel(self) -> QStandardItemModel:
-        return self._dataModel
-
     def _initUserInputHandlers(self):
         self._topModel().rowsAboutToBeInserted.connect(self._beforeRowInserted)
         self._topModel().rowsInserted.connect(self._afterRowInserted)
+        self._dataModel.rowsInserted.connect(self._rowsInserted)
         self._navigationFrame.upArrowButton.clicked.connect(self._navScrollTop)  # fmt: skip
         self._navigationFrame.downArrowButton.clicked.connect(self._navScrollBottom)  # fmt: skip
         self.requestShowLineDetails.connect(self._rowActivated)
         self.rowActivated.connect(self._rowActivated)
+
+    def _refreshBackground(self):
+        quickFilterModel = self._quickFilterModel
+        quickFilter = "on" if quickFilterModel.filteringEnabled() else "off"
+        hasResults = "true" if quickFilterModel.hasResults() else "false"
+        self.setProperty("hasResults", hasResults)
+        self.setProperty("quickFilter", quickFilter)
+        self.setStyleSheet(self.styleSheet())
+
+    def _refreshBackgroundIfHasResults(self):
+
+        #
+        # Handle situation when initially filter has no results,
+        # but new matching log line appeared later
+        #
+
+        if not self._quickFilterModel.filteringEnabled():
+            return
+
+        if not self._quickFilterModel.hasResults():
+            return
+
+        if not self.property("hasResults") == "false":
+            return
+
+        self.setProperty("hasResults", "true")
+        self.setStyleSheet(self.styleSheet())
+
+    def _rowsInserted(self, parent: QModelIndex, first: int, last: int):
+        self._refreshBackgroundIfHasResults()
 
     def _initDataModel(self):
         self._dataModel = DataModel()
@@ -255,9 +283,6 @@ class LogMessagesTable(TableView):
         bottomRight = self.indexAt(viewportRect.bottomRight())
         self._topModel().dataChanged.emit(topLeft, bottomRight)
 
-    def setWhiteBackground(self):
-        self.setStyleSheet("background: white;")
-
     #####
 
     def logLineCount(self):
@@ -295,11 +320,13 @@ class LogMessagesTable(TableView):
     def quickFilterApply(self, column: Column, filterText: str):
         self._quickFilterModel.setFilterKeyColumn(column.value)
         self._quickFilterModel.setFilterFixedString(filterText)
+        self._refreshBackground()
         self.selectRow(0)
 
     def quickFilterReset(self):
         self._quickFilterModel.setFilterKeyColumn(Column.logMessage.value)
         self._quickFilterModel.setFilterFixedString("")
+        self._refreshBackground()
         self.selectRow(0)
 
     def quickFilterEnabled(self):
@@ -309,6 +336,7 @@ class LogMessagesTable(TableView):
         self.reset()
         self._quickFilterModel.setFilteringEnabled(enabled)
         self._navigationFrame.updateGeometry()
+        self._refreshBackground()
 
     #####
 

@@ -162,9 +162,6 @@ class LogMessagesPanel(Widget):
     def clearLogLines(self):
         self._logMessagesTable.clearLogLines()
 
-    def setWhiteBackground(self):
-        self._logMessagesTable.setWhiteBackground()
-
     def setHighlightingEnabled(self, enabled: bool):
         self._logMessagesTable.setHighlightingEnabled(enabled)
 

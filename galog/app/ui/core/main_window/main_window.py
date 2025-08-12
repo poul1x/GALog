@@ -229,7 +229,6 @@ class GALogMainWindow(QMainWindow):
 
         assert pids is not None
         self.setCaptureSpecificActionsEnabled(True)
-        self.logMessagesPanel.setWhiteBackground()
         self.logMessagesPanel.disableQuickFilter()
         self.logMessagesPanel.clearLogLines()
         self.logMessagesPanel.startCapture(device, package, pids)
@@ -245,7 +244,6 @@ class GALogMainWindow(QMainWindow):
             body="All captured log messages will be erased",
             parent=self,
         ):
-            self.logMessagesPanel.setWhiteBackground()
             self.logMessagesPanel.disableQuickFilter()
             self.logMessagesPanel.clearLogLines()
 
@@ -286,7 +284,6 @@ class GALogMainWindow(QMainWindow):
 
         self._saveLastSelectedDir(filePicker)
         self.logMessagesPanel.clearLogLines()
-        self.logMessagesPanel.setWhiteBackground()
         self.logMessagesPanel.disableQuickFilter()
         self.logMessagesPanel.loadLogFile(filePath)
 
@@ -301,7 +298,6 @@ class GALogMainWindow(QMainWindow):
         # mode = settings.lastSelectedPackage.action
 
         self.logMessagesPanel.stopCapture()
-        self.logMessagesPanel.setWhiteBackground()
         self.logMessagesPanel.clearLogLines()
         self.logMessagesPanel.startCapture(device, package, pids=[])
 

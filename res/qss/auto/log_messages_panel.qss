@@ -9,15 +9,29 @@
 }
 
 #LogMessagesPanel > QTableView {
-    background: white;
     border: none;
+    background-color: white;
     background-image: url(res/images/galog.png);
     background-repeat: no-repeat;
     background-position: center;
 }
 
+#LogMessagesPanel > QTableView[quickFilter="off"] {
+    background: white;
+}
+
+#LogMessagesPanel > QTableView[quickFilter="on"][hasResults="true"] {
+    background: white;
+}
+
+#LogMessagesPanel > QTableView[quickFilter="on"][hasResults="false"] {
+    background-color: white;
+    background-image: url(res/images/no-results.png);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
 #LogMessagesPanel > #QuickFilterBar {
-    /* padding: 15px; */
     background: #7b7b7b;
 }
 

@@ -10,6 +10,9 @@ class RegExpFilterModel(QSortFilterProxyModel):
         self.setFilterKeyColumn(0)
         self._enabled = False
 
+    def hasResults(self):
+        return self.rowCount() > 0
+
     def filteringEnabled(self):
         return self._enabled
 
