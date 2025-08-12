@@ -39,6 +39,7 @@ pyinstaller `
 	--noconfirm `
 	--name $GALogName `
 	--add-data "res;res" `
+	--add-data "config;config" `
 	--distpath $DistDir `
 	--exclude-module .\galog\tests `
 	"$GALogSrcDir\__main__.py"
