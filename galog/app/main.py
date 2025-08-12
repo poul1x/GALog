@@ -72,9 +72,8 @@ def initializeUserDataOrDie():
         sys.exit(1)
 
 
-def runGUIApplication():
+def runGUIApplication(app: GALogApp):
     try:
-        app = GALogApp(sys.argv)
         mainWindow = GALogMainWindow()
         mainWindow.show()
         result = app.exec()
@@ -95,6 +94,7 @@ def runGUIApplication():
 
 
 def runApp():
+    app = GALogApp(sys.argv)
     initializeUserDataOrDie()
     initializeLoggingOrDie()
-    sys.exit(runGUIApplication())
+    sys.exit(runGUIApplication(app))
