@@ -230,7 +230,7 @@ class MainWindow(QMainWindow):
         device = self._sessionSettings.lastSelectedDevice.serial
         package = self._sessionSettings.lastSelectedPackage.name
 
-        action = GetAppPidsAction(adbClient())
+        action = GetAppPidsAction(adbClient(), self)
         action.setLoadingDialogText("Retrieving app state...")
         pids = action.appPids(device, package)
         if action.failed():
@@ -310,7 +310,7 @@ class MainWindow(QMainWindow):
         self.logMessagesPanel.clearLogLines()
         self.logMessagesPanel.startCapture(device, package, pids=[])
 
-        action = RestartAppAction(adbClient())
+        action = RestartAppAction(adbClient(), self)
         action.restartApp(device, package)
 
     def stopCapture(self):

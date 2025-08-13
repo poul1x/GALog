@@ -292,14 +292,14 @@ class LogMessagesPanel(Widget):
         self._logMessagesTable.addLogLine(logLine)
 
     def loadLogFile(self, filePath: str):
-        action = ReadLogFileAction(filePath)
+        action = ReadLogFileAction(filePath, self)
         action.setLoadingDialogText("Reading log file")
         action.lineRead.connect(self._logLineRead)
         with self._logMessagesTable.enterBatchMode():
             action.readLogFile()
 
     def saveLogFile(self, filePath: str):
-        action = WriteLogFileAction(filePath)
+        action = WriteLogFileAction(filePath, self)
         action.setLoadingDialogText("Saving log output to file")
         action.writeLogFile(self._logMessagesTable.logLines())
 
