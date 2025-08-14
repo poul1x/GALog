@@ -17,10 +17,8 @@
 
 ### Windows
 
-**Requirements**:
-- [Microsoft Visual C++ Redistributable 2015-2022](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#visual-studio-2015-2017-2019-and-2022)
+**Install from github releases (recommended)**:
 
-**Install & Run**:
 - Download app bundle for Windows 10 from the [releases](https://github.com/poul1x/galog/releases) page
 - Unpack the bundle and run `galog.exe` executable
 
@@ -45,9 +43,16 @@ python -m galog
 ### Linux
 
 **Requirements**:
-- [Qt for X11 Requirements](https://doc.qt.io/qt-5/linux-requirements.html). Install the libraries listed in the table to make Qt functional. Also read this [issue](https://github.com/poul1x/GALog/issues/1).
 
-**Install & Run**: 
+Prebuilt executable requires Qt5 shared libraries (qtcore, qtgui, qtwidgets) to be installed.
+
+For Debian/Ubuntu/Mint:
+
+```
+sudo apt install libqt5widgets5
+```
+
+**Install from github releases (recommended)**:
 
 - Download app bundle for Linux from the [releases](https://github.com/poul1x/galog/releases) page
 - Unpack the bundle and run `galog` executable
@@ -71,12 +76,6 @@ python -m galog
 ```
 
 ### Mac
-
-**Requirements**:
-Unknown (Everything works out of the box).
-
-**Install & Run**: 
-Due to macOS design, a ready-to-use app bundle is currently unavailable.
 
 **Run GALog using Python**:
 
@@ -102,9 +101,9 @@ Documentation can be found [there](https://github.com/poul1x/galog/wiki)
 
 ## OS support
 
-**Windows**: Primary development system for fast feedback and efficient bug fixes.
+**Linux**: Primary development system for fast feedback and efficient bug fixes.
 
-**Linux**: Development on Linux involves utilizing a hypervisor, leading to slower feedback and bug fixes compared to the Windows environment.
+**Windows**: Development on Windows involves utilizing a hypervisor, leading to slower feedback and bug fixes compared to the Linux environment.
 
 **Mac**: Development on Mac involves utilizing a hypervisor (note: slow performance), resulting in the slowest feedback and bug fixes. Please be aware that there are known UI bugs on the Mac platform, and they may not be addressed in the near future.
 

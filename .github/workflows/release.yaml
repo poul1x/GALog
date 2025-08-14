@@ -44,37 +44,15 @@ jobs:
       - name: Apt Update
         run: |
           apt update
-      - name: Setup Packages
+      - name: Install required dependecies
         run: |
-          apt install -y \
-            libgssapi-krb5-2 \
-            libglib2.0-0 \
-            libglib2.0-dev \
-            libfontconfig1 \
-            libfreetype6 \
-            libxcb-xinerama0 \
-            libxkbcommon-x11-0 \
-            libxcb-icccm4 \
-            libxcb-image0 \
-            libxcb-keysyms1 \
-            libxcb-randr0 \
-            libxcb-render-util0 \
-            libxcb-xinerama0 \
-            libxcb-xfixes0 \
-            libegl1-mesa \
-            libxcb-shape0 \
-            libdbus-1-3 \
-            binutils \
-            libgl1 \
-
-      - name: Setup UPX
-        run: |
-          apt install -y upx
+          apt install -y binutils libglib2.0-0
       - name: Setup Python
         run: |
           apt install -y python3.9
           apt install -y python3.9-venv
           apt install -y python3.9-dev
+          apt install -y python3-pip
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Build App
