@@ -38,6 +38,11 @@ def _runtimeEnvironment():
         return RuntimeEnvironment.PyInstaller
 
 
+RUNTIME = _runtimeEnvironment()
+if RUNTIME == RuntimeEnvironment.PyInstaller:
+    os.chdir(os.path.dirname(sys.argv[0]))
+
+
 def _deploymentMode():
     if os.path.exists(RES_DIR_NAME):
         return DeploymentMode.Portable
@@ -45,5 +50,4 @@ def _deploymentMode():
         return DeploymentMode.Installer
 
 
-RUNTIME = _runtimeEnvironment()
 DEPLOYMENT = _deploymentMode()
