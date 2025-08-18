@@ -81,7 +81,7 @@ class AdbDevice(Device):
 
 class AdbClient(Client):
     def create_connection(self, timeout: Optional[float] = None):
-        return super().create_connection(timeout=timeout or 5.0)
+        return super().create_connection(timeout=timeout or 10.0)
 
     def devices_with_states(self) -> List[Tuple[AdbDevice, str]]:
         cmd = "host:devices"
